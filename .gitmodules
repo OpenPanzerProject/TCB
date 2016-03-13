@@ -1,0 +1,3 @@
+[submodule "TCB/libraries"]
+	path = TCB/libraries
+	url = git@github.com:OpenPanzerProject/libraries.git
