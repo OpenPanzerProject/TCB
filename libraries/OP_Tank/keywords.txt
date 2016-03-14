@@ -1,0 +1,71 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_Tank	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+begin	KEYWORD2
+UpdateTimer	KEYWORD2
+Fire	KEYWORD2
+CannonReloaded	KEYWORD2
+TriggerMechBarrel	KEYWORD2
+TriggerMuzzleFlash	KEYWORD2
+WasHit	KEYWORD2
+LastHitProtocol	KEYWORD2
+LastHitTeam	KEYWORD2
+PctDamaged	KEYWORD2
+PctHealthRemaining	KEYWORD2
+isRepairOngoing	KEYWORD2
+Damage	KEYWORD2
+BattleSettings	KEYWORD2
+isInvulnerable	KEYWORD2
+isDestroyed	KEYWORD2
+CannonHitsTaken	KEYWORD2
+MGHitsTaken	KEYWORD2
+MachineGun	KEYWORD2
+MachineGun_Stop	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+REPAIR_TIME_mS	LITERAL1
+DESTROYED_INOPERATIVE_TIME_mS	LITERAL1
+MECHRECOIL_TRIGGER_MODE	LITERAL1
+AIRSOFT_TRIGGER_MODE	LITERAL1
+HIT_FILTER_mS	LITERAL1
+MUZZLE_FLASH_TRIGGER_mS	LITERAL1
+AIRSOFT_DEBOUNCE_mS	LITERAL1
+MECH_RECOIL_DEBOUNCE_mS	LITERAL1
+IR_RECEIVE_INT_NUM	LITERAL1
+MAX_BRIGHT	LITERAL1
+MIN_BRIGHT	LITERAL1
+BRIGHT_FADE_BREAK	LITERAL1
+DIM_FADE_BREAK	LITERAL1
+MAX_FADE_STEP	LITERAL1
+MIN_FADE_STEP	LITERAL1
+FADE_UPDATE_mS	LITERAL1
+FLICKER_EFFECT_LENGTH_mS	LITERAL1
+MG_HIT_BLINK_TIME	LITERAL1
+WC_CUSTOM	LITERAL1
+WC_LIGHT	LITERAL1
+WC_MEDIUM	LITERAL1
+WC_HEAVY	LITERAL1
+TAMIYA_DAMAGE	LITERAL1
+OPENPANZER_DAMAGE	LITERAL1
+HIT_TYPE_NONE	LITERAL1
+HIT_TYPE_CANNON	LITERAL1
+HIT_TYPE_MG	LITERAL1
+HIT_TYPE_REPAIR	LITERAL1
+
