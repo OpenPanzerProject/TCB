@@ -1,4 +1,4 @@
-![Open Panzer](http://www.openpanzer.org/images/github/openpanzer2.png)
+![Open Panzer](http://www.openpanzer.org/images/github/openpanzer.png)
 # The TCB (Tank Control Board)
 Open Panzer is a project to develop open source products for the RC tank market. The TCB is a highly capable control board designed specifically for RC model tanks, but also suitable for halftracks, cars, or even battleships. 
 
