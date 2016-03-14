@@ -1,0 +1,79 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+Motor	KEYWORD1
+Sabertooth_SerialESC	KEYWORD1
+Pololu_SerialESC	KEYWORD1
+OPScout_SerialESC	KEYWORD1
+Onboard_ESC	KEYWORD1
+Onboard_Smoker	KEYWORD1
+Servo_ESC	KEYWORD1
+Servo_PAN	KEYWORD1
+Servo_RECOIL	KEYWORD1
+
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+ESC_POS_t	KEYWORD2
+Drive_t	KEYWORD2	KEYWORD2
+set_ExternalRange	KEYWORD2
+set_InternalRange	KEYWORD2
+set_DefaultInternalRange	KEYWORD2
+restore_Speed	KEYWORD2
+set_Reversed	KEYWORD2
+isReversed	KEYWORD2
+cut_SpeedPct	KEYWORD2
+set_MaxSpeedPct	KEYWORD2
+cut_PosSpeedPct	KEYWORD2
+cut_NegSpeedPct	KEYWORD2
+map_Range	KEYWORD2
+getSpeed	KEYWORD2
+setSpeed	KEYWORD2
+begin	KEYWORD2
+stop	KEYWORD2
+setIdle	KEYWORD2
+setFastIdle	KEYWORD2
+setPos	KEYWORD2
+setLimits	KEYWORD2
+PulseWidth	KEYWORD2
+Recoil	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+SERVO_8	LITERAL1
+SERVO_7	LITERAL1
+SERVO_6	LITERAL1
+SERVO_5	LITERAL1
+SERVO_4	LITERAL1
+SERVO_3	LITERAL1
+SERVO_2	LITERAL1
+SERVO_1	LITERAL1
+SIDEA	LITERAL1
+SIDEB	LITERAL1
+SERVO8	LITERAL1
+SERVO7	LITERAL1
+SERVO6	LITERAL1
+SERVO5	LITERAL1
+SERVO4	LITERAL1
+SERVO3	LITERAL1
+SERVO2	LITERAL1
+SERVO1	LITERAL1
+POLOLU	LITERAL1
+SABERTOOTH	LITERAL1
+OP_SCOUT	LITERAL1
+ONBOARD	LITERAL1
+SERVO_ESC	LITERAL1
+SERVO_PAN	LITERAL1
+SERVO_RECOIL	LITERAL1

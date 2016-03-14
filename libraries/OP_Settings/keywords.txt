@@ -1,0 +1,83 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+FIRMWARE_VERSION	LITERAL1
+MotorSerial	LITERAL1
+AuxSerial	LITERAL1
+Serial3Tx	LITERAL1
+DEFAULTBAUDRATE	LITERAL1
+USB_BAUD_RATE	LITERAL1
+SERVO_ESC_STOP	LITERAL1
+SERVONUM_LEFTTREAD	LITERAL1
+SERVONUM_RIGHTTREAD	LITERAL1
+SERVONUM_TURRETROTATION	LITERAL1
+SERVONUM_TURRETELEVATION	LITERAL1
+SERVONUM_RECOIL	LITERAL1
+SERVONUM_PROP3	LITERAL1
+SERVONUM_PROP2	LITERAL1
+SERVONUM_PROP1	LITERAL1
+Sabertooth_DRIVE_Address	LITERAL1
+Sabertooth_TURRET_Address	LITERAL1
+Pololu_DRIVE_ID	LITERAL1
+Pololu_TURRET_ID	LITERAL1
+MOTOR_MAX_FWDSPEED	LITERAL1
+MOTOR_MAX_REVSPEED	LITERAL1
+MOTOR_MAX_FWDSPEED_DBL	LITERAL1
+MOTOR_MAX_REVSPEED_DBL	LITERAL1
+OB_MA1	LITERAL1
+OB_MA2	LITERAL1
+OB_MA_PWM	LITERAL1
+OB_MA_OCR	LITERAL1
+OB_MB1	LITERAL1
+OB_MB2	LITERAL1
+OB_MB_PWM	LITERAL1
+OB_MB_OCR	LITERAL1
+OB_SMOKER_PWM	LITERAL1
+OB_SMOKER_OCR	LITERAL1
+IOA	LITERAL1
+IOB	LITERAL1
+pin_IO_A	LITERAL1
+pin_IO_B	LITERAL1
+IO_port	LITERAL1
+IO_A_bit	LITERAL1
+IO_B_bit	LITERAL1
+pin_BattVoltage	LITERAL1
+NUMDIPSWITCHES	LITERAL1
+pin_Dip1	LITERAL1
+pin_Dip2	LITERAL1
+pin_Dip3	LITERAL1
+pin_Dip4	LITERAL1
+pin_Dip5	LITERAL1
+pin_Dip6	LITERAL1
+pin_RepairTank	LITERAL1
+pin_Button	LITERAL1
+pin_RedLED	LITERAL1
+pin_GreenLED	LITERAL1
+pin_Light1	LITERAL1
+pin_Light2	LITERAL1
+pin_Brakelights	LITERAL1
+pin_AuxOutput	LITERAL1
+pin_MuzzleFlash	LITERAL1
+pin_HitNotifyLEDs	LITERAL1
+MG_PORT	LITERAL1
+MG_DDR	LITERAL1
+MG_PORTPIN	LITERAL1
+pin_MechRecoilMotor	LITERAL1

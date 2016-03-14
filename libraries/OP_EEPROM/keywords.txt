@@ -1,0 +1,45 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_EEPROM	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+begin	KEYWORD2
+
+ramcopy	KEYWORD2
+
+loadRAMcopy	KEYWORD2
+
+readSerialEEPROM_byID	KEYWORD2
+
+updateEEPROM_byID	KEYWORD2
+
+_eeprom_data	KEYWORD2
+_vartype	KEYWORD2
+_storage_var_info	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+NUM_STORED_VARS	LITERAL1
+varNULL	LITERAL1
+varBOOL	LITERAL1
+varCHAR	LITERAL1
+varINT8	LITERAL1
+varUINT8	LITERAL1
+varINT16	LITERAL1
+varUINT16	LITERAL1
+varINT32	LITERAL1
+varUINT32	LITERAL1

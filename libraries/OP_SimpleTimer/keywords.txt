@@ -1,0 +1,52 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_SimpleTimer	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+run	KEYWORD2
+
+setInterval	KEYWORD2
+
+setTimeout	KEYWORD2
+setTimer	KEYWORD2
+
+deleteTimer	KEYWORD2
+
+restartTimer	KEYWORD2
+
+isEnabled	KEYWORD2
+
+enable	KEYWORD2
+
+disable	KEYWORD2
+
+toggle	KEYWORD2
+
+getNumTimers	KEYWORD2
+
+getNumAvailableTimers	KEYWORD2
+
+getTimerNum	KEYWORD2
+
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+MAX_TIMERS	LITERAL1
+RUN_FOREVER	LITERAL1
+RUN_ONCE	LITERAL1
+
+

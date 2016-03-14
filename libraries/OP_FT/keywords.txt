@@ -1,0 +1,34 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+trigger_id_multiplier_auxchannel	LITERAL1
+trigger_id_multiplier_ports	LITERAL1
+switch_pos_multiplier	LITERAL1
+ANALOG_SPECFUNCTION_MAX_VAL	LITERAL1
+ANALOG_SPECFUNCTION_CENTER_VAL	LITERAL1
+ANALOG_SPECFUNCTION_MIN_VAL	LITERAL1
+COUNT_SPECFUNCTIONS	LITERAL1
+MAX_FUNCTION_TRIGGERS	LITERAL1
+_functionTrigger	LITERAL1
+_trigger_source	LITERAL1
+
+
+

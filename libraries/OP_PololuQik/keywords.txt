@@ -1,0 +1,33 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_PololuQik	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+deviceID	KEYWORD2
+port	KEYWORD2
+autobaud	KEYWORD2
+command	KEYWORD2
+motor	KEYWORD2
+allStop	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+QIK_INIT_COMMAND	LITERAL1
+QIK_MOTOR_M0_FORWARD	LITERAL1
+QIK_MOTOR_M0_REVERSE	LITERAL1
+QIK_MOTOR_M1_FORWARD	LITERAL1
+QIK_MOTOR_M1_REVERSE	LITERAL1

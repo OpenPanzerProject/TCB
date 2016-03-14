@@ -1,0 +1,38 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+OP_Button	KEYWORD1
+
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+read	KEYWORD2
+
+isPressed	KEYWORD2
+
+isReleased	KEYWORD2
+
+wasPressed	KEYWORD2
+
+wasReleased	KEYWORD2
+
+pressedFor	KEYWORD2
+
+releasedFor	KEYWORD2
+
+lastChange	KEYWORD2
+
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+

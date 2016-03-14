@@ -1,0 +1,39 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+SBusDecode	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+begin	KEYWORD2
+shutdown	KEYWORD2
+getState	KEYWORD2
+getChanCount	KEYWORD2
+GetSBus_Frame	KEYWORD2
+NewFrame	KEYWORD2
+update	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+UBBR_SBUS	LITERAL1
+SBUS_STARTBYTE	LITERAL1
+SBUS_ENDBYTE	LITERAL1
+SBUS_DIGI_CHAN1_BIT	LITERAL1
+SBUS_DIGI_CHAN2_BIT	LITERAL1
+SBUS_CHANNELS	LITERAL1
+SBUS_FRAME_BYTES	LITERAL1
+SBUS_ACQUISITION_COUNT	LITERAL1
+DISCARD_FRAMES	LITERAL1
+

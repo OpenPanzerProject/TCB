@@ -1,0 +1,56 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_PCComm	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+SentencePrefix	KEYWORD2
+DataSentence	KEYWORD2
+begin	KEYWORD2
+CheckPC	KEYWORD2
+ListenToPC	KEYWORD2
+switchToAltSerial	KEYWORD2
+revertToDefaultSerial	KEYWORD2
+skipCRC	KEYWORD2
+requireCRC	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+DELIMITER	LITERAL1
+NEWLINE	LITERAL1
+INIT_STRING	LITERAL1
+PCCMD_NUM_CHANNELS	LITERAL1
+PCCMD_STARTSTREAM_RADIO	LITERAL1
+PCCMD_STOPSTREAM_RADIO	LITERAL1
+PCCMD_UPDATE_EEPROM	LITERAL1
+PCCMD_READ_EEPROM	LITERAL1
+PCCMD_READ_VERSION	LITERAL1
+PCCMD_STAY_AWAKE	LITERAL1
+PCCMD_DISCONNECT	LITERAL1
+DVCMD_RADIO_NOTREADY	LITERAL1
+DVCMD_NEXT_SENTENCE	LITERAL1
+DVCMD_REPEAT_SENTENCE	LITERAL1
+DVCMD_RETURN_VALUE	LITERAL1
+DVCMD_NOSUCH_VALUE	LITERAL1
+DVCMD_GOODBYE	LITERAL1
+MIN_EEPROM_ID	LITERAL1
+SERIAL_COMM_TIMEOUT	LITERAL1
+MAX_COMM_ERRORCOUNT	LITERAL1
+DEFAULT_SERIAL_PORT	LITERAL1
+ALT_SERIAL_PORT	LITERAL1
+VALUE_BUFF	LITERAL1
+SENTENCE_BUFF	LITERAL1
+

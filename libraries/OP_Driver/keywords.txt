@@ -1,0 +1,108 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_Driver	KEYWORD1
+OP_Engine	KEYWORD1
+OP_Transmission	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+begin	KEYWORD2
+
+OCR3A_ISR	KEYWORD2
+
+GetBrakeFlag	KEYWORD2
+
+GetDriveMode	KEYWORD2
+
+setAccelRampFrequency	KEYWORD2
+
+getAccelRampFrequency	KEYWORD2
+
+setDecelRampFrequency	KEYWORD2
+
+getDecelRampFrequency	KEYWORD2
+
+setTurnMode	KEYWORD2
+
+getTurnMode	KEYWORD2
+GetDriveSpeed	KEYWORD2
+
+GetThrottleSpeed	KEYWORD2
+
+ScaleTurnCommand	KEYWORD2
+
+MixSteering	KEYWORD2
+
+
+begin	KEYWORD2
+
+Running	KEYWORD2
+
+StartEngine	KEYWORD2
+
+StopEngine	KEYWORD2
+
+UpdateTimer	KEYWORD2
+
+
+begin	KEYWORD2
+
+Engaged	KEYWORD2
+
+PUtInGear	KEYWORD2
+
+PutInNeutral	KEYWORD2
+
+PUtInGear_Delay	KEYWORD2
+
+DelayedGearComplete	KEYWORD2
+
+UpdateTimer	KEYWORD2
+
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+DT_UNKNOWN	LITERAL1
+DT_TANK	LITERAL1
+DT_HALFTRACK	LITERAL1
+DT_CAR	LITERAL1
+LAST_DT	LITERAL1
+UNKNOWN	LITERAL1
+STOP	LITERAL1
+FORWARD	LITERAL1
+REVERSE	LITERAL1
+NEUTRALTURN	LITERAL1
+LAST_MODE	LITERAL1
+ADP_NONE	LITERAL1
+ADP_EXP_1	LITERAL1
+ADP_EXP_2	LITERAL1
+ADP_EXP_3	LITERAL1
+NUM_ACCEL_PRESETS	LITERAL1
+DDP_NONE	LITERAL1
+DDP_EXP_1	LITERAL1
+DDP_EXP_2	LITERAL1
+DDP_EXP_3	LITERAL1
+NUM_DECEL_PRESETS	LITERAL1
+NUM_TURN_MODES	LITERAL1
+MAX_SKIP_NUM	LITERAL1
+DRIVE_RAMP_STEP_DEFAULT	LITERAL1
+ACCEL_RAMP_STEP_DEFAULT	LITERAL1
+DECEL_RAMP_STEP_DEFAULT	LITERAL1
+COMPLETE_STOP_NEARLIMIT	LITERAL1
+
+
+
+

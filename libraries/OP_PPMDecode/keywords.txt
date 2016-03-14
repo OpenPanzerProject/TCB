@@ -1,0 +1,38 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+PPMDecode	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+begin	KEYWORD2
+shutdown	KEYWORD2
+clearTicks	KEYWORD2
+getState	KEYWORD2
+GetPPM_Frame	KEYWORD2
+getChanCount	KEYWORD2
+INT5_PPM_ISR	KEYWORD2
+NewFrame	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+PPM_PIN	LITERAL1
+PPM_MODE	LITERAL1
+MIN_PPM_CHANNELS	LITERAL1
+MAX_PPM_CHANNELS	LITERAL1
+PPM_ACQUISITION_COUNT	LITERAL1
+MIN_PPM_TICKLEN	LITERAL1
+MAX_PPM_TICKLEN	LITERAL1
+SYNC_GAP_TICKLEN	LITERAL1

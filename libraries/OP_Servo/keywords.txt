@@ -1,0 +1,46 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+
+OP_Servos	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+begin	KEYWORD2
+attach	KEYWORD2
+detach	KEYWORD2
+isAttached	KEYWORD2
+writeMicroseconds	KEYWORD2
+setFrameSpace	KEYWORD2
+setMinPulseWidth	KEYWORD2
+setMaxPulseWidth	KEYWORD2
+getMinPulseWidth	KEYWORD2
+getMaxPulseWidth	KEYWORD2
+getPulseWidth	KEYWORD2
+setRampSpeed_mS	KEYWORD2
+setRampStepPerFrame	KEYWORD2
+stopRamping	KEYWORD2
+setupRecoil_mS	KEYWORD2
+StartRecoil	KEYWORD2
+setRecoilReversed	KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+SERVO_OUT_COUNT	LITERAL1
+SERVO_OUT_MINPULSE	LITERAL1
+SERVO_OUT_MAXPULSE	LITERAL1
+SERVO_OUT_CENTERPULSE	LITERAL1
+SERVO_MAXRAMP_TICKSTEP	LITERAL1
+
+

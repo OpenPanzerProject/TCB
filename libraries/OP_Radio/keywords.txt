@@ -1,0 +1,57 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes and types
+#-------------------------------------------------------------
+
+OP_Radio	KEYWORD1
+RADIO_PROTOCOL	KEYWORD1
+stick_channel_settings	KEYWORD1
+stick_channel	KEYWORD1
+stick_channels	KEYWORD1
+aux_channel_settings	KEYWORD1
+aux_channels	KEYWORD1
+common_channel_settings	KEYWORD1
+sf_channel	KEYWORD1
+decodeState_t	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+detect	KEYWORD2
+begin	KEYWORD2
+GetCommands	KEYWORD2
+getProtocol	KEYWORD2
+Status	KEYWORD2
+NewFrame	KEYWORD2
+getChannelCount	KEYWORD2
+ChannelsUtilized	KEYWORD2
+UsingSpecialPositions	KEYWORD2
+AdjustTurretStickEndPoints	KEYWORD2
+InFailsafe	KEYWORD2
+Sticks	KEYWORD2
+SpecialStick	KEYWORD2
+AuxChannel	KEYWORD2
+Update	KEYWORD2
+GetStringFrame	KEYWORD2
+		
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+
+COUNT_OP_CHANNELS	LITERAL1
+STICKCHANNELS	LITERAL1
+AUXCHANNELS	LITERAL1
+switch_positions	LITERAL1
+SPECIALPOSITIONS	LITERAL1
+TURRETSTICK_PULSESUBTRACT	LITERAL1
+turretStick_Positions	LITERAL1
+border_vals	LITERAL1
+
+
