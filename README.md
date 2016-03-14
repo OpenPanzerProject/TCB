@@ -18,5 +18,11 @@ To compile or upload the code from the Arduino IDE, go to the Tools menu and mak
 
 Most of the functionality actually resides in the many C++ libraries. These will be in your `Sketches\libraries\` folder and they will all begin with the prefix **OP_**. 
 
+## License
+Firmware for the TCB, as well as the source files for OP Config (the desktop configuration program) are free software: you can redistribute them and/or modify them under the terms of the GNU General Public License version 3 as published by the Free Software Foundation.
 
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
+For more specific details see http://www.gnu.org/licenses, the Quick Guide to GPLv3. and the copying.txt in the codebase.
+
+The GNU operating system which is under the same license has an informative FAQ here.
