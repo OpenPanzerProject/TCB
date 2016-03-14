@@ -3,7 +3,8 @@
 The TCB is a highly capable control board designed specifically for RC model tanks, but also suitable for halftracks, cars, or even battleships. 
 
 ## Resources
-For more information on the Open Panzer project, see the [OpenPanzer Wiki](http://www.openpanzer.org/wiki). To discuss the project, feel free to join the [Open Panzer Community](http://www.openpanzer.org/forum/). 
+For more information on the Open Panzer project, see the [OpenPanzer Wiki](http://www.openpanzer.org/wiki).  
+To discuss the project, feel free to join the [Open Panzer Community](http://www.openpanzer.org/forum/). 
 
 ## General Users
 If you don't intend to modify the source code or care about any of the nitty gritty details, that's fine. And you don't even need to be here! Instead go to the [OpenPanzer Wiki](http://www.openpanzer.org/wiki), learn how to get your own TCB board, [download](http://www.openpanzer.org/downloads) the OP Config Windows desktop program, and start tanking! 
