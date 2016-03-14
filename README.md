@@ -1,3 +1,4 @@
+![Open Panzer](http://www.openpanzer.org/images/github/openpanzer.png)
 # Open Panzer TCB (Tank Control Board)
 The TCB is a highly capable control board designed specifically for RC model tanks, but also suitable for halftracks, cars, or even battleships. 
 
