@@ -310,7 +310,7 @@ else return true;
 }
 
 bool IRdecodeTamiya::decode(void) {
-// That Tamiya signal is very simple - two marks separated by a space, followed by a longer gap between re-transmissions:
+// The Tamiya signal is very simple - two marks separated by a space, followed by a longer gap between re-transmissions:
 // 3000uS On, 3000 Off, 6000 On, 8000 Off
 // Tamiya repeats the signal about 50 times, but we only need to read it once. 
 // Because the GAP between transmissions is less than what we count as a GAP (due to Heng Long using such a long data space),
@@ -347,7 +347,7 @@ bool IRdecodeTamiya::decode(void) {
 	return DATA_MARK_ERROR(pgm_read_word_near(&(Tamiya16Sig[0])));;
 }
 bool IRdecodeTamiya_2Shot::decode(void) {
-// That Tamiya 2-shot kill signal is very simple - two marks separated by a space, followed by a longer gap between re-transmissions:
+// The Tamiya 2-shot kill signal is very simple - two marks separated by a space, followed by a longer gap between re-transmissions:
 // 4000uS On, 5000 Off, 3000 On, 8000 Off
 // Tamiya repeats the signal about 50 times, but we only need to read it once. 
 // Because the GAP between transmissions is less than what we count as a GAP (due to Heng Long using such a long data space),
