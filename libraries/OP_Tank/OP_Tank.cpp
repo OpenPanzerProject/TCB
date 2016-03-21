@@ -358,6 +358,9 @@ void OP_Tank::Fire_Part2(void)
 	// If Airsoft we already sent IR before this. If mech-recoil, we send the IR now.
 	if (!_Airsoft) { Cannon_SendIR(); }
 	
+	// If Mechanical Recoil we already started the recoil servo. If Airsoft, we do it now.
+	if (_Airsoft && _RecoilServoWithCannon) { _RecoilServo->Recoil(); }
+	
 	// Now start the reload timer
 	Cannon_StartReload();
 }
