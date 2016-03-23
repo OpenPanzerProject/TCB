@@ -1,6 +1,6 @@
-/* OP_Sound.h		Open Panzer Sound - definitions for the various sound cards supported
- * Source: 			openpanzer.org				
- * Authors:    		Luke Middleton
+/* OP_Sound.h       Open Panzer Sound - definitions for the various sound cards supported
+ * Source:          openpanzer.org              
+ * Authors:         Luke Middleton
  *   
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 enum sound_devices{
     SD_BENEDINI_TBSMINI = 0,
-	SD_BEIER_USMRC2
+    SD_BEIER_USMRC2
 };
 
 
