@@ -69,8 +69,8 @@
 // Each sound also has a priority number associated with it. If a sound is playing, and second sound is triggered, the second
 // sound will only interrupt the first one if it has a higher priority. However, note that most sounds will be considered over 
 // after TBS_SIGNAL_mS long (see the define below, very short), even though the actual sound may play longer than that. So it is 
-// still possible for a lower priority sound to interrupt a higher priority sound if is triggered after TBS_SIGNAL_mS the first one
-// was triggered, unless we specifically told the first sound to remain on indefinitely (pass true to TriggerSpecialSound). 
+// still possible for a lower priority sound to interrupt a higher priority sound if it is triggered TBS_SIGNAL_mS after the first one
+// was triggered, unless we specifically told the first sound to remain on indefinitely, ie repeat (by pass true to TriggerSpecialSound). 
 // Anyway, this is all sort of complicated, but the main reason for all of it is so that when the machine gun is firing, other sounds
 // won't stop it (like squeaks). But you can tweak the priorities to create other effects as well. The important thing to remember is
 // make sure SOUND_OFF has priority = 0 and every other sound has at least priority = 1. 
