@@ -1,8 +1,8 @@
-/* OP_Sabertooth.h	Open Panzer Sabertooth library - 
- *					functions for communicating with Dimension Engineering's Sabertooth seriers of dual-motor controllers, 
- *											 		 such as the 2X5, 2X12, 2X25, 2X32, 2X60
- * Source: 			http://www.dimensionengineering.com/
- * Authors:    		Dimension Engineering
+/* OP_Sabertooth.h  Open Panzer Sabertooth library - 
+ *                  functions for communicating with Dimension Engineering's Sabertooth seriers of dual-motor controllers, 
+ *                                                   such as the 2X5, 2X12, 2X25, 2X32, 2X60
+ * Source:          http://www.dimensionengineering.com/
+ * Authors:         Dimension Engineering
  *   
  * This library is a stripped-down version of DE's original for use in the Open Panzer project.
  * Please use the full version of the library for any other application. 

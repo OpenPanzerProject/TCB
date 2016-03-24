@@ -23,61 +23,61 @@
 
 template<typename T> class EEPROMVar 
 {
-	public:
-	  EEPROMVar(T init) {
-		address = EEPROM.getAddress(sizeof(T));	
-		var = init;
-	  }
-	  operator T () { 
-		return var; 
-	  }
-	  EEPROMVar &operator=(T val) {
-		var = val;
-		return *this;
-	  }
-	  
-	  void operator+=(T val) {
-		var += T(val); 
-	  }
-	  void operator-=(T val) {
-		var -= T(val); 
-	  }	 	  
-	  void operator++(int) {
-		var += T(1); 
-	  }
-	  void operator--(int) {
-		var -= T(1); 
-	  }
-	  void operator++() {
-		var += T(1); 
-	  }
-	  void operator--() {
-		var -= T(1); 
-	  }
-	  template<typename V>
-		void operator /= (V divisor) {
-		var = var / divisor;
-	  }
-	  template<typename V>
-		void operator *= (V multiplicator) {
-		var = var * multiplicator;
-	  }
-	  void save(){	   	   
-	    EEPROM.writeBlock<T>(address, var);
-	  }
-	  
-	  void update(){	   	   
-	    EEPROM.updateBlock<T>(address, var);
-	  }
-	  
-	  int getAddress(){	   	   
-	    return address;
-	  }
-	  
-	  void restore(){
-	  	EEPROM.readBlock<T>(address, var);
-	  }
-	protected:	
-	  T var;
-	  int address;
+    public:
+      EEPROMVar(T init) {
+        address = EEPROM.getAddress(sizeof(T)); 
+        var = init;
+      }
+      operator T () { 
+        return var; 
+      }
+      EEPROMVar &operator=(T val) {
+        var = val;
+        return *this;
+      }
+      
+      void operator+=(T val) {
+        var += T(val); 
+      }
+      void operator-=(T val) {
+        var -= T(val); 
+      }       
+      void operator++(int) {
+        var += T(1); 
+      }
+      void operator--(int) {
+        var -= T(1); 
+      }
+      void operator++() {
+        var += T(1); 
+      }
+      void operator--() {
+        var -= T(1); 
+      }
+      template<typename V>
+        void operator /= (V divisor) {
+        var = var / divisor;
+      }
+      template<typename V>
+        void operator *= (V multiplicator) {
+        var = var * multiplicator;
+      }
+      void save(){         
+        EEPROM.writeBlock<T>(address, var);
+      }
+      
+      void update(){           
+        EEPROM.updateBlock<T>(address, var);
+      }
+      
+      int getAddress(){        
+        return address;
+      }
+      
+      void restore(){
+        EEPROM.readBlock<T>(address, var);
+      }
+    protected:  
+      T var;
+      int address;
 };

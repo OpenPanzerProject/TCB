@@ -1,6 +1,6 @@
-/* OP_FunctionsTriggers.h	Open Panzer functions & triggers - defines and structs related to special functions and their triggers
- * Source: 					openpanzer.org				
- * Authors:    				Luke Middleton
+/* OP_FunctionsTriggers.h   Open Panzer functions & triggers - defines and structs related to special functions and their triggers
+ * Source:                  openpanzer.org              
+ * Authors:                 Luke Middleton
  *   
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,89 +25,89 @@
 // SPECIAL FUNCTIONS
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 
-#define trigger_id_multiplier_auxchannel 	1000		// Aux channel trigger ID is defined as:
+#define trigger_id_multiplier_auxchannel    1000        // Aux channel trigger ID is defined as:
                                                         // (multiplier * channel number) + (number of switch positions * switch_pos_multiplier) + switch position (1-5)
 #define trigger_id_multiplier_ports         100         // External ports input trigger ID is defined as:
                                                         // (multipler * port number) + 0/1 (off/on)
-#define switch_pos_multiplier               10          // Move the number of switch positions to the tens slot (the actual position will be in the ones slot)		
+#define switch_pos_multiplier               10          // Move the number of switch positions to the tens slot (the actual position will be in the ones slot)      
 
-#define ANALOG_SPECFUNCTION_MAX_VAL			1023
-#define ANALOG_SPECFUNCTION_CENTER_VAL		511
-#define ANALOG_SPECFUNCTION_MIN_VAL 		0
+#define ANALOG_SPECFUNCTION_MAX_VAL         1023
+#define ANALOG_SPECFUNCTION_CENTER_VAL      511
+#define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 68;	// Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 68;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
-	SF_NULL_FUNCTION 	= 0,		// 0    -- no function assigned
-	SF_ENGINE_TOGGLE 	= 1,   		// 1
-	SF_ENGINE_ON 		= 2,    	// 2
-	SF_ENGINE_OFF		= 3,    	// 3
-	SF_TRANS_TOGGLE 	= 4,    	// 4
-	SF_TRANS_ON			= 5,    	// 5
-	SF_TRANS_OFF		= 6,    	// 6
-	SF_CANNON_FIRE		= 7,    	// 7
-	SF_MECH_BARREL	    = 8,		// 8
-	SF_RECOIL_SERVO		= 9,		// 9
-	SF_HI_FLASH			= 10,		// 10
-	SF_MG_FIRE 			= 11,    	// 11
-	SF_MG_OFF			= 12,    	// 12
-	SF_LIGHT1_TOGGLE	= 13,		// 13
-	SF_LIGHT1_ON		= 14,   	// 14
-	SF_LIGHT1_OFF		= 15,   	// 15
-	SF_LIGHT2_TOGGLE	= 16,		// 16
-	SF_LIGHT2_ON		= 17,   	// 17
-	SF_LIGHT2_OFF		= 18,   	// 18	
-	SF_RUNNINGLIGHTS_TOGGLE = 19,	// 19
-	SF_RUNNINGLIGHTS_ON = 20,		// 20
-	SF_RUNNINGLIGHTS_OFF= 21,		// 21
-    SF_AUXOUT_TOGGLE	= 22,   	// 22
-    SF_AUXOUT_ON		= 23,   	// 23
-    SF_AUXOUT_OFF		= 24,   	// 24
-    SF_AUXOUT_LEVEL		= 25,   	// 25   -- analog function
-	SF_AUXOUT_PRESETDIM = 26,		// 26
-	SF_AUXOUT_FLASH		= 27,		// 27
-    SF_AUXOUT_BLINK		= 28,   	// 28
-	SF_AUXOUT_TOGGLEBLINK = 29, 	// 29
-    SF_AUXOUT_REVOLVE	= 30,   	// 30
-	SF_AUXOUT_TOGGLEREVOLVE = 31,	// 31
-	SF_USER_SOUND1_ONCE	= 32,   	// 32
-	SF_USER_SOUND1_RPT  = 33,		// 33
-	SF_USER_SOUND1_OFF  = 34,		// 34
-	SF_USER_SOUND2_ONCE	= 35,   	// 35
-	SF_USER_SOUND2_RPT  = 36,		// 36
-	SF_USER_SOUND2_OFF  = 37,		// 37
-	SF_OUTPUT_A_TOGGLE	= 38,   	// 38
-	SF_OUTPUT_A_ON		= 39,   	// 39
-	SF_OUTPUT_A_OFF		= 40,		// 40
-	SF_OUTPUT_B_TOGGLE	= 41,   	// 41
-	SF_OUTPUT_B_ON		= 42,   	// 42
-	SF_OUTPUT_B_OFF		= 43,		// 43	
-	SF_ACCEL_LEVEL		= 44,		// 44   -- analog function
-	SF_DECEL_LEVEL		= 45,		// 45   -- analog function
-	SF_TURNMODE_1		= 46,		// 46
-	SF_TURNMODE_2		= 47,		// 47
-	SF_TURNMODE_3		= 48,		// 48
-	SF_SMOKER			= 49,		// 49	-- analog function
-	SF_MOTOR_A			= 50,		// 50	-- analog function
-	SF_MOTOR_B			= 51,		// 51	-- analog function
-	SF_SERVO1_PASS	    = 52,		// 52	-- analog function ("PASS" for pass-through)
-	SF_SERVO2_PASS	    = 53,		// 53   -- analog function
-	SF_SERVO3_PASS	    = 54,		// 54   -- analog function
-	SF_SERVO4_PASS	    = 55,		// 55   -- analog function
-	SF_BARREL_ON		= 56,		// 56 
-	SF_BARREL_OFF		= 57,		// 57
-	SF_BARREL_TOGGLE	= 58,		// 58
-	SF_BARREL_LEVEL		= 59,		// 59   -- analog function
-	SF_HILLS_ON			= 60,		// 60 
-	SF_HILLS_OFF		= 61,		// 61
-	SF_HILLS_TOGGLE		= 62,		// 62
-	SF_HILLS_LEVEL		= 63,		// 63   -- analog function
-	SF_USER_FUNC_1		= 64,		// 64
-	SF_USER_FUNC_2		= 65,		// 65
-	SF_USER_ANLG_1		= 66,		// 66	-- analog function
-	SF_USER_ANLG_2		= 67		// 67	-- analog function
+    SF_NULL_FUNCTION    = 0,        // 0    -- no function assigned
+    SF_ENGINE_TOGGLE    = 1,        // 1
+    SF_ENGINE_ON        = 2,        // 2
+    SF_ENGINE_OFF       = 3,        // 3
+    SF_TRANS_TOGGLE     = 4,        // 4
+    SF_TRANS_ON         = 5,        // 5
+    SF_TRANS_OFF        = 6,        // 6
+    SF_CANNON_FIRE      = 7,        // 7
+    SF_MECH_BARREL      = 8,        // 8
+    SF_RECOIL_SERVO     = 9,        // 9
+    SF_HI_FLASH         = 10,       // 10
+    SF_MG_FIRE          = 11,       // 11
+    SF_MG_OFF           = 12,       // 12
+    SF_LIGHT1_TOGGLE    = 13,       // 13
+    SF_LIGHT1_ON        = 14,       // 14
+    SF_LIGHT1_OFF       = 15,       // 15
+    SF_LIGHT2_TOGGLE    = 16,       // 16
+    SF_LIGHT2_ON        = 17,       // 17
+    SF_LIGHT2_OFF       = 18,       // 18   
+    SF_RUNNINGLIGHTS_TOGGLE = 19,   // 19
+    SF_RUNNINGLIGHTS_ON = 20,       // 20
+    SF_RUNNINGLIGHTS_OFF= 21,       // 21
+    SF_AUXOUT_TOGGLE    = 22,       // 22
+    SF_AUXOUT_ON        = 23,       // 23
+    SF_AUXOUT_OFF       = 24,       // 24
+    SF_AUXOUT_LEVEL     = 25,       // 25   -- analog function
+    SF_AUXOUT_PRESETDIM = 26,       // 26
+    SF_AUXOUT_FLASH     = 27,       // 27
+    SF_AUXOUT_BLINK     = 28,       // 28
+    SF_AUXOUT_TOGGLEBLINK = 29,     // 29
+    SF_AUXOUT_REVOLVE   = 30,       // 30
+    SF_AUXOUT_TOGGLEREVOLVE = 31,   // 31
+    SF_USER_SOUND1_ONCE = 32,       // 32
+    SF_USER_SOUND1_RPT  = 33,       // 33
+    SF_USER_SOUND1_OFF  = 34,       // 34
+    SF_USER_SOUND2_ONCE = 35,       // 35
+    SF_USER_SOUND2_RPT  = 36,       // 36
+    SF_USER_SOUND2_OFF  = 37,       // 37
+    SF_OUTPUT_A_TOGGLE  = 38,       // 38
+    SF_OUTPUT_A_ON      = 39,       // 39
+    SF_OUTPUT_A_OFF     = 40,       // 40
+    SF_OUTPUT_B_TOGGLE  = 41,       // 41
+    SF_OUTPUT_B_ON      = 42,       // 42
+    SF_OUTPUT_B_OFF     = 43,       // 43   
+    SF_ACCEL_LEVEL      = 44,       // 44   -- analog function
+    SF_DECEL_LEVEL      = 45,       // 45   -- analog function
+    SF_TURNMODE_1       = 46,       // 46
+    SF_TURNMODE_2       = 47,       // 47
+    SF_TURNMODE_3       = 48,       // 48
+    SF_SMOKER           = 49,       // 49   -- analog function
+    SF_MOTOR_A          = 50,       // 50   -- analog function
+    SF_MOTOR_B          = 51,       // 51   -- analog function
+    SF_SERVO1_PASS      = 52,       // 52   -- analog function ("PASS" for pass-through)
+    SF_SERVO2_PASS      = 53,       // 53   -- analog function
+    SF_SERVO3_PASS      = 54,       // 54   -- analog function
+    SF_SERVO4_PASS      = 55,       // 55   -- analog function
+    SF_BARREL_ON        = 56,       // 56 
+    SF_BARREL_OFF       = 57,       // 57
+    SF_BARREL_TOGGLE    = 58,       // 58
+    SF_BARREL_LEVEL     = 59,       // 59   -- analog function
+    SF_HILLS_ON         = 60,       // 60 
+    SF_HILLS_OFF        = 61,       // 61
+    SF_HILLS_TOGGLE     = 62,       // 62
+    SF_HILLS_LEVEL      = 63,       // 63   -- analog function
+    SF_USER_FUNC_1      = 64,       // 64
+    SF_USER_FUNC_2      = 65,       // 65
+    SF_USER_ANLG_1      = 66,       // 66   -- analog function
+    SF_USER_ANLG_2      = 67        // 67   -- analog function
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -115,13 +115,13 @@ enum _special_function : byte {
 // an array with 1 in the slot if the function is digital, and 0 in the slot if the function is analog. 
 const PROGMEM boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] =
 {
- 1,1,1,1,1,1,1,1,1,1,	// 0-9
- 1,1,1,1,1,1,1,1,1,1,	// 10-19
- 1,1,1,1,1,0,1,1,1,1,	// 20-29	25 analog
- 1,1,1,1,1,1,1,1,1,1,	// 30-39	
- 1,1,1,1,0,0,1,1,1,0,	// 40-49	44,45,49 analog
- 0,0,0,0,0,0,1,1,1,0,	// 50-59    50,51,52,53,54,55,59 analog
- 1,1,1,0,1,1,0,0		// 60-67	63,66,67 analog
+ 1,1,1,1,1,1,1,1,1,1,   // 0-9
+ 1,1,1,1,1,1,1,1,1,1,   // 10-19
+ 1,1,1,1,1,0,1,1,1,1,   // 20-29    25 analog
+ 1,1,1,1,1,1,1,1,1,1,   // 30-39    
+ 1,1,1,1,0,0,1,1,1,0,   // 40-49    44,45,49 analog
+ 0,0,0,0,0,0,1,1,1,0,   // 50-59    50,51,52,53,54,55,59 analog
+ 1,1,1,0,1,1,0,0        // 60-67    63,66,67 analog
  };
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(&DigitalFunctionsTable[f])
 
@@ -129,11 +129,11 @@ const PROGMEM boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] =
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // FUNCTION TRIGGERS
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
-#define MAX_FUNCTION_TRIGGERS 40			// Maximum number of triggers we can save
+#define MAX_FUNCTION_TRIGGERS 40            // Maximum number of triggers we can save
 // An array of MAX_FUNCTION_TRIGGERS of this struct will be saved in EEPROM: 
 typedef struct _functionTrigger {
-	uint16_t TriggerID;						// Each trigger has an ID
-	_special_function specialFunction;		// The trigger will be linked to a special function in the sketch
+    uint16_t TriggerID;                     // Each trigger has an ID
+    _special_function specialFunction;      // The trigger will be linked to a special function in the sketch
 };
 
 // Trigger sources:

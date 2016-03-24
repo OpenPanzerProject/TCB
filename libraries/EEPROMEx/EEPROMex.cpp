@@ -49,23 +49,23 @@ EEPROMClassEx::EEPROMClassEx()
  * Set starting position and memory size that EEPROMEx may manage
  */
 void EEPROMClassEx::setMemPool(int base, int memSize) {
-	//Base can only be adjusted if no addresses have already been issued
-	if (_nextAvailableaddress == _base) 
-		_base = base;
-		_nextAvailableaddress=_base;
-	
-	//Ceiling can only be adjusted if not below issued addresses
-	if (memSize >= _nextAvailableaddress ) 
-		_memSize = memSize;
+    //Base can only be adjusted if no addresses have already been issued
+    if (_nextAvailableaddress == _base) 
+        _base = base;
+        _nextAvailableaddress=_base;
+    
+    //Ceiling can only be adjusted if not below issued addresses
+    if (memSize >= _nextAvailableaddress ) 
+        _memSize = memSize;
 
-	#ifdef _EEPROMEX_DEBUG    
-	if (_nextAvailableaddress != _base) 
-		Serial.println("Cannot change base, addresses have been issued");
+    #ifdef _EEPROMEX_DEBUG    
+    if (_nextAvailableaddress != _base) 
+        Serial.println("Cannot change base, addresses have been issued");
 
-	if (memSize < _nextAvailableaddress )  
-		Serial.println("Cannot change ceiling, below issued addresses");
-	#endif	
-	
+    if (memSize < _nextAvailableaddress )  
+        Serial.println("Cannot change ceiling, below issued addresses");
+    #endif  
+    
 }
 
 /**
@@ -73,33 +73,33 @@ void EEPROMClassEx::setMemPool(int base, int memSize) {
  */
 void EEPROMClassEx::setMaxAllowedWrites(int allowedWrites) {
 #ifdef _EEPROMEX_DEBUG
-	_allowedWrites = allowedWrites;
-#endif			
+    _allowedWrites = allowedWrites;
+#endif          
 }
 
 /**
  * Get a new starting address to write to. Adress is negative if not enough space is available
  */
 int EEPROMClassEx::getAddress(int noOfBytes){
-	int availableaddress   = _nextAvailableaddress;
-	_nextAvailableaddress += noOfBytes;
+    int availableaddress   = _nextAvailableaddress;
+    _nextAvailableaddress += noOfBytes;
 
 #ifdef _EEPROMEX_DEBUG    
-	if (_nextAvailableaddress > _memSize) {
-		Serial.println("Attempt to write outside of EEPROM memory");
-		return -availableaddress;
-	} else {
-		return availableaddress;
-	}
+    if (_nextAvailableaddress > _memSize) {
+        Serial.println("Attempt to write outside of EEPROM memory");
+        return -availableaddress;
+    } else {
+        return availableaddress;
+    }
 #endif
-	return availableaddress;		
+    return availableaddress;        
 }
  
 /**
  * Check if EEPROM memory is ready to be accessed
  */
 bool EEPROMClassEx::isReady() {
-	return eeprom_is_ready();
+    return eeprom_is_ready();
 }
 
 /**
@@ -108,17 +108,17 @@ bool EEPROMClassEx::isReady() {
  */
 uint8_t EEPROMClassEx::read(int address)
 {
-	return readByte(address);
+    return readByte(address);
 }
 
 /**
  * Read a single bit
  */
 bool EEPROMClassEx::readBit(int address, byte bit) {
-	  if (bit> 7) return false; 
-	  if (!isReadOk(address+sizeof(uint8_t))) return false;
-	  byte byteVal =  eeprom_read_byte((unsigned char *) address);      
-	  byte bytePos = (1 << bit);
+      if (bit> 7) return false; 
+      if (!isReadOk(address+sizeof(uint8_t))) return false;
+      byte byteVal =  eeprom_read_byte((unsigned char *) address);      
+      byte bytePos = (1 << bit);
       return (byteVal & bytePos);
 }
 
@@ -126,9 +126,9 @@ bool EEPROMClassEx::readBit(int address, byte bit) {
  * Read a single byte
  */
 uint8_t EEPROMClassEx::readByte(int address)
-{	
-	if (!isReadOk(address+sizeof(uint8_t))) return 0;
-	return eeprom_read_byte((unsigned char *) address);
+{   
+    if (!isReadOk(address+sizeof(uint8_t))) return 0;
+    return eeprom_read_byte((unsigned char *) address);
 }
 
 /**
@@ -136,8 +136,8 @@ uint8_t EEPROMClassEx::readByte(int address)
  */
 uint16_t EEPROMClassEx::readInt(int address)
 {
-	if (!isReadOk(address+sizeof(uint16_t))) return 0;
-	return eeprom_read_word((uint16_t *) address);
+    if (!isReadOk(address+sizeof(uint16_t))) return 0;
+    return eeprom_read_word((uint16_t *) address);
 }
 
 /**
@@ -145,8 +145,8 @@ uint16_t EEPROMClassEx::readInt(int address)
  */
 uint32_t EEPROMClassEx::readLong(int address)
 {
-	if (!isReadOk(address+sizeof(uint32_t))) return 0;
-	return eeprom_read_dword((unsigned long *) address);
+    if (!isReadOk(address+sizeof(uint32_t))) return 0;
+    return eeprom_read_dword((unsigned long *) address);
 }
 
 /**
@@ -154,10 +154,10 @@ uint32_t EEPROMClassEx::readLong(int address)
  */
 float EEPROMClassEx::readFloat(int address)
 {
-	if (!isReadOk(address+sizeof(float))) return 0;
-	float _value;
-	readBlock<float>(address, _value);
-	return _value;
+    if (!isReadOk(address+sizeof(float))) return 0;
+    float _value;
+    readBlock<float>(address, _value);
+    return _value;
 }
 
 /**
@@ -165,10 +165,10 @@ float EEPROMClassEx::readFloat(int address)
  */
 double EEPROMClassEx::readDouble(int address)
 {
-	if (!isReadOk(address+sizeof(double))) return 0;	
-	double _value;
-	readBlock<double>(address, _value);
-	return _value;
+    if (!isReadOk(address+sizeof(double))) return 0;    
+    double _value;
+    readBlock<double>(address, _value);
+    return _value;
 }
 
 /**
@@ -177,15 +177,15 @@ double EEPROMClassEx::readDouble(int address)
  */
 bool EEPROMClassEx::write(int address, uint8_t value)
 {
-	return writeByte(address, value);
+    return writeByte(address, value);
 }
 
 /**
  * Write a single bit
  */
 bool EEPROMClassEx::writeBit(int address, uint8_t bit, bool value) {
-	updateBit(address, bit, value);
-	return true;
+    updateBit(address, bit, value);
+    return true;
 }
 
 /**
@@ -193,9 +193,9 @@ bool EEPROMClassEx::writeBit(int address, uint8_t bit, bool value) {
  */
 bool EEPROMClassEx::writeByte(int address, uint8_t value)
 {
-	if (!isWriteOk(address+sizeof(uint8_t))) return false;
-	eeprom_write_byte((unsigned char *) address, value);
-	return true;
+    if (!isWriteOk(address+sizeof(uint8_t))) return false;
+    eeprom_write_byte((unsigned char *) address, value);
+    return true;
 }
 
 /**
@@ -203,9 +203,9 @@ bool EEPROMClassEx::writeByte(int address, uint8_t value)
  */
 bool EEPROMClassEx::writeInt(int address, uint16_t value)
 {
-	if (!isWriteOk(address+sizeof(uint16_t))) return false;
-	eeprom_write_word((uint16_t *) address, value);
-	return true;
+    if (!isWriteOk(address+sizeof(uint16_t))) return false;
+    eeprom_write_word((uint16_t *) address, value);
+    return true;
 }
 
 /**
@@ -213,9 +213,9 @@ bool EEPROMClassEx::writeInt(int address, uint16_t value)
  */
 bool EEPROMClassEx::writeLong(int address, uint32_t value)
 {
-	if (!isWriteOk(address+sizeof(uint32_t))) return false;
-	eeprom_write_dword((unsigned long *) address, value);
-	return true;
+    if (!isWriteOk(address+sizeof(uint32_t))) return false;
+    eeprom_write_dword((unsigned long *) address, value);
+    return true;
 }
 
 /**
@@ -223,7 +223,7 @@ bool EEPROMClassEx::writeLong(int address, uint32_t value)
  */
 bool EEPROMClassEx::writeFloat(int address, float value)
 {
-	return (writeBlock<float>(address, value)!=0);	
+    return (writeBlock<float>(address, value)!=0);  
 }
 
 /**
@@ -231,7 +231,7 @@ bool EEPROMClassEx::writeFloat(int address, float value)
  */
 bool EEPROMClassEx::writeDouble(int address, double value)
 {
-	return (writeBlock<float>(address, value)!=0);	
+    return (writeBlock<float>(address, value)!=0);  
 }
 
 /**
@@ -241,7 +241,7 @@ bool EEPROMClassEx::writeDouble(int address, double value)
  */
 bool EEPROMClassEx::update(int address, uint8_t value)
 {
-	return (updateByte(address, value));
+    return (updateByte(address, value));
 }
 
 /**
@@ -250,21 +250,21 @@ bool EEPROMClassEx::update(int address, uint8_t value)
  */
 bool EEPROMClassEx::updateBit(int address, uint8_t bit, bool value) 
 {
-	  if (bit> 7) return false; 
-	  
-	  byte byteValInput  = readByte(address);
-	  byte byteValOutput = byteValInput;	  
-	  // Set bit
-	  if (value) {	    
-		byteValOutput |= (1 << bit);  //Set bit to 1
-	  } else {		
-	    byteValOutput &= ~(1 << bit); //Set bit to 0
-	  }
-	  // Store if different from input
-	  if (byteValOutput!=byteValInput) {
-		writeByte(address, byteValOutput);	  
-	  }
-	  return true;
+      if (bit> 7) return false; 
+      
+      byte byteValInput  = readByte(address);
+      byte byteValOutput = byteValInput;      
+      // Set bit
+      if (value) {      
+        byteValOutput |= (1 << bit);  //Set bit to 1
+      } else {      
+        byteValOutput &= ~(1 << bit); //Set bit to 0
+      }
+      // Store if different from input
+      if (byteValOutput!=byteValInput) {
+        writeByte(address, byteValOutput);    
+      }
+      return true;
 }
 
 
@@ -274,7 +274,7 @@ bool EEPROMClassEx::updateBit(int address, uint8_t bit, bool value)
  */
 bool EEPROMClassEx::updateByte(int address, uint8_t value)
 {
-	return (updateBlock<uint8_t>(address, value)!=0);
+    return (updateBlock<uint8_t>(address, value)!=0);
 }
 
 /**
@@ -283,7 +283,7 @@ bool EEPROMClassEx::updateByte(int address, uint8_t value)
  */
 bool EEPROMClassEx::updateInt(int address, uint16_t value)
 {
-	return (updateBlock<uint16_t>(address, value)!=0);
+    return (updateBlock<uint16_t>(address, value)!=0);
 }
 
 /**
@@ -292,7 +292,7 @@ bool EEPROMClassEx::updateInt(int address, uint16_t value)
  */
 bool EEPROMClassEx::updateLong(int address, uint32_t value)
 {
-	return (updateBlock<uint32_t>(address, value)!=0);
+    return (updateBlock<uint32_t>(address, value)!=0);
 }
 
 /**
@@ -301,7 +301,7 @@ bool EEPROMClassEx::updateLong(int address, uint32_t value)
  */
 bool EEPROMClassEx::updateFloat(int address, float value)
 {
-	return (updateBlock<float>(address, value)!=0);
+    return (updateBlock<float>(address, value)!=0);
 }
 
 /**
@@ -310,7 +310,7 @@ bool EEPROMClassEx::updateFloat(int address, float value)
  */
 bool EEPROMClassEx::updateDouble(int address, double value)
 {
-	return (writeBlock<double>(address, value)!=0);
+    return (writeBlock<double>(address, value)!=0);
 }
 
 /**
@@ -319,20 +319,20 @@ bool EEPROMClassEx::updateDouble(int address, double value)
 bool EEPROMClassEx::isWriteOk(int address)
 {
 #ifdef _EEPROMEX_DEBUG    
-	_writeCounts++;
-	if (_allowedWrites == 0 || _writeCounts > _allowedWrites ) {
-		Serial.println("Exceeded maximum number of writes");
-		return false;
-	}
-	
-	if (address > _memSize) {
-		Serial.println("Attempt to write outside of EEPROM memory");
-		return false;
-	} else {
-		return true;
-	}
-#endif		
-	return true;
+    _writeCounts++;
+    if (_allowedWrites == 0 || _writeCounts > _allowedWrites ) {
+        Serial.println("Exceeded maximum number of writes");
+        return false;
+    }
+    
+    if (address > _memSize) {
+        Serial.println("Attempt to write outside of EEPROM memory");
+        return false;
+    } else {
+        return true;
+    }
+#endif      
+    return true;
 }
 
 /**
@@ -341,14 +341,14 @@ bool EEPROMClassEx::isWriteOk(int address)
 bool EEPROMClassEx::isReadOk(int address)
 {
 #ifdef _EEPROMEX_DEBUG    
-	if (address > _memSize) {
-		Serial.println("Attempt to write outside of EEPROM memory");
-		return false;
-	} else {
-		return true;
-	}
+    if (address > _memSize) {
+        Serial.println("Attempt to write outside of EEPROM memory");
+        return false;
+    } else {
+        return true;
+    }
 #endif
-	return true;	
+    return true;    
 }
 
 int EEPROMClassEx::_base= 0;

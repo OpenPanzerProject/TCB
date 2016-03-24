@@ -1,6 +1,6 @@
-/* OP_BNO055.h	 	Open Panzer Bosch BNO-055 IMU sensor library
- * Source: 			openpanzer.org				
- * Authors:    		Kevin Townsend, Luke Middleton
+/* OP_BNO055.h      Open Panzer Bosch BNO-055 IMU sensor library
+ * Source:          openpanzer.org              
+ * Authors:         Kevin Townsend, Luke Middleton
  *
  * This library is a modification of Kevin Townsend's (KTOWN) Adafruit_BNO055 library.
  * GitHub page: https://github.com/adafruit/Adafruit_BNO055
@@ -63,9 +63,9 @@
 #include <alloca.h>
 #include "OP_I2C.h"
 
-#define BNO055_ADDRESS_A (0x28)		// Decimal 40
-#define BNO055_ADDRESS_B (0x29)		// Decimal 41
-#define BNO055_ID        (0xA0)		// Decimal 160
+#define BNO055_ADDRESS_A (0x28)     // Decimal 40
+#define BNO055_ADDRESS_B (0x29)     // Decimal 41
+#define BNO055_ID        (0xA0)     // Decimal 160
 
 #define NUM_BNO055_OFFSET_REGISTERS (22)
 
@@ -73,39 +73,39 @@
 
 typedef struct 
 {   union 
-	{   float v[3];
+    {   float v[3];
         struct 
-		{
+        {
             float x;
             float y;
             float z;
-		};
-	};
+        };
+    };
 } imu_orientation_t;
 
 typedef struct 
 {   union 
-	{   uint8_t c[4];
+    {   uint8_t c[4];
         struct 
-		{
+        {
             uint8_t system;
-			uint8_t gyro;
-			uint8_t accel;
-			uint8_t mag;
-		};
-	};
+            uint8_t gyro;
+            uint8_t accel;
+            uint8_t mag;
+        };
+    };
 } imu_calibration_t;
 
 typedef struct 
 {   union 
-	{   uint8_t c[3];
+    {   uint8_t c[3];
         struct 
-		{
+        {
             uint8_t systemStatus;
-			uint8_t selfTest;
-			uint8_t systemError;
-		};
-	};
+            uint8_t selfTest;
+            uint8_t systemError;
+        };
+    };
 } imu_status_t;
 
 /*
@@ -125,7 +125,7 @@ typedef struct
 } bno055_offsets_t;
 */
 
-class OP_BNO055	
+class OP_BNO055 
 {
   public:
     typedef enum
@@ -348,78 +348,78 @@ class OP_BNO055
 
     typedef enum
     {
-		STATE_IDLE,
-		STATE_GET_ID,
-		STATE_SETUP,
-		STATE_GET_TEMP,
-		STATE_GET_CAL,
-		STATE_GET_VECTOR,
-		STATE_GET_STATUS,
-		STATE_GET_OFFSETS,
-		STATE_WRITE_OFFSETS
+        STATE_IDLE,
+        STATE_GET_ID,
+        STATE_SETUP,
+        STATE_GET_TEMP,
+        STATE_GET_CAL,
+        STATE_GET_VECTOR,
+        STATE_GET_STATUS,
+        STATE_GET_OFFSETS,
+        STATE_WRITE_OFFSETS
     } op_bno055_state_t;
 
-// Constructor - default to abstract sensor ID -1, and BNO055 address A	
+// Constructor - default to abstract sensor ID -1, and BNO055 address A 
     OP_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS_A );
 
 // Public functions
     void  begin               ( void );
-	void  checkIfPresent	  ( void );
-	bool  isPresent() 		  { return _deviceFound; }
-	bool  setup			  	  ( boolean usextal = true, bno055_opmode_t mode = OPERATION_MODE_NDOF );
+    void  checkIfPresent      ( void );
+    bool  isPresent()         { return _deviceFound; }
+    bool  setup               ( boolean usextal = true, bno055_opmode_t mode = OPERATION_MODE_NDOF );
 
-	bool  process			  ( void );
-	bool  transactionDone	  ( void );
-	bool  transactionSuccessful( void );
-	void  requestStatus 	  ( void );	
-	void  requestCalibration  ( void );
-	void  requestVector		  ( vector_type_t vector_type );
-	void  requestEuler		  ( void );
-    void  requestTemp   	  ( void );	
+    bool  process             ( void );
+    bool  transactionDone     ( void );
+    bool  transactionSuccessful( void );
+    void  requestStatus       ( void ); 
+    void  requestCalibration  ( void );
+    void  requestVector       ( vector_type_t vector_type );
+    void  requestEuler        ( void );
+    void  requestTemp         ( void ); 
 
 // Public variables
-	op_bno055_state_t 	state;
-	op_bno055_state_t	lastState;
-	imu_orientation_t 	orientation;	// This is a struct of 3 floats: x, y, z
-	imu_calibration_t 	calibration;	// This is a struct of 4 unsigned ints: system, gyro, accel, mag (each with numbers 0-3)
-	imu_status_t	  	status;			// This is a struct of 3 unsigned ints: systemStatus, selfTest, systemError
-	int8_t  			temperature;	// Temperature
+    op_bno055_state_t   state;
+    op_bno055_state_t   lastState;
+    imu_orientation_t   orientation;    // This is a struct of 3 floats: x, y, z
+    imu_calibration_t   calibration;    // This is a struct of 4 unsigned ints: system, gyro, accel, mag (each with numbers 0-3)
+    imu_status_t        status;         // This is a struct of 3 unsigned ints: systemStatus, selfTest, systemError
+    int8_t              temperature;    // Temperature
 
 // We aren't using the offset stuff for now
-//	void  requestSensorOffsets( void );
-//	void  setSensorOffsets_Accel ( void );
-//	void  setSensorOffsets_Gyro ( void );
-//	void  setSensorOffsets_Mag ( void );
-//	uint8_t 			offsetData[NUM_BNO055_OFFSET_REGISTERS];
-//	bno055_offsets_t	offsets;
+//  void  requestSensorOffsets( void );
+//  void  setSensorOffsets_Accel ( void );
+//  void  setSensorOffsets_Gyro ( void );
+//  void  setSensorOffsets_Mag ( void );
+//  uint8_t             offsetData[NUM_BNO055_OFFSET_REGISTERS];
+//  bno055_offsets_t    offsets;
 
   private:
-	void  getCalibration      ( void );
-	void  getOffsets		  ( void );	// We will already have offsets saved in the offsetData[] array, but this puts them into a convenient struct "offsets"
-	void  getVector			  ( void );
-	void  getTemp			  ( void );	
-	void  clearReg			  ( void );
+    void  getCalibration      ( void );
+    void  getOffsets          ( void ); // We will already have offsets saved in the offsetData[] array, but this puts them into a convenient struct "offsets"
+    void  getVector           ( void );
+    void  getTemp             ( void ); 
+    void  clearReg            ( void );
   
-	void  read8   ( uint8_t *reg, uint8_t *value);
-	void  readLen ( uint8_t *reg, uint8_t *buffer, uint8_t len);
+    void  read8   ( uint8_t *reg, uint8_t *value);
+    void  readLen ( uint8_t *reg, uint8_t *buffer, uint8_t len);
    
 // Private variables
-	i2c_txn_t *t;				// Our I2C transaction
+    i2c_txn_t *t;               // Our I2C transaction
 
-    uint8_t _address;			// Device address
-    int32_t _sensorID;			// Abstract ID, not needed or used
-    bno055_opmode_t _mode;		// What mode to set the sensor to
-	
-	uint8_t _chipID;			// Unique number that identifies a BNO055, as opposed to other devices on the bus
-	boolean _deviceFound;
-	uint8_t _calData; 
-	
-	vector_type_t _cur_vector_type;	// What vector type did the user request
-	uint8_t _vectorBuf[6];			// Vector data returned from the device is held in this array
-	
-	uint8_t _temp;				// Temp data returned from the device is held in this var
-	
-	uint8_t reg[MAX_OPERATIONS * 2];	// Yikes
+    uint8_t _address;           // Device address
+    int32_t _sensorID;          // Abstract ID, not needed or used
+    bno055_opmode_t _mode;      // What mode to set the sensor to
+    
+    uint8_t _chipID;            // Unique number that identifies a BNO055, as opposed to other devices on the bus
+    boolean _deviceFound;
+    uint8_t _calData; 
+    
+    vector_type_t _cur_vector_type; // What vector type did the user request
+    uint8_t _vectorBuf[6];          // Vector data returned from the device is held in this array
+    
+    uint8_t _temp;              // Temp data returned from the device is held in this var
+    
+    uint8_t reg[MAX_OPERATIONS * 2];    // Yikes
 };
 
 #endif

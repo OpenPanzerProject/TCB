@@ -1,7 +1,7 @@
-/* OP_PololuQik.cpp	Open Panzer PololuQik library - functions for communicating with Pololu's Qik dual-serial motor controllers, 
- *													such as the 2s12v10 and the 2s9v1 running the full Pololu Protocol in 7-bit mode.
- * Source: 			http://www.Pololu.com
- * Authors:    		Pololu
+/* OP_PololuQik.cpp Open Panzer PololuQik library - functions for communicating with Pololu's Qik dual-serial motor controllers, 
+ *                                                  such as the 2s12v10 and the 2s9v1 running the full Pololu Protocol in 7-bit mode.
+ * Source:          http://www.Pololu.com
+ * Authors:         Pololu
  *   
  * This library is a minor modification of the Pololu "qik-arduino" library.
  * For the original library, see their github page: https://github.com/pololu/qik-arduino
@@ -72,9 +72,9 @@ void OP_PololuQik::throttleCommand(byte command, int speed) const
 
 void OP_PololuQik::motor(byte motor, int speed) const
 {
-	if 		(motor == 1) 	throttleCommand((speed < 0 ? QIK_MOTOR_M0_REVERSE : QIK_MOTOR_M0_FORWARD), speed);
-	else if (motor == 2)	throttleCommand((speed < 0 ? QIK_MOTOR_M1_REVERSE : QIK_MOTOR_M1_FORWARD), speed);
-	else 	return;
+    if      (motor == 1)    throttleCommand((speed < 0 ? QIK_MOTOR_M0_REVERSE : QIK_MOTOR_M0_FORWARD), speed);
+    else if (motor == 2)    throttleCommand((speed < 0 ? QIK_MOTOR_M1_REVERSE : QIK_MOTOR_M1_FORWARD), speed);
+    else    return;
 }
 
 void OP_PololuQik::allStop() const

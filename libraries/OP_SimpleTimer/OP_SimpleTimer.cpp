@@ -1,6 +1,6 @@
-/* OP_SimpleTimer.cpp	Open Panzer Simple Timer library - for handling timed events without using delays
- * Source: 				openpanzer.org				
- * Authors:    			Marcello Romani, Luke Middleton
+/* OP_SimpleTimer.cpp   Open Panzer Simple Timer library - for handling timed events without using delays
+ * Source:              openpanzer.org              
+ * Authors:             Marcello Romani, Luke Middleton
  *
  * This library is a modification of the Simple Timer timer library written by Marcello Romani.
  * Timer events now return a unique ID. Even though timer "slots" are constantly being
@@ -37,14 +37,14 @@ static inline unsigned long elapsed() { return millis(); }
 OP_SimpleTimer::OP_SimpleTimer() {
     unsigned long current_millis = elapsed();
 
-	NextID = 1; // Initialize Next ID
+    NextID = 1; // Initialize Next ID
 
     for (int i = 0; i < MAX_TIMERS; i++) {
         enabled[i] = false;
         callbacks[i] = 0;                   // if the callback pointer is zero, the slot is free, i.e. doesn't "contain" any timer
         prev_millis[i] = current_millis;
         numRuns[i] = 0;
-		timerID[i] = 0;						// Initialize IDs to Zero, which is an invalid ID
+        timerID[i] = 0;                     // Initialize IDs to Zero, which is an invalid ID
     }
 
     numTimers = 0;
@@ -83,10 +83,10 @@ void OP_SimpleTimer::run() {
                     }
                     // other timers get executed the specified number of times
                     else if (numRuns[i] < maxNumRuns[i]) {
-					
+                    
                         toBeCalled[i] = DEFCALL_RUNONLY;
                         numRuns[i]++;
-						
+                        
                         // after the last run, delete the timer
                         if (numRuns[i] >= maxNumRuns[i]) {
                             toBeCalled[i] = DEFCALL_RUNANDDEL;
@@ -108,7 +108,7 @@ void OP_SimpleTimer::run() {
 
             case DEFCALL_RUNANDDEL:
                 (*callbacks[i])();
-                deleteTimer(timerID[i]);	// Pass the unique ID, not the Timer Number
+                deleteTimer(timerID[i]);    // Pass the unique ID, not the Timer Number
                 break;
         }
     }
@@ -139,11 +139,11 @@ int OP_SimpleTimer::findFirstFreeSlot() {
 
 int OP_SimpleTimer::setTimer(long d, timer_callback f, int n) {
     int returnID;
-	int freeTimer;
+    int freeTimer;
 
     freeTimer = findFirstFreeSlot();
     if (freeTimer < 0) {
-		return -1;
+        return -1;
     }
 
     if (f == NULL) {
@@ -155,21 +155,21 @@ int OP_SimpleTimer::setTimer(long d, timer_callback f, int n) {
     maxNumRuns[freeTimer] = n;
     enabled[freeTimer] = true;
     prev_millis[freeTimer] = elapsed();
-	timerID[freeTimer] = NextID;
+    timerID[freeTimer] = NextID;
 
     // Increment number of timers
-	numTimers++;				
-	
-	// Save timer ID to return to user
-	returnID = NextID;
-	// Increment timer ID
-	NextID++;
-	// Handle rollover
-	if (NextID < 1) { NextID = 1; }
+    numTimers++;                
+    
+    // Save timer ID to return to user
+    returnID = NextID;
+    // Increment timer ID
+    NextID++;
+    // Handle rollover
+    if (NextID < 1) { NextID = 1; }
 
-    //return freeTimer; // OLD	
-//	Serial.print(F("Created ")); Serial.print(returnID); Serial.print(" ("); Serial.print(freeTimer); Serial.println(F(")"));
-	return (returnID);
+    //return freeTimer; // OLD  
+//  Serial.print(F("Created ")); Serial.print(returnID); Serial.print(" ("); Serial.print(freeTimer); Serial.println(F(")"));
+    return (returnID);
 }
 
 
@@ -186,17 +186,17 @@ int OP_SimpleTimer::setTimeout(long d, timer_callback f) {
 void OP_SimpleTimer::deleteTimer(int ID) 
 {
     int timerNum;
-	
+    
     // nothing to delete if no timers are in use
     if (numTimers == 0) {
         return;
     }
 
-	timerNum = getTimerNum(ID);
-	
-	if (timerNum == -1) {
-		return;
-	}
+    timerNum = getTimerNum(ID);
+    
+    if (timerNum == -1) {
+        return;
+    }
 
     // don't decrease the number of timers if the
     // specified slot is already empty
@@ -206,12 +206,12 @@ void OP_SimpleTimer::deleteTimer(int ID)
         toBeCalled[timerNum] = DEFCALL_DONTRUN;
         delays[timerNum] = 0;
         numRuns[timerNum] = 0;
-		timerID[timerNum] = 0;
+        timerID[timerNum] = 0;
 
         // update number of timers
         numTimers--;
-		
-		//Serial.print(F("Deleted ")); Serial.print(ID); Serial.print(" ("); Serial.print(timerNum); Serial.println(F(")"));
+        
+        //Serial.print(F("Deleted ")); Serial.print(ID); Serial.print(" ("); Serial.print(timerNum); Serial.println(F(")"));
     }
 }
 
@@ -220,13 +220,13 @@ void OP_SimpleTimer::restartTimer(int ID)
 {
 
     int timerNum;
-	
-	timerNum = getTimerNum(ID);
-	
-	if (timerNum == -1) {
-		return;
-	}
-	
+    
+    timerNum = getTimerNum(ID);
+    
+    if (timerNum == -1) {
+        return;
+    }
+    
     prev_millis[timerNum] = elapsed();
 }
 
@@ -234,13 +234,13 @@ void OP_SimpleTimer::restartTimer(int ID)
 boolean OP_SimpleTimer::isEnabled(int ID) 
 {
     int timerNum;
-	
-	timerNum = getTimerNum(ID);
-	
-	if (timerNum == -1) {
-		return false;
-	}
-	
+    
+    timerNum = getTimerNum(ID);
+    
+    if (timerNum == -1) {
+        return false;
+    }
+    
     return enabled[timerNum];
 }
 
@@ -248,12 +248,12 @@ boolean OP_SimpleTimer::isEnabled(int ID)
 void OP_SimpleTimer::enable(int ID) 
 {
     int timerNum;
-	
-	timerNum = getTimerNum(ID);
-	
-	if (timerNum == -1) {
-		return;
-	}
+    
+    timerNum = getTimerNum(ID);
+    
+    if (timerNum == -1) {
+        return;
+    }
 
     enabled[timerNum] = true;
 }
@@ -262,13 +262,13 @@ void OP_SimpleTimer::enable(int ID)
 void OP_SimpleTimer::disable(int ID) 
 {
     int timerNum;
-	
-	timerNum = getTimerNum(ID);
-	
-	if (timerNum == -1) {
-		return;
-	}
-	
+    
+    timerNum = getTimerNum(ID);
+    
+    if (timerNum == -1) {
+        return;
+    }
+    
     enabled[timerNum] = false;
 }
 
@@ -276,14 +276,14 @@ void OP_SimpleTimer::disable(int ID)
 void OP_SimpleTimer::toggle(int ID) 
 {
     int timerNum;
-	
-	timerNum = getTimerNum(ID);
-	
-	if (timerNum == -1) {
-		return;
-	}
-	
-	enabled[timerNum] = !enabled[timerNum];
+    
+    timerNum = getTimerNum(ID);
+    
+    if (timerNum == -1) {
+        return;
+    }
+    
+    enabled[timerNum] = !enabled[timerNum];
 }
 
 
@@ -294,12 +294,12 @@ int OP_SimpleTimer::getNumTimers() {
 
 int OP_SimpleTimer::getTimerNum(int ID)
 {
-	int timerNum = -1;
-	
-	for (int i = 0; i < MAX_TIMERS; i++) 
-	{
-		if (timerID[i] == ID) { timerNum = i; break;}
-	}
-	
-	return timerNum;
+    int timerNum = -1;
+    
+    for (int i = 0; i < MAX_TIMERS; i++) 
+    {
+        if (timerID[i] == ID) { timerNum = i; break;}
+    }
+    
+    return timerNum;
 }

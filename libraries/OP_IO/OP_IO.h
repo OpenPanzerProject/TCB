@@ -1,6 +1,6 @@
-/* OP_IO.h			Open Panzer IO - defines and structs related to the two general purpose i/o ports on the TCB board
- * Source: 			openpanzer.org				
- * Authors:    		Luke Middleton
+/* OP_IO.h          Open Panzer IO - defines and structs related to the two general purpose i/o ports on the TCB board
+ * Source:          openpanzer.org              
+ * Authors:         Luke Middleton
  *   
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,16 +28,16 @@
 #define NUM_IO_PORTS 2
 
 typedef struct external_io_settings{
-	uint8_t dataDirection;	// 1 = output, 0 = input
-	boolean Digital;		// If input, is this on/off or analog
+    uint8_t dataDirection;  // 1 = output, 0 = input
+    boolean Digital;        // If input, is this on/off or analog
 };
 
 typedef struct external_io{
-	boolean inputActive;	// If input, hast his been assigned as a trigger to any function?
-	uint16_t inputValue;	// If input, what is the analog reading (0-1023 if analog) or digital reading (0/1 if digital)
-	boolean updated;		// If input, has the input value changed since last time? 
-	boolean outputValue; 	// If output, is it currently high (1) or low (0) (may not need this)
-	external_io_settings Settings;	// Settings
+    boolean inputActive;    // If input, hast his been assigned as a trigger to any function?
+    uint16_t inputValue;    // If input, what is the analog reading (0-1023 if analog) or digital reading (0/1 if digital)
+    boolean updated;        // If input, has the input value changed since last time? 
+    boolean outputValue;    // If output, is it currently high (1) or low (0) (may not need this)
+    external_io_settings Settings;  // Settings
 };
 
 

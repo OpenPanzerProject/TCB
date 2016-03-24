@@ -59,130 +59,130 @@
 #define EEPROMSizeTeensy31    EEPROMSizeMK20DX256
 class EEPROMClassEx
 {
-	  
+      
   public:
-	EEPROMClassEx();
-	bool 	 isReady();
-	int 	 writtenBytes();
-    void 	 setMemPool(int base, int memSize);
-	void  	 setMaxAllowedWrites(int allowedWrites);
-	int 	 getAddress(int noOfBytes);
+    EEPROMClassEx();
+    bool     isReady();
+    int      writtenBytes();
+    void     setMemPool(int base, int memSize);
+    void     setMaxAllowedWrites(int allowedWrites);
+    int      getAddress(int noOfBytes);
     
-	uint8_t  read(int);	
-	bool 	 readBit(int, byte);
-	uint8_t  readByte(int);
+    uint8_t  read(int); 
+    bool     readBit(int, byte);
+    uint8_t  readByte(int);
     uint16_t readInt(int);
     uint32_t readLong(int);
-	float    readFloat(int);
-	double   readDouble(int);
-			
+    float    readFloat(int);
+    double   readDouble(int);
+            
     bool     write(int, uint8_t);
-	bool 	 writeBit(int , uint8_t, bool);
-	bool     writeByte(int, uint8_t);
-	bool 	 writeInt(int, uint16_t);
-	bool 	 writeLong(int, uint32_t);
-	bool 	 writeFloat(int, float);
-	bool 	 writeDouble(int, double);
+    bool     writeBit(int , uint8_t, bool);
+    bool     writeByte(int, uint8_t);
+    bool     writeInt(int, uint16_t);
+    bool     writeLong(int, uint32_t);
+    bool     writeFloat(int, float);
+    bool     writeDouble(int, double);
 
-	bool     update(int, uint8_t);
-	bool 	 updateBit(int , uint8_t, bool);
-	bool     updateByte(int, uint8_t);
-	bool 	 updateInt(int, uint16_t);
-	bool 	 updateLong(int, uint32_t);
-	bool 	 updateFloat(int, float);
-	bool 	 updateDouble(int, double);
+    bool     update(int, uint8_t);
+    bool     updateBit(int , uint8_t, bool);
+    bool     updateByte(int, uint8_t);
+    bool     updateInt(int, uint16_t);
+    bool     updateLong(int, uint32_t);
+    bool     updateFloat(int, float);
+    bool     updateDouble(int, double);
 
-	
+    
     // Use template for other data formats
 
-	/**
-	 * Template function to read  multiple items of any type of variable, such as structs
-	 */
-	template <class T> int readBlock(int address, const T value[], int items)
-	{
-		unsigned int i;
-		for (i = 0; i < (unsigned int)items; i++)
-			readBlock<T>(address+(i*sizeof(T)),value[i]);
-		return i;
-	}
+    /**
+     * Template function to read  multiple items of any type of variable, such as structs
+     */
+    template <class T> int readBlock(int address, const T value[], int items)
+    {
+        unsigned int i;
+        for (i = 0; i < (unsigned int)items; i++)
+            readBlock<T>(address+(i*sizeof(T)),value[i]);
+        return i;
+    }
 
-	/**
-	 * Template function to read any type of variable, such as structs
-	 */	
-	template <class T> int readBlock(int address, const T& value)
-	{		
-		eeprom_read_block((void*)&value, (const void*)address, sizeof(value));
-		return sizeof(value);
-	}
-	
-	/**
-	 * Template function to write multiple items of any type of variable, such as structs
-	 */	
-	template <class T> int writeBlock(int address, const T value[], int items)
-	{	
-		if (!isWriteOk(address+items*sizeof(T))) return 0;
-		unsigned int i;
-		for (i = 0; i < (unsigned int)items; i++)
-			  writeBlock<T>(address+(i*sizeof(T)),value[i]);
-		return i;
-	}
+    /**
+     * Template function to read any type of variable, such as structs
+     */ 
+    template <class T> int readBlock(int address, const T& value)
+    {       
+        eeprom_read_block((void*)&value, (const void*)address, sizeof(value));
+        return sizeof(value);
+    }
+    
+    /**
+     * Template function to write multiple items of any type of variable, such as structs
+     */ 
+    template <class T> int writeBlock(int address, const T value[], int items)
+    {   
+        if (!isWriteOk(address+items*sizeof(T))) return 0;
+        unsigned int i;
+        for (i = 0; i < (unsigned int)items; i++)
+              writeBlock<T>(address+(i*sizeof(T)),value[i]);
+        return i;
+    }
 
-	/**
-	 * Template function to write any type of variable, such as structs
-	 */		
-	template <class T> int writeBlock(int address, const T& value)
-	{
-		if (!isWriteOk(address+sizeof(value))) return 0;
-		eeprom_write_block((void*)&value, (void*)address, sizeof(value));			  			  
-		return sizeof(value);
-	}
-	 
-	/**
-	 * Template function to update multiple items of any type of variable, such as structs
-	 * The EEPROM will only be overwritten if different. This will reduce wear.
-	 */	 
-	template <class T> int updateBlock(int address, const T value[], int items)
-	{
-		int writeCount=0;
-		if (!isWriteOk(address+items*sizeof(T))) return 0;
-		unsigned int i;
-		for (i = 0; i < (unsigned int)items; i++)
-			  writeCount+= updateBlock<T>(address+(i*sizeof(T)),value[i]);
-		return writeCount;
-	}
-	
-	/**
-	 * Template function to update any type of variable, such as structs
-	 * The EEPROM will only be overwritten if different. This will reduce wear.
-	 */	 
-	template <class T> int updateBlock(int address, const T& value)
-	{
-		int writeCount=0;
-		if (!isWriteOk(address+sizeof(value))) return 0;
-		const byte* bytePointer = (const byte*)(const void*)&value;
-		for (unsigned int i = 0; i < (unsigned int)sizeof(value); i++) {
-			if (read(address)!=*bytePointer) {
-				write(address, *bytePointer);
-				writeCount++;		
-			}
-			address++;
-			bytePointer++;
-		}
-		return writeCount;
-	}
-	
-	
-	
+    /**
+     * Template function to write any type of variable, such as structs
+     */     
+    template <class T> int writeBlock(int address, const T& value)
+    {
+        if (!isWriteOk(address+sizeof(value))) return 0;
+        eeprom_write_block((void*)&value, (void*)address, sizeof(value));                         
+        return sizeof(value);
+    }
+     
+    /**
+     * Template function to update multiple items of any type of variable, such as structs
+     * The EEPROM will only be overwritten if different. This will reduce wear.
+     */  
+    template <class T> int updateBlock(int address, const T value[], int items)
+    {
+        int writeCount=0;
+        if (!isWriteOk(address+items*sizeof(T))) return 0;
+        unsigned int i;
+        for (i = 0; i < (unsigned int)items; i++)
+              writeCount+= updateBlock<T>(address+(i*sizeof(T)),value[i]);
+        return writeCount;
+    }
+    
+    /**
+     * Template function to update any type of variable, such as structs
+     * The EEPROM will only be overwritten if different. This will reduce wear.
+     */  
+    template <class T> int updateBlock(int address, const T& value)
+    {
+        int writeCount=0;
+        if (!isWriteOk(address+sizeof(value))) return 0;
+        const byte* bytePointer = (const byte*)(const void*)&value;
+        for (unsigned int i = 0; i < (unsigned int)sizeof(value); i++) {
+            if (read(address)!=*bytePointer) {
+                write(address, *bytePointer);
+                writeCount++;       
+            }
+            address++;
+            bytePointer++;
+        }
+        return writeCount;
+    }
+    
+    
+    
 private:
-	//Private variables
-	static int _base;
-	static int _memSize;
-	static int _nextAvailableaddress;	
-	static int _writeCounts;
-	int _allowedWrites;	
-	bool checkWrite(int base,int noOfBytes);	
-	bool isWriteOk(int address);
-	bool isReadOk(int address);
+    //Private variables
+    static int _base;
+    static int _memSize;
+    static int _nextAvailableaddress;   
+    static int _writeCounts;
+    int _allowedWrites; 
+    bool checkWrite(int base,int noOfBytes);    
+    bool isWriteOk(int address);
+    bool isReadOk(int address);
 };
 
 extern EEPROMClassEx EEPROM;

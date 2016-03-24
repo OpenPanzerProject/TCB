@@ -1,6 +1,6 @@
-/* OP_EEPROM.h		Open Panzer EEPROM - a library functions related to EEPROM usage
- * Source: 			openpanzer.org				
- * Authors:    		Luke Middleton
+/* OP_EEPROM.h      Open Panzer EEPROM - a library functions related to EEPROM usage
+ * Source:          openpanzer.org              
+ * Authors:         Luke Middleton
  *   
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 #include "OP_Motors.h"
 #include "OP_Driver.h"
 #include "OP_Settings.h"
-#include "EEPROMex.h"	// We use the extended version, not Arduino's built-in EEPROM library. 
+#include "EEPROMex.h"   // We use the extended version, not Arduino's built-in EEPROM library. 
 // This one is important. It has the definition of our eeprom struct
 #include "OP_EEPROM_Struct.h"
 
@@ -48,46 +48,46 @@
 // and the sketch will exhibit unstable behavior!
 // 
 
-	#define EEPROM_INIT 			0xAA42
+    #define EEPROM_INIT             0xAA42
 //
 //
 //=======================================================================================================================================>>
 //--------------------------------------------------------------------------------------------------------------------------------------->>
 
 
-#define EEPROM_START_ADDRESS 	0
+#define EEPROM_START_ADDRESS    0
 
 
 
 // Class OP_EEPROM
 class OP_EEPROM
-{	public:
-		OP_EEPROM(void);							// Constructor
-		static boolean begin(void);					// This function will initialize EEPROM to default values if it hasn't been before.
-													// After initialization, the EEPROM_INIT number above will be written to EEPROM, so
-													// next time we'll know it's been done. This prevents us from writing to the EEPROM over and over
-													// every time we turn on the Arduino. 
-		// Vars
-		static _eeprom_data ramcopy;				// This is the complete eeprom struct that we will store in RAM
-		
-		// Functions
-		static void loadRAMcopy(void);				// This will load the eeprom data from eeprom into our ramcopy struct in RAM
-		
-		static boolean readSerialEEPROM_byID(uint16_t ID, char * chrArray, uint8_t bufflen, uint8_t &stringlength);
-		static boolean updateEEPROM_byID(uint16_t ID, uint32_t Value);		// This will update the variable of "ID" with "Value" in EEPROM
+{   public:
+        OP_EEPROM(void);                            // Constructor
+        static boolean begin(void);                 // This function will initialize EEPROM to default values if it hasn't been before.
+                                                    // After initialization, the EEPROM_INIT number above will be written to EEPROM, so
+                                                    // next time we'll know it's been done. This prevents us from writing to the EEPROM over and over
+                                                    // every time we turn on the Arduino. 
+        // Vars
+        static _eeprom_data ramcopy;                // This is the complete eeprom struct that we will store in RAM
+        
+        // Functions
+        static void loadRAMcopy(void);              // This will load the eeprom data from eeprom into our ramcopy struct in RAM
+        
+        static boolean readSerialEEPROM_byID(uint16_t ID, char * chrArray, uint8_t bufflen, uint8_t &stringlength);
+        static boolean updateEEPROM_byID(uint16_t ID, uint32_t Value);      // This will update the variable of "ID" with "Value" in EEPROM
 
-		
-	protected:
-		
-		// Functions
-		static void Initialize_RAMcopy(void);		// Called by Initilize_EEPROM. It sets all the RAM variables to default values. 
-		static void Initialize_EEPROM(void);		// This copies all variables (at default values) from RAM into eeprom. 
-		
-		static uint16_t findStorageVarInfo(_storage_var_info &svi, uint16_t findID);	// When we know the var ID but not the position in the array it occupies
-		static boolean getStorageVarInfo(_storage_var_info &svi, uint16_t arrayPos);	// For when we already know the array element we want
+        
+    protected:
+        
+        // Functions
+        static void Initialize_RAMcopy(void);       // Called by Initilize_EEPROM. It sets all the RAM variables to default values. 
+        static void Initialize_EEPROM(void);        // This copies all variables (at default values) from RAM into eeprom. 
+        
+        static uint16_t findStorageVarInfo(_storage_var_info &svi, uint16_t findID);    // When we know the var ID but not the position in the array it occupies
+        static boolean getStorageVarInfo(_storage_var_info &svi, uint16_t arrayPos);    // For when we already know the array element we want
 
-		// Vars
-		
+        // Vars
+        
 };
 
 

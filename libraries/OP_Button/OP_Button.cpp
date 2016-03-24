@@ -1,6 +1,6 @@
-/* OP_Button.h		Button - a library for reading button inputs
- * Source: 			https://github.com/JChristensen/Button		
- * Authors:    		Jack Christensen
+/* OP_Button.h      Button - a library for reading button inputs
+ * Source:          https://github.com/JChristensen/Button      
+ * Authors:         Jack Christensen
  *
  * This library is an unmodified copy of Jack Christensen's button library. 
  * It has been renamed to OP_Button for consistency with other Open Panzer 

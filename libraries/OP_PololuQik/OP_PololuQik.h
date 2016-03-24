@@ -1,7 +1,7 @@
-/* OP_PololuQik.h	Open Panzer PololuQik library - functions for communicating with Pololu's Qik dual-serial motor controllers, 
- *													such as the 2s12v10 and the 2s9v1 running the full Pololu Protocol in 7-bit mode.
- * Source: 			http://www.Pololu.com
- * Authors:    		Pololu
+/* OP_PololuQik.h   Open Panzer PololuQik library - functions for communicating with Pololu's Qik dual-serial motor controllers, 
+ *                                                  such as the 2s12v10 and the 2s9v1 running the full Pololu Protocol in 7-bit mode.
+ * Source:          http://www.Pololu.com
+ * Authors:         Pololu
  *   
  * This library is a minor modification of the Pololu "qik-arduino" library.
  * For the original library, see their github page: https://github.com/pololu/qik-arduino
@@ -41,7 +41,7 @@
 
 
 // Commands
-#define QIK_INIT_COMMAND				 0xAA
+#define QIK_INIT_COMMAND                 0xAA
 
 // 7-bit speed commands, we are not using the 8 bit option in Open Panzer
 // We are however using the full Pololu Protocol (not the compact protocol)
@@ -59,66 +59,66 @@
 class OP_PololuQik
 {
   public:
-	/*!
-	Initializes a new instance of the PololuQik class.
-	The device ID is set to the value given, and the specified serial port is used.
-	\param deviceID The device ID to use.
-	\param port     The port to use.
-	*/
-	OP_PololuQik(byte deviceID, HardwareSerial *port);
+    /*!
+    Initializes a new instance of the PololuQik class.
+    The device ID is set to the value given, and the specified serial port is used.
+    \param deviceID The device ID to use.
+    \param port     The port to use.
+    */
+    OP_PololuQik(byte deviceID, HardwareSerial *port);
 
   public:
-	/*!
-	Gets the device number.
-	\return The device number.
-	*/
-	inline byte deviceID() const { return _deviceID; }
+    /*!
+    Gets the device number.
+    \return The device number.
+    */
+    inline byte deviceID() const { return _deviceID; }
 
-	/*!
-	Gets the serial port.
-	\return The serial port.
-	*/
-	inline HardwareSerial* port() const { return _port; }
+    /*!
+    Gets the serial port.
+    \return The serial port.
+    */
+    inline HardwareSerial* port() const { return _port; }
 
-	/*!
-	Sends the autobaud character.
-	\param dontWait If false, a delay is added to give the driver time to start up.
-	*/
-	void autobaud(boolean dontWait = false) const;
+    /*!
+    Sends the autobaud character.
+    \param dontWait If false, a delay is added to give the driver time to start up.
+    */
+    void autobaud(boolean dontWait = false) const;
 
-	/*!
-	Sends the autobaud character.
-	\param port     The port to use.
-	\param dontWait If false, a delay is added to give the driver time to start up.
-	*/
-	static void autobaud(HardwareSerial *port, boolean dontWait = false);
+    /*!
+    Sends the autobaud character.
+    \param port     The port to use.
+    \param dontWait If false, a delay is added to give the driver time to start up.
+    */
+    static void autobaud(HardwareSerial *port, boolean dontWait = false);
 
-	/*!
-	Sends a packet serial command to the motor driver.
-	\param command The number of the command.
-	\param value   The command's value.
-	*/
-	void command(byte command, byte value) const;
+    /*!
+    Sends a packet serial command to the motor driver.
+    \param command The number of the command.
+    \param value   The command's value.
+    */
+    void command(byte command, byte value) const;
 
-	public:
-	/*!
-	Sets the speed of the specified motor.
-	\param motor The motor number, 1 or 2.
-	\param speed The speed, between -127 and 127.
-	*/
-	void motor(byte motor, int speed) const;
+    public:
+    /*!
+    Sets the speed of the specified motor.
+    \param motor The motor number, 1 or 2.
+    \param speed The speed, between -127 and 127.
+    */
+    void motor(byte motor, int speed) const;
 
-	/*!
-	Stops.
-	*/
-	void allStop() const;
+    /*!
+    Stops.
+    */
+    void allStop() const;
 
   private:
-	void throttleCommand(byte command, int speed) const;
+    void throttleCommand(byte command, int speed) const;
 
   private:
     const byte      _deviceID;  
-	HardwareSerial *_port; 	
+    HardwareSerial *_port;  
 };
 
 

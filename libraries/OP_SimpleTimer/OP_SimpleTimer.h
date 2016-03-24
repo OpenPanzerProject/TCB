@@ -1,6 +1,6 @@
-/* OP_SimpleTimer.h	Open Panzer Simple Timer library - for handling timed events without using delays
- * Source: 			openpanzer.org				
- * Authors:    		Marcello Romani, Luke Middleton
+/* OP_SimpleTimer.h Open Panzer Simple Timer library - for handling timed events without using delays
+ * Source:          openpanzer.org              
+ * Authors:         Marcello Romani, Luke Middleton
  *
  * This library is a modification of the Simple Timer timer library written by Marcello Romani.
  * Timer events now return a unique ID. Even though timer "slots" are constantly being
@@ -84,9 +84,9 @@ public:
 
     // returns the number of available timers
     int getNumAvailableTimers() { return MAX_TIMERS - numTimers; };
-	
-	// Gets the timer number (0-MAX_TIMERS) by ID
-	int getTimerNum(int ID);
+    
+    // Gets the timer number (0-MAX_TIMERS) by ID
+    int getTimerNum(int ID);
 
 private:
     // deferred call constants
@@ -119,9 +119,9 @@ private:
     // deferred function call (sort of) - N.B.: this array is only used in run()
     int toBeCalled[MAX_TIMERS];
 
-	// IDs for each timer (not equal to the timer number)
-	int timerID[MAX_TIMERS];
-	int NextID;	
+    // IDs for each timer (not equal to the timer number)
+    int timerID[MAX_TIMERS];
+    int NextID; 
 
     // actual number of timers in use
     int numTimers;

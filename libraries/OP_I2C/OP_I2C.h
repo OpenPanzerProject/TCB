@@ -1,6 +1,6 @@
-/* OP_I2C.h 		Open Panzer I2C communication library
- * Source: 			openpanzer.org				
- * Authors:    		Pieter Noordhuis, Luke Middleton
+/* OP_I2C.h         Open Panzer I2C communication library
+ * Source:          openpanzer.org              
+ * Authors:         Pieter Noordhuis, Luke Middleton
  *
  * This library is a modification of Peter Noordhuis' "AVR-I2C" library. 
  * GitHub page: https://github.com/pietern/avr-i2c
@@ -53,8 +53,8 @@
 // But we'll use 100kHz instead
 #define I2C_FREQ 100000
 
-#define I2C_TXN_DONE _BV(0)	// First bit to 1
-#define I2C_TXN_ERR  _BV(1)	// Second bit to 1
+#define I2C_TXN_DONE _BV(0) // First bit to 1
+#define I2C_TXN_ERR  _BV(1) // Second bit to 1
 
 typedef struct i2c_op i2c_op_t;
 typedef struct i2c_txn i2c_txn_t;
@@ -93,7 +93,7 @@ static inline void OP_I2C_Init_Pause(i2c_op_t *o, uint32_t len) {
   o->bufpos = 0;
   o->buf = NULL;
   o->isPause = true;
-  o->pauseLen = len*2000;	// Multiply by 2 because there are 2 ticks per uS, and 1000 because ther are 1000 uS per mS (assumes)
+  o->pauseLen = len*2000;   // Multiply by 2 because there are 2 ticks per uS, and 1000 because ther are 1000 uS per mS (assumes)
 }
 
 // Read multiple bytes

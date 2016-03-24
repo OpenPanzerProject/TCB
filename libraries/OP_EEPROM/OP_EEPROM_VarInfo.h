@@ -7,7 +7,7 @@
 //=======================================================================================================================================>>
 // You must make sure this number equals the number of variables defined in the __eeprom_data struct (including the unused FirstVar)
 // 
-	#define NUM_STORED_VARS			282
+    #define NUM_STORED_VARS         282
 
 // THIS NUMBER CAN BE CALCULATED BY THE EXCEL REFERENCE SHEET - AS CAN THE ENTIRE PROGMEM STATEMENT BELOW
 // Don't bother trying to do it by hand!
@@ -21,9 +21,9 @@ typedef uint8_t _vartype;
 #define varBOOL      1
 #define varCHAR      2
 #define varINT8      3
-#define varUINT8	 4
+#define varUINT8     4
 #define varINT16     5
-#define varUINT16	 6
+#define varUINT16    6
 #define varINT32     7
 #define varUINT32    8
 #define LAST_VARTYPE varUINT32
@@ -37,9 +37,9 @@ const __FlashStringHelper *printVarType(_vartype Type);
 
 // Meta-data we want to know for each storage/eeprom variable
 struct _storage_var_info {
-	uint16_t varID;			// Arbitrary ID set by the software developer
-	uint16_t varOffset;		// Offset of this variable within the _eeprom_data structure
-	_vartype varType;		// Type of variable. This will let us determine bytes and sign. 
+    uint16_t varID;         // Arbitrary ID set by the software developer
+    uint16_t varOffset;     // Offset of this variable within the _eeprom_data structure
+    _vartype varType;       // Type of variable. This will let us determine bytes and sign. 
 };
 
 
@@ -332,4 +332,4 @@ const PROGMEM _storage_var_info STORAGEVARS[NUM_STORED_VARS] = {
 };
 
 
-#endif	// Define OP_EEPROM_VARINFO_H
+#endif  // Define OP_EEPROM_VARINFO_H

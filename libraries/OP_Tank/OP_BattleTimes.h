@@ -7,13 +7,13 @@
 
 
 // Repairs take 15 seconds
-#define REPAIR_TIME_mS					15000	// How long does a repair operation take. During this time the tank can still receive hits, but 
+#define REPAIR_TIME_mS                  15000   // How long does a repair operation take. During this time the tank can still receive hits, but 
 
 
 // Tanks is dead for 15 seconds 
-#define DESTROYED_INOPERATIVE_TIME_mS 	15000	// How long is the vehicle immobilized after being destroyed. 15 seconds is the Tamiya spec. After this,
-												// the vehicle will automatically re-generate with full health restored. 
-											
+#define DESTROYED_INOPERATIVE_TIME_mS   15000   // How long is the vehicle immobilized after being destroyed. 15 seconds is the Tamiya spec. After this,
+                                                // the vehicle will automatically re-generate with full health restored. 
+                                            
 
 
 #endif 
