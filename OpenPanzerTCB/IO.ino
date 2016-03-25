@@ -25,9 +25,9 @@ void SetActiveInputFlag(void)
             }
         }
     }
-    //DebugSerial->print(F("A Active: "));
+    //DebugSerial->print(F("A Active Input: "));
     //PrintLnYesNo(IO_Pin[0].inputActive);
-    //DebugSerial->print(F("B Active: "));
+    //DebugSerial->print(F("B Active Input: "));
     //PrintLnYesNo(IO_Pin[1].inputActive);
 }
 

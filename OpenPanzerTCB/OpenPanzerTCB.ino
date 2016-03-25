@@ -100,15 +100,20 @@
         Servo_RECOIL * RecoilServo;
     // And of course we always have the mechanical smoker motor
         Onboard_Smoker * Smoker;
-    // We may optionally have up to 4 general purpose servo outputs, depending on how the user sets up the other motor objects
-        Servo_ESC * Servo1; // If the drive motors are onboard or serial controllers, this will be available
-        Servo_ESC * Servo2; // If the drive motors are onboard or serial controllers, AND if there is no steering servo specified, this will be available
-        Servo_ESC * Servo3; // If the turret rotation motor is serial or onboard, this will be available
-        Servo_ESC * Servo4; // If the turret elevation motor is serial or onboard, this will be available
-        boolean Servo1_Available = false;
-        boolean Servo2_Available = false;
-        boolean Servo3_Available = false;
-        boolean Servo4_Available = false;
+    // We may optionally have up to 4 general purpose RC outputs, depending on how the user sets up the other motor objects. The user can choose to have them be regular RC pass-through
+    // or create them as Pan servo pass-throughs by selecting the appropriate function in OP Config. 
+        Servo_ESC * RCOutput1;      // If the drive motors are onboard or serial controllers, this will be available
+        Servo_ESC * RCOutput2;      // If the drive motors are onboard or serial controllers, AND if there is no steering servo specified (ie not car or halftrack), this will be available
+        Servo_ESC * RCOutput3;      // If the turret rotation motor is serial or onboard, this will be available
+        Servo_ESC * RCOutput4;      // If the turret elevation motor is serial or onboard, this will be available
+        Servo_PAN * ServoOutput1;   // If the drive motors are onboard or serial controllers, this will be available
+        Servo_PAN * ServoOutput2;   // If the drive motors are onboard or serial controllers, AND if there is no steering servo specified (ie not car or halftrack), this will be available
+        Servo_PAN * ServoOutput3;   // If the turret rotation motor is serial or onboard, this will be available
+        Servo_PAN * ServoOutput4;   // If the turret elevation motor is serial or onboard, this will be available
+        boolean RCOutput1_Available = false;
+        boolean RCOutput2_Available = false;
+        boolean RCOutput3_Available = false;
+        boolean RCOutput4_Available = false;
     // We may also be able to control the onboard motors A or B directly if they are not assigned to any drive or turret function
         Onboard_ESC * MotorA;
         Onboard_ESC * MotorB;
@@ -154,11 +159,6 @@ void setup()
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         Serial.begin(USB_BAUD_RATE);                               // Hardware Serial0 - through the FTDI to USB
 
-    // PINS NOT RELATED TO OBJECTS - SETUP
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        SetupPins();                                               // We want to get our pins setup as early as we can, to put all outputs in a safe state. 
-        RedLedOn();                                                // Keep the Red LED on solid until we are out of setup. 
-
     // LOAD VALUES FROM EEPROM    
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         boolean did_we_init = eeprom.begin();                      // begin() will initialize EEPROM if it never has been before, and load all EEPROM settings into our ramcopy struct
@@ -170,6 +170,13 @@ void setup()
         {   DebugSerial = &Serial1;  }                             // Aux
         else
         {   DebugSerial = &Serial;   }                             // USB
+
+    // PINS NOT RELATED TO OBJECTS - SETUP
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->
+        // We want to setup the pins as early as possible to put all outputs in a safe state. But remember to read EEPROM first because some EEPROM setting will determine 
+        // how the pins are set. 
+        SetupPins();                                               // Any pin not explicitly set by a library gets initalized here. 
+        RedLedOn();                                                // Keep the Red LED on solid until we are out of setup. 
 
     // INIT SERIALS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->

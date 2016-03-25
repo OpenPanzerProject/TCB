@@ -25,207 +25,77 @@ void LoadFunctionTriggers()
             // that the function definition occupies in our eeprom.ramcopy.SF_Trigger array
             switch (eeprom.ramcopy.SF_Trigger[i].specialFunction)
             {
-                case SF_ENGINE_TOGGLE:
-                    SF_Callback[i] = &SF_EngineToggle;
-                    break;
-                case SF_ENGINE_ON:
-                    SF_Callback[i] = &SF_EngineOn;
-                    break;
-                case SF_ENGINE_OFF:
-                    SF_Callback[i] = &SF_EngineOff;
-                    break;
-                case SF_TRANS_TOGGLE:
-                    SF_Callback[i] = &SF_TransmissionToggle;
-                    break;
-                case SF_TRANS_ON:
-                    SF_Callback[i] = &SF_TransmissionEngage;
-                    break;
-                case SF_TRANS_OFF:
-                    SF_Callback[i] = &SF_TransmissionDisengage;
-                    break;
-                case SF_CANNON_FIRE:
-                    SF_Callback[i] = &SF_FireCannon;
-                    break;
-                case SF_MECH_BARREL:
-                    SF_Callback[i] = &SF_MechBarrel;
-                    break;
-                case SF_RECOIL_SERVO:
-                    SF_Callback[i] = &SF_RecoilServo;
-                    break;
-                case SF_HI_FLASH:
-                    SF_Callback[i] = &SF_HiFlash;
-                    break;
-                case SF_MG_FIRE:
-                    SF_Callback[i] = &SF_MG_Start;
-                    break;
-                case SF_MG_OFF:
-                    SF_Callback[i] = &SF_MG_Stop;
-                    break;
-                case SF_LIGHT1_TOGGLE:
-                    SF_Callback[i] = &SF_Light1Toggle;
-                    break;
-                case SF_LIGHT1_ON:
-                    SF_Callback[i] = &SF_Light1On;
-                    break;
-                case SF_LIGHT1_OFF:
-                    SF_Callback[i] = &SF_Light1Off;
-                    break;
-                case SF_LIGHT2_TOGGLE:
-                    SF_Callback[i] = &SF_Light2Toggle;
-                    break;
-                case SF_LIGHT2_ON:
-                    SF_Callback[i] = &SF_Light2On;
-                    break;
-                case SF_LIGHT2_OFF:
-                    SF_Callback[i] = &SF_Light2Off;
-                    break;                
-                case SF_RUNNINGLIGHTS_TOGGLE:
-                    SF_Callback[i] = &SF_RunningLightsToggle;
-                    break;
-                case SF_RUNNINGLIGHTS_ON:
-                    SF_Callback[i] = &SF_RunningLightsOn;
-                    break;
-                case SF_RUNNINGLIGHTS_OFF:
-                    SF_Callback[i] = &SF_RunningLightsOff;
-                    break;
-                case SF_AUXOUT_TOGGLE:
-                    SF_Callback[i] = &SF_AuxOutputToggle;
-                    break;
-                case SF_AUXOUT_ON:
-                    SF_Callback[i] = &SF_AuxOutputOn;
-                    break;
-                case SF_AUXOUT_OFF:
-                    SF_Callback[i] = &SF_AuxOutputOff;
-                    break;
-                case SF_AUXOUT_LEVEL:                       // Analog function
-                    SF_Callback[i] = &AuxOutput_SetLevel;   // Doesn't need an SF_ mapped function, we can call it directly
-                    break;
-                case SF_AUXOUT_PRESETDIM:
-                    SF_Callback[i] = &SF_AuxOutput_PresetDim;
-                    break;
-                case SF_AUXOUT_FLASH:
-                    SF_Callback[i] = &SF_AuxOutputFlash;
-                    break;
-                case SF_AUXOUT_BLINK:
-                    SF_Callback[i] = &SF_AuxOutputBlink;
-                    break;
-                case SF_AUXOUT_TOGGLEBLINK:
-                    SF_Callback[i] = &SF_AuxOutputToggleBlink;
-                    break;
-                case SF_AUXOUT_REVOLVE:
-                    SF_Callback[i] = &SF_AuxOutputRevolve;
-                    break;
-                case SF_AUXOUT_TOGGLEREVOLVE:
-                    SF_Callback[i] = &SF_AuxOutputToggleRevolve;
-                    break;                    
-                case SF_USER_SOUND1_ONCE:
-                    SF_Callback[i] = &SF_TriggerUserSound1;
-                    break;
-                case SF_USER_SOUND1_RPT:
-                    SF_Callback[i] = &SF_UserSound1_Repeat;
-                    break;
-                case SF_USER_SOUND1_OFF:
-                    SF_Callback[i] = &SF_UserSound1_Stop;
-                    break;
-                case SF_USER_SOUND2_ONCE:
-                    SF_Callback[i] = &SF_TriggerUserSound2;
-                    break;
-                case SF_USER_SOUND2_RPT:
-                    SF_Callback[i] = &SF_UserSound2_Repeat;
-                    break;
-                case SF_USER_SOUND2_OFF:
-                    SF_Callback[i] = &SF_UserSound2_Stop;
-                    break;
-                case SF_OUTPUT_A_TOGGLE:
-                    SF_Callback[i] = &SF_PortA_Toggle;
-                    break;
-                case SF_OUTPUT_A_ON:
-                    SF_Callback[i] = &SF_PortA_On;
-                    break; 
-                case SF_OUTPUT_A_OFF:
-                    SF_Callback[i] = &SF_PortA_Off;
-                    break; 
-                case SF_OUTPUT_B_TOGGLE:
-                    SF_Callback[i] = &SF_PortA_Toggle;
-                    break;
-                case SF_OUTPUT_B_ON:
-                    SF_Callback[i] = &SF_PortA_On;
-                    break; 
-                case SF_OUTPUT_B_OFF:
-                    SF_Callback[i] = &SF_PortA_Off;
-                    break; 
-                case SF_ACCEL_LEVEL:
-                    SF_Callback[i] = &SF_SetAccelRampFreq;
-                    break;         
-                case SF_DECEL_LEVEL:        
-                    SF_Callback[i] = &SF_SetDecelRampFreq;
-                    break;
-                case SF_TURNMODE_1:        
-                    SF_Callback[i] = &SF_TurnMode1;
-                    break;                    
-                case SF_TURNMODE_2:        
-                    SF_Callback[i] = &SF_TurnMode2;
-                    break;                    
-                case SF_TURNMODE_3:        
-                    SF_Callback[i] = &SF_TurnMode3;
-                    break;                    
-                case SF_SMOKER:                              // Analog function
-                    SF_Callback[i] = &Smoker_ManualControl;   
-                    break;
-                case SF_MOTOR_A:                             // Analog function
-                    SF_Callback[i] = &MotorA_ManualControl;   
-                    break;
-                case SF_MOTOR_B:                             // Analog function
-                    SF_Callback[i] = &MotorB_ManualControl;   
-                    break;
-                case SF_SERVO1_PASS:                         // Analog function
-                    SF_Callback[i] = &Servo1_Passthrough;   
-                    break;                    
-                case SF_SERVO2_PASS:                         // Analog function
-                    SF_Callback[i] = &Servo2_Passthrough;   
-                    break;                    
-                case SF_SERVO3_PASS:                         // Analog function
-                    SF_Callback[i] = &Servo3_Passthrough;   
-                    break;                    
-                case SF_SERVO4_PASS:                         // Analog function
-                    SF_Callback[i] = &Servo4_Passthrough;   
-                    break;                    
-                case SF_BARREL_ON:
-                    SF_Callback[i] = &SF_BarrelStab_On;   
-                    break;                    
-                case SF_BARREL_OFF:
-                    SF_Callback[i] = &SF_BarrelStab_Off;   
-                    break;                    
-                case SF_BARREL_TOGGLE:
-                    SF_Callback[i] = &SF_BarrelStab_Toggle;   
-                    break;                                        
-                case SF_BARREL_LEVEL:                        // Analog function
-                    SF_Callback[i] = &SetBarrelSensitivity;   
-                    break;                    
-                case SF_HILLS_ON:
-                    SF_Callback[i] = &SF_HillPhysics_On;   
-                    break;                    
-                case SF_HILLS_OFF:
-                    SF_Callback[i] = &SF_HillPhysics_Off;   
-                    break;                    
-                case SF_HILLS_TOGGLE:
-                    SF_Callback[i] = &SF_HillPhysics_Toggle;   
-                    break;                                        
-                case SF_HILLS_LEVEL:                         // Analog function
-                    SF_Callback[i] = &SetHillSensitivity;   
-                    break;                    
-                case SF_USER_FUNC_1:
-                    SF_Callback[i] = &SF_UserFunc1;
-                    break;
-                case SF_USER_FUNC_2:
-                    SF_Callback[i] = &SF_UserFunc2;
-                    break;                    
-                case SF_USER_ANLG_1:
-                    SF_Callback[i] = &User_Analog_Function1;
-                    break;
-                case SF_USER_ANLG_2:
-                    SF_Callback[i] = &User_Analog_Function2;
-                    break;
+                case SF_ENGINE_TOGGLE:              SF_Callback[i] = &SF_EngineToggle;                              break;
+                case SF_ENGINE_ON:                  SF_Callback[i] = &SF_EngineOn;                                  break; 
+                case SF_ENGINE_OFF:                 SF_Callback[i] = &SF_EngineOff;                                 break;
+                case SF_TRANS_TOGGLE:               SF_Callback[i] = &SF_TransmissionToggle;                        break;
+                case SF_TRANS_ON:                   SF_Callback[i] = &SF_TransmissionEngage;                        break;
+                case SF_TRANS_OFF:                  SF_Callback[i] = &SF_TransmissionDisengage;                     break;
+                case SF_CANNON_FIRE:                SF_Callback[i] = &SF_FireCannon;                                break;
+                case SF_MECH_BARREL:                SF_Callback[i] = &SF_MechBarrel;                                break;
+                case SF_RECOIL_SERVO:               SF_Callback[i] = &SF_RecoilServo;                               break;
+                case SF_HI_FLASH:                   SF_Callback[i] = &SF_HiFlash;                                   break;
+                case SF_MG_FIRE:                    SF_Callback[i] = &SF_MG_Start;                                  break;
+                case SF_MG_OFF:                     SF_Callback[i] = &SF_MG_Stop;                                   break;
+                case SF_LIGHT1_TOGGLE:              SF_Callback[i] = &SF_Light1Toggle;                              break;
+                case SF_LIGHT1_ON:                  SF_Callback[i] = &SF_Light1On;                                  break;
+                case SF_LIGHT1_OFF:                 SF_Callback[i] = &SF_Light1Off;                                 break;
+                case SF_LIGHT2_TOGGLE:              SF_Callback[i] = &SF_Light2Toggle;                              break;
+                case SF_LIGHT2_ON:                  SF_Callback[i] = &SF_Light2On;                                  break;
+                case SF_LIGHT2_OFF:                 SF_Callback[i] = &SF_Light2Off;                                 break;                
+                case SF_RUNNINGLIGHTS_TOGGLE:       SF_Callback[i] = &SF_RunningLightsToggle;                       break;
+                case SF_RUNNINGLIGHTS_ON:           SF_Callback[i] = &SF_RunningLightsOn;                           break;
+                case SF_RUNNINGLIGHTS_OFF:          SF_Callback[i] = &SF_RunningLightsOff;                          break;
+                case SF_AUXOUT_TOGGLE:              SF_Callback[i] = &SF_AuxOutputToggle;                           break;
+                case SF_AUXOUT_ON:                  SF_Callback[i] = &SF_AuxOutputOn;                               break;
+                case SF_AUXOUT_OFF:                 SF_Callback[i] = &SF_AuxOutputOff;                              break;
+                case SF_AUXOUT_LEVEL:               SF_Callback[i] = &AuxOutput_SetLevel;                           break; // Analog function
+                case SF_AUXOUT_PRESETDIM:           SF_Callback[i] = &SF_AuxOutput_PresetDim;                       break;
+                case SF_AUXOUT_FLASH:               SF_Callback[i] = &SF_AuxOutputFlash;                            break;
+                case SF_AUXOUT_BLINK:               SF_Callback[i] = &SF_AuxOutputBlink;                            break;
+                case SF_AUXOUT_TOGGLEBLINK:         SF_Callback[i] = &SF_AuxOutputToggleBlink;                      break;
+                case SF_AUXOUT_REVOLVE:             SF_Callback[i] = &SF_AuxOutputRevolve;                          break;
+                case SF_AUXOUT_TOGGLEREVOLVE:       SF_Callback[i] = &SF_AuxOutputToggleRevolve;                    break;                    
+                case SF_USER_SOUND1_ONCE:           SF_Callback[i] = &SF_TriggerUserSound1;                         break;
+                case SF_USER_SOUND1_RPT:            SF_Callback[i] = &SF_UserSound1_Repeat;                         break;
+                case SF_USER_SOUND1_OFF:            SF_Callback[i] = &SF_UserSound1_Stop;                           break;
+                case SF_USER_SOUND2_ONCE:           SF_Callback[i] = &SF_TriggerUserSound2;                         break;
+                case SF_USER_SOUND2_RPT:            SF_Callback[i] = &SF_UserSound2_Repeat;                         break;
+                case SF_USER_SOUND2_OFF:            SF_Callback[i] = &SF_UserSound2_Stop;                           break;
+                case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
+                case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
+                case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
+                case SF_OUTPUT_B_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
+                case SF_OUTPUT_B_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
+                case SF_OUTPUT_B_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
+                case SF_ACCEL_LEVEL:                SF_Callback[i] = &SF_SetAccelRampFreq;                          break;         
+                case SF_DECEL_LEVEL:                SF_Callback[i] = &SF_SetDecelRampFreq;                          break;
+                case SF_TURNMODE_1:                 SF_Callback[i] = &SF_TurnMode1;                                 break;                    
+                case SF_TURNMODE_2:                 SF_Callback[i] = &SF_TurnMode2;                                 break;                    
+                case SF_TURNMODE_3:                 SF_Callback[i] = &SF_TurnMode3;                                 break;                    
+                case SF_SMOKER:                     SF_Callback[i] = &Smoker_ManualControl;                         break; // Analog function
+                case SF_MOTOR_A:                    SF_Callback[i] = &MotorA_ManualControl;                         break; // Analog function
+                case SF_MOTOR_B:                    SF_Callback[i] = &MotorB_ManualControl;                         break; // Analog function
+                case SF_RC1_PASS:                   SF_Callback[i] = &RC_Passthrough_1;                             break; // Analog function
+                case SF_RC2_PASS:                   SF_Callback[i] = &RC_Passthrough_2;                             break; // Analog function
+                case SF_RC3_PASS:                   SF_Callback[i] = &RC_Passthrough_3;                             break; // Analog function
+                case SF_RC4_PASS:                   SF_Callback[i] = &RC_Passthrough_4;                             break; // Analog function
+                case SF_RC1_PASS_PAN:               SF_Callback[i] = &RC_PanServo_1;                                break; // Analog function
+                case SF_RC2_PASS_PAN:               SF_Callback[i] = &RC_PanServo_2;                                break; // Analog function
+                case SF_RC3_PASS_PAN:               SF_Callback[i] = &RC_PanServo_3;                                break; // Analog function
+                case SF_RC4_PASS_PAN:               SF_Callback[i] = &RC_PanServo_4;                                break; // Analog function
+                case SF_BARREL_ON:                  SF_Callback[i] = &SF_BarrelStab_On;                             break;                    
+                case SF_BARREL_OFF:                 SF_Callback[i] = &SF_BarrelStab_Off;                            break;                    
+                case SF_BARREL_TOGGLE:              SF_Callback[i] = &SF_BarrelStab_Toggle;                         break;                                        
+                case SF_BARREL_LEVEL:               SF_Callback[i] = &SetBarrelSensitivity;                         break; // Analog function
+                case SF_HILLS_ON:                   SF_Callback[i] = &SF_HillPhysics_On;                            break;                    
+                case SF_HILLS_OFF:                  SF_Callback[i] = &SF_HillPhysics_Off;                           break;                    
+                case SF_HILLS_TOGGLE:               SF_Callback[i] = &SF_HillPhysics_Toggle;                        break;                                        
+                case SF_HILLS_LEVEL:                SF_Callback[i] = &SetHillSensitivity;                           break; // Analog function
+                case SF_USER_FUNC_1:                SF_Callback[i] = &SF_UserFunc1;                                 break;
+                case SF_USER_FUNC_2:                SF_Callback[i] = &SF_UserFunc2;                                 break;                    
+                case SF_USER_ANLG_1:                SF_Callback[i] = &User_Analog_Function1;                        break; // Analog function
+                case SF_USER_ANLG_2:                SF_Callback[i] = &User_Analog_Function2;                        break; // Analog function
             }
         }
     }
@@ -249,6 +119,11 @@ uint8_t CountTriggers(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
 {
+    // We add spaces at the end of each description so they will all always equal the same number of characters.
+    // With a fixed space font this makes them easier to read when printed. Set this constant to the length of
+    // the longest decription, and any description shorter than that will have the appropriate number of spaces added. 
+    const uint8_t PadLength = 29;
+    
     uint8_t TriggerAction = 0;
 
     // Is the selected function digital or analog:
@@ -260,6 +135,7 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
         // Trigger action in this case is equal to the Trigger ID
         DebugSerial->print(F("Turret Stick - "));
         DebugSerial->print(TurretStickPosition(TriggerID));
+        PrintSpaces(PadLength - (TS_PositionString_Length(TurretStickPositionArrayNumFromTriggerID(TriggerID)) + 15));   // TS_PositionString_Length defined in OP_Radio.h. TurretStickPositionArrayNumFromTriggerID is defined below. 
     }
     // External I/O source. The Trigger Source is the integer value of the division by the ports multiplier (discard remainder)
     else if (TriggerID >= trigger_id_multiplier_ports && TriggerID < trigger_id_multiplier_auxchannel)
@@ -276,12 +152,13 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
         {
             // The remainder is the action (on/off if digital, or variable if analog)
             TriggerAction = getTriggerActionFromTriggerID(TriggerID);
-            if (TriggerAction == 0) DebugSerial->print(F("Off")); 
-            if (TriggerAction == 1) DebugSerial->print(F("On"));
+            if (TriggerAction == 0) { DebugSerial->print(F("Off")); PrintSpaces(PadLength - 22); }
+            if (TriggerAction == 1) { DebugSerial->print(F("On"));  PrintSpaces(PadLength - 21); }
         }
         else                         
         {
             DebugSerial->print(F("Variable"));
+            PrintSpaces(PadLength - 27);
         }
     }
     // Aux RC Channel Trigger
@@ -289,9 +166,10 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
     {
         int channelNum = TriggerID / trigger_id_multiplier_auxchannel;
         DebugSerial->print(F("Aux Channel "));
+        if (channelNum < 10) PrintSpace();
         DebugSerial->print(channelNum, DEC);
         PrintSpaceDash();
-        // Up to this point we now have something like "Aux Channel 4 - "
+        // Up to this point we now have something like "Aux Channel  4 - "
         if (sf_digital)
         {
             // But we still need to append the position. Complicating matters is that the text description of the switch position
@@ -308,26 +186,53 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
                     // we split the difference at 3 for robustness
                     if (TriggerAction <= 3) DebugSerial->print(F("1 (of 2)"));
                     if (TriggerAction >  3) DebugSerial->print(F("2 (of 2)"));
+                    PrintSpaces(PadLength - 29);    
                     break;
                 case 3:
                     // Again here the only valid positions are 1,3 and 5 but this works as well
                     if (TriggerAction <  3) DebugSerial->print(F("1 (of 3)"));
                     if (TriggerAction == 3) DebugSerial->print(F("2 (of 3)"));
                     if (TriggerAction >  3) DebugSerial->print(F("3 (of 3)"));
+                    PrintSpaces(PadLength - 29);
                     break;
                 case 5:
                     DebugSerial->print(TriggerAction, DEC);
                     DebugSerial->print(F(" (of 5)"));
+                    PrintSpaces(PadLength - 29);
                     break;
             }
         }
         else
         {
             DebugSerial->print(F("Variable"));
+            PrintSpaces(PadLength - 25);
         }
     }
 }
 
+// The Trigger ID for the 9 turret stick positions are not numbers 1-9, 
+// but for purposes of printing out the description we have the names in
+// an array from 1-9 so sometimes it is useful to convert the Trigger ID
+// to that range
+uint8_t TurretStickPositionArrayNumFromTriggerID(uint8_t TID)
+{
+    switch (TID)
+    {
+        case 0:  return 0; break;
+        case TL: return 1; break;
+        case TC: return 2; break;
+        case TR: return 3; break;
+        case ML: return 4; break;
+        case MC: return 5; break;
+        case MR: return 6; break;
+        case BL: return 7; break;
+        case BC: return 8; break;
+        case BR: return 9; break;
+        default: return 0; break;
+    }
+}
+
+// How many switch positions does this trigger have (External Input or Digital Aux only)
 uint8_t getNumPositionsFromTriggerID(uint16_t TriggerID)
 {
     // Turret stick trigger - num positions is not relevant
@@ -494,6 +399,9 @@ uint16_t ScaleAuxChannelPulse_to_AnalogInput(int chan)
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // RE-DIRECT FUNCTIONS - FOR ANALOG FUNCTIONS WITH PARAMETER
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
+
+// Acceleration and Deceleration constraint adjustment
+// ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // This function maps the 0-1023 analog input to a range from 1-MAX_SKIP_NUM expected by the two 
 // drive functions used to change the acceleration/deceleration constraints
 uint8_t SkipNum_from_AnalogInput(uint16_t val)
@@ -524,11 +432,8 @@ void SF_SetDecelRampFreq(uint16_t val)
     }
 }
 
-// These re-direct functions pass the correct mode number
-void SF_TurnMode1(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 1) { Driver.setTurnMode(1); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 1")); } }
-void SF_TurnMode2(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 2) { Driver.setTurnMode(2); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 2")); } }
-void SF_TurnMode3(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 3) { Driver.setTurnMode(3); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 3")); } }
-
+// Barrel stabilizatoin and "Hill physics" adjustment
+// ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // Barrel Stabilization and Hill Physics sensitivy numbers can vary between 1-100. 
 void SetBarrelSensitivity(uint16_t level)       
 { 
@@ -540,7 +445,6 @@ void SetBarrelSensitivity(uint16_t level)
         if (DEBUG) { DebugSerial->print(F("Set Barrel Sensitivity: ")); PrintLnPct(bs); } 
     }
 }  
-
 void SetHillSensitivity(uint16_t level)         
 { 
     uint8_t hs = map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 1, 100); 
@@ -552,35 +456,55 @@ void SetHillSensitivity(uint16_t level)
     }
 }  
 
-// Servo pass-through functions
-void Servo1_Passthrough(uint16_t level)
+
+// RC Output pass-through functions
+// ----------------------------------------------------------------------------------------------------------------------------------------------->>
+void RC_Passthrough_1(uint16_t level)
 {   // Recall, all analog special functions must receive values from 0-1023. But instead of using the map function here, we just set the external range
-    // of the servo object to that range and the motor class will take care of it. 
-    //if (Servo1_Available) Servo1->setSpeed(map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, MOTOR_MAX_REVSPEED, MOTOR_MAX_FWDSPEED));
-    if (Servo1_Available) Servo1->setSpeed(level);
+    // of the servo object to that range and the motor class will take care of it (which we did when we created this object)
+    if (RCOutput1_Available) RCOutput1->setPos(level);    
 }
-void Servo2_Passthrough(uint16_t level)
+void RC_Passthrough_2(uint16_t level)
 {
-    if (Servo2_Available) Servo2->setSpeed(level);
+    if (RCOutput2_Available) RCOutput2->setPos(level);
 }
-void Servo3_Passthrough(uint16_t level)
+void RC_Passthrough_3(uint16_t level)
 {
-    if (Servo3_Available) Servo3->setSpeed(level);
+    if (RCOutput3_Available) RCOutput3->setPos(level);
 }
-void Servo4_Passthrough(uint16_t level)
+void RC_Passthrough_4(uint16_t level)
 {
-    if (Servo4_Available) Servo4->setSpeed(level);
+    if (RCOutput4_Available) RCOutput4->setPos(level);
+}
+// These are the pan servo variants. Here we set the pan speed instead of the actual position
+void RC_PanServo_1(uint16_t level)
+{
+    if (RCOutput1_Available) ServoOutput1->setSpeed(level);
+}
+void RC_PanServo_2(uint16_t level)
+{
+    if (RCOutput2_Available) ServoOutput2->setSpeed(level);
+}
+void RC_PanServo_3(uint16_t level)
+{
+    if (RCOutput3_Available) ServoOutput3->setSpeed(level);
+}
+void RC_PanServo_4(uint16_t level)
+{
+    if (RCOutput4_Available) ServoOutput4->setSpeed(level);
 }
 
-// Onboard motor pass-through functions - if not used for drive or turret control
+
+// Onbord motor pass-through functions - if not used for drive or turret control
+// ----------------------------------------------------------------------------------------------------------------------------------------------->>
+// If these exist, we already set the Motor A & B external range to ANALOG_SPECFUNCTION_MIN_VAL to ANALOG_SPECFUNCTION_MAX_VAL for the motor object in InstantiateMotorObjects() on the ObjectSetup tab.
+// So no scaling needs to be done to level. 
 void MotorA_ManualControl(uint16_t level)
 {
-    //if (MotorA_Available) MotorA->setSpeed();
+    if (MotorA_Available) MotorA->setSpeed(level);
 }
 void MotorB_ManualControl(uint16_t level)
 {
-    // We already set the MotorB external range to ANALOG_SPECFUNCTION_MIN_VAL to ANALOG_SPECFUNCTION_MAX_VAL for the MotorB object in
-    // InstantiateMotorObjects()
     if (MotorB_Available) MotorB->setSpeed(level);
 }
 

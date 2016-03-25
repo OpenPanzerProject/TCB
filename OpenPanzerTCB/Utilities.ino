@@ -38,6 +38,7 @@ void PrintSpace()
 
 void PrintSpaces(int num)
 {
+    if (num == 0) return;
     for (int i=0; i<num; i++) { PrintSpace(); }
 }
 
@@ -384,6 +385,8 @@ void DumpLVC_Voltage()
 
 void DumpFunctionTriggers()
 {
+    char buffer[50];
+    
     DebugSerial->println();
     PrintDebugLine();
     DebugSerial->println(F("FUNCTION TRIGGERS"));
@@ -394,11 +397,14 @@ void DumpFunctionTriggers()
         {   // A valid function-trigger will have a function number and a TriggerID > 0
             if (eeprom.ramcopy.SF_Trigger[i].specialFunction != SF_NULL_FUNCTION && eeprom.ramcopy.SF_Trigger[i].TriggerID > 0)
             {   
+                PrintTriggerDescription(eeprom.ramcopy.SF_Trigger[i].specialFunction, eeprom.ramcopy.SF_Trigger[i].TriggerID);
+                DebugSerial->print(F(" -> "));
                 DebugSerial->print(F("Function #"));
                 DebugSerial->print(eeprom.ramcopy.SF_Trigger[i].specialFunction);
                 if (eeprom.ramcopy.SF_Trigger[i].specialFunction < 10) PrintSpace();
                 PrintSpaceDash();
-                PrintTriggerDescription(eeprom.ramcopy.SF_Trigger[i].specialFunction, eeprom.ramcopy.SF_Trigger[i].TriggerID);
+                strcpy_P(buffer, (char*)pgm_read_word_far(&(function_name_table[eeprom.ramcopy.SF_Trigger[i].specialFunction])));
+                DebugSerial->print(buffer);
                 DebugSerial->println();
             }
         }

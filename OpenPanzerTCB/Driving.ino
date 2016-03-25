@@ -127,6 +127,13 @@ void TransmissionToggle()
 }
 
 
+// SPECIAL FUNCTIONS: Turn Mode
+// ----------------------------------------------------------------------------------------------------------------------------------------------->>
+void SF_TurnMode1(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 1) { Driver.setTurnMode(1); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 1")); } }
+void SF_TurnMode2(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 2) { Driver.setTurnMode(2); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 2")); } }
+void SF_TurnMode3(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 3) { Driver.setTurnMode(3); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 3")); } }
+
+
 // OTHER DRIVING FUNCTIONS
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void StopEverything()

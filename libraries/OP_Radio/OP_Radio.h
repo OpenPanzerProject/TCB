@@ -37,6 +37,9 @@ const __FlashStringHelper *RadioProtocol(RADIO_PROTOCOL RP); // Returns a pointe
 // This one is to print out turret stick positions
 const __FlashStringHelper *TurretStickPosition(uint8_t TSP); // Returns a pointer to a flash-stored character string that is name of turret stick position
 
+// This array is the length in characters of the text description of each turret stick position (as defined in OP_Radio.cpp)
+const PROGMEM uint8_t TurretStickPositionStringLengths[SPECIALPOSITIONS+1] = { 7, 8, 9, 9, 11, 12, 12, 11, 12, 12 }; // We add one for "unknown"
+#define TS_PositionString_Length(p) pgm_read_byte_far(&TurretStickPositionStringLengths[p])
 
 #define SBUS_TRY_TIME       400     // How long to try detecting an SBus signal, in mS. Only used in detect mode at startup. 
 #define PPM_TRY_TIME        400     // How long to try detecting a PPM signal, in mS. Only used in detect mode at startup. 

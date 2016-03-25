@@ -79,7 +79,7 @@ void RunningLightsOn()
     {   // But we only set the dim level if the brake lights aren't on
         analogWrite(pin_Brakelights, RunningLightsDimLevel);
     }
-    if (DEBUG) { DebugSerial->println(F("Running Lights On")); }
+    //if (DEBUG) { DebugSerial->println(F("Running Lights On")); }
 }
 
 void RunningLightsOff()

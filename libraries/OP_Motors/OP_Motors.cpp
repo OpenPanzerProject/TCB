@@ -451,18 +451,18 @@ void Servo_PAN::setSpeed(int s)
 {
     // save current speed
     curspeed = s;
-
+        
     // All the other classes use map_Range to map the passed speed parameter to the internal range of the motor object. 
     // But this is a unique case, we actually want to map the passed speed parameter to the range of allowable speeds we let the servo move.
     // This is not the same as the servo's endpoints, those are saved in the servo object. 
     // So here we are not writing a specific position to the servo, we are telling it how *fast* to move (pan). 
     // It will keep moving in this direction at this rate until we change the speed, stop the ramping, or it reaches the servo object limit. 
-    if (s == 0) 
+    if (s == this->e_middlespeed)
     { 
         // Tell the servo to stop moving.
         this->stopRamping(ESC_Position); 
         // Now figure out where the servo stopped, and save this position for future reference. 
-        // When the user stops moving the servo (s == 0) we know it is in the position where the user wants it to stay. 
+        // When the user stops moving the servo (s == middlespeed) we know it is in the position where the user wants it to stay. 
         // If this pan servo is being used for barrel stabilization, we can refer to this fixedPos as the point where it needs to be stabilized to. 
         if (canSetFixedPos) 
         {

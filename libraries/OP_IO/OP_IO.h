@@ -29,7 +29,7 @@
 
 typedef struct external_io_settings{
     uint8_t dataDirection;  // 1 = output, 0 = input
-    boolean Digital;        // If input, is this on/off or analog
+    boolean Digital;        // If input, is this on/off (digital = 1) or analog (0)
 };
 
 typedef struct external_io{
