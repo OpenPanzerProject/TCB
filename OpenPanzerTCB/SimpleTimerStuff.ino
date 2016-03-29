@@ -45,13 +45,13 @@ void StopBlinking(int TimerID)
     timer.deleteTimer(TimerID);
 }
 
-int StartWaiting_mS(int mS)
+int StartWaiting_mS(long mS)
 {
     TimeUp = false;
     return timer.setTimeout(mS, SetTimeUp);    // will call function once after ms duration
 }
 
-int StartWaiting_sec(int seconds)
+int StartWaiting_sec(long seconds)
 {
     return StartWaiting_mS(seconds*1000);
 }
