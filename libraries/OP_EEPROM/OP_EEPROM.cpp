@@ -422,7 +422,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.DecelSkipNum = 4;
         ramcopy.DecelPreset = 0;
         ramcopy.BrakeSensitivityPct = 40;       // NOT PRESENTLY IMPLEMENTED
-        ramcopy.TimeToShift_mS = 1500;
+        ramcopy.TimeToShift_mS = 1000;          // Default to 1 second
         ramcopy.EnginePauseTime_mS = 1000;      // Default to 1 second
         ramcopy.TransmissionDelay_mS =2000;     // Default to 2 seconds
         ramcopy.NeutralTurnAllowed = true;
