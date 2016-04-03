@@ -25,13 +25,15 @@
 #include "OP_RadioDefines.h"
 #include "OP_PPMDecode.h"
 #include "OP_SBusDecode.h"
+#include "OP_iBusDecode.h"
 
 
 typedef char RADIO_PROTOCOL; 
 #define PROTOCOL_NONE   0                   // Unknown or none detected
-#define PROTOCOL_SBUS   1                   // SBus protocol
-#define PROTOCOL_PPM    2                   // PPM protocol
-#define LAST_RADIOPROTOCOL PROTOCOL_PPM     // So we know how to identify invalid values
+#define PROTOCOL_PPM    1                   // PPM protocol
+#define PROTOCOL_SBUS   2                   // SBus protocol
+#define PROTOCOL_iBUS   3                   // iBus protocol
+#define LAST_RADIOPROTOCOL PROTOCOL_iBUS    // So we know how to identify invalid values
 const __FlashStringHelper *RadioProtocol(RADIO_PROTOCOL RP); // Returns a pointer to a flash-stored character string that is the name of the radio protocol
 
 // This one is to print out turret stick positions
@@ -41,8 +43,9 @@ const __FlashStringHelper *TurretStickPosition(uint8_t TSP); // Returns a pointe
 const PROGMEM uint8_t TurretStickPositionStringLengths[SPECIALPOSITIONS+1] = { 7, 8, 9, 9, 11, 12, 12, 11, 12, 12 }; // We add one for "unknown"
 #define TS_PositionString_Length(p) pgm_read_byte_far(&TurretStickPositionStringLengths[p])
 
-#define SBUS_TRY_TIME       400     // How long to try detecting an SBus signal, in mS. Only used in detect mode at startup. 
 #define PPM_TRY_TIME        400     // How long to try detecting a PPM signal, in mS. Only used in detect mode at startup. 
+#define SBUS_TRY_TIME       400     // How long to try detecting an SBus signal, in mS. Only used in detect mode at startup. 
+#define iBUS_TRY_TIME       400     // How long to try detecting an iBus signal, in mS. Only used in detect mode at startup. 
 
 #define RADIO_FAILSAFE_MS   300     // If we exceed this amount of time in milliseconds without reading a valid radio frame, go into failsafe. 
                                     // 250 milliseconds is 1/4 second. That is a long time for an RC receiver, normally 12 PPM frames and over 25 SBus
@@ -78,6 +81,7 @@ class OP_Radio
         static RADIO_PROTOCOL   Protocol;                               // Which protocol detected
         static                  PPMDecode *PPMDecoder;                  // PPM Decoder object       
         static                  SBusDecode *SBusDecoder;                // SBus Decoder object
+        static                  iBusDecode *iBusDecoder;                // iBus Decoder object
         static void             GetFrame(void);                         // Request a frame from the PPM/SBus decoder
         static void             GetStickCommand(stick_channel &ch);     // Calculate the four stick channel positions
         static int              GetSpecialPosition(sf_channel &sfc);    // Calculate the abstract "special stick" position, if used
@@ -93,11 +97,14 @@ class OP_Radio
         static void             restartWatchdog(void);                  // Re-starts the watchdog timer. We call this every time we get a new frame of data from the radio. 
         static int              WatchdogTimerID;
         
-        static void             failSBus(void);                         // If we fail to read SBus
         static void             failPPM(void);                          // If we fail to read PPM
-        static boolean          SBusFailed;                             // Are we trying to detect SBus?
+        static void             failSBus(void);                         // If we fail to read SBus
+        static void             failiBus(void);                         // If we fail to read iBus
         static boolean          PPMFailed;                              // Are we trying to detect PPM? 
+        static boolean          SBusFailed;                             // Are we trying to detect SBus?
+        static boolean          iBusFailed;                             // Are we trying to detect iBus?        
         static void             pollSBus(void);                         // SBus needs polling
+        static void             polliBus(void);                         // iBus needs polling
         
         static OP_SimpleTimer   radioTimer;                             // Used for watchdog timer and other stuff
         static uint8_t          channelCount;                           // How many channels were detected in the PPM stream

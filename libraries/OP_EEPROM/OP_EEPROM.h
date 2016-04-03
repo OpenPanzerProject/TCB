@@ -76,12 +76,13 @@ class OP_EEPROM
         static boolean readSerialEEPROM_byID(uint16_t ID, char * chrArray, uint8_t bufflen, uint8_t &stringlength);
         static boolean updateEEPROM_byID(uint16_t ID, uint32_t Value);      // This will update the variable of "ID" with "Value" in EEPROM
 
-        
+        static void factoryReset(void);             // This will force a call to Initialize_EEPROM(). All eeprom vars will be rest to default values. 
+
     protected:
         
         // Functions
         static void Initialize_RAMcopy(void);       // Called by Initilize_EEPROM. It sets all the RAM variables to default values. 
-        static void Initialize_EEPROM(void);        // This copies all variables (at default values) from RAM into eeprom. 
+        static void Initialize_EEPROM(void);        // This copies all variables (at default values) from RAM into eeprom.
         
         static uint16_t findStorageVarInfo(_storage_var_info &svi, uint16_t findID);    // When we know the var ID but not the position in the array it occupies
         static boolean getStorageVarInfo(_storage_var_info &svi, uint16_t arrayPos);    // For when we already know the array element we want

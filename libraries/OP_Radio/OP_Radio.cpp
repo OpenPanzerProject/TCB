@@ -9,8 +9,10 @@ aux_channels                OP_Radio::AuxChannel[AUXCHANNELS];      // Create AU
 sf_channel                  OP_Radio::SpecialStick;                 // This holds information about the turret stick, and whether it is being held in a position to indicate a special command
 PPMDecode                 * OP_Radio::PPMDecoder;                   // PPM Decoder object       
 SBusDecode                * OP_Radio::SBusDecoder;                  // SBus Decoder object
-boolean                     OP_Radio::SBusFailed;
+iBusDecode                * OP_Radio::iBusDecoder;                  // iBus Decoder object
 boolean                     OP_Radio::PPMFailed;
+boolean                     OP_Radio::SBusFailed;
+boolean                     OP_Radio::iBusFailed;       
 RADIO_PROTOCOL              OP_Radio::Protocol;                     // Which protocol detected
 
 OP_SimpleTimer              OP_Radio::radioTimer;
@@ -26,8 +28,8 @@ const __FlashStringHelper *TurretStickPosition(uint8_t TSP)
 {
     if ( TSP > MAX_SPEC_POS) TSP = 0;
     const __FlashStringHelper *Names[SPECIALPOSITIONS+1]={F("Unknown"),F("Top Left"),F("Top Center"),F("Top Right"), 
-                                                        F("Middle Left"),F("Middle Center"),F("Middle Right"),
-                                                        F("Bottom Left"),F("Bottom Center"),F("Bottom Right")};
+                                                          F("Middle Left"),F("Middle Center"),F("Middle Right"),
+                                                          F("Bottom Left"),F("Bottom Center"),F("Bottom Right")};
     switch (TSP)
     {
         case 0:  return Names[0]; break;
@@ -48,7 +50,7 @@ const __FlashStringHelper *TurretStickPosition(uint8_t TSP)
 const __FlashStringHelper *RadioProtocol(RADIO_PROTOCOL RP)          
 {
     if ( RP > LAST_RADIOPROTOCOL) RP = PROTOCOL_NONE;
-    const __FlashStringHelper *Names[LAST_RADIOPROTOCOL+1]={F("None Detected"),F("SBus"),F("PPM")};
+    const __FlashStringHelper *Names[LAST_RADIOPROTOCOL+1]={F("None Detected"),F("PPM"),F("SBus"),F("iBus")};
     return Names[RP];
 }
 
@@ -64,18 +66,18 @@ OP_Radio::OP_Radio()
     UsingSpecialPositions = false;
     InFailsafe = false;
     
-    SBusFailed = false;
     PPMFailed = false;
+    SBusFailed = false;
+    iBusFailed = false;
 }
 
 
 void OP_Radio::detect(void)
 {
-// This function tries to detect SBus or PPM data on the line. It tries one, if it fails, it tries the next,
-// and if that fails, it goes back to the first, and keeps trying back and forth forever so long as it's called.
-// The calling routine needs to also be checking OP_Radio.Status(). When it returns READY_state, then it knows a protocol
-// has been successfully detected. At that time the calling routine can check OP_Radio.getProtocol() to find
-// out which one we found. 
+// This function tries to detect a radio signal (PPM, SBus, or iBus). It tries one, if it fails, it tries the next,
+// and keeps going until it tries the last one, and then returns to the first and starts over. It keeps trying so long as it's called, 
+// so the calling routine needs to also be checking OP_Radio.Status(). When status returns READY_state, then the calling routine knows a protocol
+// has been successfully detected. At that time the calling routine can check OP_Radio.getProtocol() to find out which one we found. 
 
 static uint8_t tryProtocol = PROTOCOL_SBUS;     // Whatever you set here, will be the first one checked
 static boolean started = false;
@@ -84,61 +86,122 @@ static boolean started = false;
     // ---------------------------------------------------------------------------->>
     if (started == false)
     {
-        if (tryProtocol == PROTOCOL_SBUS && !SBusFailed)
-        {   // See if we can detect SBus
-            SBusDecoder = new SBusDecode;
-            SBusDecoder->begin();
-            // Start a try timer
-            radioTimer.setTimeout(SBUS_TRY_TIME, failSBus);
-            started = true;
-        }
-        else if (tryProtocol == PROTOCOL_PPM && !PPMFailed)
-        {   // Try to detect PPM
-            PPMDecoder = new PPMDecode;
-            PPMDecoder->begin();
-            // Start a try timer
-            radioTimer.setTimeout(PPM_TRY_TIME, failPPM);
-            started = true;
+        switch (tryProtocol)
+        {
+            
+            case PROTOCOL_PPM:
+                if (!PPMFailed)
+                {   // Try to detect PPM
+                    PPMDecoder = new PPMDecode;
+                    PPMDecoder->begin();
+                    // Start a try timer
+                    radioTimer.setTimeout(PPM_TRY_TIME, failPPM);
+                    started = true;
+                    //Serial.println(F("Seaching for PPM..."));
+                }
+                break;
+                
+            case PROTOCOL_SBUS:
+                if (!SBusFailed)
+                {   // See if we can detect SBus
+                    SBusDecoder = new SBusDecode;
+                    SBusDecoder->begin();
+                    // Start a try timer
+                    radioTimer.setTimeout(SBUS_TRY_TIME, failSBus);
+                    started = true;
+                    //Serial.println(F("Seaching for SBus..."));
+                }
+                break;
+
+            case PROTOCOL_iBUS:
+                if (!iBusFailed)
+                {   // See if we can detect iBus
+                    iBusDecoder = new iBusDecode;
+                    iBusDecoder->begin();
+                    // Start a try timer
+                    radioTimer.setTimeout(iBUS_TRY_TIME, failiBus);
+                    started = true;
+                    //Serial.println(F("Seaching for iBus..."));
+                }
+                break;
         }
     }
     // KEEP TRYING A PROTOCOL
     // ---------------------------------------------------------------------------->>
     else
     {
-        if (tryProtocol == PROTOCOL_SBUS && !SBusFailed)
-        {   // SBus needs to be polled
-            SBusDecoder->update();
-            if (SBusDecoder->getState() == READY_state) { Protocol = PROTOCOL_SBUS; }   // Set protocol to SBUS
-        }
-        else if (tryProtocol == PROTOCOL_PPM && !PPMFailed)
+        switch (tryProtocol)
         {
-            if (PPMDecoder->getState() == READY_state)  { Protocol = PROTOCOL_PPM;  }   // Set protocol to PPM
+            case PROTOCOL_PPM:
+                if (!PPMFailed && PPMDecoder->getState() == READY_state) Protocol = PROTOCOL_PPM;   // Set protocol to PPM
+                break;
+                
+            case PROTOCOL_SBUS:
+                if (!SBusFailed)
+                {   // SBus needs to be polled
+                    SBusDecoder->update();
+                    if (SBusDecoder->getState() == READY_state) { Protocol = PROTOCOL_SBUS; }       // Set protocol to SBUS
+                }
+                break;
+            
+            case PROTOCOL_iBUS:
+                if (!iBusFailed)
+                {   // iBus needs to be polled
+                    iBusDecoder->update();
+                    if (iBusDecoder->getState() == READY_state) { Protocol = PROTOCOL_iBUS; }       // Set protocol to iBUS
+                }
+                break;
         }
     }
 
     // FAIL A PROTOCOL, AND TRY THE OTHER ONE INSTEAD
     // ---------------------------------------------------------------------------->>
-    if (tryProtocol == PROTOCOL_SBUS && SBusFailed) 
+    switch (tryProtocol)
     {
-        // Shutdown and deconstruct object
-        SBusDecoder->shutdown();
-        delete SBusDecoder;             
-        
-        // Try the other protocol
-        PPMFailed = started = false;
-        tryProtocol = PROTOCOL_PPM;     
-    }
-        
-    if (tryProtocol == PROTOCOL_PPM && PPMFailed)
-    {
-        // Shutdown and deconstruct object
-        PPMDecoder->shutdown();
-        delete PPMDecoder;      
+        case PROTOCOL_PPM:
+            if (PPMFailed)
+            {
+                // Shutdown and deconstruct object
+                PPMDecoder->shutdown();
+                delete PPMDecoder;      
 
-        // Try the other protocol
-        SBusFailed = started = false;
-        tryProtocol = PROTOCOL_SBUS;
+                // Try the next protocol - SBus
+                SBusFailed = started = false;
+                tryProtocol = PROTOCOL_SBUS;
+            }
+            break;
+            
+        case PROTOCOL_SBUS:
+            if (SBusFailed) 
+            {
+                // Shutdown and deconstruct object
+                SBusDecoder->shutdown();
+                delete SBusDecoder;             
+                
+                // Try the next protocol - iBus
+                iBusFailed = started = false;
+                tryProtocol = PROTOCOL_iBUS;     
+            }
+            break;
+
+        case PROTOCOL_iBUS:
+            if (iBusFailed) 
+            {
+                // Shutdown and deconstruct object
+                iBusDecoder->shutdown();
+                delete iBusDecoder;             
+                
+                // Try the next protocol - PPM
+                PPMFailed = started = false;
+                tryProtocol = PROTOCOL_PPM;   
+            }
+            break;
     }
+}
+
+void OP_Radio::failPPM(void)
+{
+    PPMFailed = true;
 }
 
 void OP_Radio::failSBus(void)
@@ -146,9 +209,9 @@ void OP_Radio::failSBus(void)
     SBusFailed = true;
 }
 
-void OP_Radio::failPPM(void)
+void OP_Radio::failiBus(void)
 {
-    PPMFailed = true;
+    iBusFailed = true;
 }
 
 
@@ -275,6 +338,9 @@ boolean OP_Radio::GetCommands()
 
     // If we're using it, the SBusDecoder needs to be polled
     pollSBus(); 
+
+    // If we're using it, the iBusDecoder needs to be polled
+    polliBus();     
 
     if (Status() == READY_state)
     {   // We have a lock on the Rx. 
@@ -409,13 +475,17 @@ void OP_Radio::GetFrame()
     // Fill our NewPulse array with the new frame of data
     switch (Protocol)
     {
-        case PROTOCOL_SBUS:
-            SBusDecoder->GetSBus_Frame(NewPulse, ChannelsUtilized);
-            break;      
-        
         case PROTOCOL_PPM:
             PPMDecoder->GetPPM_Frame(NewPulse, ChannelsUtilized);
             break;
+            
+        case PROTOCOL_SBUS:
+            SBusDecoder->GetSBus_Frame(NewPulse, ChannelsUtilized);
+            break;      
+
+        case PROTOCOL_iBUS:
+            iBusDecoder->GetiBus_Frame(NewPulse, ChannelsUtilized);
+            break;      
         
         case PROTOCOL_NONE:
         default:
@@ -428,10 +498,6 @@ void OP_Radio::GetFrame()
     {
         if (*ptrCommonChannelSettings[i].present == true)
         {
-//          AM HERE
-//          if (i==4) Serial.println(NewPulse[4]);
-//          else Serial.println("I<4");
-            
             Pulse = NewPulse[*ptrCommonChannelSettings[i].channelNum-1];    // We subtract one because in the array the channel numbers start at 0, not 1
             if (*ptrCommonChannelSettings[i].pulse == Pulse) { *ptrCommonChannelSettings[i].updated = false; }
             else {*ptrCommonChannelSettings[i].updated = true; *ptrCommonChannelSettings[i].pulse = Pulse; }
@@ -444,11 +510,11 @@ void OP_Radio::GetFrame()
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
 // GET FRAME IN STRING FORMAT - LOW LEVEL RADIO READING
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
-// This is similar to the above in that it obtains a frame of pulse widths from either the PPM or SBus decoder, but instead of putting them into our channel objects, 
+// This is similar to the above in that it obtains a frame of pulse widths from either the PPM, SBus or iBus decoders, but instead of putting them into our channel objects, 
 // it assembles them into a string and passes them back to the calling function in the form of a character array. This is used to send pulse widths to the PC. 
 void OP_Radio::GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength, char delimiter, uint8_t HiLo)
 {
-// We only return 8 channels at a time. For SBus, you can request LOW or HIGH which will return either channels 1-8 or 9-16
+// We only return 8 channels at a time. For SBus and iBus, you can request LOW or HIGH which will return either channels 1-8 or 9-16
 #define COUNT_STRING_CHANNELS 8    
     
     uint8_t StartChan;
@@ -462,16 +528,21 @@ void OP_Radio::GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength
     // Fill our NewPulse array with the new frame of data
     switch (Protocol)
     {
-        case PROTOCOL_SBUS:
-            // We will only call this function if we checked for a new frame first, so we don't need to poll SBus again here
-            SBusDecoder->GetSBus_Frame(NewPulse, ChannelsUtilized);
-            break;      
-        
         case PROTOCOL_PPM:
             HiLo = LOW; // By definition, PPM only goes up to 8 channels, so we only return the low 8 regardless of what was passed
             PPMDecoder->GetPPM_Frame(NewPulse, ChannelsUtilized);
             break;
         
+        case PROTOCOL_SBUS:
+            // We will only call this function if we checked for a new frame first, so we don't need to poll SBus again here
+            SBusDecoder->GetSBus_Frame(NewPulse, ChannelsUtilized);
+            break;      
+
+        case PROTOCOL_iBUS:
+            // We will only call this function if we checked for a new frame first, so we don't need to poll iBus again here
+            iBusDecoder->GetiBus_Frame(NewPulse, ChannelsUtilized);
+            break;      
+
         case PROTOCOL_NONE:
         default:
             // Bad news bears, hope we don't end up here
@@ -723,7 +794,6 @@ RADIO_PROTOCOL OP_Radio::getProtocol(void)
 
 decodeState_t OP_Radio::Status(void)
 {
-    pollSBus();
     switch (Protocol)
     {
         case PROTOCOL_PPM:
@@ -731,9 +801,15 @@ decodeState_t OP_Radio::Status(void)
             break;
         
         case PROTOCOL_SBUS:
+            pollSBus();     // SBus needs polled
             return SBusDecoder->getState();
             break;
             
+        case PROTOCOL_iBUS:
+            polliBus();     // iBus needs polled
+            return iBusDecoder->getState();
+            break;
+
         case PROTOCOL_NONE:
         default:
             return ACQUIRING_state;
@@ -742,7 +818,6 @@ decodeState_t OP_Radio::Status(void)
 
 boolean OP_Radio::NewFrame(void)
 {
-    pollSBus();
     switch (Protocol)
     {
         case PROTOCOL_PPM: 
@@ -750,7 +825,13 @@ boolean OP_Radio::NewFrame(void)
             break;
         
         case PROTOCOL_SBUS:
+            pollSBus();     // SBus needs polled
             return SBusDecoder->NewFrame;
+            break;
+            
+        case PROTOCOL_iBUS:
+            polliBus();     // iBus needs polled
+            return iBusDecoder->NewFrame;
             break;
             
         case PROTOCOL_NONE:
@@ -771,6 +852,10 @@ uint8_t OP_Radio::getChannelCount(void)
         
         case PROTOCOL_SBUS:
             channelCount = SBusDecoder->getChanCount();
+            break;
+        
+        case PROTOCOL_iBUS:
+            channelCount = iBusDecoder->getChanCount();
             break;
         
         case PROTOCOL_NONE:
@@ -804,10 +889,16 @@ void OP_Radio::SetAllChannelUpdates()
 void OP_Radio::Update(void)
 {   
     pollSBus();
+    polliBus();
     radioTimer.run();
 }
 
 void OP_Radio::pollSBus(void)
 {   // This checks if we're using the SBus protocol, and if so, updates it
     if (Protocol == PROTOCOL_SBUS) { SBusDecoder->update(); }
+}
+
+void OP_Radio::polliBus(void)
+{   // This checks if we're using the iBus protocol, and if so, updates it
+    if (Protocol == PROTOCOL_iBUS) { iBusDecoder->update(); }
 }

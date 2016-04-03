@@ -16,7 +16,7 @@
 // OPEN PANZER TANK CONTROL BOARD (TCB) - FIRMWARE VERSION NUMBER
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is the firmware version that will be returned to the desktop application when it checks. It will be split into three, two-digit numbers
-    #define FIRMWARE_VERSION "00.91.03"     // version - 3/25/2016
+    #define FIRMWARE_VERSION "00.91.05"     // version 
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -97,6 +97,7 @@
     // We also need to let these libraries know what the conversion is between ticks and uS
     #define PPM_TICKS_PER_uS        2           // For the PPMDecode class
     #define SBUS_TICKS_PER_uS       2           // For the SBusDecode class
+    #define iBUS_TICKS_PER_uS       2           // For the iBusDecode class
     #define IR_uS_TO_TICKS(s)       (s*2)       // For IR sending
     #define SERVO_uS_TO_TICKS(s)    (s*2)       // For converting servo pulse-widths to tick counts
     #define SERVO_TICKS_TO_uS(s)    (s/2)       // For converting servo tick counts to pulse widths

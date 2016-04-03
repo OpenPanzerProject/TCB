@@ -21,6 +21,7 @@
 #include "OP_IO.h"
 #include "OP_PPMDecode.h"
 #include "OP_SBusDecode.h"
+#include "OP_iBusDecode.h"
 #include "OP_Motors.h"
 #include "OP_Servo.h"
 #include "OP_Sabertooth.h"
@@ -38,7 +39,6 @@
 #include "OP_PCComm.h"
 #include "OP_BNO055.h"
 #include "OP_I2C.h"
-
 
 // GLOBAL VARIABLES
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>>
@@ -188,6 +188,26 @@ void setup()
 
     // Now send our first message out the port, if we initialized the EEPROM
         if (did_we_init && DEBUG) { DebugSerial->println(F("EEPROM Initalized")); }
+
+    // BUTTON CHECK
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->
+        // If the user holds down the button while rebooting, and keeps holding for 4 seconds, we conduct a factory reset - which just means, restore 
+        // all eeprom variables to default. 
+        do
+        {
+            InputButton.read();
+            if (InputButton.pressedFor(3700))   // People count fast, so don't actually wait the full 4 seconds.
+            {
+                eeprom.factoryReset();
+                PrintLines(2);
+                PrintDebugLine();
+                DebugSerial->println(F("FACTORY RESET"));
+                PrintDebugLine();
+                PrintLines(2);
+                delay(2000);    // Pause here to let the enormity of this action sink in
+                break;
+            }
+        } while (InputButton.isPressed());
 
     // TIMERS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -358,10 +378,10 @@ void setup()
         RestoreDebug();
         if (DEBUG) { DebugSerial->println(F("Detecting radio... ")); } // ...Because we want to print our own this time
 
-        // Now we try to detect radio input. This loop will run forever until the Radio class successfully detects either a PPM or SBus stream. 
+        // Now we try to detect radio input. This loop will run forever until the Radio class successfully detects a PPM, SBus, iBus or other stream. 
         while(Radio.Status() != READY_state)    
         {   
-            Radio.detect();                     // This will try to auto-detect between PPM or SBus 
+            Radio.detect();                     // This will try to auto-detect PPM, SBus, iBus or any other supported protocols. 
 
             // The user might want to do PC setup without the radio on, so check for that and allow if so
             if (PCComm.CheckPC()) 
@@ -463,6 +483,9 @@ void loop()
     static unsigned long currentMillis; 
 // Timing stuff
     currentMillis = millis(); 
+// Button stuff
+    enum {BUTTON_WAIT, BUTTON_TO_WAIT};       
+    static uint8_t ButtonState;                                       //The current button state machine state
 
 
 // MAIN LOOP SETUP - only run once
@@ -529,30 +552,48 @@ if (Startup)
 
     // CHECK THE BUTTON
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        if (InputButton.wasReleased())
-        {   // A single press (short) of the button will:
-            // 1) Save any adjustments the user has made to EEPROM
-            // 2) Dump the system info, regardless of whether DEBUG is true or not
-            SaveAdjustments();
-            DumpSysInfo();
-        }
-        else if (InputButton.pressedFor(1800))  // Two seconds in real life feels like longer than two seconds, so we do 1.8
+        switch (ButtonState) 
         {
-            // User has held down the input button for two seconds. We are going to enter some special routine. 
+            // This state watches for short and long presses, dumps debug info with a short press, 
+            // or enters a special menu with a long press
+            case BUTTON_WAIT:                
+                if (InputButton.wasReleased())
+                {   // A single press (short) of the button will:
+                    // 1) Save any adjustments the user has made to EEPROM
+                    // 2) Dump the system info, regardless of whether DEBUG is true or not
+                    SaveAdjustments();
+                    DumpSysInfo();
+                }
+                else if (InputButton.pressedFor(1800)) // Two seconds in real life feels like longer than two seconds, so we do 1.8
+                {
+                    // User has held down the input button for two seconds. We are going to enter some special routine. 
+                    
+                    // The DIP switch selection will determine which menu we enter.
+                    switch (GetMenuNumber())
+                    {
+                        case 1: 
+                            if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
+                            { SetupServo(SERVONUM_TURRETELEVATION); }
+                            else
+                            { if (DEBUG) DebugSerial->println(F("Turret elevation is not of type Servo. No setup available.")); }
+                            break;
+                        case 2: 
+                            //RadioSetup();     // Nothing for now. We are using OP Config for radio setup instead of the local version. This menu is free for some other action.   
+                            break;        
+                        case 3: TBS_Setup();    
+                            break;
+                        case 4: SetupServo(SERVONUM_RECOIL); 
+                            break;
+                    }
+                    ButtonState = BUTTON_TO_WAIT;
+                }
+                break;
 
-            // The DIP switch selection will determine which menu we enter.
-            switch (GetMenuNumber())
-            {
-                case 1: 
-                    if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
-                    { SetupServo(SERVONUM_TURRETELEVATION); }
-                    else
-                    { if (DEBUG) DebugSerial->println(F("Turret elevation is not of type Servo. No setup available.")); }
-                    break;
-                case 2: RadioSetup();   break;
-                case 3: TBS_Setup();    break;
-                case 4: SetupServo(SERVONUM_RECOIL); break;
-            }
+            //This is a transition state where we just wait for the user to release the button
+            //before moving back to the WAIT state.
+            case BUTTON_TO_WAIT:
+                if (InputButton.wasReleased()) ButtonState = BUTTON_WAIT;
+                break;
         }
 
 

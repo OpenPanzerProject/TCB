@@ -312,6 +312,11 @@ boolean OP_EEPROM::getStorageVarInfo(_storage_var_info & svi, uint16_t arrayPos)
 //------------------------------------------------------------------------------------------------------------------------>>
 // INITIALIZE EEPROM
 //------------------------------------------------------------------------------------------------------------------------>>
+void OP_EEPROM::factoryReset(void)
+{
+    Initialize_EEPROM();
+}
+
 void OP_EEPROM::Initialize_EEPROM(void) 
 {   
     // The way we do this is set the values in our ramcopy struct, then write the entire struct to EEPROM (actually "update" instead of "write")

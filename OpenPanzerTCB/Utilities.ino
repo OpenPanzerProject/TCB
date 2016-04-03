@@ -36,10 +36,21 @@ void PrintSpace()
     DebugSerial->print(F(" "));
 }    
 
-void PrintSpaces(int num)
+void PrintSpaces(uint8_t num)
 {
     if (num == 0) return;
-    for (int i=0; i<num; i++) { PrintSpace(); }
+    for (uint8_t i=0; i<num; i++) { PrintSpace(); }
+}
+
+void PrintLine()
+{
+    DebugSerial->println();
+}
+
+void PrintLines(uint8_t num)
+{    
+    if (num == 0) return;
+    for (uint8_t i=0; i<num; i++) { PrintLine(); }
 }
 
 void PrintTrueFalse(boolean boolVal)

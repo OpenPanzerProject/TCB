@@ -1,0 +1,6 @@
+00.91.05        4/02/2016 - Added FlySky iBus support, up to 14 channels. Required board change to Rev 0.19. 
+                            Tested with FlySky i10 transmitter and FS-iA10 and FS-iA6B receivers.
+00.91.04        3/25/2016 - Local dev copy
+00.91.03        3/25/2016 - Added printed function names in Debug dump
+                          - RC Output pass-throughs can now be of type regular or Pan Servo
+00.91.02        3/13/2016 - Posted to GitHub

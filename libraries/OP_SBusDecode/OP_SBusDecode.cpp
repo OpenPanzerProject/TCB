@@ -70,7 +70,7 @@ void SBusDecode::begin()
     _serial = &SBUS_SERIAL;
     _serial->begin(100000, SERIAL_8E2); // 100k baud, 8 data bits, even parity, 2 stop bits
 
-    // But because we also don't trust Arduino, we setup the port manually as well (though in testing the above seemed to work fine, though I don't like their baud rate calculator): 
+    // But because we also like to do things manually for educational purposes, here is the explicit setup:
 
     // Make sure power reduction hasn't turned off this serial port
     PRR1 &= ~(1 << SBUS_PRUSART);

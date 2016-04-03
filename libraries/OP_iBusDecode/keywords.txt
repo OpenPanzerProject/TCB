@@ -8,39 +8,30 @@
 # KEYWORD1 - Classes
 #-------------------------------------------------------------
 
-OP_EEPROM	KEYWORD1
+iBusDecode	KEYWORD1
 
 
 #-------------------------------------------------------------
 # KEYWORD2 - Methods, functions, members
 #-------------------------------------------------------------
 begin	KEYWORD2
-
-ramcopy	KEYWORD2
-
-loadRAMcopy	KEYWORD2
-
-readSerialEEPROM_byID	KEYWORD2
-
-updateEEPROM_byID	KEYWORD2
-
-factoryReset	KEYWORD2
-_eeprom_data	KEYWORD2
-_vartype	KEYWORD2
-_storage_var_info	KEYWORD2
+shutdown	KEYWORD2
+getState	KEYWORD2
+getChanCount	KEYWORD2
+GetiBus_Frame	KEYWORD2
+NewFrame	KEYWORD2
+update	KEYWORD2
 
 
 #-------------------------------------------------------------
 # LITERAL1 - Constants & Defines
 #-------------------------------------------------------------
 
-NUM_STORED_VARS	LITERAL1
-varNULL	LITERAL1
-varBOOL	LITERAL1
-varCHAR	LITERAL1
-varINT8	LITERAL1
-varUINT8	LITERAL1
-varINT16	LITERAL1
-varUINT16	LITERAL1
-varINT32	LITERAL1
-varUINT32	LITERAL1
+UBBR_iBus	LITERAL1
+iBus_CHANNELS	LITERAL1
+iBus_STARTBYTE	LITERAL1
+iBus_CMDBYTE	LITERAL1
+iBus_FRAME_BYTES	LITERAL1
+iBus_ACQUISITION_COUNT	LITERAL1
+DISCARD_FRAMES	LITERAL1
+
