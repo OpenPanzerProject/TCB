@@ -201,10 +201,23 @@ void setup()
                 eeprom.factoryReset();
                 PrintLines(2);
                 PrintDebugLine();
-                DebugSerial->println(F("FACTORY RESET"));
+                DebugSerial->print(F("FACTORY RESET! "));
+                // Now blink both red and green LEDs slowly 4 times. This uses straight delays and blocks execution, which is fine for this case. 
+                uint8_t HowMany = 4;
+                for (int i=1; i<=HowMany; i++)
+                {
+                    GreenLedOn();
+                    RedLedOn();
+                    delay(750);
+                    DebugSerial->print(F("! "));
+                    GreenLedOff();
+                    RedLedOff();
+                    if (i < HowMany)
+                    { delay(500);  }
+                }                
+                PrintLine();
                 PrintDebugLine();
                 PrintLines(2);
-                delay(2000);    // Pause here to let the enormity of this action sink in
                 break;
             }
         } while (InputButton.isPressed());
@@ -525,11 +538,9 @@ if (Startup)
             HavePower = true;
         }
 
-    // Display some info if we have debug set
-        if (DEBUG)
-        {   
-            DumpSysInfo();
-        }
+    // Display some info if we have debug set. But wait until a few seconds after we've booted so the dump doesn't interfere with any PC communication attempts. 
+    // Of course, the user can also always dump the info just by pressing the input button. 
+        if (DEBUG) { timer.setTimeout(2500, DumpSysInfo); }
 
     // Get the time
         currentMillis = millis();

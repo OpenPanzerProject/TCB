@@ -338,6 +338,32 @@ void GreenBlinkSlow(int HowMany)
     }
 }
 
+void RedBlinkSlow(int HowMany)
+{   // This uses Delays and blocks all code!
+    for (int i=1; i<=HowMany; i++)
+    {
+        RedLedOn();
+        delay(750);
+        RedLedOff();
+        if (i < HowMany)
+        { delay(500);  }
+    }
+}
+
+void BothBlinkSlow(int HowMany)
+{   // This uses Delays and blocks all code!
+    for (int i=1; i<=HowMany; i++)
+    {
+        GreenLedOn();
+        RedLedOn();
+        delay(750);
+        GreenLedOff();
+        RedLedOff();
+        if (i < HowMany)
+        { delay(500);  }
+    }
+}
+
 void RedBlinkFast(int HowMany)
 {   // This uses Delays and blocks all code!
     for (int i=1; i<=HowMany; i++)
