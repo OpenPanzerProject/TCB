@@ -38,19 +38,36 @@ To flash the bootloader to your chip you will need a special programmer device. 
 
 Plug your programmer into a USB port on your computer. Plug the ISP cable into the TCB. The programmer will not supply power to the TCB so you will also need to connect a battery. 
 
-Then open a command prompt and browse to the following folder in the Arduino installation directory:
+You can then flash the bootloader using one of two methods: 
+
+### 1. Using the Arduino IDE
+Make sure the bootloader hex file is in the `openpanzer_boot` directory of the Arduino bootloaders folder, something like: `C:\Arduino\hardware\arduino\avr\bootloaders\openpanzer_boot\optcb2560_boot.hex`. 
+
+Also make sure you have updated the Arduino `boards.txt` file to add information for the TCB board ([see the README for the TCB repo](https://github.com/OpenPanzerProject/TCB) for a description). Then in the Arduino IDE, go to the Tools menu, select "Open Panzer TCB (Mega 2560)" as the board, select the appropriate programmer from the Programmer list, then click "Burn Bootloader." 
+(Note: recent versions of the IDE seem to be having an issue programming with the AVR ISP Mk1 programer, if you happen to be using one of those. Best to get a USBasp.)
+
+### 2. Using AVRDUDE from the Command Line
+Avrdude is the program Arduino uses to write to ATmega chips, but you can use it directly from the command line as well. 
+
+Open a command prompt and browse to the following folder in the Arduino installation directory, where `avrdude.exe` should reside:
 `Arduino_Dir\hardware\tools\avr\bin\`
 
-Then run the following commands. The first one unlocks 1) erases the existing program memory, 2) unlocks the bootloader section so we can access it in step two, and it sets the three fuse bits to the correct values:
-`avrdude -C "Drive:\Arduino_Dir\hardware\tools\avr\etc\avrdude.conf" -p atmega2560 -c usbasp -P usb -v -e -U lock:w:0x3F:m -U efuse:w:0xFD:m -U hfuse:w:0xDA:m -U lfuse:w:0xD7:m`
+Then run the following commands. This first one 1) erases the existing program memory, 2) unlocks the bootloader section so we can access it in step two, and 3) it sets the three fuse bits to the correct values:
+`avrdude -C "YourDrive:\YourArduino_Dir\hardware\tools\avr\etc\avrdude.conf" -p atmega2560 -c usbasp -P usb -v -e -U lock:w:0x3F:m -U efuse:w:0xFD:m -U hfuse:w:0xDA:m -U lfuse:w:0xD7:m`
 
-Note that we are referencing `avrdude.conf` which should also be in your Arduino install directory as shown in the command above. Also if you are using a programmer other than the USBasp you will need to change the `-c` flag, for a list of supported avrdude programmers see (this link)[http://www.nongnu.org/avrdude/user-manual/avrdude_4.html] or type `avrdude -c ?` 
+Note that we are referencing `avrdude.conf` which is a configuration file avrdude needs to know about, and should already exist in your Arduino install directory as shown in the command above. Also if you are using a programmer other than the USBasp you will need to change the `-c` flag, for a list of supported avrdude programmers see [this link](http://www.nongnu.org/avrdude/user-manual/avrdude_4.html) or type `avrdude -c ?` 
 
 Now to flash the bootloader, run this command:
-`avrdude -C "Drive:\Arduino_Dir\hardware\tools\avr\etc\avrdude.conf" -p atmega2560 -c usbasp -P usb -v -U flash:w:Drive:\PathToBootloader\optcb2560_boot.hex:i -U lock:w:0xOF:m`
+`avrdude -C "YourDrive:\YourArduino_Dir\hardware\tools\avr\etc\avrdude.conf" -p atmega2560 -c usbasp -P usb -v -U flash:w:YourDrive:\PathToBootloader\optcb2560_boot.hex:i -U lock:w:0xOF:m`
 
 Where again you need to specify the actual path to the conf file, your specific programmer, and the actual path to the `optcb2560_boot.hex` file. 
 
+#### Tips
+Avrdude doesn't like spaces in file names and for sure will croak if there is a parentheses in the path, such as there will be if you install Arduino on a 64-bit Windows OS (ie, "C:\Program Files (x86)\etc..")
+
+So save yourself some hassle and install Arduino into a clean folder like "C:\Arduino\"
+
+If you are going to be doing a lot of flashing it can be useful to put these commands into a Windows batch file. A sample one is included in this folder, with voluminous comments about the bootloader and the batch script process. 
 
 
 
