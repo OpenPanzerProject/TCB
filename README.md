@@ -20,7 +20,7 @@ The processor used on the TCB is an ATmega 2560 and the firmware can be compiled
 ```
 ##############################################################
 
-optcb2560.name=Open Panzer TCB with Mega 2560
+optcb2560.name=Open Panzer TCB (Mega 2560)
 
 optcb2560.upload.tool=avrdude
 optcb2560.upload.maximum_data_size=8192
@@ -47,13 +47,11 @@ You can add the entry anywhere in the `boards.txt` file. Keep a backup of the fi
 
 Then open `Your_Sketch_Folder\Sketches\OpenPanzerTCB\OpenPanzerTCB.ino` with the Arduino IDE to see the sketch code. In the Tools > Board menu select the  entry titled "Open Panzer TCB (Mega 2560)." 
 
+It is also possible to treat the TCB as an "Arduino Mega 2560" from the IDE and it will work fine, but the computed program statistics will be off when you compile the sketch, and if you for some reason re-flash the bootloader you will be uploading the incorrect one.  
 
-To compile or upload the code from the Arduino IDE, you can can treat the TCB as an Arduino Mega 2560 and it will work just fine. But preferably you will want to take two additional steps instead: 
+If you are running Windows, it is highly recommended you install Arduino to a clean folder like `C:\Arduino` rather than in something like `C:\Program Files (x586)\` that has spaces and parentheses in the file name. As a developer this will save you hassle later. 
 
-
-If you are running Windows, it is highly recommended you install Arduino to a clean folder like `C:\Arduino` rather than in something like `C:\Program Files (x586)\` that has spaces and parenthese in the file name, as a developer this will save you hassle later. 
-
-Most of the functionality actually resides in the many C++ libraries. These will be in your `Sketches\libraries\` folder and they will all begin with the prefix **OP_**. 
+In addition to the various tabs in the sketch, most of the functionality actually resides in the many C++ libraries. These will be in your `Sketches\libraries\` folder and they will all begin with the prefix **OP_**. 
 
 ## License
 Firmware for the TCB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 as published by the Free Software Foundation.
