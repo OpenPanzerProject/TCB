@@ -17,18 +17,39 @@ The processor used on the TCB is an ATmega 2560 and the firmware can be compiled
   * Copy the **openpanzer_boot* folder to your Arduino bootloader folder: `Arduino_Dir\hardware\arduino\avr\bootloaders\openpanzer_boot\`
   * Finally, add the following code snippet to your Arduino `boards.txt` file, which should be located at `Arduino_Dir\hardware\arduino\avr\boards.txt`:
 
-Then open `Your_Sketch_Folder\Sketches\OpenPanzerTCB\OpenPanzerTCB.ino` with the Arduino IDE to see the sketch code. 
+```
+##############################################################
+
+optcb2560.name=Open Panzer TCB with Mega 2560
+
+optcb2560.upload.tool=avrdude
+optcb2560.upload.maximum_data_size=8192
+optcb2560.upload.maximum_size=258048
+optcb2560.upload.protocol=wiring
+optcb2560.upload.speed=115200
+
+optcb2560.bootloader.tool=avrdude
+optcb2560.bootloader.extended_fuses=0xFD
+optcb2560.bootloader.high_fuses=0xDA
+optcb2560.bootloader.low_fuses=0xD7
+optcb2560.bootloader.unlock_bits=0x3F
+optcb2560.bootloader.lock_bits=0x0F
+optcb2560.bootloader.file=openpanzer_boot/optcb2560_boot.hex
+
+optcb2560.build.f_cpu=16000000L
+optcb2560.build.core=arduino
+optcb2560.build.variant=mega
+optcb2560.build.mcu=atmega2560
+optcb2560.build.board=AVR_MEGA2560
+```
+
+You can add the entry anywhere in the `boards.txt` file. Keep a backup of the file becasue it is likely to be overwritten if you upgrade the IDE.
+
+Then open `Your_Sketch_Folder\Sketches\OpenPanzerTCB\OpenPanzerTCB.ino` with the Arduino IDE to see the sketch code. In the Tools > Board menu select the  entry titled "Open Panzer TCB (Mega 2560)." 
+
 
 To compile or upload the code from the Arduino IDE, you can can treat the TCB as an Arduino Mega 2560 and it will work just fine. But preferably you will want to take two additional steps instead: 
 
-### 1
-Add the following entry to your Arduino `boards.txt` file. This can be found in your Arduino install directory:
-`InstallDir\hardware\arduino\avr\boards.txt`
-
-
-
-### 2
-Copy the 
 
 If you are running Windows, it is highly recommended you install Arduino to a clean folder like `C:\Arduino` rather than in something like `C:\Program Files (x586)\` that has spaces and parenthese in the file name, as a developer this will save you hassle later. 
 
