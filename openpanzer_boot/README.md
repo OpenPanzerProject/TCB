@@ -41,7 +41,16 @@ Plug your programmer into a USB port on your computer. Plug the ISP cable into t
 Then open a command prompt and browse to the following folder in the Arduino installation directory:
 `Arduino_Dir\hardware\tools\avr\bin\`
 
-And run the following commands: 
+Then run the following commands. The first one unlocks 1) erases the existing program memory, 2) unlocks the bootloader section so we can access it in step two, and it sets the three fuse bits to the correct values:
+`avrdude -C "Drive:\Arduino_Dir\hardware\tools\avr\etc\avrdude.conf" -p atmega2560 -c usbasp -P usb -v -e -U lock:w:0x3F:m -U efuse:w:0xFD:m -U hfuse:w:0xDA:m -U lfuse:w:0xD7:m`
+
+Note that we are referencing `avrdude.conf` which should also be in your Arduino install directory as shown in the command above. Also if you are using a programmer other than the USBasp you will need to change the `-c` flag, for a list of supported avrdude programmers see (this link)[http://www.nongnu.org/avrdude/user-manual/avrdude_4.html] or type `avrdude -c ?` 
+
+Now to flash the bootloader, run this command:
+`avrdude -C "Drive:\Arduino_Dir\hardware\tools\avr\etc\avrdude.conf" -p atmega2560 -c usbasp -P usb -v -U flash:w:Drive:\PathToBootloader\optcb2560_boot.hex:i -U lock:w:0xOF:m`
+
+Where again you need to specify the actual path to the conf file, your specific programmer, and the actual path to the `optcb2560_boot.hex` file. 
+
 
 
 
