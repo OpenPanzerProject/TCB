@@ -112,9 +112,13 @@
 #endif
 
 // iBus is 115.2k baud. Pre-calculate the UBBRn setting that will give us this baud rate.
-#define UBRR_iBus                   16          // (F_CPU / (16*BAUD) ) -1 = (16,000,000 / (16 * 115,200) ) - 1 = 7.8 = ~8 (-3.5% error).
-                                                // BUT! We double it to 16 instead, and then set U2Xn = 1 for double USART transfer speed. This gives us an error of only 2%.
-                                                // See page 231 of the 2560 datasheet
+#define UBRR_iBus                   16          // Normal mode UBRR would be 8: (F_CPU / (16*BAUD) ) -1 = (16,000,000 / (16 * 115,200) ) - 1 = 7.8 = ~8 UBRR
+                                                // But according to the data sheet (pg 231), our actual baud rate is then -3.5% off of desired.
+                                                // Instead we can set the USART to double-speed mode, then the formula for UBRR  becomes: 
+                                                // High speed mode: (F_CPU / (8 *BAUD) ) -1 = (16,000,000 / (8  * 115,200) ) - 1 = 16.4 = ~16 UBRR
+                                                // According to the datasheet our actual baud rate would then only be 2% off the desired value, so we set UBRR = 16. 
+                                                // We then need to make sure we select double speed mode by setting U2Xn = 1, see begin() in OP_iBusDecode.cpp. 
+                                                // See page 231 of the 2560 datasheet, or 208 for formulas
 #define iBus_CHANNELS               14          // Number of iBus channels (max)
 #define iBus_STARTBYTE              0x20        // First byte/sync byte of iBus frame should always be 0x20 (number of bytes in packet = 32 decimal)
 #define iBus_CMDBYTE                0x40        // Second byte is the command. 0x40 indicates channel value to follow. 

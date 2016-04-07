@@ -112,8 +112,10 @@
 #endif
 
 // SBus is 100k baud. Pre-calculate the UBBRn setting that will give us this baud rate.
-#define UBRR_SBUS                   9           // (F_CPU / (16*BAUD) ) -1 = (16,000,000 / (16 * 100,000) ) - 1 = 9
-
+#define UBRR_SBUS                   9           // We can get a perfect match: 
+                                                // (F_CPU / (16*BAUD) ) -1 = (16,000,000 / (16 * 100,000) ) - 1 = 9
+                                                // Note this is in Normal Speed Mode, so make sure you set U2Xn = 0! (See the .cpp file)
+    
 #define SBUS_STARTBYTE              0x0F        // First byte of an SBus frame should always be 0x0F
 #define SBUS_ENDBYTE                0x00        // Last byte of an SBus frame should always be 0
 

@@ -78,8 +78,11 @@ void iBusDecode::begin()
     //        0 - clock polarity, keep at 0 when in asynchronous mode
     // 00000110 = 0x06
     iBus_UCSRC = 0x06;                  // mode normal (asynchronous USART), no parity , 1 stop bit, 8 bits data, no polarity for asynchronous
-    // Clear flags
-    iBus_UCSRA = 0x02;                  // But we set to U2Xn = 1 for double USART speed, as this setting allows us to get closer to our desired baud rate
+    
+    // Clear flags, set double speed mode, disable multi-processor mode
+    iBus_UCSRA = 0xFE;                  // Flags are cleared by writing 1. The only other bits to worry about are: 
+                                        // U2Xn - but we want to set that to 1 as well, for double USART speed. The double-speed mode lets us get closer to our desired baud rate.
+                                        // MPCMn - multiprocessor communication mode, we want this off (0)
     // Enable receiver only  
     iBus_UCSRB = 0x90;                  // Rx interrupt enabled, Rx enabled, TX disabled, only 8 bits
 

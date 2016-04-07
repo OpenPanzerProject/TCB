@@ -79,8 +79,11 @@ void SBusDecode::begin()
     SBUS_UBRRL = (unsigned char)UBRR_SBUS;
     // Set frame format 
     SBUS_UCSRC = 0x2E;                  // mode normal (asynchronous USART), even parity , 2 stop bit, 8 bits data, no polarity for asynchronous
-    // Clear flags
-    SBUS_UCSRA = 0x00;
+    
+    // Clear flags, set normal speed mode, turn off multi-processor communication mode
+    SBUS_UCSRA = 0xFC;                  // Clear flags (by writing 1 to them), but leave U2Xn = 0 because we don't want double speed mode, we can get a perfect 100k baud rate in normal speed mode with UBRR = 9.
+                                        // Also turn off multi-processor communication mode
+    
     // Enable receiver only  
     SBUS_UCSRB = 0x90;                  // Rx interrupt enabled, Rx enabled, TX disabled, only 8 bits
 
