@@ -12,13 +12,46 @@
 If you are not a developer, you probably don't need to worry about anything on this site. Instead go to the [OpenPanzer Wiki](http://www.openpanzer.org/wiki), learn how to get your own TCB board, [download the OP Config Windows desktop program](http://www.openpanzer.org/downloads), and start tanking! 
 
 ## Developers
-The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. If you want to modify the source code you should either clone the TCB repository if you are familiar with Git, or simply click the **Download ZIP** button at the top right of this page. Extract the ZIP file to your computer. Inside the ZIP file enter the `TCB-master` folder and copy the **libraries** and **OpenPanzerTCB** folders to your Arduino Sketches directory. You may already have a libraries folder in your sketches directory - if so, that's fine, just overwrite it (this will simply add the new libraries). 
+The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. If you want to modify the source code you should either clone the TCB repository if you are familiar with Git, or simply click the **Download ZIP** button at the top right of this page. Extract the ZIP file to your computer. Inside the ZIP file enter the `TCB-master` folder and:
+  * Copy the **libraries** and **OpenPanzerTCB** folders to your Arduino Sketches directory. You may already have a libraries folder in your sketches directory - if so, that's fine, just overwrite it (this will simply add the new libraries). 
+  * Copy the **openpanzer_boot** folder to your Arduino bootloader folder: `Arduino_Dir\hardware\arduino\avr\bootloaders\openpanzer_boot\`
+  * Finally, add the following code snippet to your Arduino `boards.txt` file, which should be located at `Arduino_Dir\hardware\arduino\avr\boards.txt`:
 
-Then open `Your_Sketch_Folder\Sketches\OpenPanzerTCB\OpenPanzerTCB.ino` with the Arduino IDE to see the sketch code. 
+```
+##############################################################
 
-To compile or upload the code from the Arduino IDE, go to the Tools menu and make sure the Board is set to "Arduino Mega or Mega 2560" and make sure the Processor is set to "ATmega2560 (Mega 2560)". 
+optcb2560.name=Open Panzer TCB (Mega 2560)
 
-Most of the functionality actually resides in the many C++ libraries. These will be in your `Sketches\libraries\` folder and they will all begin with the prefix **OP_**. 
+optcb2560.upload.tool=avrdude
+optcb2560.upload.maximum_data_size=8192
+optcb2560.upload.maximum_size=258048
+optcb2560.upload.protocol=wiring
+optcb2560.upload.speed=115200
+
+optcb2560.bootloader.tool=avrdude
+optcb2560.bootloader.extended_fuses=0xFD
+optcb2560.bootloader.high_fuses=0xDA
+optcb2560.bootloader.low_fuses=0xD7
+optcb2560.bootloader.unlock_bits=0x3F
+optcb2560.bootloader.lock_bits=0x0F
+optcb2560.bootloader.file=openpanzer_boot/optcb2560_boot.hex
+
+optcb2560.build.f_cpu=16000000L
+optcb2560.build.core=arduino
+optcb2560.build.variant=mega
+optcb2560.build.mcu=atmega2560
+optcb2560.build.board=AVR_MEGA2560
+```
+
+You can add the entry anywhere in the `boards.txt` file. Keep a backup of the file becasue it is likely to be overwritten if you upgrade the IDE.
+
+Then open `Your_Sketch_Folder\Sketches\OpenPanzerTCB\OpenPanzerTCB.ino` with the Arduino IDE to see the sketch code. In the Tools > Board menu select the  entry titled "Open Panzer TCB (Mega 2560)." 
+
+It is also possible to treat the TCB as an "Arduino Mega 2560" from the IDE and it will work fine, but the computed program statistics will be off when you compile the sketch, and if you for some reason re-flash the bootloader you will be uploading the incorrect one.  
+
+If you are running Windows, it is highly recommended you install Arduino to a clean folder like `C:\Arduino` rather than in something like `C:\Program Files (x586)\` that has spaces and parentheses in the file name. As a developer this will save you hassle later. 
+
+In addition to the various tabs in the sketch, most of the functionality actually resides in the many C++ libraries. These will be in your `Sketches\libraries\` folder and they will all begin with the prefix **OP_**. 
 
 ## License
 Firmware for the TCB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 as published by the Free Software Foundation.
