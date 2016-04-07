@@ -55,7 +55,7 @@ boolean UseAuxSerialForPCComm(void)
 // BASIC DIPSWITCH UTILITIES
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 // The dipswitches are held to ground when "ON"
-// They are left floating when "OFF", except we have input pullups turned on, so they are actually high. 
+// Physically these are left floating when "OFF", but we have input pullups turned on, so they are actually high. 
 // In short, low is ON and high is OFF.
 boolean DipSwitchOn(uint8_t switchNum)
 {   
