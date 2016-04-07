@@ -67,7 +67,7 @@ Avrdude doesn't like spaces in file names and for sure will croak if there is a 
 
 So save yourself some hassle and install Arduino into a clean folder like "C:\Arduino\"
 
-If you are going to be doing a lot of flashing it can be useful to put these commands into a Windows batch file. A sample one is included in this folder, with voluminous comments about the bootloader and the batch script process. 
+If you are going to be doing a lot of flashing it can be useful to put these commands into a Windows batch file. A sample one is included in this folder. You will first need to edit it in a text editor such as Notepad (but we like [Programmer's Notepad[(http://www.pnotepad.org/) better!), and set the paths to the actual ones you will be using. Then you can simply double-click the batch file in Windows and it will execute. 
 
 
 
