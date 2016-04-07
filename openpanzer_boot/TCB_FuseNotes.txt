@@ -21,10 +21,10 @@ High Fuse   0xDA
                   BOOTSZ1:0   - 01    Bootsize = 2,048 Words (4,096 bytes) Page 331 ATmega2560 datasheet. Bootloader can't exceed 8Kb, ours is a tad over 2k so we reserve 4k.
                   BOOTRST     - 0     Boot Reset vector enabled (write 0). This confusingly-named bit tells the CPU to start executing code not at address 0
                                       but instead at whatever the bootloader address is set to in the makefile. This is usually some area at the very high end
-                                      of the flash memory where the bootloader is stashed. Boot size reserved the area for bootloader, so the starting address should
-                                      be total flash (262,144) minus how many bytes we reserved for the bootloader - in this case 8,192 bytes, so the starting address
-                                      for our bootloader will be 262,144-8,192 = 253,952 or in hex: 0x3E000. If you are not using a bootloader, don't set BOOTRST (ie, write 1)
-                                      and code will just start at address 0. 
+                                      of the flash memory where the bootloader is stashed. BOOTSZ1:0 reserved the area for the bootloader, so the starting address should
+                                      be total flash (262,144) minus how many bytes we reserved for the bootloader - in our case 4,096 bytes, so the starting address
+                                      for our bootloader will be 262144 - 4096 = 258048 or in hex: 0x3E000. That is important to know because we need to set it in 
+                                      both our optcb2560_boot.c and Makefile when we compile the bootloader. 
 Low Fuse     0xD7  
                   CKDIV8      - 1     Clock divided by 8 - not set
                   CKOUT       - 1     Clock output - not set
