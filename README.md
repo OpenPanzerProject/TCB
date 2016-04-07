@@ -14,7 +14,7 @@ If you are not a developer, you probably don't need to worry about anything on t
 ## Developers
 The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. If you want to modify the source code you should either clone the TCB repository if you are familiar with Git, or simply click the **Download ZIP** button at the top right of this page. Extract the ZIP file to your computer. Inside the ZIP file enter the `TCB-master` folder and:
   * Copy the **libraries** and **OpenPanzerTCB** folders to your Arduino Sketches directory. You may already have a libraries folder in your sketches directory - if so, that's fine, just overwrite it (this will simply add the new libraries). 
-  * Copy the **openpanzer_boot* folder to your Arduino bootloader folder: `Arduino_Dir\hardware\arduino\avr\bootloaders\openpanzer_boot\`
+  * Copy the **openpanzer_boot** folder to your Arduino bootloader folder: `Arduino_Dir\hardware\arduino\avr\bootloaders\openpanzer_boot\`
   * Finally, add the following code snippet to your Arduino `boards.txt` file, which should be located at `Arduino_Dir\hardware\arduino\avr\boards.txt`:
 
 ```
