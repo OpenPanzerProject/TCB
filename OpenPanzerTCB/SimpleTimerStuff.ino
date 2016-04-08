@@ -4,6 +4,7 @@
 void PerLoopUpdates(void)
 {
     InputButton.read();     // Read the input button
+    SetActiveCommPort();    // Check Dipswitch #5 and set the communication port to USB (switch On) or Serial 1 (switch Off)
     UpdateSimpleTimers();   // Update timers
 }
 

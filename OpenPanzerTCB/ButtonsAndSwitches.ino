@@ -50,6 +50,55 @@ boolean UseAuxSerialForPCComm(void)
     return DipSwitchOff(5);
 }
 
+void SetActiveCommPort()
+{
+    static uint8_t useAlternate = 0xAA;
+    static uint32_t lastTime = millis();
+
+    // The local static variable useAlternate keeps track of the current setting.
+    // But when we call this function, we check the current setting against the actual position of Dipswitch #5. 
+    // If the current setting doesn't match, the user made a change, so update the current setting, and
+    // adjust the pointer to the serial port for both Debug output and the PCComm class.
+
+    // We haven't yet initialized - do so now. This will only get run once
+    if (useAlternate == 0xAA)
+    {
+        if (UseAuxSerialForPCComm())  
+        {                             
+            PCComm.switchToAltSerial();     // Use Serial 1 for PC comm
+            DebugSerial = &Serial1;         // Use Serial 1 for debugging messages
+            useAlternate = 0xFF;
+        }
+        else 
+        {
+            PCComm.revertToDefaultSerial(); // Use Serial 0 for PC comm
+            DebugSerial = &Serial;          // Use Serial 0 for debugging messages
+            useAlternate = 0x00;
+        }
+    }
+
+    // This will get run every other time this function is called, which will be once per loop
+    // It will only change the serial port of the switch has changed since last time, and only
+    // if a certain amount of time has passed since the last check (switch debounce)
+    if (millis() - lastTime > 50)   // 50ms debounce
+    {
+        lastTime = millis();
+        if (UseAuxSerialForPCComm() && useAlternate == 0x00)
+        {
+            PCComm.switchToAltSerial();     // Use Serial 1 for PC comm
+            DebugSerial = &Serial1;         // Use Serial 1 for debugging messages
+            if (DEBUG) DebugSerial->println(F("Comms changed to Serial 1"));        
+            useAlternate = 0xFF;
+        }
+        else if (!UseAuxSerialForPCComm() && useAlternate == 0xFF)
+        {
+            PCComm.revertToDefaultSerial(); // Use Serial 0 for PC comm
+            DebugSerial = &Serial;          // Use Serial 0 for debugging messages
+            if (DEBUG) DebugSerial->println(F("Comms changed to USB"));        
+            useAlternate = 0x00;
+        }
+    }
+}
 
 // BASIC DIPSWITCH UTILITIES
 // -------------------------------------------------------------------------------------------------------------------------------------------------->

@@ -157,7 +157,7 @@ void setup()
 
     // INIT USB SERIAL
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        Serial.begin(USB_BAUD_RATE);                               // Hardware Serial0 - through the FTDI to USB
+        Serial.begin(USB_BAUD_RATE);                               // Hardware Serial 0 - through the FTDI to USB
 
     // LOAD VALUES FROM EEPROM    
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -166,10 +166,7 @@ void setup()
     // SELECT WHICH SERIAL PORT FOR DEBUGGING MESSAGES
     // -------------------------------------------------------------------------------------------------------------------------------------------------->        
         DEBUG = SAVE_DEBUG = eeprom.ramcopy.PrintDebug;            // Does the user want to see debug messages
-        if (UseAuxSerialForPCComm())                               // Select the debug serial port (dipswitch #5)
-        {   DebugSerial = &Serial1;  }                             // Aux
-        else
-        {   DebugSerial = &Serial;   }                             // USB
+        SetActiveCommPort();                                       // Check Dipswitch #5 and set the communication port to USB (switch On) or Serial 1 (switch Off)
 
     // PINS NOT RELATED TO OBJECTS - SETUP
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -234,7 +231,7 @@ void setup()
         // PC communication - we also want to immediately start this object in case the PC is trying to communicate
         PCComm.begin(&eeprom, &Radio);  // We must pass a reference to OP_EEPROM annd OP_Radio objects to the OP_PCComm class
         //PCComm.skipCRC();             // You can disable CRC checking for testing, but leave it on in production
-        if (UseAuxSerialForPCComm()) { PCComm.switchToAltSerial(); } // Set by dipswitch. Use Aux serial to communicate with the computer over bluetooth. 
+        SetActiveCommPort();            // Probably hasn't changed since we just checked above, but let's be safe
         if (PCComm.CheckPC())
         {
             PCComm.ListenToPC();
