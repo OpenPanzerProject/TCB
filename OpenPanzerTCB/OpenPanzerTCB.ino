@@ -276,7 +276,6 @@ void setup()
         BattleSettings.Use_MG_Protocol = eeprom.ramcopy.Use_MG_Protocol;
         BattleSettings.Accept_MG_Damage = eeprom.ramcopy.Accept_MG_Damage;
         BattleSettings.DamageProfile = eeprom.ramcopy.DamageProfile;
-        BattleSettings.isRepairTank = GetIsRepair();    // This is also set by the user with the fight/repair switch
         BattleSettings.SendTankID = eeprom.ramcopy.SendTankID;
         BattleSettings.TankID = eeprom.ramcopy.TankID;
         // Now pass the battle settings and other settings

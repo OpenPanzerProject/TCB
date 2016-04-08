@@ -231,6 +231,12 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     StopMechRecoilMotor();
 }
 
+boolean OP_Tank::isRepairTank()
+{   
+    // Repair tank setting is set by the position of a physical switch on the TCB board. 
+    // If LOW (held to ground), tank is fighter. If HIGH (through input pullup), tank is repair. 
+    return digitalRead(pin_RepairTank);
+}
 
 void OP_Tank::SetupTamiyaWeightClass(char weight_class)
 {
@@ -284,7 +290,7 @@ void OP_Tank::Fire(void)
     if (!RepairOngoing) // Don't do anything if repair is ongoing
     {
         // Is this a repair tank? 
-        if (BattleSettings.isRepairTank)
+        if (isRepairTank())
         {
             // This is a repair tank. We skip mechanical/servo recoil and airsoft. We do have a repair sound, and we also do a
             // special light effect on the hit notification LEDs (in the apple). And of course we also send the repair IR code. 
@@ -379,7 +385,7 @@ void OP_Tank::Cannon_SendIR(void)
     {
         // We don't want to hit ourselves. So while we are sending, we disable reception
         DisableHitReception();      
-        if (BattleSettings.isRepairTank)
+        if (isRepairTank())
         {   // We are a repair tank, send the repair signal if one is selected
             if (BattleSettings.IR_RepairProtocol != IR_DISABLED) IR_Tx.send(BattleSettings.IR_RepairProtocol);
         }

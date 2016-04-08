@@ -9,7 +9,7 @@ void FireCannon()
 {
     if (Tank.CannonReloaded())          // Only fire if reloading is complete
     {   
-        if (Tank.BattleSettings.isRepairTank) 
+        if (Tank.isRepairTank()) 
         {   
             if (!Tank.isRepairOngoing() && !RepairOngoing)
             {

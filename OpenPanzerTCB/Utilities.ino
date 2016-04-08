@@ -318,8 +318,8 @@ void DumpBattleInfo()
     PrintDebugLine();
     if (Tank.BattleSettings.IR_FireProtocol != IR_UNKNOWN)
     {
-    DebugSerial->print(F("Is Repair Tank?   ")); PrintLnYesNo(Tank.BattleSettings.isRepairTank);
-    if (Tank.BattleSettings.isRepairTank) { DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_RepairProtocol)); }
+    DebugSerial->print(F("Is Repair Tank?   ")); PrintLnYesNo(Tank.isRepairTank());
+    if (Tank.isRepairTank()) { DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_RepairProtocol)); }
     else
     {
         DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_FireProtocol));

@@ -109,7 +109,6 @@ typedef struct battle_settings{
     boolean  Use_MG_Protocol;   // If true, the Machine Gun IR code will be sent when firing the machine gun, otherwise, it will be skipped. 
     boolean  Accept_MG_Damage;  // If true, the vehicle will be susceptible to MG fire. 
     char     DamageProfile;     // Which Damage Profile are we using
-    boolean  isRepairTank;      // Is this tank a repair tank. Note repair tanks can be of any class. 
     boolean  SendTankID;        // Do we include the Tank ID in the cannon IR transmission
     uint16_t TankID;            // What is this tank's ID number
 };
@@ -154,6 +153,7 @@ class OP_Tank
         static void     MachineGun_Stop(void);
         
         // Misc
+        static boolean  isRepairTank(void);         // Returns status of fight/repair switch on the TCB.
         static void     StopRepair(void);           // The only time the sketch might need to call this is a failsafe, LVC or other dire situation occured, and we want to
                                                     // shut everything down. Some functions check for a repair before they actually do anything (ie EngineOn/EngineOff in the sketch).
                                                     // If we force a repair to be over first then those other functions will be sure to run as expected.

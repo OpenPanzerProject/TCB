@@ -25,6 +25,7 @@ LastHitProtocol	KEYWORD2
 LastHitTeam	KEYWORD2
 PctDamaged	KEYWORD2
 PctHealthRemaining	KEYWORD2
+isRepairTank    KEYWORD2
 isRepairOngoing	KEYWORD2
 Damage	KEYWORD2
 BattleSettings	KEYWORD2

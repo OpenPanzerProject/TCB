@@ -7,7 +7,6 @@ void PerLoopUpdates(void)
     UpdateSimpleTimers();   // Update timers
 }
 
-
 void UpdateSimpleTimers()
 {
     timer.run();                        // This timer is local to the sketch. It is used in the main loop and elsewhere (eg Machine Gun). 

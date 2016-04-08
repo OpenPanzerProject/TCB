@@ -7,10 +7,9 @@
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 boolean GetIsRepair(void)
 {   // Repair tank setting. If LOW (held to ground), tank is fighter. If HIGH (through input pullup), tank is repair. 
-    return digitalRead(pin_RepairTank);
+    // But the actual pin read is done in the OP_Tank class.
+    return Tank.isRepairTank();
 }
-
-
 
 // DIPSWITCH 1 & 2: TANK WEIGHT CLASS
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
