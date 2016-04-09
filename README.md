@@ -50,7 +50,7 @@ Then open `Your_Sketch_Folder\Sketches\OpenPanzerTCB\OpenPanzerTCB.ino` with the
 
 It is also possible to treat the TCB as an "Arduino Mega 2560" from the IDE and it will work fine, but the computed program statistics will be off when you compile the sketch, and if you for some reason re-flash the bootloader you will be uploading the incorrect one.  
 
-If you are running Windows, it is highly recommended you install Arduino to a clean folder like `C:\Arduino` rather than in something like `C:\Program Files (x586)\` that has spaces and parentheses in the file name. As a developer this will save you hassle later. 
+If you are running Windows, it is highly recommended you install Arduino to a clean folder like `C:\Arduino` rather than in something like `C:\Program Files (x86)\` that has spaces and parentheses in the file name. As a developer this will save you hassle later. 
 
 In addition to the various tabs in the sketch, most of the functionality actually resides in the many C++ libraries. These will be in your `Sketches\libraries\` folder and they will all begin with the prefix **OP_**. 
 
