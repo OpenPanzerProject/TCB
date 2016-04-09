@@ -226,14 +226,14 @@
     
     // We need to set which of the eight servo outputs will be used for drive motors (left and right) and turret motors, amongst other things.
     // Not every setup will require servo outputs for drive or turret motors, but if they do, they should always map to the same servo number. 
-    #define SERVONUM_LEFTTREAD          SERVO_1     // This is the left-most servo output on the board, looking from the top. Servo 1 on the TCB board
-    #define SERVONUM_RIGHTTREAD         SERVO_2     // Servo 2 is right tread
-    #define SERVONUM_TURRETROTATION     SERVO_3     // Servo 3 is turret rotation 
-    #define SERVONUM_TURRETELEVATION    SERVO_4     // Servo 4 is turret elevation
-    #define SERVONUM_RECOIL             SERVO_5     // Servo 5 is barrel recoil. Will also recoil even if using a mechanical recoil. 
-    #define SERVONUM_PROP3              SERVO_6     // Proportional 3 - used for the 12-sound trigger switch of the TBS Mini (and maybe something else for future sound devices)
-    #define SERVONUM_PROP2              SERVO_7     // Proportional 2 - used as an engine on/off and beep trigger for the TBS Mini (and maybe something else for future sound devices)
-    #define SERVONUM_PROP1              SERVO_8     // Proportional 1 - used as throttle output to sound device
+    #define SERVONUM_LEFTTREAD          SERVO_1     // This is the left-most servo output on the board, looking from the top. Servo 1 on the TCB board (Arduino 22, ATmega A0)
+    #define SERVONUM_RIGHTTREAD         SERVO_2     // Servo 2 is right tread (Arduino 23, ATmega A1)
+    #define SERVONUM_TURRETROTATION     SERVO_3     // Servo 3 is turret rotation (Arduino 24, ATmega A2)
+    #define SERVONUM_TURRETELEVATION    SERVO_4     // Servo 4 is turret elevation (Arduino 25, ATmega A3)
+    #define SERVONUM_RECOIL             SERVO_5     // Servo 5 is barrel recoil. Will also recoil even if using a mechanical recoil. (Arduino 26, ATmega A4)
+    #define SERVONUM_PROP3              SERVO_6     // Proportional 3 - used for the 12-sound trigger switch of the TBS Mini (and maybe something else for future sound devices) (Arduino 27, ATmega A5)
+    #define SERVONUM_PROP2              SERVO_7     // Proportional 2 - used as an engine on/off and beep trigger for the TBS Mini (and maybe something else for future sound devices) (Arduino 28, ATmega A6)
+    #define SERVONUM_PROP1              SERVO_8     // Proportional 1 - used as throttle output to sound device (Arduino 29, ATmega A7)
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -294,46 +294,46 @@
     // Analog Pins
         #define IOA                      0        // Number of I/O A for use in arrays
         #define IOB                      1        // Number of I/O B for use in arrays
-        #define pin_IO_A                 A9       // Input/Output - for future expansion. Can read analog voltage, digital i/o, and pin-change interrupt capability.
-        #define pin_IO_B                 A8       // Input/Output - for future expansion. Can read analog voltage, digital i/o, and pin-change interrupt capability.
+        #define pin_IO_A                 A9       // Input/Output - for future expansion. Can read analog voltage, digital i/o, and pin-change interrupt capability (ATmega K1)
+        #define pin_IO_B                 A8       // Input/Output - for future expansion. Can read analog voltage, digital i/o, and pin-change interrupt capability (ATmega K0)
         #define IO_port                  DDRK     // What Atmega port are the IO pins on (Port K on TCB)
         #define IO_A_bit                 1        // What bit in port_IO is IO "A"
         #define IO_B_bit                 0        // What bit in port_IO is IO "B"
-        #define pin_BattVoltage          A15      // Input    - Battery voltage monitor through voltage divider (1/3 scaling ratio)
+        #define pin_BattVoltage          A15      // Input    - Battery voltage monitor through voltage divider (1/3 scaling ratio) (ATmega K7)
 
     // Dipswitch pins
-        #define pin_Dip1                 A6       // Input    - Dipswitch 1
-        #define pin_Dip2                 A5       // Input    - Dipswitch 2
-        #define pin_Dip3                 A10      // Input    - Dipswitch 3
-        #define pin_Dip4                 A11      // Input    - Dipswitch 4
-        #define pin_Dip5                 A12      // Input    - Dipswitch 5
+        #define pin_Dip1                 A6       // Input    - Dipswitch 1 (ATmega F6)
+        #define pin_Dip2                 A5       // Input    - Dipswitch 2 (ATmega F5)
+        #define pin_Dip3                 A10      // Input    - Dipswitch 3 (ATmega K2)
+        #define pin_Dip4                 A11      // Input    - Dipswitch 4 (ATmega K3)
+        #define pin_Dip5                 A12      // Input    - Dipswitch 5 (ATmega K4)
     
     // Repair selection switch
-        #define pin_RepairTank           33       // Input    - Repair tank selection switch
+        #define pin_RepairTank           33       // Input    - Repair tank selection switch (ATmega C4)
 
     // Pushbutton
-        #define pin_Button               A14      // Input    - Pushbutton input (not reset)
+        #define pin_Button               A14      // Input    - Input pushbutton (ATmega K6)
 
     // Board LEDs
-        #define pin_RedLED               A4       // Output   - Red   LED on board
-        #define pin_GreenLED             A3       // Output   - Green LED on board
+        #define pin_RedLED               A3       // Output   - Red   LED on board (ATmega F3)
+        #define pin_GreenLED             A4       // Output   - Green LED on board (ATmega F4)
 
     // Transistorized Light outputs
-        #define pin_Light1               53       // Output   - Light #1 output (headlights)
-        #define pin_Light2               5        // Output   - Light #2 output
-        #define pin_Brakelights          4        // Output   - Brake light output. PWM capable. 
-        #define pin_AuxOutput            8        // Output   - Aux output. PWM capable. Has a flyback diode installed, this special output can drive a relay directly, or even a small motor. 
-        #define pin_MuzzleFlash          41       // Output   - Trigger output for Taigen High Intensity muzzle flash unit
-        #define pin_HitNotifyLEDs        7        // Output   - Hit notification LEDs if using the Tamiya apple. PWM capable.
-        //Machine Gun light output - slightly different. This is on Atmega pin 4, but it does not have an Arduino pin number!
+        #define pin_Light1               53       // Output   - Light #1 output (headlights) (ATmega B0)
+        #define pin_Light2               5        // Output   - Light #2 output (ATmega E3)
+        #define pin_Brakelights          4        // Output   - Brake light output. PWM capable. (ATmega G5)
+        #define pin_AuxOutput            8        // Output   - Aux output. PWM capable. Has a flyback diode installed, this special output can drive a relay directly, or even a small motor (ATmega H5)
+        #define pin_MuzzleFlash          41       // Output   - Trigger output for Taigen High Intensity muzzle flash unit (ATmega G0)
+        #define pin_HitNotifyLEDs        7        // Output   - Hit notification LEDs if using the Tamiya apple. PWM capable (ATmega H4)
+        //Machine Gun light output - slightly different. This is on Atmega pin 4, but it does not have an Arduino pin number! 
         // Therefore we have to manipulate the port directly, we can't use pinMode() or digitalWrite() functions
-        #define MG_PORT                  PORTH    // Port H
-        #define MG_DDR                   DDRH     // Data direction register for Port H 
-        #define MG_PORTPIN               PH5      // The specific port pin for the machine gun LED
+        #define MG_PORT                  PORTE    // Port H
+        #define MG_DDR                   DDRE     // Data direction register for Port H 
+        #define MG_PORTPIN               PE5      // The specific port pin for the machine gun LED (ATmega E2)
 
         
     // Mechanical Recoil 
-        #define pin_MechRecoilMotor      43       // Output   - Controls the mechanical recoil motor (on/off)
+        #define pin_MechRecoilMotor      43       // Output   - Controls the mechanical recoil motor (on/off) (ATmega L6)
         
     // OTHER PINS
         // Onboard motor driver pins are defined above in the "MOTOR DRIVERS - ONBOARD" section
