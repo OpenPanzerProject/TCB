@@ -409,13 +409,14 @@ int main (void)
     unsigned int boot_state;
     boot_timer = 0;
     boot_state = 0;
-    boot_timeout = 20000; // should be about 1 second
+    boot_timeout = 25000; // Each boot_state=0 wait loop is about 39uS long, this number is how many times we will do the wait loop
+                          // 25k will be roughly 1 second
 
     // PROG_PIN pulled low, indicate with LED that bootloader is active
-    PROGLED_DDR       |=  (1 << PROGLED_PIN_RED);           // Set Green LED pin to output
+    PROGLED_DDR       |=  (1 << PROGLED_PIN_RED);           // Set Red LED pin to output
     PROGLED_DDR       |=  (1 << PROGLED_PIN_GREEN);         // Set Green LED pin to output
-    PROGLED_PORT      &= ~(1 << PROGLED_PIN_RED);           // Start with Green LED OFF
-    PROGLED_PORT      &= ~(1 << PROGLED_PIN_GREEN);         // Start with Red LED OFF
+    PROGLED_PORT      &= ~(1 << PROGLED_PIN_RED);           // Start with Red LED OFF
+    PROGLED_PORT      &= ~(1 << PROGLED_PIN_GREEN);         // Start with Green LED OFF
 
     // Read Dipswitch #5 to determine which USART the user wants to flash with
     USART_SELECT_PORT |=  (1 << USART_SELECT_PIN);          // Enable internal pullup on pin
@@ -473,9 +474,10 @@ int main (void)
                 boot_state = 1;     // (after ++ -> boot_state=2 bootloader timeout, jump to main 0x00000 )
             }
 
-            // About halfway through the wait (we wait until boot_timer = 20,000) we turn the Red LED on. If the bootloader keeps repeating for
-            // infinity, this will cause the appearance of a blinking Red LED.
-            if (! (boot_timer % 8191)) 
+            // About halfway through the wait (we wait until boot_timer = 25,000) we turn the Red LED on. If the bootloader keeps repeating for
+            // infinity, this will cause the appearance of a blinking Red LED, on for 1/2 second, off for 1/2 second.
+            // Of course, the bootloader will only repeat for infinity if there is no other program on the chip to go to. 
+            if (! (boot_timer % 12500)) 
             {
                 PROGLED_PORT |= (1 << PROGLED_PIN_RED); // turn Red LED On                
             }
