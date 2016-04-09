@@ -330,7 +330,11 @@ static int Serial_Available (void)
     }
 }
 
-#define MAX_TIME_COUNT (uint32_t)F_CPU
+// The stock stk500v2 bootloader sets the timeout to: 
+// #define MAX_TIME_COUNT (F_CPU >> 1) - basically 8 million, which is about 9 seconds for them
+
+// We set it to F_CPU / 8 which comes to 2 million instructions - about 3 seconds
+#define MAX_TIME_COUNT (F_CPU >> 3)
 static unsigned char recchar_timeout (void)
 {
     char c;
@@ -339,29 +343,6 @@ static unsigned char recchar_timeout (void)
 
     do 
     {
-        count++;
-
-        // Timeout, exit bootloader
-        if (count > MAX_TIME_COUNT) 
-        {
-            unsigned int data;
-        #if (FLASHEND > 0x0FFFF)
-            data = pgm_read_word_far (0);   // get the first word of the user program
-        #else
-            data = pgm_read_word_near (0);  // get the first word of the user program
-        #endif
-
-            if (data != 0xffff)             // make sure its valid before jumping to it.
-            { 
-                asm volatile (
-                    " clr r30\n"
-                    " clr r31\n"
-                    " ijmp\n"
-                );
-            }
-            count = 0;
-        }
-
         // Check for incoming byte
         if (useAltSerial)
         {
@@ -371,9 +352,34 @@ static unsigned char recchar_timeout (void)
         {
             incoming = (UART_STATUS_REG & (1 << UART_RECEIVE_COMPLETE)); 
         }
-    }
-    while (!incoming);
+        
+        if (incoming == 0)
+        {
+            count++;
+            
+            // Timeout, exit bootloader
+            if (count > MAX_TIME_COUNT) 
+            {
+                unsigned int data;
+            #if (FLASHEND > 0x0FFFF)
+                data = pgm_read_word_far (0);   // get the first word of the user program
+            #else
+                data = pgm_read_word_near (0);  // get the first word of the user program
+            #endif
 
+                if (data != 0xffff)             // make sure its valid before jumping to it.
+                { 
+                    asm volatile (
+                        " clr r30\n"
+                        " clr r31\n"
+                        " ijmp\n"
+                    );
+                }
+                count = 0;
+            }
+        }
+    } while (incoming == 0);
+    
     // Turn Green LED On when byte received. If we are flashing via USB cable, the two amber LEDs on the TCB will blink
     // during flash as a useful visual indicator. But if we are flashing over Bluetooth/FTDI over Serial 1 (alt serial), 
     // those amber LEDs will do nothing. So regardless of which serial port we are using, we flash the Green LED on any byte
@@ -449,7 +455,11 @@ int main (void)
         UART_BAUD_RATE_LOW      = UART_BAUD_SELECT(BAUDRATE,F_CPU);
         UART_CONTROL_REG        = ((1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER));
     }
-    asm volatile ( " nop\n" );  // wait until port has changed
+    asm volatile (      // wait until port has changed
+        "\tnop\n"
+        "\tnop\n"
+        "\tnop\n"
+    );    
 
 
     while (boot_state == 0) 
@@ -463,7 +473,7 @@ int main (void)
                 boot_state = 1;     // (after ++ -> boot_state=2 bootloader timeout, jump to main 0x00000 )
             }
 
-            // About halfway through the wait, we turn the Red LED on. If the bootloader keeps repeating for
+            // About halfway through the wait (we wait until boot_timer = 20,000) we turn the Red LED on. If the bootloader keeps repeating for
             // infinity, this will cause the appearance of a blinking Red LED.
             if (! (boot_timer % 8191)) 
             {
@@ -899,20 +909,18 @@ int main (void)
         "\tnop\n"
     ); 
 
-    // Now leave bootloader
-
     // Here we clear every serial flag and put double-speed back to off - let the Sketch set these up however it wants.
     if (useAltSerial)
     {
-        UART_ALT_STATUS_REG &= 0xfd;        
+        UART_ALT_STATUS_REG &= 0xFC;        
     }
     else
     {
-        UART_STATUS_REG &= 0xfd;
+        UART_STATUS_REG &= 0xFC;
     }
     
+    // Now leave bootloader
     boot_rww_enable();              // Enable application section
-    
     asm volatile (
         " clr r30\n"
         " clr r31\n"
