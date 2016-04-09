@@ -155,36 +155,30 @@
 void setup()
 {   // Here we get everything started. Begin with the most important things, and keep going in descending order
 
-    // INIT USB SERIAL
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        Serial.begin(USB_BAUD_RATE);                               // Hardware Serial 0 - through the FTDI to USB
-
     // LOAD VALUES FROM EEPROM    
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         boolean did_we_init = eeprom.begin();                      // begin() will initialize EEPROM if it never has been before, and load all EEPROM settings into our ramcopy struct
 
-    // SELECT WHICH SERIAL PORT USER WANTS TO COMMUNICATE OVER
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->        
-        SetActiveCommPort();                                       // Check Dipswitch #5 and set the communication port to USB (switch On) or Serial 1 (switch Off)
+    // INIT SERIALS & COMMS
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->
+        Serial.begin(USB_BAUD_RATE);                               // Hardware Serial 0 - Connected to FTDI/USB connector. We also have a baud rate in EEPROM (eeprom.ramcopy.USBSerialBaud) but for now we leave this static at the baud rate set in OP_Settings.h
+        AuxSerial.begin(eeprom.ramcopy.AuxSerialBaud);             // Hardware Serial 1 - alternate communication port
+        MotorSerial.begin(eeprom.ramcopy.MotorSerialBaud);         // Hardware Serial 2 - reserved for serial motor controllers
+        Serial3Tx.begin(eeprom.ramcopy.Serial3TxBaud);             // Hardware Serial 3 - Receive used for serial radio receivers (SBus,iBus,etc). Tx brought out to Serial 3 connector, but Tx disabled if serial receiver detected. 
+                                                                   //                     The original idea was to use Serial 3 for an Adafruit or Sparkfun serial LCD, and the connector is compatible with those, but no code was written for that application.
+        PCComm.begin(&eeprom, &Radio);                             // Initialize the PC communication class. It needs a reference to OP_EEPROM annd OP_Radio objects which we pass by reference.
+        SetActiveCommPort();                                       // Check Dipswitch #5 and set the active communication port to USB if switch On, or Serial 1 if switch Off
+
+        // Now send our first message out the port, if we initialized the EEPROM
+        DEBUG = SAVE_DEBUG = eeprom.ramcopy.PrintDebug;            // Does the user want to see debug messages
+        if (did_we_init && DEBUG) { DebugSerial->println(F("EEPROM Initalized")); }
 
     // PINS NOT RELATED TO OBJECTS - SETUP
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // We want to setup the pins as early as possible to put all outputs in a safe state. But remember to read EEPROM first because some EEPROM settings will determine how the pins are set. 
         SetupPins();                                               // Any pin not explicitly set by a library gets initalized here. 
         RedLedOn();                                                // Keep the Red LED on solid until we are out of setup. 
-
-    // INIT SERIALS
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        //Serial.begin(eeprom.ramcopy.USBSerialBaud);              // We have the option of setting and saving a baud rate in EEPROM for USB. But for now we leave it fixed to the define in OP_Settings.h.   
-        AuxSerial.begin(eeprom.ramcopy.AuxSerialBaud);             // Hardware Serial1 on the TCB - we call it AuxSerial
-        MotorSerial.begin(eeprom.ramcopy.MotorSerialBaud);         // Hardware Serial2 on the TCB - used for serial motor controllers
-        Serial3Tx.begin(eeprom.ramcopy.Serial3TxBaud);             // We only bring out the Tx line of Serial 3 on the TCB. And, if you use an SBus receiver, it is programmatically disabled. So this may be of
-                                                                   // limited use. The original idea was to use Serial 3 for an Adafruit or Sparkfun serial LCD, and the connector is compatible with those. 
-
-    // Now send our first message out the port, if we initialized the EEPROM
-        DEBUG = SAVE_DEBUG = eeprom.ramcopy.PrintDebug;            // Does the user want to see debug messages
-        if (did_we_init && DEBUG) { DebugSerial->println(F("EEPROM Initalized")); }
-
+        
     // BUTTON CHECK
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // If the user holds down the button while rebooting, and keeps holding for 4 seconds, we conduct a factory reset - which just means, restore 
@@ -367,14 +361,13 @@ void setup()
 
     // PC COMMUNICATION
     // -------------------------------------------------------------------------------------------------------------------------------------------------->        
-        PCComm.begin(&eeprom, &Radio);  // We must pass a reference to OP_EEPROM annd OP_Radio objects to the OP_PCComm class
-        SetActiveCommPort();            // Probably hasn't changed since we just checked above, but let's be safe
-        if (PCComm.CheckPC())
+/*        if (PCComm.CheckPC())
         {
             PCComm.ListenToPC();
             // Leave the Red LED on because we still aren't out of setup
             RedLedOn();
         }
+*/
         
     // READ RECEIVER
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -382,7 +375,7 @@ void setup()
         DisableDebug();
             StartFailsafe();    // This would otherwise give a message we don't need right now...
         RestoreDebug();
-        if (DEBUG) { DebugSerial->println(F("Waiting for radio... ")); } // ...Because we want to print our own this time
+        if (DEBUG) { DebugSerial->println(F("Waiting for radio... ")); } // ...because we want to print our own this time
 
         // Now we try to detect radio input. This loop will run forever until the Radio class successfully detects a PPM, SBus, iBus or other stream. 
         while(Radio.Status() != READY_state)    
