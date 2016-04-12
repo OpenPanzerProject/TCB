@@ -71,7 +71,7 @@ void BrakeLightsOff()
 
 // RUNNING LIGHTS
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
-// These are the same as the brake lights, only dim. When the brake lights come on, they switch from dim to full bright. 
+// These are the same as the brake lights, only dim. When the brake lights come on, they will switch from dim to full bright. 
 void RunningLightsOn()
 {   
     RunningLightsActive = true;
@@ -79,7 +79,7 @@ void RunningLightsOn()
     {   // But we only set the dim level if the brake lights aren't on
         analogWrite(pin_Brakelights, RunningLightsDimLevel);
     }
-    //if (DEBUG) { DebugSerial->println(F("Running Lights On")); }
+    if (DEBUG) { DebugSerial->println(F("Running Lights On")); }
 }
 
 void RunningLightsOff()
