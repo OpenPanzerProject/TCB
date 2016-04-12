@@ -354,7 +354,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         DefaultChSettings.channelNum = 1;
         ramcopy.AzimuthSettings = DefaultChSettings;
 
-    // Write aux channel settings. Default to digital inputs, 3-position switch, not reversed. 
+    // Write aux channel settings. Default to digital inputs, 2-position switch, not reversed. 
     // channel order in the PPM stream of 5,6,7,8,9,10,etc..
         uint8_t firstChanNum = 5;
         for (int a=0; a<AUXCHANNELS; a++)
@@ -364,7 +364,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
             ramcopy.Aux_ChannelSettings[a].pulseMax = 2000;
             ramcopy.Aux_ChannelSettings[a].pulseCenter = 1500;
             ramcopy.Aux_ChannelSettings[a].Digital = true;
-            ramcopy.Aux_ChannelSettings[a].numPositions = 3;
+            ramcopy.Aux_ChannelSettings[a].numPositions = 2;
             ramcopy.Aux_ChannelSettings[a].reversed = false;
         }
     
