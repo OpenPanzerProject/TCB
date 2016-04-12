@@ -361,11 +361,11 @@ void OP_Tank::Fire_Part2(void)
     // If tied to the Fire Cannon function, flash the high intensity flash unit
     if (_HiFlashWithCannon) { Cannon_Flash(); }
     
-    // If Airsoft we already sent IR before this. If mech-recoil, we send the IR now.
-    if (!_Airsoft) { Cannon_SendIR(); }
+    // If Airsoft we already sent IR before this. If mech-recoil, or if no mechanical barrel is specified, we send the IR now.
+    if (!_Airsoft || !_MechBarrelWithCannon) { Cannon_SendIR(); }
     
-    // If Mechanical Recoil we already started the recoil servo. If Airsoft, we do it now.
-    if (_Airsoft && _RecoilServoWithCannon) { _RecoilServo->Recoil(); }
+    // If Mechanical Recoil (or no mechanical barrel) we already started the recoil servo. If Airsoft, we do it now.
+    if (_MechBarrelWithCannon && _Airsoft && _RecoilServoWithCannon) { _RecoilServo->Recoil(); }
     
     // Now start the reload timer
     Cannon_StartReload();
