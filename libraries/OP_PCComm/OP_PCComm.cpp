@@ -37,7 +37,7 @@ DataSentence      OP_PCComm::SentenceIN;
 //------------------------------------------------------------------------------------------------------------------------>>
 // CONSTRUCT, BEGIN, MISC
 //------------------------------------------------------------------------------------------------------------------------>>
-OP_PCComm::OP_PCComm(void) {}                   // Constructor
+OP_PCComm::OP_PCComm(void) {}                                       // Constructor
 
 void OP_PCComm::begin(OP_EEPROM * opeeprom, OP_Radio * radio)       // Begin
 {
@@ -335,6 +335,10 @@ SentencePrefix s;
 char prefixString[VALUE_BUFF];
 uint8_t prefixLength = 0;
 
+// Radio detect time
+#define WaitForRadio 1000   // Time in mS
+uint32_t lastTime;
+
 // These variables are additionally used when sending radio stream data back
 static boolean StreamRadio; 
 SentencePrefix altS;
@@ -351,19 +355,31 @@ uint8_t strLen = 0;
     switch (SentenceIN.Command)
     {
         case PCCMD_NUM_CHANNELS:
+            // Computer is requesting number of radio channels. If the radio isn't ready, try to read it for a short amount of time before giving up. 
+            _radio->Update();
+            lastTime = millis();
+            while((_radio->Status() != READY_state) && (millis() - lastTime < lastTime))    
+            {   
+                _radio->detect();       // This will try to detect the radio signal
+                _radio->Update();       // Update the radio
+                updateTimer();          // Update the PC comm watchdog timer
+            }
+            
+            // Time up, or we sucessfully read the radio.
             if (_radio->Status() != READY_state)
-            {
+            {   // Radio could not be read, fail. 
                 sendNullValueSentence(DVCMD_RADIO_NOTREADY);
             }
             else
-            {
+            {   // Success, give the computer our number of channels, but first begin the radio object if it hasn't been already. 
+                if (!_radio->hasBegun()) _radio->begin(&_op_eeprom->ramcopy);  
                 GivePC_Int(PCCMD_NUM_CHANNELS, _radio->ChannelsUtilized);
             }
             break;
         
         case PCCMD_STARTSTREAM_RADIO:
-            _radio->Update();   // Update the radio (SBus polling and radio timer)
-            
+            // We don't try waiting for the radio in this segment, because before this one is called, OP Config will always call first for PCCMD_NUM_CHANNELS, and that one will have already
+            // tried getting the radio going. 
             if (_radio->Status() != READY_state) 
             {   // If the radio isn't ready (disconnected, not on, whatever), tell the PC
                 sendNullValueSentence(DVCMD_RADIO_NOTREADY);
@@ -439,7 +455,7 @@ uint8_t strLen = 0;
                         // Now if we have more than 8 channels to send, send the opposite 8 next time around
                         if (_radio->ChannelsUtilized > 8) HiLo == LOW ? HiLo = HIGH : HiLo = LOW;
                     }
-                    _radio->Update();                   // Update the radio (SBus polling and radio timer)
+                    _radio->Update();                   // Update the radio
                     updateTimer();                      // Update the PC comm watchdog timer
                     if (ReadData()) ProcessCommand();   // recursive - so we know when the PC tells us to stop
                 } while (!Disconnect && StreamRadio && !Timeout && numErrors < MAX_COMM_ERRORCOUNT);
