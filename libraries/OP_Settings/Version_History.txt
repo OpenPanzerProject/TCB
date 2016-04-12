@@ -1,3 +1,6 @@
+00.91.06	4/12/2016 - Fixed debug LED behavior on braking. PCComm class can now try to initialize the radio after communication with 
+                            PC has started, in the event the user forgets to turn their radio on until after, or communcation begins before
+                            the sketch has a chance to set it up. Fixed machine gun LED pin number, was incorrect for current board. 
 00.91.05        4/02/2016 - Added FlySky iBus support, up to 14 channels. Required board change to Rev 0.19. 
                             Tested with FlySky i10 transmitter and FS-iA10 and FS-iA6B receivers.
 00.91.04        3/25/2016 - Local dev copy
