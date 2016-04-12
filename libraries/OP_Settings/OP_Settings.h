@@ -329,7 +329,7 @@
         // Therefore we have to manipulate the port directly, we can't use pinMode() or digitalWrite() functions
         #define MG_PORT                  PORTE    // Port H
         #define MG_DDR                   DDRE     // Data direction register for Port H 
-        #define MG_PORTPIN               PE5      // The specific port pin for the machine gun LED (ATmega E2)
+        #define MG_PORTPIN               PE2      // The specific port pin for the machine gun LED (ATmega E2)
 
         
     // Mechanical Recoil 
