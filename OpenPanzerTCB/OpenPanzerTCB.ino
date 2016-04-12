@@ -192,8 +192,8 @@ void setup()
                 PrintLines(2);
                 PrintDebugLine();
                 DebugSerial->print(F("FACTORY RESET! "));
-                // Now blink both red and green LEDs slowly 4 times. This uses straight delays and blocks execution, which is fine for this case. 
-                uint8_t HowMany = 4;
+                // Now blink both red and green LEDs slowly 5 times. This uses straight delays and blocks execution, which is fine for this case. 
+                uint8_t HowMany = 5;
                 for (int i=1; i<=HowMany; i++)
                 {
                     GreenLedOn();
@@ -399,7 +399,8 @@ void setup()
         RedLedOn(); // But keep the Red LED one because we aren't into the main loop yet
 
         // Pass the eeprom ramcopy struct so the Radio object can initialize all channels to the settings saved in eeprom. 
-        Radio.begin(&eeprom.ramcopy);       
+        // But the PCComm class may already have called this, in which case we don't need to. 
+        if (!Radio.hasBegun()) Radio.begin(&eeprom.ramcopy);       
         
         // Now check how many channels were detected. If the Radio state is READY_state, we are assured of at least 4 channels.
         int ChannelsDetected = Radio.getChannelCount();
@@ -1307,66 +1308,74 @@ if (Startup)
 // ====================================================================================================================================================>        
     if (HavePower)
     {
-        // If we change direction we may want to notify the user via lights and the debug port
-        if (DriveModeActual != DriveMode_Previous || DriveModeActual == NEUTRALTURN) // We need to check Neutral Turn each time because the direction may have changed even though the drive mode won't.
-        {
-            switch (DriveModeActual)
-            {
-                case FORWARD: 
-                    // When moving forward, the Green LED is on an the Red LED is Off
-                    RedLedOff(); 
-                    GreenLedOn();
-                   if (DEBUG) { DebugSerial->println(F("Moving Forward")); }
-                   break;
-                
-                case REVERSE: 
-                    // When moving in reverse, the Red LED is on an the Green LED is Off
-                    RedLedOn(); 
-                    GreenLedOff(); 
-                    if (DEBUG) { DebugSerial->println(F("Moving Reverse")); }
-                    break;
-                    
-                case NEUTRALTURN: 
-                    // In a left neutral turn the Red LED blinks slowly and the Green LED is off
-                    // In a right neutral turn, the Green LED blinks slowly and the Red LED is off
-                    if (TurnSpeed > 0)  // Right turn
-                    {
-                        if (RedBlinker != 0)   { StopBlinking(RedBlinker); RedBlinker = 0; }
-                        RedLedOff();
-                        if (GreenBlinker == 0) { GreenBlinker = StartBlinking_ms(pin_GreenLED, 1, 400); }
-                    }
-                    else    // Left turn
-                    {
-                        if (GreenBlinker != 0) { StopBlinking(GreenBlinker); GreenBlinker = 0; }
-                        GreenLedOff();
-                        if (RedBlinker == 0) { RedBlinker = StartBlinking_ms(pin_RedLED, 1, 400); }
-                    }
-                    // Here we need to add back the check against the previous drive mode otherwise the message will get repeated
-                    if (DEBUG && DriveMode_Previous != NEUTRALTURN) { DebugSerial->println(F("Neutral Turn")); }
-                    break;
-                
-                case STOP: 
-                    // When stopped both LEDs are off. 
-                    RedLedOff(); 
-                    GreenLedOff();
-                    if (DEBUG) { DebugSerial->println(F("Stopped")); }
-                    break;
-            }
-
-            if (DriveModeActual != NEUTRALTURN)
-            {   // If we aren't in a neutral turn, cancel the blinkers
-                if (GreenBlinker != 0) { StopBlinking(GreenBlinker); GreenBlinker = 0; }
-                if (RedBlinker != 0)   { StopBlinking(RedBlinker); RedBlinker = 0; }
-            }
-        }
-
+        boolean UpdateDebugLEDs = false;
+        
         // Braking is not a drive mode so we check it separately
         // While braking, both the Red and Green LEDs are On. 
-        if (Braking == true && DriveModeActual != STOP)   { RedLedOn(); GreenLedOn(); }
+        //if (Braking == true && DriveModeActual != STOP)   { RedLedOn(); GreenLedOn(); }
+        if (Braking) { RedLedOn(); GreenLedOn(); } else { RedLedOff(); GreenLedOff(); }
         if (DEBUG && Braking && !Braking_Previous) DebugSerial->println(F("Braking"));
+        
+        // Notify the user via lights and the debug port (if enabled) of the tank's current direction of travel
+        switch (DriveModeActual)
+        {
+            case FORWARD: 
+                // When moving forward, the Green LED is on an the Red LED is Off
+                if (!Braking)
+                {
+                    RedLedOff(); 
+                    GreenLedOn();
+                    // We only print a message if the mode has changed, not every loop. This is the same for all the rest of the cases below. 
+                    if (DEBUG && DriveModeActual != DriveMode_Previous) { DebugSerial->println(F("Moving Forward")); }
+                }
+                break;
+            
+            case REVERSE: 
+                // When moving in reverse, the Red LED is on an the Green LED is Off
+                if (!Braking)
+                {
+                    RedLedOn(); 
+                    GreenLedOff(); 
+                    if (DEBUG && DriveModeActual != DriveMode_Previous) { DebugSerial->println(F("Moving Reverse")); }
+                }
+                break;
+                
+            case NEUTRALTURN: 
+                // In a left neutral turn the Red LED blinks slowly and the Green LED is off.
+                // In a right neutral turn, the Green LED blinks slowly and the Red LED is off.
+                if (TurnSpeed > 0)  // Right turn
+                {
+                    if (RedBlinker != 0)   { StopBlinking(RedBlinker); RedBlinker = 0; }
+                    RedLedOff();
+                    if (GreenBlinker == 0) { GreenBlinker = StartBlinking_ms(pin_GreenLED, 1, 400); }
+                }
+                else    // Left turn
+                {
+                    if (GreenBlinker != 0) { StopBlinking(GreenBlinker); GreenBlinker = 0; }
+                    GreenLedOff();
+                    if (RedBlinker == 0) { RedBlinker = StartBlinking_ms(pin_RedLED, 1, 400); }
+                }
+                // Only print a message if we are just now starting a neutral turn, not every time through the loop
+                if (DEBUG && DriveMode_Previous != NEUTRALTURN) { DebugSerial->println(F("Neutral Turn")); }
+                break;
+            
+            case STOP: 
+                // When stopped both LEDs are off. But we let the user keep the brake lights on manually by holding brake even after they've stopped. 
+                if (!Braking)
+                {                
+                    RedLedOff(); 
+                    GreenLedOff();
+                    if (DEBUG && DriveModeActual != DriveMode_Previous) { DebugSerial->println(F("Stopped")); }
+                }
+                break;
+        }
 
+        if (DriveModeActual != NEUTRALTURN)
+        {   // If we aren't in a neutral turn, cancel the blinkers
+            if (GreenBlinker != 0) { StopBlinking(GreenBlinker); GreenBlinker = 0; }
+            if (RedBlinker != 0)   { StopBlinking(RedBlinker); RedBlinker = 0; }
+        }
     }
-
     
 
 // ====================================================================================================================================================>
