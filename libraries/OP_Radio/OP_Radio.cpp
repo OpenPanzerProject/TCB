@@ -1,6 +1,7 @@
 
 #include "OP_Radio.h"
 
+boolean                     OP_Radio::didWeBegin;                   
 int                         OP_Radio::ChannelsUtilized;
 boolean                     OP_Radio::UsingSpecialPositions;
 boolean                     OP_Radio::InFailsafe;                   // Are we in failsafe due to some radio problem?            
@@ -61,6 +62,7 @@ const __FlashStringHelper *RadioProtocol(RADIO_PROTOCOL RP)
 OP_Radio::OP_Radio()
 {
     Protocol = PROTOCOL_NONE;   // We don't know yet what protocol we will detect
+    didWeBegin = false;         // We have not yet gotten to the begin() function yet.
     ChannelsUtilized = 0;
     channelCount = 0;
     UsingSpecialPositions = false;
@@ -315,6 +317,11 @@ void OP_Radio::begin(_eeprom_data *storage)
         ptrCommonChannelSettings[4 + i].present = &AuxChannel[i].present;
     }
     
+    
+    // The begin() function is done - set a flag so we know we don't have to come here again. We do this becasue multiple objects have access to this class, 
+    // namely the sketch and the OP_PCComm class. We won't know which one gets to it first, but whichever comes second will check to see if this flag has been
+    // set, and if so, won't call the begin function again. 
+    didWeBegin = true;
 }
 
 void OP_Radio::AdjustTurretStickEndPoints(void)
@@ -787,6 +794,10 @@ void OP_Radio::SetChannelsFailSafe()
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
 // UTILITIES
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
+boolean OP_Radio::hasBegun(void)
+{   // We want to know if we've already called the begin() function or not
+    return didWeBegin;
+}
 RADIO_PROTOCOL OP_Radio::getProtocol(void)
 {
     return Protocol;

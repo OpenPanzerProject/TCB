@@ -57,6 +57,7 @@ class OP_Radio
         OP_Radio();                                                     // Constructor
         static void             detect(void);                           // See what kind of signal is attached
         static void             begin(_eeprom_data *storage);           // This loads the save eeprom information into the radio object, and does basic initialization
+        static boolean          hasBegun(void);                         // Did we already call the begin() function yet? 
         static boolean          GetCommands();                          // High level command handler
         static RADIO_PROTOCOL   getProtocol();                          // Return currently detected protocol
         static decodeState_t    Status(void);                           // This actually returns the status of the PPM or SBus decoder
@@ -78,6 +79,7 @@ class OP_Radio
 
     private:
     
+        static boolean          didWeBegin;                             // Has the begin() function been called? 
         static RADIO_PROTOCOL   Protocol;                               // Which protocol detected
         static                  PPMDecode *PPMDecoder;                  // PPM Decoder object       
         static                  SBusDecode *SBusDecoder;                // SBus Decoder object

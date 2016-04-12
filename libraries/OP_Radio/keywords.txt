@@ -25,6 +25,7 @@ decodeState_t	KEYWORD1
 #-------------------------------------------------------------
 detect	KEYWORD2
 begin	KEYWORD2
+hasBegun    KEYWORD2
 GetCommands	KEYWORD2
 getProtocol	KEYWORD2
 Status	KEYWORD2
