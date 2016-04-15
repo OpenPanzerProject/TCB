@@ -409,8 +409,8 @@ int main (void)
     unsigned int boot_state;
     boot_timer = 0;
     boot_state = 0;
-    boot_timeout = 25000; // Each boot_state=0 wait loop is about 39uS long, this number is how many times we will do the wait loop
-                          // 25k will be roughly 1 second
+    boot_timeout = 50000; // Each boot_state=0 wait loop is about 39uS long, this number is how many times we will do the wait loop
+                          // 25k will be roughly 1 second, 50k will be 2 seconds, etc.
 
     // PROG_PIN pulled low, indicate with LED that bootloader is active
     PROGLED_DDR       |=  (1 << PROGLED_PIN_RED);           // Set Red LED pin to output
@@ -474,10 +474,10 @@ int main (void)
                 boot_state = 1;     // (after ++ -> boot_state=2 bootloader timeout, jump to main 0x00000 )
             }
 
-            // About halfway through the wait (we wait until boot_timer = 25,000) we turn the Red LED on. If the bootloader keeps repeating for
-            // infinity, this will cause the appearance of a blinking Red LED, on for 1/2 second, off for 1/2 second.
+            // About halfway through the wait we turn the Red LED on. If the bootloader keeps repeating for
+            // infinity, this will cause the appearance of a blinking Red LED.
             // Of course, the bootloader will only repeat for infinity if there is no other program on the chip to go to. 
-            if (! (boot_timer % 12500)) 
+            if (! (boot_timer % 25000))
             {
                 PROGLED_PORT |= (1 << PROGLED_PIN_RED); // turn Red LED On                
             }
