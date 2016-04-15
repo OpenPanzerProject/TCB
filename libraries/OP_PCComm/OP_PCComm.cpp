@@ -358,7 +358,7 @@ uint8_t strLen = 0;
             // Computer is requesting number of radio channels. If the radio isn't ready, try to read it for a short amount of time before giving up. 
             _radio->Update();
             lastTime = millis();
-            while((_radio->Status() != READY_state) && (millis() - lastTime < lastTime))    
+            while((_radio->Status() != READY_state) && ((millis() - lastTime) < WaitForRadio))    
             {   
                 _radio->detect();       // This will try to detect the radio signal
                 _radio->Update();       // Update the radio
