@@ -90,6 +90,10 @@ void PrintLnPct(uint8_t pct)
     PrintPct(pct);
     DebugSerial->println();
 }
+void PrintWaitingForRadio()
+{   // Only print this message if we are still in the setup() routine and still waiting for the radio to be plugged in.
+    if (inSetup && DEBUG && Radio.Status() != READY_state) { DebugSerial->println(F("Waiting for radio... ")); }
+}
 
 float Convert_mS_to_Sec(int mS)
 {
@@ -98,15 +102,23 @@ float Convert_mS_to_Sec(int mS)
 
 void DumpSysInfo()
 {
+    // All this printing can take some time, so we sprinkle some per-loop-updates throughout
     DumpVersion();
     DumpRadioInfo();
+        PerLoopUpdates();
     DumpTankInfo();
+        PerLoopUpdates();
     DumpBattleInfo();
+        PerLoopUpdates();
     DumpDriveSettings();
+        PerLoopUpdates();
     DumpIMUInfo();
+        PerLoopUpdates();
     DumpFunctionTriggers();
+        PerLoopUpdates();
     DumpVoltage();
     DumpBaudRates();
+        PerLoopUpdates();
     DebugSerial->println();
     PrintDebugLine();
 }

@@ -178,6 +178,9 @@ void OP_PCComm::ListenToPC(void)
     } while (!Disconnect);
     
     // If any eeprom data was updated, let's post it to RAM now
+    // However, this alone won't actually update everything that needs updating. Many objects are created or not created
+    // depending on certain settings in EEPROM, and only the sketch can decide that, and only when the device is booting.
+    // So we rely on OP Config to also force a reset by setting the DTR pin low if it knows we need it. 
     if (eepromUpdated) _op_eeprom->loadRAMcopy();
     
     // Reset the LEDs
@@ -336,7 +339,8 @@ char prefixString[VALUE_BUFF];
 uint8_t prefixLength = 0;
 
 // Radio detect time
-#define WaitForRadio 1000   // Time in mS
+#define WaitForRadio 600   // Time in mS we will wait for the radio if the PC asks us to stream and it's not ready. OP Config response timeout occurs at 1 second, so this needs to be less than that. 
+                           // If there really is a radio connected, we should be able to get it pretty quickly.
 uint32_t lastTime;
 
 // These variables are additionally used when sending radio stream data back

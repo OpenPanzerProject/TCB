@@ -45,6 +45,9 @@
 // PROJECT SPECIFIC EEPROM
     OP_EEPROM eeprom;                            // Wrapper class for dealing with eeprom. Note that EEPROM is also a valid object, it is the name of the EEPROMex class instance. Use the correct one!
                                                  // OP_EEPROM basically provides some further functionality beyond EEPROMex. 
+// SETUP FLAG
+    boolean inSetup = true;                      // Is code still in the setup() function? Will be true until we exit setup()
+    
 // SIMPLE TIMER 
     OP_SimpleTimer timer;                        // SimpleTimer named "timer"
     boolean TimeUp = true;
@@ -158,7 +161,9 @@ void setup()
     // LOAD VALUES FROM EEPROM    
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         boolean did_we_init = eeprom.begin();                      // begin() will initialize EEPROM if it never has been before, and load all EEPROM settings into our ramcopy struct
-
+        //if (did_we_init && DEBUG) { DebugSerial->println(F("EEPROM Initalized")); } // In general we don't want to be talking for the first few seconds after boot in case the computer is trying to talk to us,
+                                                                   // but this message should only occur once on a new device. I guess that also means we could get rid of it too... it was only useful for testing. 
+                                                                   // For now we will leave the code here, but comment it out. 
     // INIT SERIALS & COMMS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         Serial.begin(USB_BAUD_RATE);                               // Hardware Serial 0 - Connected to FTDI/USB connector. We also have a baud rate in EEPROM (eeprom.ramcopy.USBSerialBaud) but for now we leave this static at the baud rate set in OP_Settings.h
@@ -171,7 +176,6 @@ void setup()
 
         // Now send our first message out the port, if we initialized the EEPROM
         DEBUG = SAVE_DEBUG = eeprom.ramcopy.PrintDebug;            // Does the user want to see debug messages
-        if (did_we_init && DEBUG) { DebugSerial->println(F("EEPROM Initalized")); }
 
     // PINS NOT RELATED TO OBJECTS - SETUP
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -189,6 +193,8 @@ void setup()
             if (InputButton.pressedFor(3700))   // People count fast, so don't actually wait the full 4 seconds.
             {
                 eeprom.factoryReset();
+                // In general we try to avoid sending anything out the serial port for a few seconds after boot in case the PC is trying to communicate with us - 
+                // but if we are doing a factory reset, then it's fair to assume we don't need to catch any comms right now. 
                 PrintLines(2);
                 PrintDebugLine();
                 DebugSerial->print(F("FACTORY RESET! "));
@@ -368,21 +374,34 @@ void setup()
             RedLedOn();
         }
 */
+
         
-    // READ RECEIVER
+    // WAIT FOR PC COMM - AND TRY TO DETECT RECEIVER (kill two birds with one stone)
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // Assume no connection to start with. But we don't want the StartFailsafe message this time, so temporarily disable debug
         DisableDebug();
-            StartFailsafe();    // This would otherwise give a message we don't need right now...
+            StartFailsafe();    // This would otherwise give a message we don't need right now
         RestoreDebug();
-        if (DEBUG) { DebugSerial->println(F("Waiting for radio... ")); } // ...because we want to print our own this time
-
+        
         // Now we try to detect radio input. This loop will run forever until the Radio class successfully detects a PPM, SBus, iBus or other stream. 
-        while(Radio.Status() != READY_state)    
+        // While waiting, it will also be listening for any communication from the computer, since this frequently occurs on reboot. And in fact, 
+        // even if we do detect the radio right away, we still wait a short bit of time to give the computer a chance to talk to us. Of course we can
+        // accept PC comms later in the main loop too, but since the computer often reboots the device when it wants to communicate, most communication
+        // attempts will be happening now. 
+        boolean scheduleMsg = false;
+        uint32_t startTime = millis();
+        do
         {   
-            Radio.detect();                     // This will try to auto-detect PPM, SBus, iBus or any other supported protocols. 
-
-            // The user might want to do PC setup without the radio on, so check for that and allow if so
+            // We will schedule a message for two seconds from now, that will let the user know we are waiting on the radio to do anything. 
+            // We wait two seconds because we don't want to be putting traffic on the line right after boot in case the computer was the one that rebooted us
+            // and is now trying to communicate. Also, if in two seconds the radio has been detected, or we've moved out of the setup() routine, then the message won't actually display. 
+            if (!scheduleMsg && DEBUG)
+            {
+                timer.setTimeout(2000, PrintWaitingForRadio);       // The function can be found in the Utilites tab
+                scheduleMsg = true;                                 // Only schedule it once. 
+            }
+            
+            // While we're waiting, check for PC comms
             if (PCComm.CheckPC()) 
             {   // Temporarily disable the failsafe lights
                 StopFailsafeLights();
@@ -392,14 +411,20 @@ void setup()
                 // But when we're done talking to the PC, restart the lights
                 StartFailsafeLights();
             }
+        
+            // This will try to auto-detect PPM, SBus, iBus or any other supported protocols. 
+            if (Radio.Status() != READY_state) { Radio.detect(); }
+            
             PerLoopUpdates();
-        }
-        // Ok, the radio is ready! 
+
+        } while(Radio.Status() != READY_state || (millis() - startTime < 700) );
+        
+        // Ok, if we make it out of the loop, it means the radio is ready! 
         EndFailsafe(); 
         RedLedOn(); // But keep the Red LED one because we aren't into the main loop yet
 
         // Pass the eeprom ramcopy struct so the Radio object can initialize all channels to the settings saved in eeprom. 
-        // But the PCComm class may already have called this, in which case we don't need to. 
+        // But the PCComm class may already have called this, in which case we don't need to, which is why we check the hasBegun() function first. 
         if (!Radio.hasBegun()) Radio.begin(&eeprom.ramcopy);       
         
         // Now check how many channels were detected. If the Radio state is READY_state, we are assured of at least 4 channels.
@@ -409,6 +434,11 @@ void setup()
     // RANDOM SEED
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
         randomSeed(analogRead(A0));
+
+
+    // DONE WITH SETUP()
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->    
+        inSetup = false;
 }
 
 
@@ -527,7 +557,7 @@ if (Startup)
 
     // Display some info if we have debug set. But wait until a few seconds after we've booted so the dump doesn't interfere with any PC communication attempts. 
     // Of course, the user can also always dump the info just by pressing the input button. 
-        if (DEBUG) { timer.setTimeout(2500, DumpSysInfo); }
+        if (DEBUG) { timer.setTimeout(1000, DumpSysInfo); }
 
     // Get the time
         currentMillis = millis();
@@ -1084,11 +1114,10 @@ if (Startup)
             // If the user set brake lights to come on automatically at stop, turn them off now, because we are no longer stopped
             if (eeprom.ramcopy.BrakesAutoOnAtStop && BrakeLightsActive) { BrakeLightsOff(); }
 
-            // If we are moving fast enough, restart the idle timer (this timer auto-shuts-off the engine if we've been idling longer than a user-defined length of time). 
-            // "Fast enough" is defined as 1/3 of absolute full speed. If we restrict reverse or neutral turn max speeds, we may have to be very near full throttle before 
-            // we exceed 1/3 absolute full speed. Or if we just like to creep around real slow all the time, we may have an issue there as well. 
-            // But worse thing that happens is the engine auto-shuts off, so the user can just re-start it. The user can also disable the auto shut-off completely if they want. 
-            if ((DriveModeActual == NEUTRALTURN && abs(TurnSpeed) > (MOTOR_MAX_FWDSPEED / 3)) || (DriveModeActual != NEUTRALTURN && abs(DriveSpeed) > (MOTOR_MAX_FWDSPEED / 3)))   { UpdateEngineIdleTimer(); }
+            // If we are moving, keep the idle timer going. Once we come to a stop we'll quit updating it, and if the user has EngineAutoStopTime_mS set to something more than 0 (meaning, they want the 
+            // engine to automatically turn off after a certain amount of time sitting stopped at idle), then when the timer expires it will turn the engine off. UpdateEngineIdleTimer() also starts the timer
+            // if this is the first time we're calling it. 
+            if (DriveModeActual != STOP)   { UpdateEngineIdleTimer(); }
         }
     }
     else // In this case the engine is stopped
