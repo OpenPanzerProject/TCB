@@ -495,13 +495,13 @@ boolean neg;
 // GetThrottleSpeed - this one is similar to GetDriveSpeed, except now we are setting our "virtual" engine throttle speed, not the tank's actual movement speed. 
 // Throttle speed does *NOT* go to the drive motors - it will be used instead to set the speed of the mechanical smoker, and most importantly, the sound unit. 
 // By divorcing the "engine" speed from actual drive speed, we can do simple things like rev the engine without moving the tank, or play a special sound on high acceleration, or 
-// even more sophisticated effects. 
+// even potentially more sophisticated effects. 
 
 // As with drive speed, we have the option of "ramping" throttle speed using similar parameters. The same 256 Hz interrupt is used, and we can set the amount the throttle speed
 // changes each time (ThrottleRampStep), or how many interrupts most occur before an increment is allowed (ThrottleSkipNum). Of course, throttle speed could also be set directly
 // instead of ramped. 
 
-// For now, all we do here is try to prevent the throttle sound from stopping suddenly, and we implement the special acceleration sound on fast stick movements. 
+// For now, all we do here is try to prevent the throttle sound from stopping suddenly. 
 int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int DriveSpeed, _driveModes DriveMode, boolean Brake, OP_TBS * SoundObject)
 {
     int8_t t_ThrottleSkipNum = 0;           // Temporary number of interrupts to skip before incrementing throttle speed. Initialize to zero, but it needs to be set to something else below (if ramping is used). 
@@ -512,7 +512,7 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
     
     // First of all, the engine only runs one direction, so we don't need negative numbers
     Brake ? ThrottleCMD = 0 : ThrottleCMD = abs(ThrottleCMD);   // Also, if we are braking, by definition we have let off the gas, so throttle speed will be zero (actually idle)
-    DriveSpeed = abs(DriveSpeed);
+    DriveSpeed = abs(DriveSpeed);                               // DriveSpeed is not presently used in this routine, but is passed anyway for some future effect that may want to know it. 
     //LastThrottleSpeed should already come in as a positive number
 
     // Second, we start by initializing final throttle speed to the throttle command speed (essentially the throttle stick position), but this may change by the end of the routine
@@ -537,7 +537,7 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
         }
 
         // While the tank may be able to slow down very quickly, there is no "brake" on the engine RPM. Think of a real car, 
-        // you can have the pedal to the floor and the let go, but it will still take a moment for the engine speed to return 
+        // you can have the pedal to the floor and then let go, but it will still take a moment for the engine speed to return 
         // to idle on its own. 
         
         // What we're trying to do on deceleration, is prevent the engine sound from stopping too suddenly, because that will sound strange. 
