@@ -51,7 +51,7 @@ void PortA_On()
     { 
         digitalWrite(pin_IO_A, HIGH);
         IO_Pin[IOA].outputValue = HIGH;
-        if (DEBUG) { DebugSerial->println(F("IO Port A Output - On")); }
+        if (DEBUG && !inSetup) { DebugSerial->println(F("IO Port A Output - On")); }
     }
 }
 void PortA_Off()
@@ -60,7 +60,7 @@ void PortA_Off()
     { 
         digitalWrite(pin_IO_A, LOW);
         IO_Pin[IOA].outputValue = LOW;
-        if (DEBUG) { DebugSerial->println(F("IO Port A Output - Off")); }
+        if (DEBUG && !inSetup) { DebugSerial->println(F("IO Port A Output - Off")); }
     }
 }
 void PortA_Toggle()
@@ -104,7 +104,7 @@ void PortB_On()
     { 
         digitalWrite(pin_IO_B, HIGH);
         IO_Pin[IOB].outputValue = HIGH;
-        if (DEBUG) { DebugSerial->println(F("IO Port B Output - On")); }
+        if (DEBUG && !inSetup) { DebugSerial->println(F("IO Port B Output - On")); }
     }
 }
 void PortB_Off()
@@ -113,7 +113,7 @@ void PortB_Off()
     { 
         digitalWrite(pin_IO_B, LOW);
         IO_Pin[IOB].outputValue = LOW;
-        if (DEBUG) { DebugSerial->println(F("IO Port B Output - Off")); }
+        if (DEBUG && !inSetup) { DebugSerial->println(F("IO Port B Output - Off")); }
     }
 }
 void PortB_Toggle()
