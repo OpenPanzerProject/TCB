@@ -180,7 +180,13 @@ void InstantiateMotorObjects()
             RCOutput3_Available = false;
     }
     // Now initialize the motor
-    TurretRotation->begin();    
+    TurretRotation->begin(); 
+    // The user also has the option of limiting max turret rotation speed. We can easily do this by using the set_MaxSpeedPct function of the motor object. 
+    // Of course this will cause unintended consequences if the motor type is set to SERVO_ESC and they are using an unmodified hobby servo (ie, not a continuous rotation servo). 
+    // In that case limiting the max speed will actually just limit the servo's travel. However for turret rotation it is unlikelyi an unmodified hobby servo would be used. 
+    // We could do a check for SERVO_ESC, but that won't help, because the user could have plugged in a continuous rotation servo, or be using a hobby ESC, and still selected SERVO_ESC,
+    // and in those cases limiting the max speed would indeed work as intended. 
+    if (eeprom.ramcopy.TurretRotation_MaxSpeedPct < 100) { TurretRotation->set_MaxSpeedPct(eeprom.ramcopy.TurretRotation_MaxSpeedPct); }   
 
     // TURRET MOTOR DEFINITION - ELEVATION
     // -------------------------------------------------------------------------------------------------------------------------------------->>
@@ -223,6 +229,13 @@ void InstantiateMotorObjects()
     }
     // Now initialize the motor
     TurretElevation->begin();    
+    // The user also has the option of limiting max turret elevation speed. We can easily do this by using the set_MaxSpeedPct function of the motor object. 
+    // Of course this will cause unintended consequences if the motor type is set to SERVO_ESC and they are using an unmodified hobby servo (ie, not a continuous rotation servo). 
+    // For barrel elevation, that very well could be the case although we suggest that SERVO_PAN is a better choice for hobby servos in this application, which the user would
+    // hopefully use instead, and in which case the speed limitation will work. 
+    // Note we do not set a speed limitation on the Barrel copy object. That one is only used for barrel stabilization and in that case we don't want any limit on the speed of the servo. 
+    if (eeprom.ramcopy.TurretElevation_MaxSpeedPct < 100) { TurretElevation->set_MaxSpeedPct(eeprom.ramcopy.TurretElevation_MaxSpeedPct); }
+    
     // We may also have some custom end-points defined for the elevation motor, if it is set to servo. 
     // These end-points need to be set after the begin() statement, which initializes the endpoints to defaults.
     if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
@@ -231,9 +244,11 @@ void InstantiateMotorObjects()
         // and not the servo class we need to call the servo class directly using TankServos (even though in this case TurretElevation is also a subclass of servo)
         TankServos.setMinPulseWidth(SERVONUM_TURRETELEVATION, eeprom.ramcopy.TurretElevation_EPMin);
         TankServos.setMaxPulseWidth(SERVONUM_TURRETELEVATION, eeprom.ramcopy.TurretElevation_EPMax);
+        
         // For turret elevation, we use the reversed setting of the motor class. 
         // FYI, we don't have a reversed setting for traditional motors (Sabertooth, onboard, etc...) because in those cases you can just swap the motor wires. 
         TurretElevation->set_Reversed(eeprom.ramcopy.TurretElevation_Reversed);
+        
         // If we have a duplicate barrel object, set its reversed flag as well. 
         if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
         { Barrel->set_Reversed(eeprom.ramcopy.TurretElevation_Reversed); }
@@ -274,7 +289,7 @@ void InstantiateMotorObjects()
         // control them directly for whatever purpose. They essentially "pass-through" whatever radio channel has been assigned to them. 
         // In OP Config the user has the option of doing regular RC passthrough (good for servos, continuous rotation servos, or ESCs), or they 
         // can select a Pan Servo passthrough. Which one they picked will influence what kind of object we need to create. The only way to know
-        // is to run through the list of the user's function triggers and see. And they may not have one at all, in which case we don't need
+        // is to run through the list of the user's function triggers and see. And they may not have any at all, in which case we don't need
         // to create anything. 
 
         // It is also technically possible for the user to assign more than one trigger to the same RC pass-through. This would be bad news, so
@@ -346,7 +361,7 @@ void InstantiateMotorObjects()
                             }
                             break;
                         case SF_RC4_PASS_PAN:   // Pan Servo on RC Output 4
-                            if (RCOutput4_Available && !RCOutput1_Assigned) 
+                            if (RCOutput4_Available && !RCOutput4_Assigned) 
                             {   // Servo_PAN on TURRETELEVATION
                                 ServoOutput4 = new Servo_PAN (SERVONUM_TURRETELEVATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
                                 ServoOutput4->begin(); 
@@ -444,6 +459,8 @@ void SetupPins()
     pinMode(pin_Brakelights, OUTPUT);	    // Output   - Brake light output. PWM capable.
     pinMode(pin_AuxOutput, OUTPUT);         // Output   - Aux output. PWM capable. Has flyback diode, can drive a relay directly or a (very small) motor 
     pinMode(pin_HitNotifyLEDs, OUTPUT);	    // Output   - Hit notification LEDs if using the Tamiya apple
+    // This one is PNP, so logic high is off
+    digitalWrite(pin_MuzzleFlash, HIGH);
     pinMode(pin_MuzzleFlash, OUTPUT);	    // Output	- Trigger output for Taigen High Intensity muzzle flash unit
     // Machine gun LED has to be manipulated directly, we can't use the Arduino functions
     MG_DDR |= (1 << MG_PORTPIN);            // Output   - Machine gun - set the port pin to output ("or" that bit of the data direction register with a 1)
@@ -456,8 +473,7 @@ void SetupPins()
     digitalWrite(pin_AuxOutput, LOW);
     digitalWrite(pin_HitNotifyLEDs, LOW);
     MG_PORT &= ~(1 << MG_PORTPIN);          // Machine Gun LED must be set directly. We "and-not" the port pin bit with 1 to set it to 0, this turns it off
-    // This one is PNP, so logic high is off
-    digitalWrite(pin_MuzzleFlash, HIGH);
+
 
 // Mechanical Recoil Trigger
     pinMode(pin_MechRecoilMotor, OUTPUT);	    // Output   - Transistor for Asiatam, Tamiya or similar mechanical recoil units

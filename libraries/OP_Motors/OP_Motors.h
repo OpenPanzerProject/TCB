@@ -118,10 +118,8 @@ class Motor {
         { return this->reversed; }
 
     // Other common functions
-    void cut_SpeedPct(int);         // Cut the total speed range by some percent
-    void set_MaxSpeedPct(int);      // Alternate way of writing cut_SpeedPct
-    void cut_PosSpeedPct(int);      // Cut the positive speed range by some percent
-    void cut_NegSpeedPct(int);      // Cut the negative speed range by some percent
+    void cut_SpeedPct(uint8_t);         // Cut the total speed range by some percent
+    void set_MaxSpeedPct(uint8_t);      // Alternate way of writing cut_SpeedPct
 
     // This maps the external speed range to the internal one
     int map_Range(int s)

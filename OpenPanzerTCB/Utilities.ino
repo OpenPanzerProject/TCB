@@ -103,24 +103,28 @@ float Convert_mS_to_Sec(int mS)
 void DumpSysInfo()
 {
     // All this printing can take some time, so we sprinkle some per-loop-updates throughout
+    // Actually we have commented this out temporarily as it causes (even worse than usual) interruptions
+    // in the serial data stream. When we figure that out we will un-comment these. 
     DumpVersion();
     DumpRadioInfo();
-        PerLoopUpdates();
-    DumpTankInfo();
-        PerLoopUpdates();
+//        PerLoopUpdates();
+    DumpMotorInfo();
+//        PerLoopUpdates();
     DumpBattleInfo();
-        PerLoopUpdates();
+//        PerLoopUpdates();
     DumpDriveSettings();
-        PerLoopUpdates();
+//        PerLoopUpdates();
+    DumpTurretInfo();
+//        PerLoopUpdates();
     DumpIMUInfo();
-        PerLoopUpdates();
+//        PerLoopUpdates();
     DumpFunctionTriggers();
-        PerLoopUpdates();
+//        PerLoopUpdates();
     DumpVoltage();
     DumpBaudRates();
-        PerLoopUpdates();
+//        PerLoopUpdates();
     DebugSerial->println();
-    PrintDebugLine();
+    PrintDebugLine();    
 }
 
 void DumpVersion()
@@ -184,11 +188,11 @@ void DumpChannelsDetectedUtilized()
     DebugSerial->print(F("Channels utilized: ")); DebugSerial->println(Radio.ChannelsUtilized);
 }
 
-void DumpTankInfo()
+void DumpMotorInfo()
 {
     DebugSerial->println();
     PrintDebugLine();
-    DebugSerial->println(F("MECHANICAL INFO"));
+    DebugSerial->println(F("MOTOR TYPES"));
     PrintDebugLine();
     DebugSerial->print(F("Drive Motors:      ")); DebugSerial->println(ptrDriveType(eeprom.ramcopy.DriveMotors)); 
     DebugSerial->print(F("Turret Rotation:   ")); DebugSerial->print(ptrDriveType(eeprom.ramcopy.TurretRotationMotor)); 
@@ -253,6 +257,9 @@ void DumpDriveSettings()
         DebugSerial->print(eeprom.ramcopy.NudgeTime_mS);
         DebugSerial->println(F(" ms)"));
     }
+    DebugSerial->print(F("Forward Speed Limited:  ")); 
+    if (eeprom.ramcopy.MaxForwardSpeedPct < 100) { DebugSerial->print(F("Yes - ")); DebugSerial->print(eeprom.ramcopy.MaxForwardSpeedPct); DebugSerial->println(F("%")); }
+    else PrintLnYesNo(false);
     DebugSerial->print(F("Reverse Speed Limited:  ")); 
     if (eeprom.ramcopy.MaxReverseSpeedPct < 100) { DebugSerial->print(F("Yes - ")); DebugSerial->print(eeprom.ramcopy.MaxReverseSpeedPct); DebugSerial->println(F("%")); }
     else PrintLnYesNo(false);
@@ -263,17 +270,27 @@ void DumpDriveSettings()
     if (eeprom.ramcopy.NeutralTurnAllowed) DebugSerial->print(F(" - ")); DebugSerial->print(eeprom.ramcopy.NeutralTurnPct); DebugSerial->print(F("%"));
     DebugSerial->println();
     DebugSerial->print(F("Turn mode:              ")); DebugSerial->println(Driver.getTurnMode());  
-    DebugSerial->print(F("Turret stick functions: ")); PrintLnYesNo(Radio.UsingSpecialPositions);
-    if (Radio.UsingSpecialPositions)
-    {
-        DebugSerial->print(F("Turret movement delay:  ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.IgnoreTurretDelay_mS),2); DebugSerial->println(F(" sec"));    
-    }
-    DebugSerial->print(F("Recoil delay:           ")); 
+}
+
+void DumpTurretInfo()
+{
+    DebugSerial->println();
+    PrintDebugLine();
+    DebugSerial->println(F("TURRET SETTINGS"));
+    PrintDebugLine();    
+    DebugSerial->print(F("Turret Rotation Speed Limited:  ")); 
+    if (eeprom.ramcopy.TurretRotation_MaxSpeedPct < 100) { DebugSerial->print(F("Yes - ")); DebugSerial->print(eeprom.ramcopy.TurretRotation_MaxSpeedPct); DebugSerial->println(F("%")); }
+    else PrintLnYesNo(false);
+    DebugSerial->print(F("Barrel Elevation Speed Limited: ")); 
+    if (eeprom.ramcopy.TurretElevation_MaxSpeedPct < 100) { DebugSerial->print(F("Yes - ")); DebugSerial->print(eeprom.ramcopy.TurretElevation_MaxSpeedPct); DebugSerial->println(F("%")); }
+    else PrintLnYesNo(false);
+    DebugSerial->print(F("Recoil delay:                   ")); 
     if (eeprom.ramcopy.RecoilDelay > 0)
     {
         DebugSerial->println(Convert_mS_to_Sec(eeprom.ramcopy.RecoilDelay),2); DebugSerial->println(F(" sec"));
     }
     else { PrintLnYesNo(0); }    
+    
 }
 
 void DumpIMUInfo()
@@ -409,11 +426,25 @@ void DumpLVC_Voltage()
 void DumpFunctionTriggers()
 {
     char buffer[50];
+    byte c;
+
+    uint_farptr_t addr_fnametable;
+//    addr_fnametable = pgm_get_far_address(function_name_table);
+//    address = pgm_get_far_address (bitmap);
     
     DebugSerial->println();
     PrintDebugLine();
     DebugSerial->println(F("FUNCTION TRIGGERS"));
     PrintDebugLine();
+
+    // Let the user know if there are any functions assigned to turret stick triggers
+    DebugSerial->print(F("Turret stick functions: ")); if (Radio.UsingSpecialPositions) { DebugSerial->println(F("Yes")); } else { DebugSerial->println(F("None")); }
+    if (Radio.UsingSpecialPositions)
+    {
+        DebugSerial->print(F("Turret movement delay:  ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.IgnoreTurretDelay_mS),2); DebugSerial->println(F(" sec"));    
+    }
+
+    // Now list all functions and their triggers
     if (MAX_FUNCTION_TRIGGERS > 0)
     {
         for (uint8_t i = 0; i <MAX_FUNCTION_TRIGGERS; i++)
@@ -426,8 +457,53 @@ void DumpFunctionTriggers()
                 DebugSerial->print(eeprom.ramcopy.SF_Trigger[i].specialFunction);
                 if (eeprom.ramcopy.SF_Trigger[i].specialFunction < 10) PrintSpace();
                 PrintSpaceDash();
-                strcpy_P(buffer, (char*)pgm_read_word_far(&(function_name_table[eeprom.ramcopy.SF_Trigger[i].specialFunction])));
-                DebugSerial->print(buffer);
+                //strcpy_P(buffer, (char*)pgm_read_byte_far(&(function_name_table[eeprom.ramcopy.SF_Trigger[i].specialFunction])));
+                //strcpy_PF(buffer, addr_fnametable + eeprom.ramcopy.SF_Trigger[i].specialFunction);
+                //strcpy_P(buffer, (char*)pgm_read_byte_far(addr_fnametable + eeprom.ramcopy.SF_Trigger[i].specialFunction));
+                //strcpy_PF(buffer, addr_fnametable);
+
+
+                //addr_fnametable = pgm_get_far_address(function_name_table); // + eeprom.ramcopy.SF_Trigger[i].specialFunction;
+                //DebugSerial->println(addr_fnametable);
+                //for (int j=0; j<100; j++)
+                //{
+                    //DebugSerial->print(pgm_read_byte_far(addr_fnametable + j));
+                //    DebugSerial->print((char)pgm_read_byte_far(pgm_get_far_address(function_name_table) + j));
+                //}
+                int j = 0;
+                //while( c = pgm_read_byte_far( GET_FAR_ADDRESS(function_name_table) + j++ ) )
+                //{
+                //    DebugSerial->print( (char)c );
+                //}
+
+                //while( c = pgm_read_byte_far( GET_FAR_ADDRESS(pgmData + j++ )) )
+                //{
+                //    DebugSerial->print( (char)c );
+                //}
+                
+                //while (c = pgm_read_byte_far(addr_fnametable++))
+                //{
+                //    DebugSerial->print(c);
+                //}
+/*
+                
+                //c = pgm_read_byte_far(addr_fnametable + eeprom.ramcopy.SF_Trigger[i].specialFunction);
+                addr_fnametable = pgm_get_far_address(function_name_table);
+                c = (char)pgm_read_byte_far(addr_fnametable + i);
+                while (c)
+                {
+                    DebugSerial->print(c);
+                    c = pgm_read_byte_far(++addr_fnametable);   
+                }
+                DebugSerial->println();
+
+                addr_fnametable = pgm_get_far_address(function_name_table);
+                while ((c = (char)pgm_read_byte_far(addr_fnametable++))) 
+                {
+                    DebugSerial->print(c);
+                }
+        */
+                //DebugSerial->print(buffer);
                 DebugSerial->println();
             }
         }
@@ -437,4 +513,26 @@ void DumpFunctionTriggers()
         DebugSerial->println(F("No function triggers defined"));
     }
 }
+
+void DumpVarInfo()
+{
+    
+    uint16_t varID;         // Variable ID
+    uint16_t varOffset;     // Offset of this variable within the _eeprom_data structure
+    _vartype varType;       // Type - signed or unsigned int 8, 16 or 32, or boolean
+    for (int i=0; i<NUM_STORED_VARS; i++)
+    {   
+        varID = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5));
+        varOffset = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 2);
+        varType = pgm_read_byte_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 4);
+        DebugSerial->print(F("ID: ")); DebugSerial->print(varID);
+        DebugSerial->print(F(" Offset: ")); DebugSerial->print(varOffset);
+        DebugSerial->print(F(" Type: ")); DebugSerial->print(printVarType(varType)); 
+        DebugSerial->println();
+        delay(5);
+    }
+}
+
+
+
 

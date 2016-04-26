@@ -8,7 +8,7 @@
  * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -39,6 +39,7 @@
 #include "OP_PCComm.h"
 #include "OP_BNO055.h"
 #include "OP_I2C.h"
+
 
 // GLOBAL VARIABLES
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>>
@@ -172,6 +173,7 @@ void setup()
         Serial3Tx.begin(eeprom.ramcopy.Serial3TxBaud);             // Hardware Serial 3 - Receive used for serial radio receivers (SBus,iBus,etc). Tx brought out to Serial 3 connector, but Tx disabled if serial receiver detected. 
                                                                    //                     The original idea was to use Serial 3 for an Adafruit or Sparkfun serial LCD, and the connector is compatible with those, but no code was written for that application.
         PCComm.begin(&eeprom, &Radio);                             // Initialize the PC communication class. It needs a reference to OP_EEPROM annd OP_Radio objects which we pass by reference.
+        //PCComm.skipCRC();                                        // We can skip CRC checking for testing, but don't use this in production. 
         SetActiveCommPort();                                       // Check Dipswitch #5 and set the active communication port to USB if switch On, or Serial 1 if switch Off
 
         // Now send our first message out the port, if we initialized the EEPROM
@@ -417,7 +419,7 @@ void setup()
             
             PerLoopUpdates();
 
-        } while(Radio.Status() != READY_state || (millis() - startTime < 700) );
+        } while(Radio.Status() != READY_state || (millis() - startTime) < 700 );
         
         // Ok, if we make it out of the loop, it means the radio is ready! 
         EndFailsafe(); 
@@ -478,6 +480,7 @@ void loop()
     static boolean NudgeEnabled = false;                              // Is nudging even enabled
 // Driving Variables Calculated at Startup
     static int ReverseSpeed_Max;                                      // Calculate an absolute figure for max reverse speed based on the user's setting of MaxReverseSpeedPct
+    static int ForwardSpeed_Max;                                      // Calcluate an absolute figure for max forward speed based on teh user's setting of MaxForwardSpeedPct
     static float BrakeSensitivityPct;                                 // NOT IMPLEMENTED: We convert the user's BrakeSensitivityPct to a number between 0-1. 
     static int NeutralTurn_Max;                                       // Calculate an absolute figure for max neutral turn speed based on the user's setting of NeutralTurnPct
     static int HalftrackTurn_Max;                                     // Calculate an absolute figure for max rear tread turn based on the user's setting of HalftrackTreadTurnPct
@@ -529,11 +532,18 @@ if (Startup)
     // Same for the percent of turns that can be applied to the treds in halftrack mode
         HalftrackTurn_Max = (int)(((float)eeprom.ramcopy.HalftrackTreadTurnPct / 100.0) * (float)MOTOR_MAX_FWDSPEED); 
     
-    // Convert the user setting of MaxReverseSpeedPct into an absolute max reverse speed
+    // Convert the user setting of MaxForwardSpeedPct & MaxReverseSpeedPct into an absolute max forward/reverse speed
+        if (eeprom.ramcopy.MaxForwardSpeedPct < 100) { ForwardSpeed_Max = (int)(((float)eeprom.ramcopy.MaxForwardSpeedPct / 100.0) * (float)MOTOR_MAX_FWDSPEED); }
+        else { ForwardSpeed_Max = MOTOR_MAX_FWDSPEED; } // This part isn't really necessary, but we do it just in case we forget an if statement later
         if (eeprom.ramcopy.MaxReverseSpeedPct < 100) { ReverseSpeed_Max = (int)(((float)eeprom.ramcopy.MaxReverseSpeedPct / 100.0) * (float)MOTOR_MAX_REVSPEED); }
         else { ReverseSpeed_Max = MOTOR_MAX_REVSPEED; } // This part isn't really necessary, but we do it just in case we forget an if statement later
     
-    // Check if nudging is active, if so, calculate the forward, reverse, and neutral turn nudge amounts from the user percent
+    // Check if nudging is active, if so, calculate the forward, reverse, and neutral turn nudge amounts from the user percent.
+    // Note, if we used ForwardSpeed_Max above in the formula below instead of MOTOR_MAX_FWDSPEED, the nudge amount would become a percent of our adjsuted 
+    // maximum forward speed. For example in that case, if ForwardSpeed_Max was set to 70% and MotorNudgePct was set to 100%, then in effect the MotorNudgePct
+    // would only be 70% in absolute terms. For now we leave it as-is, which means that it is possibe for the NudgePct to equal a drive speed greater than the 
+    // actual restricted speed limit. This can look silly but the user must be responsible for choosing settings that make sense for his model, and this way gives him
+    // the greatest flexibility. 
         if (eeprom.ramcopy.MotorNudgePct == 0) NudgeEnabled = false;
         else
         {
@@ -557,7 +567,7 @@ if (Startup)
 
     // Display some info if we have debug set. But wait until a few seconds after we've booted so the dump doesn't interfere with any PC communication attempts. 
     // Of course, the user can also always dump the info just by pressing the input button. 
-        if (DEBUG) { timer.setTimeout(1000, DumpSysInfo); }
+        if (DEBUG) { timer.setTimeout(1500, DumpSysInfo); }
 
     // Get the time
         currentMillis = millis();
@@ -985,8 +995,18 @@ if (Startup)
         {   // We're going to start manipulating drive speed so we will use the DriveSpeed variable rather than DriveCommand, because we want DriveCommand (and DriveCommand_Previous)
             // to accurately reflect the actual command. 
             
-            // If we are moving in reverse, and the user wants to limit the maximum reverse speed, we need to scale the command to the range the user specifies
-            if (DriveModeActual == REVERSE && eeprom.ramcopy.MaxReverseSpeedPct < 100)
+            // Apply any user speed limitations to forward and reverse. We do this by scaling the command to the range the user specifies. 
+            // Why not simply adjust the internal speed range of the motor object? That is a great idea, but unfortunately, because forward and reverse can have different
+            // max speeds, limiting the motor object will cause uneven motor speed in Neutral Turns - for example, the tread turning in reverse will move slower than the tread
+            // moving forward. We would have to keep changing the internal speed range on the fly depending on if we were moving forward, reverse, or in a neutral turn. 
+            // It probably wouldn't be any more work really than what we've ended up doing which is adjusting the command, but that's how we're doing it. 
+            // And no, this will NOT hinder the ability of the sound object from reaching full speed even with limited motor speeds. The engine sound speed is based off 
+            // ThrottleCommand which we do not limit the way we are now with DriveCommand. 
+            if (DriveModeActual == FORWARD && eeprom.ramcopy.MaxForwardSpeedPct < 100)
+            {
+                DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_FWDSPEED, 0, ForwardSpeed_Max);
+            }
+            else if (DriveModeActual == REVERSE && eeprom.ramcopy.MaxReverseSpeedPct < 100)
             {
                 DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_REVSPEED, 0, ReverseSpeed_Max);  
             }
@@ -1211,6 +1231,8 @@ if (Startup)
     // ------------------------------------------------------------------------------------------------------------------------------------------------>  
     // Were we hit? 
     if (HavePower && Alive) HitType = Tank.WasHit();
+    else                    HitType = HIT_TYPE_NONE;
+    
     if (HitType != HIT_TYPE_NONE)
     {
         // We were hit. But was it a damaging hit, or a repair hit? 

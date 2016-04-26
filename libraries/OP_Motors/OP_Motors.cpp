@@ -49,8 +49,10 @@ const __FlashStringHelper *ptrDriveType(Drive_t dType) {
 // speed a motor can go (useful for battle damage). We can always restore the motor to whatever its full speed is by 
 // calling restore_Speed();
 // In this case, we take the cut and apply it equally to min and max (forward and backward). 
-void Motor::cut_SpeedPct(int cut_pct)
+void Motor::cut_SpeedPct(uint8_t cut_pct)
 { 
+    if (cut_pct == 0) return;                           // If cut is 0, then there is nothing to cut. 
+
     // We make sure cut is a "percent" between 1 - 100
     // The higher the number, the greater the speed will be cut
     cut_pct = constrain(cut_pct, 1, 100);
@@ -63,21 +65,11 @@ void Motor::cut_SpeedPct(int cut_pct)
 }
 // Just a different way of doing the above. Instead of passing the percent to cut, 
 // we pass the max speed possible, and it cuts the rest. 
-void Motor::set_MaxSpeedPct(int max_pct)
+void Motor::set_MaxSpeedPct(uint8_t max_pct)
 {
-    max_pct = constrain(max_pct, 1, 100);
+    if (max_pct > 100) return;                          // Max speed can't exceed 100
+    max_pct = constrain(max_pct, 0, 100);
     this->cut_SpeedPct(100-max_pct);
-}
-// Same as above, but this only cuts the speed range from 0 to positive numbers
-void Motor::cut_PosSpeedPct(int cut_pct)
-{ 
-    this->i_maxspeed = round((((float)cut_pct)/100.0)*(float)di_maxspeed);
-}
-// Same as above, but this only cuts the speed range from 0 to negative numbers
-// We use this function for example to reduce the maximum speed the tank can travel in reverse
-void Motor::cut_NegSpeedPct(int cut_pct)
-{ 
-    this->i_minspeed = round((((float)cut_pct)/100.0)*(float)di_minspeed);
 }
 
 

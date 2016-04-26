@@ -38,6 +38,8 @@ struct _eeprom_data {
     int16_t TurretElevation_EPMin;             // If the elevation motor selection is of type servo, we allow customized endpoints
     int16_t TurretElevation_EPMax;
     boolean TurretElevation_Reversed;          // And we have a motor-specific reversed flag as well, so it doesn't have to be tied to the stick reversed setting
+    uint8_t TurretElevation_MaxSpeedPct;       // Barrel elevation motor speed as percent of full speed
+    uint8_t TurretRotation_MaxSpeedPct;        // Turret rotation motor speed as percent of full speed
 
 // Mechanical Barrel and Recoil Servo settings
     boolean Airsoft;                           // If true, we are controlling an airsoft unit. If false, we are controlling mechanical recoil unit. 
@@ -83,6 +85,7 @@ struct _eeprom_data {
                                                  // Type 2: Halftrack - again two independent treads that can be used to steer, but with front steering wheels as well (servo output)
                                                  // Type 3: Car - steering accomplished entirey by the front wheels, single rear drive. Can also be used with halftracks, but rear treads 
                                                  //         will not be independent. 
+    uint8_t MaxForwardSpeedPct;                  // Forward speed as percent of full speed
     uint8_t MaxReverseSpeedPct;                  // Reverse speed as percent of full speed
     uint8_t HalftrackTreadTurnPct;               // What percent of turn command gets applied to the treads in Halftrack mode (100% is always applied to the steering servo)
     boolean EngineAutoStart;                     // If true, engine will auto-start on first blip of throttle. If false, start engine with user selected trigger.

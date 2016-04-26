@@ -48,7 +48,7 @@
 // and the sketch will exhibit unstable behavior!
 // 
 
-    #define EEPROM_INIT             0xAA42
+    #define EEPROM_INIT             0xAA49
 //
 //
 //=======================================================================================================================================>>
@@ -79,7 +79,7 @@ class OP_EEPROM
         static void factoryReset(void);             // This will force a call to Initialize_EEPROM(). All eeprom vars will be rest to default values. 
 
     protected:
-        
+
         // Functions
         static void Initialize_RAMcopy(void);       // Called by Initilize_EEPROM. It sets all the RAM variables to default values. 
         static void Initialize_EEPROM(void);        // This copies all variables (at default values) from RAM into eeprom.
