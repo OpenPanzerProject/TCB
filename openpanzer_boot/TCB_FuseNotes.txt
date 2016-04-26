@@ -25,11 +25,13 @@ High Fuse   0xDA
                                       be total flash (262,144) minus how many bytes we reserved for the bootloader - in our case 4,096 bytes, so the starting address
                                       for our bootloader will be 262144 - 4096 = 258048 or in hex: 0x3E000. That is important to know because we need to set it in 
                                       both our optcb2560_boot.c and Makefile when we compile the bootloader. 
-Low Fuse     0xFF  
+Low Fuse     0xF7  
                   CKDIV8      - 1     Clock divided by 8 - not set
                   CKOUT       - 1     Clock output - not set
                   SUT1:1      - 11    Startup time = 16K CK, slowly rising power. SUT1:0 bits cleared (by writing 1)
-                  CKSEL3:0    - 1111  Low power crystal oscillator (all cleared with 1)
+                  CKSEL3:0    - 0111  Full-swing crystal oscillator (only CKSEL3 set with 0, CKSEL2:0 cleared with 1). The stock Arduino Mega has this set to low-power crystal, but
+                                      we are using a different crystal than the Mega, and in testing we get much more stable serial communication at high baud rates with the extra power
+                                      used with the full-swing option. 
 Unlock Bits  0x3F
                   7:6         - 11    These bits do nothing
                   BLB12:11    - 11    Unlock the Boot Loader Section so we can write to it. 

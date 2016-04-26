@@ -10,7 +10,7 @@ REM - FUSES - DON'T CHANGE THESE, THEY ARE CORRECT FOR THE OPEN PANZER TCB Mk 1
 REM ----------------------------------------------------------------------------------------------------------->>
 set EFUSE=0xFD
 set HFUSE=0xDA
-set LFUSE=0xFF
+set LFUSE=0xF7
 set ULOCKF=0x3F
 set LOCKF=0x0F
 
