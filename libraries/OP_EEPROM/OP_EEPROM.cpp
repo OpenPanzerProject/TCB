@@ -251,11 +251,22 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
     int i;
     boolean found = false;
     
-    
     // Start searching from the position after the last one we found
-    for (i=(lastArrayPos+1); i<=NUM_STORED_VARS; i++)
+    for (i=(lastArrayPos+1); i<NUM_STORED_VARS; i++)
     {   
-        if (findID == pgm_read_word_near(&(STORAGEVARS[i].varID)))
+        // Back when we had STORAGEVARS (see OP_EEPROM_VarInfo.h) in regular progmem, we could do this: 
+        // if (findID == pgm_read_word_near(&(STORAGEVARS[i].varID)))
+        // Note we could reference any element of the struct array using typical array syntax ([i]) and we could also access the 
+        // the struct members directly by name (in this case varID). 
+        
+        // When we moved it to PROGMEM_FAR (out beyond the first 64k of program memory) we could no longer
+        // address it with an 8-bit pointer. Instead we use the GET_FAR_ADDRESS macro (see OP_Settings.h)
+        // to return a 32-bit pointer to the start address of the struct. This precludes use from obtain individual 
+        // elements of the array in the traditional manner, or the struct members likewise. Here we get the starting address, 
+        // then to get the first word of the i-th struct we multiply i by 5 which is the number of bytes in each struct, or 
+        // in other words, the number of bytes for each element of the array. See below for other machinations to get 
+        // struct members other than the first one (varID is the first member of the _storage_var_info struct)
+        if (findID == pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5)))
         {
             found = true;
             break;
@@ -267,8 +278,11 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
     if (!found)
     {
         for (i=1; i<=lastArrayPos; i++)
-        {
-            if (findID == pgm_read_word_near(&(STORAGEVARS[i].varID)))
+        {   // Old method: 
+            // if (findID == pgm_read_word_near(&(STORAGEVARS[i].varID)))
+            
+            // Far method: 
+            if (findID == pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5)))
             {
                 found = true;
                 break;
@@ -279,14 +293,21 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
     // If found, fill in the _storage_var struct that was passed, and return
     // the array position
     if (found)
-    {
-        svi.varOffset = pgm_read_word_near(&(STORAGEVARS[i].varOffset));        // read_word is for reading a two-byte value (int16 for example)
-        svi.varType = pgm_read_byte_near(&(STORAGEVARS[i].varType));            // read_word is for reading a two-byte value (int16 for example)
+    {   // Old method: 
+        //svi.varOffset = pgm_read_word_near(&(STORAGEVARS[i].varOffset));        // read_word is for reading a two-byte value (int16 for example)
+        //svi.varType = pgm_read_byte_near(&(STORAGEVARS[i].varType));            // read_byte is for reading a single byte value (int8 for example)
+        
+        // Far method: 
+        // Here we use again i*5 to get us the i-th element of the array. But we also add some more bytes to reach the second and third members of the struct
+        svi.varOffset = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 2);    // varOffset comes after varID which is 2 bytes, so we need to add 2 bytes to reach it. varOffset is 2 bytes as well so we use read_word.
+        svi.varType = pgm_read_byte_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 4);      // varType comes after varID and varOffset so we have to add 4 bytes to reach it. varType is only 1 byte so we use read_byte to read it. 
+        lastArrayPos = i;   // remember where we were for next time
         return i+1;         // return the position. Add 1 since the array is zero-based, but zero doesn't count (our null "FirstVal")
     }
     else
     {
         // If not found, return 0
+        lastArrayPos = 0;
         return 0;
     }
 
@@ -295,9 +316,13 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
 boolean OP_EEPROM::getStorageVarInfo(_storage_var_info & svi, uint16_t arrayPos)
 {
     if (arrayPos > 0 && arrayPos <= NUM_STORED_VARS)
-    {
-        svi.varOffset = pgm_read_word_near(&(STORAGEVARS[arrayPos].varOffset));         
-        svi.varType = pgm_read_byte_near(&(STORAGEVARS[arrayPos].varType));       
+    {   // Old method: 
+        //svi.varOffset = pgm_read_word_near(&(STORAGEVARS[arrayPos].varOffset));         
+        //svi.varType = pgm_read_byte_near(&(STORAGEVARS[arrayPos].varType));       
+        
+        // Far method: see the discussion above for what we're doing. 
+        svi.varOffset = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (arrayPos*5) + 2);
+        svi.varType = pgm_read_byte_far(GET_FAR_ADDRESS(STORAGEVARS) + (arrayPos*5) + 4);
         return true;
     }
     else
@@ -401,6 +426,8 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.TurretElevation_EPMin = 1000;
         ramcopy.TurretElevation_EPMax = 2000;
         ramcopy.TurretElevation_Reversed = false;
+        ramcopy.TurretElevation_MaxSpeedPct = 100;
+        ramcopy.TurretRotation_MaxSpeedPct = 100;
 
     // Mechanical Barrel and Recoil Servo settings
         ramcopy.Airsoft = true;
@@ -415,8 +442,8 @@ void OP_EEPROM::Initialize_RAMcopy(void)
 
     // On board smoker output
         ramcopy.SmokerControlAuto = true;
-        ramcopy.SmokerIdleSpeed = 64;           // 25 percent
-        ramcopy.SmokerFastIdleSpeed = 102;      // 40 percent
+        ramcopy.SmokerIdleSpeed = 89;           // 35 percent
+        ramcopy.SmokerFastIdleSpeed = 128;      // 50 percent
         ramcopy.SmokerMaxSpeed = 255;           // 100 percent
 
     // Driving adjustments
@@ -434,7 +461,8 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.NeutralTurnPct = 50;            // Default to 50 percent of max forward speed for neutral turn max speed
         ramcopy.TurnMode = 2;                   // Default Turn Mode = 2. See MixSteering function in OP_Driver.cpp for specific mode definitions. 
         ramcopy.DriveType = DT_TANK;            // Default to Tank
-        ramcopy.MaxReverseSpeedPct = 70;        // Default to 70 pct reverse speed
+        ramcopy.MaxForwardSpeedPct = 100;       // Default to 100 percent
+        ramcopy.MaxReverseSpeedPct = 70;        // Default to 70 percent
         ramcopy.HalftrackTreadTurnPct = 50;     // Default to 50 pct turn command applied to halftrack treads (in halftrack mode)
         ramcopy.EngineAutoStart = false;        // Default to engine start with trigger instead of throttle. 
         ramcopy.EngineAutoStopTime_mS = 0;      // Default to auto-stop disabled (time = 0)
