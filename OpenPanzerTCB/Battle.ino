@@ -49,16 +49,16 @@ void FireCannon()
 void MG_Start()
 {   
     Tank.MachineGun();
-    if (DEBUG) {DebugSerial->println(F("MG Start"));}
+    if (DEBUG && !inSetup) {DebugSerial->println(F("MG Start"));}
 }
 void MG_Stop()
 {
     Tank.MachineGun_Stop();
-    if (DEBUG) {DebugSerial->println(F("MG Stop"));}
+    if (DEBUG && !inSetup) {DebugSerial->println(F("MG Stop"));}
 }
 
 
-// SPECIAL FUNCTIONS: Trigger Mechanical Barrel
+// SPECIAL FUNCTIONS: Trigger Mechanical Barrel; Enable/Disable/Toggle Mechanical Barrel (Mechanical Barrel = Airsoft or Mechanical Recoil Unit)
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 // If the setting "Trigger With Cannon" is checked in OP Config on the Motors tab, the mechanical barrel (airsoft or recoil) will trigger automatically
 // with the FireCannon function above. If un-checked, FireCannon will still play the sound, flash, IR, etc.. but will not trigger the mechanical barrel. 
@@ -67,10 +67,42 @@ void MG_Stop()
 void MechBarrel()
 {
     Tank.TriggerMechBarrel();
-    if (DEBUG) 
+    if (DEBUG && !inSetup) 
     { 
         if (eeprom.ramcopy.Airsoft) DebugSerial->println(F("Airsoft - Manual Trigger")); 
         else DebugSerial->println(F("Mechanical Recoil - Manual Trigger")); 
+    }
+}
+// These functions let us include or not include the mechanical barrel action with the CannonFire function (mechanical barrel is either Airsoft or mechanical recoil unit, whichever the user has specified). 
+// The setting can be specified once in OP Config, but the user may also want to change it on the fly - for example if they have a combination airsoft/IR setup, they may want to fire the IR on occasion
+// without firing the airsoft, so this would let them turn airsoft off (disable the "mechanical" barrel). Note this has nothing to do with the recoil servo. 
+void MechBarrel_Enable()
+{
+    Tank.SetMechBarrelWithCannon(true);
+    if (DEBUG && !inSetup)
+    { 
+        if (eeprom.ramcopy.Airsoft) DebugSerial->println(F("Airsoft - Enabled")); 
+        else DebugSerial->println(F("Mechanical Recoil - Enabled"));     
+    }
+}
+void MechBarrel_Disable()
+{
+    Tank.SetMechBarrelWithCannon(false);
+    if (DEBUG && !inSetup)
+    { 
+        if (eeprom.ramcopy.Airsoft) DebugSerial->println(F("Airsoft - Disabled")); 
+        else DebugSerial->println(F("Mechanical Recoil - Disabled"));     
+    }
+}
+void MechBarrel_Toggle()
+{
+    if (Tank.isMechBarrelSetWithCannon())
+    {
+        MechBarrel_Disable();
+    }
+    else
+    {
+        MechBarrel_Enable();
     }
 }
 
@@ -80,7 +112,7 @@ void MechBarrel()
 void TriggerServoRecoil()
 {
     RecoilServo->Recoil();
-    if (DEBUG) { DebugSerial->println(F("Servo Recoil - Manual Trigger")); }
+    if (DEBUG && !inSetup) { DebugSerial->println(F("Servo Recoil - Manual Trigger")); }
 }
 
 // SPECIAL FUNCTIONS: Trigger Muzzle Flash
@@ -90,7 +122,7 @@ void TriggerServoRecoil()
 void MuzzleFlash()
 {
     Tank.TriggerMuzzleFlash();
-    if (DEBUG) { DebugSerial->println(F("High Intensity Flash Unit - Manual Trigger")); }
+    if (DEBUG && !inSetup) { DebugSerial->println(F("High Intensity Flash Unit - Manual Trigger")); }
 }
 
 

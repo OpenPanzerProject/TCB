@@ -18,6 +18,8 @@ begin	KEYWORD2
 UpdateTimer	KEYWORD2
 Fire	KEYWORD2
 CannonReloaded	KEYWORD2
+SetMechBarrelWithCannon	KEYWORD2
+isMechBarrelSetWithCannon	KEYWORD2
 TriggerMechBarrel	KEYWORD2
 TriggerMuzzleFlash	KEYWORD2
 WasHit	KEYWORD2

@@ -130,6 +130,8 @@ class OP_Tank
         // Direct control over portions of the typical cannon fire event
         static void     TriggerMechBarrel(void);    // Will trigger the mechanical recoil or airsoft unit (depending on which is selected), apart from any cannon fire. Used for manual control.
         static void     TriggerMuzzleFlash(void);
+        static void     SetMechBarrelWithCannon(boolean);   // Allows the sketch to attach/detach the mechanical barrel (Airsoft or mechanical recoil) from the Cannon Fire event: True = attached, False = detached
+        static boolean  isMechBarrelSetWithCannon(void);    // Returns the current setting
         
         // Functions - IR receiving (ie, getting hit!)
         static HIT_TYPE WasHit(void);               // Have we been hit

@@ -37,6 +37,9 @@ void LoadFunctionTriggers()
                 case SF_HI_FLASH:                   SF_Callback[i] = &SF_HiFlash;                                   break;
                 case SF_MG_FIRE:                    SF_Callback[i] = &SF_MG_Start;                                  break;
                 case SF_MG_OFF:                     SF_Callback[i] = &SF_MG_Stop;                                   break;
+                case SF_BARREL_ENABLE:              SF_Callback[i] = &SF_MechBarrel_Enable;                         break;
+                case SF_BARREL_DISABLE:             SF_Callback[i] = &SF_MechBarrel_Disable;                        break;
+                case SF_BARREL_TOGGLE:              SF_Callback[i] = &SF_MechBarrel_Toggle;                         break;
                 case SF_LIGHT1_TOGGLE:              SF_Callback[i] = &SF_Light1Toggle;                              break;
                 case SF_LIGHT1_ON:                  SF_Callback[i] = &SF_Light1On;                                  break;
                 case SF_LIGHT1_OFF:                 SF_Callback[i] = &SF_Light1Off;                                 break;
@@ -65,9 +68,9 @@ void LoadFunctionTriggers()
                 case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
-                case SF_OUTPUT_B_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
-                case SF_OUTPUT_B_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
-                case SF_OUTPUT_B_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
+                case SF_OUTPUT_B_TOGGLE:            SF_Callback[i] = &SF_PortB_Toggle;                              break;
+                case SF_OUTPUT_B_ON:                SF_Callback[i] = &SF_PortB_On;                                  break; 
+                case SF_OUTPUT_B_OFF:               SF_Callback[i] = &SF_PortB_Off;                                 break; 
                 case SF_ACCEL_LEVEL:                SF_Callback[i] = &SF_SetAccelRampFreq;                          break;         
                 case SF_DECEL_LEVEL:                SF_Callback[i] = &SF_SetDecelRampFreq;                          break;
                 case SF_TURNMODE_1:                 SF_Callback[i] = &SF_TurnMode1;                                 break;                    
@@ -84,10 +87,10 @@ void LoadFunctionTriggers()
                 case SF_RC2_PASS_PAN:               SF_Callback[i] = &RC_PanServo_2;                                break; // Analog function
                 case SF_RC3_PASS_PAN:               SF_Callback[i] = &RC_PanServo_3;                                break; // Analog function
                 case SF_RC4_PASS_PAN:               SF_Callback[i] = &RC_PanServo_4;                                break; // Analog function
-                case SF_BARREL_ON:                  SF_Callback[i] = &SF_BarrelStab_On;                             break;                    
-                case SF_BARREL_OFF:                 SF_Callback[i] = &SF_BarrelStab_Off;                            break;                    
-                case SF_BARREL_TOGGLE:              SF_Callback[i] = &SF_BarrelStab_Toggle;                         break;                                        
-                case SF_BARREL_LEVEL:               SF_Callback[i] = &SetBarrelSensitivity;                         break; // Analog function
+                case SF_BARREL_STAB_ON:             SF_Callback[i] = &SF_BarrelStab_On;                             break;                    
+                case SF_BARREL_STAB_OFF:            SF_Callback[i] = &SF_BarrelStab_Off;                            break;                    
+                case SF_BARREL_STAB_TOGGLE:         SF_Callback[i] = &SF_BarrelStab_Toggle;                         break;                                        
+                case SF_BARREL_STAB_LEVEL:          SF_Callback[i] = &SetBarrelSensitivity;                         break; // Analog function
                 case SF_HILLS_ON:                   SF_Callback[i] = &SF_HillPhysics_On;                            break;                    
                 case SF_HILLS_OFF:                  SF_Callback[i] = &SF_HillPhysics_Off;                           break;                    
                 case SF_HILLS_TOGGLE:               SF_Callback[i] = &SF_HillPhysics_Toggle;                        break;                                        
@@ -96,6 +99,7 @@ void LoadFunctionTriggers()
                 case SF_USER_FUNC_2:                SF_Callback[i] = &SF_UserFunc2;                                 break;                    
                 case SF_USER_ANLG_1:                SF_Callback[i] = &User_Analog_Function1;                        break; // Analog function
                 case SF_USER_ANLG_2:                SF_Callback[i] = &User_Analog_Function2;                        break; // Analog function
+                case SF_DUMP_DEBUG:                 SF_Callback[i] = &SF_DumpDebug;                                 break;
             }
         }
     }
@@ -338,6 +342,9 @@ void SF_RecoilServo(uint16_t ignoreMe)          { TriggerServoRecoil();     }
 void SF_HiFlash(uint16_t ignoreMe)              { MuzzleFlash();            }
 void SF_MG_Start(uint16_t ignoreMe)             { MG_Start();               }
 void SF_MG_Stop(uint16_t ignoreMe)              { MG_Stop();                }
+void SF_MechBarrel_Enable(uint16_t ignoreMe)    { MechBarrel_Enable();      }
+void SF_MechBarrel_Disable(uint16_t ignoreMe)   { MechBarrel_Disable();     }
+void SF_MechBarrel_Toggle(uint16_t ignoreMe)    { MechBarrel_Toggle();      }
 void SF_Light1Toggle(uint16_t ignoreMe)         { Light1Toggle();           }
 void SF_Light1On(uint16_t ignoreMe)             { Light1On();               }
 void SF_Light1Off(uint16_t ignoreMe)            { Light1Off();              }
@@ -376,6 +383,7 @@ void SF_HillPhysics_Off(uint16_t ignoreMe)      { EnableHillPhysics(false); }
 void SF_HillPhysics_Toggle(uint16_t ignoreMe)   { ToggleHillPhysics();      }
 void SF_UserFunc1(uint16_t ignoreMe)            { UserFunction1();          }
 void SF_UserFunc2(uint16_t ignoreMe)            { UserFunction2();          }
+void SF_DumpDebug(uint16_t ignoreMe)            { DumpSysInfo();            }
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>

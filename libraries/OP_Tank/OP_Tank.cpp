@@ -238,6 +238,16 @@ boolean OP_Tank::isRepairTank()
     return digitalRead(pin_RepairTank);
 }
 
+void OP_Tank::SetMechBarrelWithCannon(boolean isSet)
+{
+    _MechBarrelWithCannon = isSet;
+}
+
+boolean OP_Tank::isMechBarrelSetWithCannon(void)
+{
+    return _MechBarrelWithCannon;
+}
+
 void OP_Tank::SetupTamiyaWeightClass(char weight_class)
 {
     // This routine assigns settings according to the given Tamiya weight class

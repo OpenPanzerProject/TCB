@@ -19,6 +19,7 @@
  
 #ifndef OP_FUNCTIONSTRIGGERS_H
 #define OP_FUNCTIONSTRIGGERS_H
+#include "OP_Settings.h"
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -36,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 72;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 76;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -53,167 +54,169 @@ enum _special_function : byte {
     SF_HI_FLASH         = 10,       // 10
     SF_MG_FIRE          = 11,       // 11
     SF_MG_OFF           = 12,       // 12
-    SF_LIGHT1_TOGGLE    = 13,       // 13
-    SF_LIGHT1_ON        = 14,       // 14
-    SF_LIGHT1_OFF       = 15,       // 15
-    SF_LIGHT2_TOGGLE    = 16,       // 16
-    SF_LIGHT2_ON        = 17,       // 17
-    SF_LIGHT2_OFF       = 18,       // 18   
-    SF_RUNNINGLIGHTS_TOGGLE = 19,   // 19
-    SF_RUNNINGLIGHTS_ON = 20,       // 20
-    SF_RUNNINGLIGHTS_OFF= 21,       // 21
-    SF_AUXOUT_TOGGLE    = 22,       // 22
-    SF_AUXOUT_ON        = 23,       // 23
-    SF_AUXOUT_OFF       = 24,       // 24
-    SF_AUXOUT_LEVEL     = 25,       // 25   -- analog function
-    SF_AUXOUT_PRESETDIM = 26,       // 26
-    SF_AUXOUT_FLASH     = 27,       // 27
-    SF_AUXOUT_BLINK     = 28,       // 28
-    SF_AUXOUT_TOGGLEBLINK = 29,     // 29
-    SF_AUXOUT_REVOLVE   = 30,       // 30
-    SF_AUXOUT_TOGGLEREVOLVE = 31,   // 31
-    SF_USER_SOUND1_ONCE = 32,       // 32
-    SF_USER_SOUND1_RPT  = 33,       // 33
-    SF_USER_SOUND1_OFF  = 34,       // 34
-    SF_USER_SOUND2_ONCE = 35,       // 35
-    SF_USER_SOUND2_RPT  = 36,       // 36
-    SF_USER_SOUND2_OFF  = 37,       // 37
-    SF_OUTPUT_A_TOGGLE  = 38,       // 38
-    SF_OUTPUT_A_ON      = 39,       // 39
-    SF_OUTPUT_A_OFF     = 40,       // 40
-    SF_OUTPUT_B_TOGGLE  = 41,       // 41
-    SF_OUTPUT_B_ON      = 42,       // 42
-    SF_OUTPUT_B_OFF     = 43,       // 43   
-    SF_ACCEL_LEVEL      = 44,       // 44   -- analog function
-    SF_DECEL_LEVEL      = 45,       // 45   -- analog function
-    SF_TURNMODE_1       = 46,       // 46
-    SF_TURNMODE_2       = 47,       // 47
-    SF_TURNMODE_3       = 48,       // 48
-    SF_SMOKER           = 49,       // 49   -- analog function
-    SF_MOTOR_A          = 50,       // 50   -- analog function
-    SF_MOTOR_B          = 51,       // 51   -- analog function
-    SF_RC1_PASS         = 52,       // 52   -- analog function ("PASS" for pass-through)
-    SF_RC2_PASS         = 53,       // 53   -- analog function
-    SF_RC3_PASS         = 54,       // 54   -- analog function
-    SF_RC4_PASS         = 55,       // 55   -- analog function
-    SF_RC1_PASS_PAN     = 56,       // 56   -- analog function (Pan servo passthrough signal)
-    SF_RC2_PASS_PAN     = 57,       // 57   -- analog function
-    SF_RC3_PASS_PAN     = 58,       // 58   -- analog function
-    SF_RC4_PASS_PAN     = 59,       // 59   -- analog function    
-    SF_BARREL_ON        = 60,       // 60 
-    SF_BARREL_OFF       = 61,       // 61
-    SF_BARREL_TOGGLE    = 62,       // 62
-    SF_BARREL_LEVEL     = 63,       // 63   -- analog function
-    SF_HILLS_ON         = 64,       // 64 
-    SF_HILLS_OFF        = 65,       // 65
-    SF_HILLS_TOGGLE     = 66,       // 66
-    SF_HILLS_LEVEL      = 67,       // 67   -- analog function
-    SF_USER_FUNC_1      = 68,       // 68
-    SF_USER_FUNC_2      = 69,       // 69
-    SF_USER_ANLG_1      = 70,       // 70   -- analog function
-    SF_USER_ANLG_2      = 71        // 71   -- analog function
+    SF_BARREL_ENABLE    = 13,       // 13
+    SF_BARREL_DISABLE   = 14,       // 14
+    SF_BARREL_TOGGLE    = 15,       // 15
+    SF_LIGHT1_TOGGLE    = 16,       // 16
+    SF_LIGHT1_ON        = 17,       // 17
+    SF_LIGHT1_OFF       = 18,       // 18
+    SF_LIGHT2_TOGGLE    = 19,       // 19
+    SF_LIGHT2_ON        = 20,       // 20
+    SF_LIGHT2_OFF       = 21,       // 21   
+    SF_RUNNINGLIGHTS_TOGGLE = 22,   // 22
+    SF_RUNNINGLIGHTS_ON = 23,       // 23
+    SF_RUNNINGLIGHTS_OFF= 24,       // 24
+    SF_AUXOUT_TOGGLE    = 25,       // 25
+    SF_AUXOUT_ON        = 26,       // 26
+    SF_AUXOUT_OFF       = 27,       // 27
+    SF_AUXOUT_LEVEL     = 28,       // 28   -- analog function
+    SF_AUXOUT_PRESETDIM = 29,       // 29
+    SF_AUXOUT_FLASH     = 30,       // 30
+    SF_AUXOUT_BLINK     = 31,       // 31
+    SF_AUXOUT_TOGGLEBLINK = 32,     // 32
+    SF_AUXOUT_REVOLVE   = 33,       // 33
+    SF_AUXOUT_TOGGLEREVOLVE = 34,   // 34
+    SF_USER_SOUND1_ONCE = 35,       // 35
+    SF_USER_SOUND1_RPT  = 36,       // 36
+    SF_USER_SOUND1_OFF  = 37,       // 37
+    SF_USER_SOUND2_ONCE = 38,       // 38
+    SF_USER_SOUND2_RPT  = 39,       // 39
+    SF_USER_SOUND2_OFF  = 40,       // 40
+    SF_OUTPUT_A_TOGGLE  = 41,       // 41
+    SF_OUTPUT_A_ON      = 42,       // 42
+    SF_OUTPUT_A_OFF     = 43,       // 43
+    SF_OUTPUT_B_TOGGLE  = 44,       // 44
+    SF_OUTPUT_B_ON      = 45,       // 45
+    SF_OUTPUT_B_OFF     = 46,       // 46   
+    SF_ACCEL_LEVEL      = 47,       // 47   -- analog function
+    SF_DECEL_LEVEL      = 48,       // 48   -- analog function
+    SF_TURNMODE_1       = 49,       // 49
+    SF_TURNMODE_2       = 50,       // 50
+    SF_TURNMODE_3       = 51,       // 51
+    SF_SMOKER           = 52,       // 52   -- analog function
+    SF_MOTOR_A          = 53,       // 53   -- analog function
+    SF_MOTOR_B          = 54,       // 54   -- analog function
+    SF_RC1_PASS         = 55,       // 55   -- analog function ("PASS" for pass-through)
+    SF_RC2_PASS         = 56,       // 56   -- analog function
+    SF_RC3_PASS         = 57,       // 57   -- analog function
+    SF_RC4_PASS         = 58,       // 58   -- analog function
+    SF_RC1_PASS_PAN     = 59,       // 59   -- analog function (Pan servo passthrough signal)
+    SF_RC2_PASS_PAN     = 60,       // 60   -- analog function
+    SF_RC3_PASS_PAN     = 61,       // 61   -- analog function
+    SF_RC4_PASS_PAN     = 62,       // 62   -- analog function    
+    SF_BARREL_STAB_ON   = 63,       // 63 
+    SF_BARREL_STAB_OFF  = 64,       // 64
+    SF_BARREL_STAB_TOGGLE = 65,     // 65
+    SF_BARREL_STAB_LEVEL= 66,       // 66   -- analog function
+    SF_HILLS_ON         = 67,       // 67 
+    SF_HILLS_OFF        = 68,       // 68
+    SF_HILLS_TOGGLE     = 69,       // 69
+    SF_HILLS_LEVEL      = 70,       // 70   -- analog function
+    SF_USER_FUNC_1      = 71,       // 71
+    SF_USER_FUNC_2      = 72,       // 72
+    SF_USER_ANLG_1      = 73,       // 73   -- analog function
+    SF_USER_ANLG_2      = 74,       // 74   -- analog function
+    SF_DUMP_DEBUG       = 75        // 75
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
 // to help print the function triggers out the serial port. For each function trigger above, we create
 // an array with 1 in the slot if the function is digital, and 0 in the slot if the function is analog. 
-const PROGMEM boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] =
+const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
 {
  1,1,1,1,1,1,1,1,1,1,   // 0-9
  1,1,1,1,1,1,1,1,1,1,   // 10-19
- 1,1,1,1,1,0,1,1,1,1,   // 20-29    25 analog
+ 1,1,1,1,1,1,1,1,0,1,   // 20-29    28 analog
  1,1,1,1,1,1,1,1,1,1,   // 30-39    
- 1,1,1,1,0,0,1,1,1,0,   // 40-49    44,45,49 analog
- 0,0,0,0,0,0,0,0,0,0,   // 50-59    50-59 analog
- 1,1,1,0,1,1,1,0,1,1,   // 60-69    63,67 analog
- 0,0                    // 70-79    70,71 analog
+ 1,1,1,1,1,1,1,0,0,1,   // 40-49    47,48 analog
+ 1,1,0,0,0,0,0,0,0,0,   // 50-59    52-59 analog
+ 0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
+ 0,1,1,0,0,1            // 70-75    70,73,74 analog
  };
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(&DigitalFunctionsTable[f])
 
 // Function names stored in Flash memory
-const char Func000[] PROGMEM = "NULL FUNCTION";                             // 0
-const char Func001[] PROGMEM = "Engine - Toggle On/Off";                    // 1
-const char Func002[] PROGMEM = "Engine - Turn On";                          // 2
-const char Func003[] PROGMEM = "Engine - Turn Off";                         // 3
-const char Func004[] PROGMEM = "Transmission - Toggle On/Off";              // 4
-const char Func005[] PROGMEM = "Transmission - Turn On";                    // 5
-const char Func006[] PROGMEM = "Transmission - Turn Off";                   // 6
-const char Func007[] PROGMEM = "Cannon Fire";                               // 7
-const char Func008[] PROGMEM = "Fire Airsoft / Mechanical Recoil Unit";     // 8
-const char Func009[] PROGMEM = "Recoil Servo";                              // 9
-const char Func010[] PROGMEM = "High Intensity Flash";                      // 10 
-const char Func011[] PROGMEM = "Machine Gun - Fire";                        // 11
-const char Func012[] PROGMEM = "Machine Gun - Stop";                        // 12
-const char Func013[] PROGMEM = "Light 1 (Headlights) - Toggle On/Off";      // 13
-const char Func014[] PROGMEM = "Light 1 (Headlights) - Turn On";            // 14
-const char Func015[] PROGMEM = "Light 1 (Headlights) - Turn Off";           // 15
-const char Func016[] PROGMEM = "Light 2 - Toggle On/Off";                   // 16
-const char Func017[] PROGMEM = "Light 2 - Turn On";                         // 17
-const char Func018[] PROGMEM = "Light 2 - Turn Off";                        // 18
-const char Func019[] PROGMEM = "Running Lights - Toggle On/Off";            // 19
-const char Func020[] PROGMEM = "Running Lights - Turn On";                  // 20
-const char Func021[] PROGMEM = "Running Lights - Turn Off";                 // 21
-const char Func022[] PROGMEM = "Aux Output - Toggle On/Off";                // 22
-const char Func023[] PROGMEM = "Aux Output - Turn On";                      // 23
-const char Func024[] PROGMEM = "Aux Output - Turn Off";                     // 24
-const char Func025[] PROGMEM = "Aux Output - Set Level";                    // 25
-const char Func026[] PROGMEM = "Aux Output - Preset Dim Level";             // 26
-const char Func027[] PROGMEM = "Aux Output - Flash";                        // 27
-const char Func028[] PROGMEM = "Aux Output - Blink";                        // 28
-const char Func029[] PROGMEM = "Aux Output - Toggle Blink";                 // 29
-const char Func030[] PROGMEM = "Aux Output - Revolving Light";              // 30 
-const char Func031[] PROGMEM = "Aux Output - Toggle Revolving Light";       // 31
-const char Func032[] PROGMEM = "User Sound 1 - Play Once";                  // 32
-const char Func033[] PROGMEM = "User Sound 1 - Repeat";                     // 33
-const char Func034[] PROGMEM = "User Sound 1 - Stop";                       // 34
-const char Func035[] PROGMEM = "User Sound 2 - Play Once";                  // 35
-const char Func036[] PROGMEM = "User Sound 2 - Repeat";                     // 36
-const char Func037[] PROGMEM = "User Sound 2- Stop";                        // 37
-const char Func038[] PROGMEM = "External Output A - Toggle";                // 38
-const char Func039[] PROGMEM = "External Output A - Turn On";               // 39
-const char Func040[] PROGMEM = "External Output A - Turn Off";              // 40             
-const char Func041[] PROGMEM = "External Output B - Toggle";                // 41
-const char Func042[] PROGMEM = "External Output B - Turn On";               // 42
-const char Func043[] PROGMEM = "External Output B - Turn Off";              // 43
-const char Func044[] PROGMEM = "Set Acceleration Level";                    // 44
-const char Func045[] PROGMEM = "Set Deceleration Level";                    // 45
-const char Func046[] PROGMEM = "Set Turn Mode = 1";                         // 46
-const char Func047[] PROGMEM = "Set Turn Mode = 2";                         // 47
-const char Func048[] PROGMEM = "Set Turn Mode = 3";                         // 48
-const char Func049[] PROGMEM = "Smoker - Manual Control";                   // 49
-const char Func050[] PROGMEM = "Motor A - Manual Control";                  // 50
-const char Func051[] PROGMEM = "Motor B - Manual Control";                  // 51
-const char Func052[] PROGMEM = "RC Output 1 - Pass-through";                // 52
-const char Func053[] PROGMEM = "RC Output 2 - Pass-through";                // 53
-const char Func054[] PROGMEM = "RC Output 3 - Pass-through";                // 54
-const char Func055[] PROGMEM = "RC Output 4 - Pass-through";                // 55
-const char Func056[] PROGMEM = "RC Output 1 - Pan Servo";                   // 56
-const char Func057[] PROGMEM = "RC Output 2 - Pan Servo";                   // 57
-const char Func058[] PROGMEM = "RC Output 3 - Pan Servo";                   // 58
-const char Func059[] PROGMEM = "RC Output 4 - Pan Servo";                   // 59
-const char Func060[] PROGMEM = "Barrel Stabilization - Turn On";            // 60
-const char Func061[] PROGMEM = "Barrel Stabilization - Turn Off";           // 61
-const char Func062[] PROGMEM = "Barrel Stabilization - Toggle";             // 62
-const char Func063[] PROGMEM = "Barrel Stabilization - Set Sensitivity";    // 63
-const char Func064[] PROGMEM = "Hill Physics - Turn On";                    // 64
-const char Func065[] PROGMEM = "Hill Physics - Turn Off";                   // 65
-const char Func066[] PROGMEM = "Hill Physics - Toggle";                     // 66
-const char Func067[] PROGMEM = "Hill Physics - Set Sensitivity";            // 67
-const char Func068[] PROGMEM = "User Function 1";                           // 68
-const char Func069[] PROGMEM = "User Function 2";                           // 69
-const char Func070[] PROGMEM = "Analog User Function 1";                    // 70
-const char Func071[] PROGMEM = "Analog User Function 2";                    // 71
-/*const char Func072[] PROGMEM = "";
-const char Func073[] PROGMEM = "";
-const char Func074[] PROGMEM = "";
-const char Func075[] PROGMEM = "";
-const char Func076[] PROGMEM = "";
-const char Func077[] PROGMEM = "";
-const char Func078[] PROGMEM = "";
-const char Func079[] PROGMEM = "";
-*/
+const char Func000[] PROGMEM_FAR = "NULL FUNCTION";                             // 0
+const char Func001[] PROGMEM_FAR = "Engine - Toggle On/Off";                    // 1
+const char Func002[] PROGMEM_FAR = "Engine - Turn On";                          // 2
+const char Func003[] PROGMEM_FAR = "Engine - Turn Off";                         // 3
+const char Func004[] PROGMEM_FAR = "Transmission - Toggle On/Off";              // 4
+const char Func005[] PROGMEM_FAR = "Transmission - Turn On";                    // 5
+const char Func006[] PROGMEM_FAR = "Transmission - Turn Off";                   // 6
+const char Func007[] PROGMEM_FAR = "Cannon Fire";                               // 7
+const char Func008[] PROGMEM_FAR = "Fire Airsoft / Mechanical Recoil Unit";     // 8
+const char Func009[] PROGMEM_FAR = "Recoil Servo";                              // 9
+const char Func010[] PROGMEM_FAR = "High Intensity Flash";                      // 10 
+const char Func011[] PROGMEM_FAR = "Machine Gun - Fire";                        // 11
+const char Func012[] PROGMEM_FAR = "Machine Gun - Stop";                        // 12
+const char Func013[] PROGMEM_FAR = "Airsoft/Mech Recoil - Enable";              // 13
+const char Func014[] PROGMEM_FAR = "Airsoft/Mech Recoil - Disable";             // 14
+const char Func015[] PROGMEM_FAR = "Airsoft/Mech Recoil - Toggle";              // 15
+const char Func016[] PROGMEM_FAR = "Light 1 (Headlights) - Toggle On/Off";      // 16
+const char Func017[] PROGMEM_FAR = "Light 1 (Headlights) - Turn On";            // 17
+const char Func018[] PROGMEM_FAR = "Light 1 (Headlights) - Turn Off";           // 18
+const char Func019[] PROGMEM_FAR = "Light 2 - Toggle On/Off";                   // 19
+const char Func020[] PROGMEM_FAR = "Light 2 - Turn On";                         // 20
+const char Func021[] PROGMEM_FAR = "Light 2 - Turn Off";                        // 21
+const char Func022[] PROGMEM_FAR = "Running Lights - Toggle On/Off";            // 22
+const char Func023[] PROGMEM_FAR = "Running Lights - Turn On";                  // 23
+const char Func024[] PROGMEM_FAR = "Running Lights - Turn Off";                 // 24
+const char Func025[] PROGMEM_FAR = "Aux Output - Toggle On/Off";                // 25
+const char Func026[] PROGMEM_FAR = "Aux Output - Turn On";                      // 26
+const char Func027[] PROGMEM_FAR = "Aux Output - Turn Off";                     // 27
+const char Func028[] PROGMEM_FAR = "Aux Output - Set Level";                    // 28
+const char Func029[] PROGMEM_FAR = "Aux Output - Preset Dim Level";             // 29
+const char Func030[] PROGMEM_FAR = "Aux Output - Flash";                        // 30
+const char Func031[] PROGMEM_FAR = "Aux Output - Blink";                        // 31
+const char Func032[] PROGMEM_FAR = "Aux Output - Toggle Blink";                 // 32
+const char Func033[] PROGMEM_FAR = "Aux Output - Revolving Light";              // 33 
+const char Func034[] PROGMEM_FAR = "Aux Output - Toggle Revolving Light";       // 34
+const char Func035[] PROGMEM_FAR = "User Sound 1 - Play Once";                  // 35
+const char Func036[] PROGMEM_FAR = "User Sound 1 - Repeat";                     // 36
+const char Func037[] PROGMEM_FAR = "User Sound 1 - Stop";                       // 37
+const char Func038[] PROGMEM_FAR = "User Sound 2 - Play Once";                  // 38
+const char Func039[] PROGMEM_FAR = "User Sound 2 - Repeat";                     // 39
+const char Func040[] PROGMEM_FAR = "User Sound 2- Stop";                        // 40
+const char Func041[] PROGMEM_FAR = "External Output A - Toggle";                // 41
+const char Func042[] PROGMEM_FAR = "External Output A - Turn On";               // 42
+const char Func043[] PROGMEM_FAR = "External Output A - Turn Off";              // 43             
+const char Func044[] PROGMEM_FAR = "External Output B - Toggle";                // 44
+const char Func045[] PROGMEM_FAR = "External Output B - Turn On";               // 45
+const char Func046[] PROGMEM_FAR = "External Output B - Turn Off";              // 46
+const char Func047[] PROGMEM_FAR = "Set Acceleration Level";                    // 47
+const char Func048[] PROGMEM_FAR = "Set Deceleration Level";                    // 48
+const char Func049[] PROGMEM_FAR = "Set Turn Mode = 1";                         // 49
+const char Func050[] PROGMEM_FAR = "Set Turn Mode = 2";                         // 50
+const char Func051[] PROGMEM_FAR = "Set Turn Mode = 3";                         // 51
+const char Func052[] PROGMEM_FAR = "Smoker - Manual Control";                   // 52
+const char Func053[] PROGMEM_FAR = "Motor A - Manual Control";                  // 53
+const char Func054[] PROGMEM_FAR = "Motor B - Manual Control";                  // 54
+const char Func055[] PROGMEM_FAR = "RC Output 1 - Pass-through";                // 55
+const char Func056[] PROGMEM_FAR = "RC Output 2 - Pass-through";                // 56
+const char Func057[] PROGMEM_FAR = "RC Output 3 - Pass-through";                // 57
+const char Func058[] PROGMEM_FAR = "RC Output 4 - Pass-through";                // 58
+const char Func059[] PROGMEM_FAR = "RC Output 1 - Pan Servo";                   // 59
+const char Func060[] PROGMEM_FAR = "RC Output 2 - Pan Servo";                   // 60
+const char Func061[] PROGMEM_FAR = "RC Output 3 - Pan Servo";                   // 61
+const char Func062[] PROGMEM_FAR = "RC Output 4 - Pan Servo";                   // 62
+const char Func063[] PROGMEM_FAR = "Barrel Stabilization - Turn On";            // 63
+const char Func064[] PROGMEM_FAR = "Barrel Stabilization - Turn Off";           // 64
+const char Func065[] PROGMEM_FAR = "Barrel Stabilization - Toggle";             // 65
+const char Func066[] PROGMEM_FAR = "Barrel Stabilization - Set Sensitivity";    // 66
+const char Func067[] PROGMEM_FAR = "Hill Physics - Turn On";                    // 67
+const char Func068[] PROGMEM_FAR = "Hill Physics - Turn Off";                   // 68
+const char Func069[] PROGMEM_FAR = "Hill Physics - Toggle";                     // 69
+const char Func070[] PROGMEM_FAR = "Hill Physics - Set Sensitivity";            // 70
+const char Func071[] PROGMEM_FAR = "User Function 1";                           // 71
+const char Func072[] PROGMEM_FAR = "User Function 2";                           // 72
+const char Func073[] PROGMEM_FAR = "Analog User Function 1";                    // 73
+const char Func074[] PROGMEM_FAR = "Analog User Function 2";                    // 74
+const char Func075[] PROGMEM_FAR = "Dump Settings";                             // 75
 
-const char* const function_name_table[] PROGMEM = 
+//const PROGMEM boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] =
+//const uint32_t * const function_name_table[COUNT_SPECFUNCTIONS] PROGMEM_FAR = 
+/*
+const char * const function_name_table[COUNT_SPECFUNCTIONS] PROGMEM_FAR = 
 {
  Func000, Func001, Func002, Func003, Func004, Func005, Func006, Func007, Func008, Func009,
  Func010, Func011, Func012, Func013, Func014, Func015, Func016, Func017, Func018, Func019,
@@ -222,9 +225,10 @@ const char* const function_name_table[] PROGMEM =
  Func040, Func041, Func042, Func043, Func044, Func045, Func046, Func047, Func048, Func049,
  Func050, Func051, Func052, Func053, Func054, Func055, Func056, Func057, Func058, Func059,
  Func060, Func061, Func062, Func063, Func064, Func065, Func066, Func067, Func068, Func069,
- Func070, Func071
+ Func070, Func071, Func072, Func073, Func074, Func075
 };
-//                   Func072, Func073, Func074, Func075, Func076, Func077, Func078, Func079,
+*/
+//                                                     , Func076, Func077, Func078, Func079,
 // Func080, Func081, Func082, Func083, Func084, Func085, Func086, Func087, Func088, Func089,
 // Func090, Func091, Func092, Func093, Func094, Func095, Func096, Func097, Func098, Func099,
 // Func100, Func101, Func102, Func103, Func104, Func105, Func106, Func107, Func108, Func109,
