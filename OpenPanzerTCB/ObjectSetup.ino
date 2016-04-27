@@ -260,13 +260,14 @@ void InstantiateMotorObjects()
 	// What will be used are recoil/return times, along with a reverse setting if the servo needs to be reversed. These can be modified
 	// later but will be initialized to sensible defaults.
         RecoilServo = new Servo_RECOIL (SERVONUM_RECOIL,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,eeprom.ramcopy.RecoilServo_Recoil_mS,eeprom.ramcopy.RecoilServo_Return_mS,eeprom.ramcopy.RecoilReversed);
-        RecoilServo->begin();
         // Recoil servos also have custom end-points. Because RecoilServo is a motor of class Servo, we can call setMin/MaxPulseWidth from the servo class directly, rather than from TankServos
         RecoilServo->setMinPulseWidth(SERVONUM_RECOIL, eeprom.ramcopy.RecoilServo_EPMin);
         RecoilServo->setMaxPulseWidth(SERVONUM_RECOIL, eeprom.ramcopy.RecoilServo_EPMax);
         // The reversed setting needs to be applied both to the motor class (flag) as well as to the servo class (actual recoil movement settings). 
         RecoilServo->set_Reversed(eeprom.ramcopy.RecoilReversed);                       // motor class method
         RecoilServo->setRecoilReversed(SERVONUM_RECOIL, eeprom.ramcopy.RecoilReversed); // servo class method
+        // The begin function will make sure the recoil servo is initialized to its "battery" position
+        RecoilServo->begin();
 
     // HENG LONG/OTHER SMOKER OUTPUT MOTOR DEFINITION
     // -------------------------------------------------------------------------------------------------------------------------------------->>

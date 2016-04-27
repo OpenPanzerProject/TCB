@@ -229,11 +229,12 @@ void setup()
         
     // MOTOR OBJECTS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
+        TankServos.begin();             // Do this before setting up motor objects
         InstantiateMotorObjects();
 
     // OTHER OBJECTS - BEGIN
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
-        TankServos.begin();        
+ 
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
                      eeprom.ramcopy.NeutralTurnAllowed, 
@@ -616,14 +617,15 @@ if (Startup)
                             { if (DEBUG) DebugSerial->println(F("Turret elevation is not of type Servo. No setup available.")); }
                             break;
                         case 2: 
-                            //RadioSetup();     // Nothing for now. We are using OP Config for radio setup instead of the local version. This menu is free for some other action.   
+                            // Reserved for future use
                             break;        
                         case 3: TBS_Setup();    
                             break;
                         case 4: SetupServo(SERVONUM_RECOIL); 
                             break;
                     }
-                    ButtonState = BUTTON_TO_WAIT;
+                    // All the menus above wait for the button to be released before exiting, so we can go straight from here to BUTTON_WAIT
+                    ButtonState = BUTTON_WAIT;
                 }
                 break;
 

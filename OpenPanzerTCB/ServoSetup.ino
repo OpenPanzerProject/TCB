@@ -312,7 +312,10 @@ void SetupServo(ESC_POS_t servoNum)
     }
     DebugSerial->println();
     PrintDebugLine();
-    DebugSerial->println(F("End Servo Setup")); 
+    switch (servoNum) 
+    {   case SERVONUM_TURRETELEVATION: DebugSerial->println(F("End Elevation Servo Setup")); break;
+        case SERVONUM_RECOIL:          DebugSerial->println(F("End Recoil Servo Setup"));    break;
+    }
     PrintDebugLine();
     DebugSerial->println(F("End Values"));
     DebugSerial->print(F("Min Pulse: ")); DebugSerial->println(pulseMin);

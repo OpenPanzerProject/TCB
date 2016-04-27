@@ -510,16 +510,32 @@ void Servo_RECOIL::begin(void)
     
     this->setupRecoil_mS(ESC_Position, _RecoilmS, _ReturnmS, _Reversed);
     
-    // This servo also needs to be initialized to its end position
+    // This servo also needs to be initialized to its end position. 
+    // Because it looks cool we will ramp it to battery, although this will also block code. 
+    uint16_t p; 
     if (_Reversed)
-    {
-        this->writeMicroseconds(ESC_Position, this->getMaxPulseWidth(this->ESC_Position));              
+    {   // Use this instead to go straight to the end position
+        //this->writeMicroseconds(ESC_Position, this->getMinPulseWidth(this->ESC_Position));              
+        
+        p = this->getMinPulseWidth(this->ESC_Position);
+        this->setRampSpeed_mS(ESC_Position, _ReturnmS, true);
+        do {delay(1);}
+        while (this->getPulseWidth(ESC_Position) > p);
+        this->stopRamping(ESC_Position);
+        this->writeMicroseconds(ESC_Position, p);
     }
     else
-    {
-        this->writeMicroseconds(ESC_Position, this->getMinPulseWidth(this->ESC_Position));
+    {   // Use this instead to go straight to the end position
+        //this->writeMicroseconds(ESC_Position, this->getMaxPulseWidth(this->ESC_Position));
+
+        p = this->getMaxPulseWidth(this->ESC_Position);
+        this->setRampSpeed_mS(ESC_Position, _ReturnmS, false);
+        do {delay(1);}
+        while (this->getPulseWidth(ESC_Position) < p);
+        this->stopRamping(ESC_Position);    
+        this->writeMicroseconds(ESC_Position, p);
     }
-    
+   
     // We don't need to set anything else, unless the user wants to modify the endpoints
 }
 
