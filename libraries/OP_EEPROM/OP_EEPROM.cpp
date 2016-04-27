@@ -433,10 +433,10 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.Airsoft = true;
         ramcopy.MechanicalBarrelWithCannon = true;
         ramcopy.RecoilDelay = 0;                // Default to no delay between recoil action, and flash/sound
-        ramcopy.RecoilReversed = false;
+        ramcopy.RecoilReversed = true;          // We default to reversed because this works with the Taigen Tiger 1 combination airsoft/servo recoil unit
         ramcopy.ServoRecoilWithCannon = true;
-        ramcopy.RecoilServo_Recoil_mS = 100;
-        ramcopy.RecoilServo_Return_mS = 1000;
+        ramcopy.RecoilServo_Recoil_mS = 200;    // These default times work well with the Taigen Tiger 1 unit
+        ramcopy.RecoilServo_Return_mS = 800;
         ramcopy.RecoilServo_EPMin = 1000;
         ramcopy.RecoilServo_EPMax = 2000;
 
