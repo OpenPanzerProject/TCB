@@ -780,11 +780,12 @@ void OP_Radio::SetChannelsFailSafe()
         Sticks.Azimuth.pulse = Sticks.Azimuth.Settings->pulseCenter; 
         Sticks.Azimuth.command      = 0;
         SpecialStick.Position = MC;    // Middle/center, means no special command
-        for (uint8_t a=0; a<AUXCHANNELS; a++)
-        {   
-            AuxChannel[a].switchPos = Pos3;
-            AuxChannel[a].pulse = 1500;
-        }
+        // We could put the aux channels to middle, but we have no idea what the user assigned to those positions. Best to just leave them at their last values. 
+        //for (uint8_t a=0; a<AUXCHANNELS; a++)
+        //{   
+        //    AuxChannel[a].switchPos = Pos3;
+        //    AuxChannel[a].pulse = 1500;
+        //}
         SetAllChannelUpdates();    // This sets the updated flag for every channel. We want the main code to read the new failsafe values we have just written above. 
         InFailsafe = true;         // Set the failsafe flag. The sketch will check this flag in order to take its own actions on failsafe. 
     }

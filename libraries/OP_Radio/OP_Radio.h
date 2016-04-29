@@ -94,7 +94,7 @@ class OP_Radio
         static void             SetChannelsFailSafe();                  // We lost connection with the radio. Set all channels to failsafe values. 
         static void             ClearAllChannelUpdates(void);           // Set all channels to "not updated"
         static void             SetAllChannelUpdates(void);             // Set all channels to "updated"
-    
+        
         static void             startWatchdog(void);                    // Create a watchdog timer
         static void             restartWatchdog(void);                  // Re-starts the watchdog timer. We call this every time we get a new frame of data from the radio. 
         static int              WatchdogTimerID;
