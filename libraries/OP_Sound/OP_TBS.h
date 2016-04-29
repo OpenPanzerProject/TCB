@@ -26,7 +26,6 @@
 #define OP_TBS_H
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
 #include "OP_Settings.h"
 #include "OP_Servo.h"
 #include "OP_Motors.h"
@@ -64,6 +63,7 @@
 #define SOUND_SQUEAK_3       10         // Sound 10: Squeak 3 (less frequent)
 #define SOUND_USER_1         11         // Sound 11: Custom User Sound 1
 #define SOUND_USER_2         12         // Sound 12: Custom User Sound 2
+#define PROP3_NUM_SOUNDS     13         // How many sounds are there in total in the Prop3 register, including the SOUND_OFF "sound"
 // The Prop3 numbers above refer to positions in the array below.
 // The array holds the actual PWM values for each of the 12 sound slots, plus one more for SOUND_OFF (1500) (so 13 total)
 // Each sound also has a priority number associated with it. If a sound is playing, and second sound is triggered, the second
@@ -78,7 +78,7 @@ typedef struct {
     int16_t Pulse;
     uint8_t Priority;
 } Prop3Settings;
-const PROGMEM Prop3Settings Prop3[13] = {
+const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 {1500, 0},  // No sound
 {1000, 1},  // Turret rotation
 {1083, 1},  // Cannon fire
@@ -93,8 +93,9 @@ const PROGMEM Prop3Settings Prop3[13] = {
 {1917, 3},  // User Sound 1 - even higher priority than MG
 {2000, 3}   // User Sound 2 - even higher priority than MG
 };
-#define Prop3SoundPulse(s)    pgm_read_word_near(&Prop3[s].Pulse)
-#define Prop3SoundPriority(s) pgm_read_byte_near(&Prop3[s].Priority)
+// We can't refer directly to array elements and struct members when using far addresses. For some reason, even using s*sizeof(Prop3) instead of (s*3) doesn't work. 
+#define Prop3SoundPulse(s)      pgm_read_word_far(pgm_get_far_address(Prop3) + (s*3))       // Get address of Prop3 array, then skip ahead to the s-th element, since each struct is 3 bytes wide
+#define Prop3SoundPriority(s)   pgm_read_byte_far(pgm_get_far_address(Prop3) + (s*3) + 2)   // Get address of Prop3 array, then skip ahead to the s-th element, then skip the next 2 bytes to get to the 3rd byte in the struct (Priority)
 
 #define TBS_SIGNAL_mS        30         // How long to send a temporary signal for TBS to get it. 20ms didn't seem stable, so it needs to be greater than that, but as small as possible. 
 
@@ -102,22 +103,30 @@ const PROGMEM Prop3Settings Prop3[13] = {
 #define DEFAULT_SQUEAK_MAX_mS 3500      // Max time between squeaks defaults to 3.5 seconds
 #define SQUEAK_DELAY_mS       3000      // We don't start squeaking until this amount of time has passed after we first start moving
 
-// Let's create descriptions of these 12 sounds so we can print them out during the teaching routine
-// THESE MUST MATCH THE 12 DEFINES ABOVE ^
-const char sndDescr1[] PROGMEM = "Turret Rotation";
-const char sndDescr2[] PROGMEM = "Cannon Fire";
-const char sndDescr3[] PROGMEM = "Machine Gun";
-const char sndDescr4[] PROGMEM = "Cannon Hit Received - Damage";
-const char sndDescr5[] PROGMEM = "MG Hit Received - Damage";
-const char sndDescr6[] PROGMEM = "Hit Received - Destroyed";
-const char sndDescr7[] PROGMEM = "Headlights on/off";
-const char sndDescr8[] PROGMEM = "Squeak 1 - frequent";
-const char sndDescr9[] PROGMEM = "Squeak 2 - medium frequency";
-const char sndDescr10[] PROGMEM = "Squeak 3 - less frequent";
-const char sndDescr11[] PROGMEM = "User Sound #1";
-const char sndDescr12[] PROGMEM = "User Sound #2";
-// Then set up a table to refer to our strings
-const char* const sound_descr_table[] PROGMEM = {sndDescr1, sndDescr2, sndDescr3, sndDescr4, sndDescr5, sndDescr6, sndDescr7, sndDescr8, sndDescr9, sndDescr10, sndDescr11, sndDescr12};
+// Let's create descriptions of these 12 sounds so we can print them out during the teaching routine. These must match
+// the order they were defined in (see above). If SOUNDNAME_CHARS is 31, that means you have 30 (not 31) chars for the name.
+// You must leave one char for the null terminator. 
+// As with the function names in OP_FunctionsTriggers.h, this construct is wasteful of program space since we are reserving 31 chars
+// per name whether we need that many or not. It is harder to address these elements as well, but the tradeoff is that we get to 
+// keep these in FAR progmem (see OP_Settings.h for the exact location where), rather than in near which causes all sorts of problems, 
+// AND we didn't have to make custom modifications to the linker script. We don't have many entries right now but we expect many
+// more in the future. 
+#define SOUNDNAME_CHARS  31
+const char _sound_descr_table_[PROP3_NUM_SOUNDS][SOUNDNAME_CHARS] PROGMEM_FAR = 
+{   "Sound Off",                            // 0
+    "Turret Rotation",                      // 1
+    "Cannon Fire",                          // 2
+    "Machine Gun",                          // 3
+    "Cannon Hit Received - Damage",         // 4
+    "MG Hit Received - Damage",             // 5
+    "Hit Received - Destroyed",             // 6
+    "Headlights on/off",                    // 7
+    "Squeak 1 - frequent",                  // 8
+    "Squeak 2 - medium frequency",          // 9
+    "Squeak 3 - less frequent",             // 10
+    "User Sound #1",                        // 11
+    "User Sound #2"                         // 12
+};
 
 
 class OP_TBS

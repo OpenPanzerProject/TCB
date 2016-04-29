@@ -545,6 +545,7 @@ void OP_TBS::UpdateTimer(void)
 void OP_TBS::TeachEncoder(void)
 {
     char buffer[30];    // This needs to be large enough to hold any string from our sound_descr_table (see OP_TBS.h)
+    uint32_t soundNameTableAddress = pgm_get_far_address(_sound_descr_table_);  // This is the starting address of our sound names table in far progmem. 
 
     // Before you run this routine, the TBS Mini needs to be placed in the TEACH mode by pushing the button on the sound unit.
     // This is handled in the sketch, as well as some other preliminary steps
@@ -578,9 +579,8 @@ void OP_TBS::TeachEncoder(void)
         // Example:
         // ...Sound 1: Cannon Fire
         Serial.print(F("...Sound ")); Serial.print(i); Serial.print(F(": "));
-        // Using the string table in program memory requires the use of special functions to retrieve the data.
-        // The strcpy_P function copies a string from program space to a string in RAM ("buffer"). 
-        strcpy_P(buffer, (char*)pgm_read_word(&(sound_descr_table[i-1]))); // Necessary casts and dereferencing
+        // Using the string table in FAR program memory requires the use of a special function to retrieve the data.
+        strcpy_PFAR(buffer, soundNameTableAddress, i*SOUNDNAME_CHARS);
         Serial.println(buffer);
         // Now send the signal for this sound number briefly, then wait two seconds before sending the next one (according to TBS teaching specs)
         PulseDelayProp3(i);

@@ -260,13 +260,13 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
         // the struct members directly by name (in this case varID). 
         
         // When we moved it to PROGMEM_FAR (out beyond the first 64k of program memory) we could no longer
-        // address it with an 8-bit pointer. Instead we use the GET_FAR_ADDRESS macro (see OP_Settings.h)
+        // address it with an 8-bit pointer. Instead we use the "pgm_get_far_address" macro
         // to return a 32-bit pointer to the start address of the struct. This precludes use from obtain individual 
         // elements of the array in the traditional manner, or the struct members likewise. Here we get the starting address, 
         // then to get the first word of the i-th struct we multiply i by 5 which is the number of bytes in each struct, or 
         // in other words, the number of bytes for each element of the array. See below for other machinations to get 
         // struct members other than the first one (varID is the first member of the _storage_var_info struct)
-        if (findID == pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5)))
+        if (findID == pgm_read_word_far(pgm_get_far_address(STORAGEVARS) + (i*5)))
         {
             found = true;
             break;
@@ -282,7 +282,7 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
             // if (findID == pgm_read_word_near(&(STORAGEVARS[i].varID)))
             
             // Far method: 
-            if (findID == pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5)))
+            if (findID == pgm_read_word_far(pgm_get_far_address(STORAGEVARS) + (i*5)))
             {
                 found = true;
                 break;
@@ -299,8 +299,8 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
         
         // Far method: 
         // Here we use again i*5 to get us the i-th element of the array. But we also add some more bytes to reach the second and third members of the struct
-        svi.varOffset = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 2);    // varOffset comes after varID which is 2 bytes, so we need to add 2 bytes to reach it. varOffset is 2 bytes as well so we use read_word.
-        svi.varType = pgm_read_byte_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 4);      // varType comes after varID and varOffset so we have to add 4 bytes to reach it. varType is only 1 byte so we use read_byte to read it. 
+        svi.varOffset = pgm_read_word_far(pgm_get_far_address(STORAGEVARS) + (i*5) + 2);    // varOffset comes after varID which is 2 bytes, so we need to add 2 bytes to reach it. varOffset is 2 bytes as well so we use read_word.
+        svi.varType = pgm_read_byte_far(pgm_get_far_address(STORAGEVARS) + (i*5) + 4);      // varType comes after varID and varOffset so we have to add 4 bytes to reach it. varType is only 1 byte so we use read_byte to read it. 
         lastArrayPos = i;   // remember where we were for next time
         return i+1;         // return the position. Add 1 since the array is zero-based, but zero doesn't count (our null "FirstVal")
     }
@@ -321,8 +321,8 @@ boolean OP_EEPROM::getStorageVarInfo(_storage_var_info & svi, uint16_t arrayPos)
         //svi.varType = pgm_read_byte_near(&(STORAGEVARS[arrayPos].varType));       
         
         // Far method: see the discussion above for what we're doing. 
-        svi.varOffset = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (arrayPos*5) + 2);
-        svi.varType = pgm_read_byte_far(GET_FAR_ADDRESS(STORAGEVARS) + (arrayPos*5) + 4);
+        svi.varOffset = pgm_read_word_far(pgm_get_far_address(STORAGEVARS) + (arrayPos*5) + 2);
+        svi.varType = pgm_read_byte_far(pgm_get_far_address(STORAGEVARS) + (arrayPos*5) + 4);
         return true;
     }
     else

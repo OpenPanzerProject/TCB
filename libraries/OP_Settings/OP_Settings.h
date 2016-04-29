@@ -23,25 +23,22 @@
 // PROGMEM
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is where we stick custom progmem tables, way out beyond program space
-    #define PROGMEM_FAR  __attribute__((section(".fini7")))
-    // This macro lets us obtain their address, as a special 32-bit pointer
-    #define GET_FAR_ADDRESS(var)                          \
-    ({                                                    \
-        uint_farptr_t tmp;                                \
-                                                          \
-        __asm__ __volatile__(                             \
-                                                          \
-                "ldi    %A0, lo8(%1)"           "\n\t"    \
-                "ldi    %B0, hi8(%1)"           "\n\t"    \
-                "ldi    %C0, hh8(%1)"           "\n\t"    \
-                "clr    %D0"                    "\n\t"    \
-            :                                             \
-                "=d" (tmp)                                \
-            :                                             \
-                "p"  (&(var))                             \
-        );                                                \
-        tmp;                                              \
-    }) 
+    #define PROGMEM_FAR  __attribute__((section(".fini7")))     // The .finiN sections are executed in descending order from 9 to 0. I suppose would could also change this to .fini9,
+                                                                // but in themselves they don't define a specific address location, that has to be accomplished through linker directives. 
+  
+    // Custom strcpy_P routine that works on far progrmem. You need to pass it both the 32 bit pointer to the location of the string you want (base), and if the string is in an array, 
+    // then you also need to provide the offset to the array element. For an example of calculating these see the DumpFunctionTriggers() function on the Utilities tab of the main sketch. 
+    inline char* strcpy_PFAR(char* des, uint32_t base, uint32_t offset)
+    {
+        uint32_t p = base + offset;
+        char* s = des;
+        do 
+        {
+            *s = pgm_read_byte_far(p++);
+        }
+        while(*s++);
+        return des;
+    } 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // SERIAL PORTS

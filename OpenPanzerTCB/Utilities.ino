@@ -18,7 +18,9 @@ void RestoreDebug()
 
 void PrintDebugLine()
 {
-    DebugSerial->println(F("-----------------------------------------------------"));
+    for (uint8_t i=0; i<45; i++) { DebugSerial->print(F("-")); }
+    DebugSerial->println(); 
+    DebugSerial->flush();   // This causes a pause until the serial transmission is complete
 }
 
 void PrintSpaceDash()
@@ -91,8 +93,8 @@ void PrintLnPct(uint8_t pct)
     DebugSerial->println();
 }
 void PrintWaitingForRadio()
-{   // Only print this message if we are still in the setup() routine and still waiting for the radio to be plugged in.
-    if (inSetup && DEBUG && Radio.Status() != READY_state) { DebugSerial->println(F("Waiting for radio... ")); }
+{   // Only print this message if we are still waiting for the radio to be plugged in.
+    if (SAVE_DEBUG && Radio.Status() != READY_state) { DebugSerial->println(F("Waiting for radio... ")); }
 }
 
 float Convert_mS_to_Sec(int mS)
@@ -102,27 +104,46 @@ float Convert_mS_to_Sec(int mS)
 
 void DumpSysInfo()
 {
-    // All this printing can take some time, so we sprinkle some per-loop-updates throughout
-    // Actually we have commented this out temporarily as it causes (even worse than usual) interruptions
-    // in the serial data stream. When we figure that out we will un-comment these. 
+    // All this printing can take some time, so we sprinkle some per-loop-updates throughout. 
+    // I also added some flush commands, which pauses until all serial data has left the transmit buffer. 
+    // As it turns out, all the garbled serial only happens when using the Arduino IDE serial monitor, or just
+    // if I have the IDE open even if I am using some other program (such as Snoop in OP Config). 
+    // Once the Arduino IDE is closed, then I get perfectly smooth serial. Not sure what the deal is with the IDE. 
+    // The PerLoopUpdates() are good to leave in, and the serial flush commands are probably unnecessary, but
+    // don't hurt anything, so I leave them too. 
+
+    // This whole dump takes about 1/3 second. It is likely to cause a brief radio failsafe event, which will correct itself immediately after. 
+    
     DumpVersion();
+        PerLoopUpdates();
+        DebugSerial->flush();
     DumpRadioInfo();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();
     DumpMotorInfo();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpBattleInfo();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpDriveSettings();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpTurretInfo();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpIMUInfo();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpFunctionTriggers();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpVoltage();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DumpBaudRates();
-//        PerLoopUpdates();
+        PerLoopUpdates();
+        DebugSerial->flush();    
     DebugSerial->println();
     PrintDebugLine();    
 }
@@ -426,11 +447,7 @@ void DumpLVC_Voltage()
 void DumpFunctionTriggers()
 {
     char buffer[50];
-    byte c;
-
-    uint_farptr_t addr_fnametable;
-//    addr_fnametable = pgm_get_far_address(function_name_table);
-//    address = pgm_get_far_address (bitmap);
+    uint32_t fnameTableAddress = pgm_get_far_address(_FunctionNames_);  // This is the starting address of our function name table in far progmem. 
     
     DebugSerial->println();
     PrintDebugLine();
@@ -442,7 +459,7 @@ void DumpFunctionTriggers()
     if (Radio.UsingSpecialPositions)
     {
         DebugSerial->print(F("Turret movement delay:  ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.IgnoreTurretDelay_mS),2); DebugSerial->println(F(" sec"));    
-    }
+    } 
 
     // Now list all functions and their triggers
     if (MAX_FUNCTION_TRIGGERS > 0)
@@ -457,54 +474,12 @@ void DumpFunctionTriggers()
                 DebugSerial->print(eeprom.ramcopy.SF_Trigger[i].specialFunction);
                 if (eeprom.ramcopy.SF_Trigger[i].specialFunction < 10) PrintSpace();
                 PrintSpaceDash();
+                // This worked back in those innocent days when we didn't have progmem in far memory. 
                 //strcpy_P(buffer, (char*)pgm_read_byte_far(&(function_name_table[eeprom.ramcopy.SF_Trigger[i].specialFunction])));
-                //strcpy_PF(buffer, addr_fnametable + eeprom.ramcopy.SF_Trigger[i].specialFunction);
-                //strcpy_P(buffer, (char*)pgm_read_byte_far(addr_fnametable + eeprom.ramcopy.SF_Trigger[i].specialFunction));
-                //strcpy_PF(buffer, addr_fnametable);
-
-
-                //addr_fnametable = pgm_get_far_address(function_name_table); // + eeprom.ramcopy.SF_Trigger[i].specialFunction;
-                //DebugSerial->println(addr_fnametable);
-                //for (int j=0; j<100; j++)
-                //{
-                    //DebugSerial->print(pgm_read_byte_far(addr_fnametable + j));
-                //    DebugSerial->print((char)pgm_read_byte_far(pgm_get_far_address(function_name_table) + j));
-                //}
-                int j = 0;
-                //while( c = pgm_read_byte_far( GET_FAR_ADDRESS(function_name_table) + j++ ) )
-                //{
-                //    DebugSerial->print( (char)c );
-                //}
-
-                //while( c = pgm_read_byte_far( GET_FAR_ADDRESS(pgmData + j++ )) )
-                //{
-                //    DebugSerial->print( (char)c );
-                //}
-                
-                //while (c = pgm_read_byte_far(addr_fnametable++))
-                //{
-                //    DebugSerial->print(c);
-                //}
-/*
-                
-                //c = pgm_read_byte_far(addr_fnametable + eeprom.ramcopy.SF_Trigger[i].specialFunction);
-                addr_fnametable = pgm_get_far_address(function_name_table);
-                c = (char)pgm_read_byte_far(addr_fnametable + i);
-                while (c)
-                {
-                    DebugSerial->print(c);
-                    c = pgm_read_byte_far(++addr_fnametable);   
-                }
-                DebugSerial->println();
-
-                addr_fnametable = pgm_get_far_address(function_name_table);
-                while ((c = (char)pgm_read_byte_far(addr_fnametable++))) 
-                {
-                    DebugSerial->print(c);
-                }
-        */
-                //DebugSerial->print(buffer);
-                DebugSerial->println();
+                // This line cost me a week of my life. The custom strcpy_PFAR is in OP_Settings.h. The function names are set in OP_FunctionsTriggers.h 
+                strcpy_PFAR(buffer, fnameTableAddress, eeprom.ramcopy.SF_Trigger[i].specialFunction*FUNCNAME_CHARS);
+                DebugSerial->println(buffer);
+                DebugSerial->flush();  
             }
         }
     }
@@ -522,9 +497,9 @@ void DumpVarInfo()
     _vartype varType;       // Type - signed or unsigned int 8, 16 or 32, or boolean
     for (int i=0; i<NUM_STORED_VARS; i++)
     {   
-        varID = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5));
-        varOffset = pgm_read_word_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 2);
-        varType = pgm_read_byte_far(GET_FAR_ADDRESS(STORAGEVARS) + (i*5) + 4);
+        varID = pgm_read_word_far(pgm_get_far_address(STORAGEVARS) + (i*5));
+        varOffset = pgm_read_word_far(pgm_get_far_address(STORAGEVARS) + (i*5) + 2);
+        varType = pgm_read_byte_far(pgm_get_far_address(STORAGEVARS) + (i*5) + 4);
         DebugSerial->print(F("ID: ")); DebugSerial->print(varID);
         DebugSerial->print(F(" Offset: ")); DebugSerial->print(varOffset);
         DebugSerial->print(F(" Type: ")); DebugSerial->print(printVarType(varType)); 

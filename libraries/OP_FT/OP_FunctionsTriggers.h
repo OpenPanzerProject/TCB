@@ -133,106 +133,95 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
  0,1,1,0,0,1            // 70-75    70,73,74 analog
  };
-#define isSpecialFunctionDigital(f) pgm_read_byte_far(&DigitalFunctionsTable[f])
+// This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
+#define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
 
-// Function names stored in Flash memory
-const char Func000[] PROGMEM_FAR = "NULL FUNCTION";                             // 0
-const char Func001[] PROGMEM_FAR = "Engine - Toggle On/Off";                    // 1
-const char Func002[] PROGMEM_FAR = "Engine - Turn On";                          // 2
-const char Func003[] PROGMEM_FAR = "Engine - Turn Off";                         // 3
-const char Func004[] PROGMEM_FAR = "Transmission - Toggle On/Off";              // 4
-const char Func005[] PROGMEM_FAR = "Transmission - Turn On";                    // 5
-const char Func006[] PROGMEM_FAR = "Transmission - Turn Off";                   // 6
-const char Func007[] PROGMEM_FAR = "Cannon Fire";                               // 7
-const char Func008[] PROGMEM_FAR = "Fire Airsoft / Mechanical Recoil Unit";     // 8
-const char Func009[] PROGMEM_FAR = "Recoil Servo";                              // 9
-const char Func010[] PROGMEM_FAR = "High Intensity Flash";                      // 10 
-const char Func011[] PROGMEM_FAR = "Machine Gun - Fire";                        // 11
-const char Func012[] PROGMEM_FAR = "Machine Gun - Stop";                        // 12
-const char Func013[] PROGMEM_FAR = "Airsoft/Mech Recoil - Enable";              // 13
-const char Func014[] PROGMEM_FAR = "Airsoft/Mech Recoil - Disable";             // 14
-const char Func015[] PROGMEM_FAR = "Airsoft/Mech Recoil - Toggle";              // 15
-const char Func016[] PROGMEM_FAR = "Light 1 (Headlights) - Toggle On/Off";      // 16
-const char Func017[] PROGMEM_FAR = "Light 1 (Headlights) - Turn On";            // 17
-const char Func018[] PROGMEM_FAR = "Light 1 (Headlights) - Turn Off";           // 18
-const char Func019[] PROGMEM_FAR = "Light 2 - Toggle On/Off";                   // 19
-const char Func020[] PROGMEM_FAR = "Light 2 - Turn On";                         // 20
-const char Func021[] PROGMEM_FAR = "Light 2 - Turn Off";                        // 21
-const char Func022[] PROGMEM_FAR = "Running Lights - Toggle On/Off";            // 22
-const char Func023[] PROGMEM_FAR = "Running Lights - Turn On";                  // 23
-const char Func024[] PROGMEM_FAR = "Running Lights - Turn Off";                 // 24
-const char Func025[] PROGMEM_FAR = "Aux Output - Toggle On/Off";                // 25
-const char Func026[] PROGMEM_FAR = "Aux Output - Turn On";                      // 26
-const char Func027[] PROGMEM_FAR = "Aux Output - Turn Off";                     // 27
-const char Func028[] PROGMEM_FAR = "Aux Output - Set Level";                    // 28
-const char Func029[] PROGMEM_FAR = "Aux Output - Preset Dim Level";             // 29
-const char Func030[] PROGMEM_FAR = "Aux Output - Flash";                        // 30
-const char Func031[] PROGMEM_FAR = "Aux Output - Blink";                        // 31
-const char Func032[] PROGMEM_FAR = "Aux Output - Toggle Blink";                 // 32
-const char Func033[] PROGMEM_FAR = "Aux Output - Revolving Light";              // 33 
-const char Func034[] PROGMEM_FAR = "Aux Output - Toggle Revolving Light";       // 34
-const char Func035[] PROGMEM_FAR = "User Sound 1 - Play Once";                  // 35
-const char Func036[] PROGMEM_FAR = "User Sound 1 - Repeat";                     // 36
-const char Func037[] PROGMEM_FAR = "User Sound 1 - Stop";                       // 37
-const char Func038[] PROGMEM_FAR = "User Sound 2 - Play Once";                  // 38
-const char Func039[] PROGMEM_FAR = "User Sound 2 - Repeat";                     // 39
-const char Func040[] PROGMEM_FAR = "User Sound 2- Stop";                        // 40
-const char Func041[] PROGMEM_FAR = "External Output A - Toggle";                // 41
-const char Func042[] PROGMEM_FAR = "External Output A - Turn On";               // 42
-const char Func043[] PROGMEM_FAR = "External Output A - Turn Off";              // 43             
-const char Func044[] PROGMEM_FAR = "External Output B - Toggle";                // 44
-const char Func045[] PROGMEM_FAR = "External Output B - Turn On";               // 45
-const char Func046[] PROGMEM_FAR = "External Output B - Turn Off";              // 46
-const char Func047[] PROGMEM_FAR = "Set Acceleration Level";                    // 47
-const char Func048[] PROGMEM_FAR = "Set Deceleration Level";                    // 48
-const char Func049[] PROGMEM_FAR = "Set Turn Mode = 1";                         // 49
-const char Func050[] PROGMEM_FAR = "Set Turn Mode = 2";                         // 50
-const char Func051[] PROGMEM_FAR = "Set Turn Mode = 3";                         // 51
-const char Func052[] PROGMEM_FAR = "Smoker - Manual Control";                   // 52
-const char Func053[] PROGMEM_FAR = "Motor A - Manual Control";                  // 53
-const char Func054[] PROGMEM_FAR = "Motor B - Manual Control";                  // 54
-const char Func055[] PROGMEM_FAR = "RC Output 1 - Pass-through";                // 55
-const char Func056[] PROGMEM_FAR = "RC Output 2 - Pass-through";                // 56
-const char Func057[] PROGMEM_FAR = "RC Output 3 - Pass-through";                // 57
-const char Func058[] PROGMEM_FAR = "RC Output 4 - Pass-through";                // 58
-const char Func059[] PROGMEM_FAR = "RC Output 1 - Pan Servo";                   // 59
-const char Func060[] PROGMEM_FAR = "RC Output 2 - Pan Servo";                   // 60
-const char Func061[] PROGMEM_FAR = "RC Output 3 - Pan Servo";                   // 61
-const char Func062[] PROGMEM_FAR = "RC Output 4 - Pan Servo";                   // 62
-const char Func063[] PROGMEM_FAR = "Barrel Stabilization - Turn On";            // 63
-const char Func064[] PROGMEM_FAR = "Barrel Stabilization - Turn Off";           // 64
-const char Func065[] PROGMEM_FAR = "Barrel Stabilization - Toggle";             // 65
-const char Func066[] PROGMEM_FAR = "Barrel Stabilization - Set Sensitivity";    // 66
-const char Func067[] PROGMEM_FAR = "Hill Physics - Turn On";                    // 67
-const char Func068[] PROGMEM_FAR = "Hill Physics - Turn Off";                   // 68
-const char Func069[] PROGMEM_FAR = "Hill Physics - Toggle";                     // 69
-const char Func070[] PROGMEM_FAR = "Hill Physics - Set Sensitivity";            // 70
-const char Func071[] PROGMEM_FAR = "User Function 1";                           // 71
-const char Func072[] PROGMEM_FAR = "User Function 2";                           // 72
-const char Func073[] PROGMEM_FAR = "Analog User Function 1";                    // 73
-const char Func074[] PROGMEM_FAR = "Analog User Function 2";                    // 74
-const char Func075[] PROGMEM_FAR = "Dump Settings";                             // 75
-
-//const PROGMEM boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] =
-//const uint32_t * const function_name_table[COUNT_SPECFUNCTIONS] PROGMEM_FAR = 
-/*
-const char * const function_name_table[COUNT_SPECFUNCTIONS] PROGMEM_FAR = 
-{
- Func000, Func001, Func002, Func003, Func004, Func005, Func006, Func007, Func008, Func009,
- Func010, Func011, Func012, Func013, Func014, Func015, Func016, Func017, Func018, Func019,
- Func020, Func021, Func022, Func023, Func024, Func025, Func026, Func027, Func028, Func029,
- Func030, Func031, Func032, Func033, Func034, Func035, Func036, Func037, Func038, Func039,
- Func040, Func041, Func042, Func043, Func044, Func045, Func046, Func047, Func048, Func049,
- Func050, Func051, Func052, Func053, Func054, Func055, Func056, Func057, Func058, Func059,
- Func060, Func061, Func062, Func063, Func064, Func065, Func066, Func067, Func068, Func069,
- Func070, Func071, Func072, Func073, Func074, Func075
+// The FUNCNAME_CHARS set to 41 means each string must be 40 chars or less (the compiler will "helpfully" null-terminate each string, which adds one extra byte). 
+// The approach shown here is a very wasteful way of storing strings since many of our strings are much less than 40 characters long, but it is the only way I have found
+// to store them in FAR program memory and still be able to access them using a reasonable array index, WHILE not needing to make custom modifications to the 
+// linker or makefile scripts that would render this project difficult for the lay user to compile with the stock Arduino IDE. 
+// Thankfully the one single thing we still have plenty of is program space. Even if we reach the maximum of 256 special functions, at 41 chars each
+// these names would take up < 11 kilobytes (11,000 bytes). Taking into account our bootloader and the code we have as of spring 2016, even 
+// with all 256 functions defined we would still be below 100 kb program memory, out of about 258k we have to work with. 
+#define FUNCNAME_CHARS  41
+const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR = 
+{   "NULL FUNCTION",                             // 0
+    "Engine - Toggle On/Off",                    // 1
+    "Engine - Turn On",                          // 2
+    "Engine - Turn Off",                         // 3
+    "Transmission - Toggle On/Off",              // 4
+    "Transmission - Turn On",                    // 5
+    "Transmission - Turn Off",                   // 6
+    "Cannon Fire",                               // 7
+    "Fire Airsoft / Mechanical Recoil Unit",     // 8
+    "Recoil Servo",                              // 9
+    "High Intensity Flash",                      // 10 
+    "Machine Gun - Fire",                        // 11
+    "Machine Gun - Stop",                        // 12
+    "Airsoft/Mech Recoil - Enable",              // 13
+    "Airsoft/Mech Recoil - Disable",             // 14
+    "Airsoft/Mech Recoil - Toggle",              // 15
+    "Light 1 (Headlights) - Toggle On/Off",      // 16
+    "Light 1 (Headlights) - Turn On",            // 17
+    "Light 1 (Headlights) - Turn Off",           // 18
+    "Light 2 - Toggle On/Off",                   // 19
+    "Light 2 - Turn On",                         // 20
+    "Light 2 - Turn Off",                        // 21
+    "Running Lights - Toggle On/Off",            // 22
+    "Running Lights - Turn On",                  // 23
+    "Running Lights - Turn Off",                 // 24
+    "Aux Output - Toggle On/Off",                // 25
+    "Aux Output - Turn On",                      // 26
+    "Aux Output - Turn Off",                     // 27
+    "Aux Output - Set Level",                    // 28
+    "Aux Output - Preset Dim Level",             // 29
+    "Aux Output - Flash",                        // 30
+    "Aux Output - Blink",                        // 31
+    "Aux Output - Toggle Blink",                 // 32
+    "Aux Output - Revolving Light",              // 33 
+    "Aux Output - Toggle Revolving Light",       // 34
+    "User Sound 1 - Play Once",                  // 35
+    "User Sound 1 - Repeat",                     // 36
+    "User Sound 1 - Stop",                       // 37
+    "User Sound 2 - Play Once",                  // 38
+    "User Sound 2 - Repeat",                     // 39
+    "User Sound 2- Stop",                        // 40
+    "External Output A - Toggle",                // 41
+    "External Output A - Turn On",               // 42
+    "External Output A - Turn Off",              // 43             
+    "External Output B - Toggle",                // 44
+    "External Output B - Turn On",               // 45
+    "External Output B - Turn Off",              // 46
+    "Set Acceleration Level",                    // 47
+    "Set Deceleration Level",                    // 48
+    "Set Turn Mode = 1",                         // 49
+    "Set Turn Mode = 2",                         // 50
+    "Set Turn Mode = 3",                         // 51
+    "Smoker - Manual Control",                   // 52
+    "Motor A - Manual Control",                  // 53
+    "Motor B - Manual Control",                  // 54
+    "RC Output 1 - Pass-through",                // 55
+    "RC Output 2 - Pass-through",                // 56
+    "RC Output 3 - Pass-through",                // 57
+    "RC Output 4 - Pass-through",                // 58
+    "RC Output 1 - Pan Servo",                   // 59
+    "RC Output 2 - Pan Servo",                   // 60
+    "RC Output 3 - Pan Servo",                   // 61
+    "RC Output 4 - Pan Servo",                   // 62
+    "Barrel Stabilization - Turn On",            // 63
+    "Barrel Stabilization - Turn Off",           // 64
+    "Barrel Stabilization - Toggle",             // 65
+    "Barrel Stabilization - Set Sensitivity",    // 66
+    "Hill Physics - Turn On",                    // 67
+    "Hill Physics - Turn Off",                   // 68
+    "Hill Physics - Toggle",                     // 69
+    "Hill Physics - Set Sensitivity",            // 70
+    "User Function 1",                           // 71
+    "User Function 2",                           // 72
+    "Analog User Function 1",                    // 73
+    "Analog User Function 2",                    // 74
+    "Dump Settings"                              // 75
 };
-*/
-//                                                     , Func076, Func077, Func078, Func079,
-// Func080, Func081, Func082, Func083, Func084, Func085, Func086, Func087, Func088, Func089,
-// Func090, Func091, Func092, Func093, Func094, Func095, Func096, Func097, Func098, Func099,
-// Func100, Func101, Func102, Func103, Func104, Func105, Func106, Func107, Func108, Func109,
-
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // FUNCTION TRIGGERS
