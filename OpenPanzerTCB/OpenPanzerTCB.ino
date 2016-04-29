@@ -46,19 +46,14 @@
 // PROJECT SPECIFIC EEPROM
     OP_EEPROM eeprom;                            // Wrapper class for dealing with eeprom. Note that EEPROM is also a valid object, it is the name of the EEPROMex class instance. Use the correct one!
                                                  // OP_EEPROM basically provides some further functionality beyond EEPROMex. 
-// SETUP FLAG
-    boolean inSetup = true;                      // Is code still in the setup() function? Will be true until we exit setup()
-    
 // SIMPLE TIMER 
     OP_SimpleTimer timer;                        // SimpleTimer named "timer"
     boolean TimeUp = true;
 
 // DEBUG FLAG
-    boolean DEBUG = false;                       // Start at true, but it will later get set to whatever value is stored in EEPROM
+    boolean DEBUG = false;                       // Start at false, but it will later get set to whatever value is stored in EEPROM
     boolean SAVE_DEBUG = false;                  // We may temporarily want to disable the debug, but we save a copy of the actual state so we can revert it
     HardwareSerial *DebugSerial;                 // Which serial port to print debug messages to
-    
-// LCD                                           // LCD, not implemented for now. 
 
 // RADIO INPUTS
     OP_Radio Radio;
@@ -162,9 +157,9 @@ void setup()
     // LOAD VALUES FROM EEPROM    
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         boolean did_we_init = eeprom.begin();                      // begin() will initialize EEPROM if it never has been before, and load all EEPROM settings into our ramcopy struct
-        //if (did_we_init && DEBUG) { DebugSerial->println(F("EEPROM Initalized")); } // In general we don't want to be talking for the first few seconds after boot in case the computer is trying to talk to us,
-                                                                   // but this message should only occur once on a new device. I guess that also means we could get rid of it too... it was only useful for testing. 
-                                                                   // For now we will leave the code here, but comment it out. 
+        //if (did_we_init) { DebugSerial->println(F("EEPROM Initalized")); } // We can use this for testing, but in general it's not needed, it doesn't happen often, and rarely would the user catch it. 
+
+        
     // INIT SERIALS & COMMS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         Serial.begin(USB_BAUD_RATE);                               // Hardware Serial 0 - Connected to FTDI/USB connector. We also have a baud rate in EEPROM (eeprom.ramcopy.USBSerialBaud) but for now we leave this static at the baud rate set in OP_Settings.h
@@ -177,7 +172,9 @@ void setup()
         SetActiveCommPort();                                       // Check Dipswitch #5 and set the active communication port to USB if switch On, or Serial 1 if switch Off
 
         // Now send our first message out the port, if we initialized the EEPROM
-        DEBUG = SAVE_DEBUG = eeprom.ramcopy.PrintDebug;            // Does the user want to see debug messages
+        SAVE_DEBUG = eeprom.ramcopy.PrintDebug;                    // Does the user want to see debug messages
+        DEBUG = false;                                             // But we leave the actual DEBUG initialized to false. It will get set equal to SAVE_DEBUG only after a certain amount of time has passed, so we 
+                                                                   // don't put messages out the port right after boot - they could conflict with our ability to detect communication efforts from the PC. 
 
     // PINS NOT RELATED TO OBJECTS - SETUP
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -234,7 +231,6 @@ void setup()
 
     // OTHER OBJECTS - BEGIN
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
- 
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
                      eeprom.ramcopy.NeutralTurnAllowed, 
@@ -244,8 +240,8 @@ void setup()
                      eeprom.ramcopy.DecelSkipNum,
                      eeprom.ramcopy.AccelPreset,
                      eeprom.ramcopy.DecelPreset);                     
-        TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, DEBUG, DebugSerial);
-        TankTransmission.begin(DEBUG, DebugSerial);
+        TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
+        TankTransmission.begin(SAVE_DEBUG, DebugSerial);
         TankSound.begin();
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
         // whether we are running an airsoft unit or mechanical recoil, the mechanical recoil delay, the machine gun blink interval, 
@@ -367,24 +363,11 @@ void setup()
         RunningLightsDimLevel = map(eeprom.ramcopy.RunningLightsDimLevelPct, 0, 100, 0, 255);   // The user sets the dim level as a percent from 0-100, but we want it as a PWM value from 0-255
         if (eeprom.ramcopy.RunningLightsAlwaysOn) RunningLightsOn();
 
-
-    // PC COMMUNICATION
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->        
-/*        if (PCComm.CheckPC())
-        {
-            PCComm.ListenToPC();
-            // Leave the Red LED on because we still aren't out of setup
-            RedLedOn();
-        }
-*/
-
-        
+       
     // WAIT FOR PC COMM - AND TRY TO DETECT RECEIVER (kill two birds with one stone)
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        // Assume no connection to start with. But we don't want the StartFailsafe message this time, so temporarily disable debug
-        DisableDebug();
-            StartFailsafe();    // This would otherwise give a message we don't need right now
-        RestoreDebug();
+        // Assume no connection to start with. 
+        StartFailsafe();    // This would usually give a message we don't need right now, except we've initialized DEBUG to false for now
         
         // Now we try to detect radio input. This loop will run forever until the Radio class successfully detects a PPM, SBus, iBus or other stream. 
         // While waiting, it will also be listening for any communication from the computer, since this frequently occurs on reboot. And in fact, 
@@ -398,7 +381,7 @@ void setup()
             // We will schedule a message for two seconds from now, that will let the user know we are waiting on the radio to do anything. 
             // We wait two seconds because we don't want to be putting traffic on the line right after boot in case the computer was the one that rebooted us
             // and is now trying to communicate. Also, if in two seconds the radio has been detected, or we've moved out of the setup() routine, then the message won't actually display. 
-            if (!scheduleMsg && DEBUG)
+            if (!scheduleMsg && SAVE_DEBUG)
             {
                 timer.setTimeout(2000, PrintWaitingForRadio);       // The function can be found in the Utilites tab
                 scheduleMsg = true;                                 // Only schedule it once. 
@@ -439,9 +422,9 @@ void setup()
         randomSeed(analogRead(A0));
 
 
-    // DONE WITH SETUP()
+    // SET DEBUG TO USER SETTING IN ANOTHER SECOND
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
-        inSetup = false;
+        timer.setTimeout(1000, RestoreDebug);
 }
 
 
@@ -568,7 +551,7 @@ if (Startup)
 
     // Display some info if we have debug set. But wait until a few seconds after we've booted so the dump doesn't interfere with any PC communication attempts. 
     // Of course, the user can also always dump the info just by pressing the input button. 
-        if (DEBUG) { timer.setTimeout(1500, DumpSysInfo); }
+        if (SAVE_DEBUG) { timer.setTimeout(1500, DumpSysInfo); }
 
     // Get the time
         currentMillis = millis();
@@ -743,9 +726,9 @@ if (Startup)
     
     // GET RX COMMANDS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-        Radio.GetCommands();    // This would also return a boolean if the radio is ready or not
+        Radio.GetCommands();    // Only call this once per loop, otherwise you will discard frames
         // If we have lost connection with the radio, blink some lights and wait for it to reconnect
-        if (Radio.InFailsafe) StartFailsafe();
+        if (Radio.InFailsafe) { StartFailsafe(); }
         while(Radio.InFailsafe)
         {
             Radio.GetCommands();
@@ -761,6 +744,7 @@ if (Startup)
         }
         // We're out of failsafe - stop the blinking
         EndFailsafe();
+
 
     // GET EXTERNAL INPUTS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->

@@ -49,12 +49,12 @@ void FireCannon()
 void MG_Start()
 {   
     Tank.MachineGun();
-    if (DEBUG && !inSetup) {DebugSerial->println(F("MG Start"));}
+    if (DEBUG) {DebugSerial->println(F("MG Start"));}
 }
 void MG_Stop()
 {
     Tank.MachineGun_Stop();
-    if (DEBUG && !inSetup) {DebugSerial->println(F("MG Stop"));}
+    if (DEBUG) {DebugSerial->println(F("MG Stop"));}
 }
 
 
@@ -67,7 +67,7 @@ void MG_Stop()
 void MechBarrel()
 {
     Tank.TriggerMechBarrel();
-    if (DEBUG && !inSetup) 
+    if (DEBUG) 
     { 
         if (eeprom.ramcopy.Airsoft) DebugSerial->println(F("Airsoft - Manual Trigger")); 
         else DebugSerial->println(F("Mechanical Recoil - Manual Trigger")); 
@@ -79,7 +79,7 @@ void MechBarrel()
 void MechBarrel_Enable()
 {
     Tank.SetMechBarrelWithCannon(true);
-    if (DEBUG && !inSetup)
+    if (DEBUG)
     { 
         if (eeprom.ramcopy.Airsoft) DebugSerial->println(F("Airsoft - Enabled")); 
         else DebugSerial->println(F("Mechanical Recoil - Enabled"));     
@@ -88,7 +88,7 @@ void MechBarrel_Enable()
 void MechBarrel_Disable()
 {
     Tank.SetMechBarrelWithCannon(false);
-    if (DEBUG && !inSetup)
+    if (DEBUG)
     { 
         if (eeprom.ramcopy.Airsoft) DebugSerial->println(F("Airsoft - Disabled")); 
         else DebugSerial->println(F("Mechanical Recoil - Disabled"));     
@@ -112,7 +112,7 @@ void MechBarrel_Toggle()
 void TriggerServoRecoil()
 {
     RecoilServo->Recoil();
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Servo Recoil - Manual Trigger")); }
+    if (DEBUG) { DebugSerial->println(F("Servo Recoil - Manual Trigger")); }
 }
 
 // SPECIAL FUNCTIONS: Trigger Muzzle Flash
@@ -122,7 +122,7 @@ void TriggerServoRecoil()
 void MuzzleFlash()
 {
     Tank.TriggerMuzzleFlash();
-    if (DEBUG && !inSetup) { DebugSerial->println(F("High Intensity Flash Unit - Manual Trigger")); }
+    if (DEBUG) { DebugSerial->println(F("High Intensity Flash Unit - Manual Trigger")); }
 }
 
 

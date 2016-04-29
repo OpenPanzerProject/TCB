@@ -6,14 +6,14 @@ void Light1On()
 {
     digitalWrite(pin_Light1, HIGH);    
     TankSound.HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Light 1 On")); }
+    if (DEBUG) { DebugSerial->println(F("Light 1 On")); }
 }
 
 void Light1Off()
 {
     digitalWrite(pin_Light1, LOW);
     TankSound.HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Light 1 Off")); }
+    if (DEBUG) { DebugSerial->println(F("Light 1 Off")); }
 }
 
 void Light1Toggle()
@@ -29,13 +29,13 @@ void Light1Toggle()
 void Light2On()
 {
     digitalWrite(pin_Light2, HIGH);    
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Light 2 On")); }
+    if (DEBUG) { DebugSerial->println(F("Light 2 On")); }
 }
 
 void Light2Off()
 {
     digitalWrite(pin_Light2, LOW);
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Light 2 Off")); }
+    if (DEBUG) { DebugSerial->println(F("Light 2 Off")); }
 }
 
 void Light2Toggle()
@@ -79,7 +79,7 @@ void RunningLightsOn()
     {   // But we only set the dim level if the brake lights aren't on
         analogWrite(pin_Brakelights, RunningLightsDimLevel);
     }
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Running Lights On")); }
+    if (DEBUG) { DebugSerial->println(F("Running Lights On")); }
 }
 
 void RunningLightsOff()
@@ -91,7 +91,7 @@ void RunningLightsOff()
     {   // Only turn the lights off if the brakes aren't on either
         digitalWrite(pin_Brakelights, LOW);
     }
-    if (DEBUG && !inSetup) { DebugSerial->println(F("Running Lights Off")); }
+    if (DEBUG) { DebugSerial->println(F("Running Lights Off")); }
 }
 
 void RunningLightsToggle()
@@ -106,18 +106,18 @@ void RunningLightsToggle()
 void AuxOutputOn()
 {
     digitalWrite(pin_AuxOutput, HIGH);    
-    if (DEBUG && !AuxOutputBlinking && !inSetup) { DebugSerial->println(F("Aux Output On")); }
+    if (DEBUG && !AuxOutputBlinking) { DebugSerial->println(F("Aux Output On")); }
 }
 void AuxOutputOff()
 {
     // Turn off
     if (timer.isEnabled(AuxOutputTimerID)) timer.deleteTimer(AuxOutputTimerID);
     digitalWrite(pin_AuxOutput, LOW);
-    if (DEBUG && !inSetup)
+    if (DEBUG)
     {
         if (AuxOutputBlinking)          { DebugSerial->println(F("Stop Aux Output Blinking")); }
         else if (AuxOutputRevolving)    { DebugSerial->println(F("Stop Revolving Aux Light")); }
-        else                            { DebugSerial->println(F("Aux Output Off")); }
+        else if (!Failsafe)             { DebugSerial->println(F("Aux Output Off")); }  // Don't need to print anything if the reason we turned it off is because of radio failsafe
     }
     // Now these are also false
     AuxOutputBlinking = false;
@@ -139,7 +139,7 @@ void AuxOutputToggle()
 void AuxOutput_PresetDim()
 {
     analogWrite(pin_AuxOutput, eeprom.ramcopy.AuxLightPresetDim);
-    if (DEBUG && !inSetup) DebugSerial->println(F("Aux Output Preset Dim"));
+    if (DEBUG) DebugSerial->println(F("Aux Output Preset Dim"));
 }
 void AuxOutput_SetLevel(uint16_t level)
 {   
@@ -170,7 +170,7 @@ void AuxOutputFlash()
     // Then we set a timer to turn it off after the flash length of time has passed
     AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightFlashTime_mS, AuxOutputOff);
 
-    if (DEBUG && !inSetup) DebugSerial->println(F("Aux Output Flashed"));
+    if (DEBUG) DebugSerial->println(F("Aux Output Flashed"));
 }
 void AuxOutputBlink()
 {
@@ -181,7 +181,7 @@ void AuxOutputBlink()
     {   // Don't do blinking and revolving at the same time
         AuxOutputOff(); // This clears any other effects first
         AuxOutputBlinking = true;
-        if (DEBUG && !inSetup) { DebugSerial->println(F("Start Aux Output Blinking")); }
+        if (DEBUG) { DebugSerial->println(F("Start Aux Output Blinking")); }
     }
 
     // Toggle the light state
@@ -200,7 +200,7 @@ void AuxOutputToggleBlink()
         AuxOutputOff();
         AuxOutputBlinking = false;
         if (timer.isEnabled(AuxOutputTimerID)) timer.deleteTimer(AuxOutputTimerID);
-        if (DEBUG && !inSetup) { DebugSerial->println(F("Stop Aux Output Blinking")); }
+        if (DEBUG) { DebugSerial->println(F("Stop Aux Output Blinking")); }
     }
     else
     {
@@ -217,7 +217,7 @@ void AuxOutputRevolve()
         if (timer.isEnabled(AuxOutputTimerID)) timer.deleteTimer(AuxOutputTimerID);
         // Ok, we are starting the revolver
         AuxOutputRevolving = true;
-        if (DEBUG && !inSetup) { DebugSerial->println(F("Start Revolving Aux Light")); }        
+        if (DEBUG) { DebugSerial->println(F("Start Revolving Aux Light")); }        
         AuxOutputRevolver();
     }
 }
@@ -228,7 +228,7 @@ void AuxOutputToggleRevolve()
         AuxOutputRevolving = false;
         digitalWrite(pin_AuxOutput, LOW);
         if (timer.isEnabled(AuxOutputTimerID)) timer.deleteTimer(AuxOutputTimerID);
-        if (DEBUG && !inSetup) { DebugSerial->println(F("Stop Revolving Aux Light")); }
+        if (DEBUG) { DebugSerial->println(F("Stop Revolving Aux Light")); }
     }
     else
     {
