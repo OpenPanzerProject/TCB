@@ -344,7 +344,7 @@ bool IRdecodeTamiya::decode(void) {
         }
     }
     // If we make it here, no match. 
-    return DATA_MARK_ERROR(pgm_read_word_near(&(Tamiya16Sig[0])));;
+  return DATA_MARK_ERROR(pgm_read_word_near(&(Tamiya16Sig[0])));
 }
 bool IRdecodeTamiya_2Shot::decode(void) {
 // The Tamiya 2-shot kill signal is very simple - two marks separated by a space, followed by a longer gap between re-transmissions:
@@ -381,7 +381,7 @@ bool IRdecodeTamiya_2Shot::decode(void) {
         }
     }
     // If we make it here, no match. 
-    return DATA_MARK_ERROR(pgm_read_word_near(&(Tamiya16TwoShotSig[0])));;
+    return DATA_MARK_ERROR(pgm_read_word_near(&(Tamiya16TwoShotSig[0])));
     
 }
  bool IRdecodeTamiya35::decode(void) {
