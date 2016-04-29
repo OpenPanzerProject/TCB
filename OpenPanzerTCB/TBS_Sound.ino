@@ -10,7 +10,10 @@ void TBS_Setup()
     RedLedOn();
     
     // 
+    DebugSerial->println();
+    PrintDebugLine();
     DebugSerial->println(F("Start TBS Setup"));
+    PrintDebugLine();
     
     // Initialize TBS outputs
     TankSound.IdleEngine();         // Initialize PROP1: set engine speed to idle
@@ -43,6 +46,10 @@ void TBS_Setup()
     
     // Ok, we're done
     DebugSerial->println(F("All Done"));
+    PrintDebugLine();
+    DebugSerial->println(F("End TBS Setup"));
+    PrintDebugLine();
+    DebugSerial->println();    
 
     // To let them know it's over, blink the Green LED 3 times quickly, then turn all leds off. 
     GreenBlinkFast(3);
@@ -57,32 +64,37 @@ void TBS_Setup()
 void TriggerUserSound1()
 {
     TankSound.UserSound1();
-    if (DEBUG) DebugSerial->println(F("User Sound 1")); 
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("1")); }
 }
 void UserSound1_Repeat()
 {
     TankSound.UserSound1_Repeat();
-    if (DEBUG) DebugSerial->println(F("User Sound 1 - Start Repeating")); 
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("1 - Start Repeating")); }
 }
 void UserSound1_Stop()
 {
     TankSound.UserSound1_Stop();
-    if (DEBUG) DebugSerial->println(F("User Sound 1 - Stop")); 
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("1 - Stop")); }
 }
 
 void TriggerUserSound2()
 {
     TankSound.UserSound2();
-    if (DEBUG) DebugSerial->println(F("User Sound 2"));     
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2")); }
 }
 void UserSound2_Repeat()
 {
     TankSound.UserSound2_Repeat();
-    if (DEBUG) DebugSerial->println(F("User Sound 2 - Start Repeating"));     
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2 - Start Repeating")); }
 }
 void UserSound2_Stop()
 {
     TankSound.UserSound2_Stop();
-    if (DEBUG) DebugSerial->println(F("User Sound 2 - Stop"));     
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2 - Stop")); }
+}
+
+void PrintUserSound()
+{
+    DebugSerial->print(F("User Sound "));
 }
 
