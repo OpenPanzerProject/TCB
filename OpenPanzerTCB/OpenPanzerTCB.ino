@@ -597,7 +597,11 @@ if (Startup)
                             if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
                             { SetupServo(SERVONUM_TURRETELEVATION); }
                             else
-                            { if (DEBUG) DebugSerial->println(F("Turret elevation is not of type Servo. No setup available.")); }
+                            { 
+                                if (DEBUG) DebugSerial->println(F("Turret elevation is not of type Servo. No setup available.")); 
+                                // Wait for them to release the button before proceeding
+                                do { delay(10); InputButton.read(); } while (!InputButton.wasReleased()); 
+                            }
                             break;
                         case 2: 
                             // Reserved for future use
