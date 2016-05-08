@@ -134,6 +134,14 @@ void SF_TurnMode2(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 2)
 void SF_TurnMode3(uint16_t ignoreMe)            { if (Driver.getTurnMode() != 3) { Driver.setTurnMode(3); if (DEBUG) DebugSerial->println(F("Set Turn Mode: 3")); } }
 
 
+// SPECIAL FUNCTIONS: Neutral Turns
+// ----------------------------------------------------------------------------------------------------------------------------------------------->>
+// Only enable neutral turns for tanks and halftracks, not cars. 
+void SF_NT_Enable(uint16_t ignoreMe)            { if (eeprom.ramcopy.DriveType != DT_CAR && Driver.getNeutralTurnAllowed() == false) { Driver.setNeutralTurnAllowed(true);  if (DEBUG) DebugSerial->println(F("Enable Neutral Turns"));  } }
+void SF_NT_Disable(uint16_t ignoreMe)           { if (Driver.getNeutralTurnAllowed() == true ) { Driver.setNeutralTurnAllowed(false); if (DEBUG) DebugSerial->println(F("Disable Neutral Turns")); } }
+void SF_NT_Toggle(uint16_t ignoreMe)            { Driver.getNeutralTurnAllowed() ? SF_NT_Disable(0) : SF_NT_Enable(0); }
+
+
 // OTHER DRIVING FUNCTIONS
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void StopEverything()

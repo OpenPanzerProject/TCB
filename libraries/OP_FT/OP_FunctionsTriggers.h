@@ -37,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 76;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 79;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -116,7 +116,10 @@ enum _special_function : byte {
     SF_USER_FUNC_2      = 72,       // 72
     SF_USER_ANLG_1      = 73,       // 73   -- analog function
     SF_USER_ANLG_2      = 74,       // 74   -- analog function
-    SF_DUMP_DEBUG       = 75        // 75
+    SF_DUMP_DEBUG       = 75,       // 75
+    SF_NT_ENABLE        = 76,       // 76
+    SF_NT_DISABLE       = 77,       // 77
+    SF_NT_TOGGLE        = 78        // 78
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -131,7 +134,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,1,1,0,0,1,   // 40-49    47,48 analog
  1,1,0,0,0,0,0,0,0,0,   // 50-59    52-59 analog
  0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
- 0,1,1,0,0,1            // 70-75    70,73,74 analog
+ 0,1,1,0,0,1,0,0,0      // 70-78    70,73,74 analog
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -220,7 +223,10 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Function 2",                           // 72
     "Analog User Function 1",                    // 73
     "Analog User Function 2",                    // 74
-    "Dump Settings"                              // 75
+    "Dump Settings",                             // 75
+    "Neutral Turn - Enable",                     // 76
+    "Neutral Turn - Disable",                    // 77
+    "Neutral Turn - Toggle"                      // 78
 };
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>

@@ -100,6 +100,9 @@ void LoadFunctionTriggers()
                 case SF_USER_ANLG_1:                SF_Callback[i] = &User_Analog_Function1;                        break; // Analog function
                 case SF_USER_ANLG_2:                SF_Callback[i] = &User_Analog_Function2;                        break; // Analog function
                 case SF_DUMP_DEBUG:                 SF_Callback[i] = &SF_DumpDebug;                                 break;
+                case SF_NT_ENABLE:                  SF_Callback[i] = &SF_NT_Enable;                                 break;
+                case SF_NT_DISABLE:                 SF_Callback[i] = &SF_NT_Disable;                                break;
+                case SF_NT_TOGGLE:                  SF_Callback[i] = &SF_NT_Toggle;                                 break;
             }
         }
     }
