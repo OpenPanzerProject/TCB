@@ -20,6 +20,8 @@ autobaud	KEYWORD2
 command	KEYWORD2
 motor	KEYWORD2
 allStop	KEYWORD2
+configurePololu	KEYWORD2
+
 
 
 #-------------------------------------------------------------

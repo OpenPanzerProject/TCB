@@ -355,6 +355,8 @@ char pulseString[SENTENCE_BUFF];
 uint8_t pulseStrLength = 0;
 uint8_t strLen = 0;
 
+// Used for Pololu Qik configuration
+OP_PololuQik * Qik;
 
     switch (SentenceIN.Command)
     {
@@ -471,6 +473,18 @@ uint8_t strLen = 0;
             // PC wants us to stop the streaming. Set the stream flag to false.
             StreamRadio = false;
             AskForNextSentence();
+            break;
+
+        case PCCMD_CONFPOLOLU_DRIVE:
+            Qik = new OP_PololuQik (Pololu_DRIVE_ID, &MotorSerial);     // We need to include a DeviceID in the constructor but for this purpose it won't be used. 
+            Qik->configurePololu(Pololu_DRIVE_ID);                      // Pololu_DRIVE_ID is defined in OP_Settings.h. Presently we don't have a way to know if the configuration succeeded or not,
+            AskForNextSentence();                                       // because we aren't reading responses back from the serial controllers. So we just ask for next sentence and assume it worked. 
+            break;
+        
+        case PCCMD_CONFPOLOLU_TURRET:
+            Qik = new OP_PololuQik (Pololu_TURRET_ID, &MotorSerial);    // We need to include a DeviceID in the constructor but for this purpose it won't be used. 
+            Qik->configurePololu(Pololu_TURRET_ID);                     // Pololu_TURRET_ID is defined in OP_Settings.h. Presently we don't have a way to know if the configuration succeeded or not,
+            AskForNextSentence();                                       // because we aren't reading responses back from the serial controllers. So we just ask for next sentence and assume it worked. 
             break;
         
         case PCCMD_UPDATE_EEPROM:           // Here we need to write whatValue to the EEPROM variable with the matching whatAddress

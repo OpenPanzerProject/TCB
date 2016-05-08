@@ -133,10 +133,11 @@
 // Commands received from PC
 #define INIT_STRING             "OPZ"   // The initialization string that tells us to start communicating with the PC
                                         // Can't be more characters than VALUE_BUFF - 1 
+#define PCCMD_CONFPOLOLU_DRIVE  119     // PC wants us to configure a Pololu device connected to Serial 2 for use with drive motors
+#define PCCMD_CONFPOLOLU_TURRET 120     // PC wants us to configure a Pololu device connected to Serial 2 for use with turret motors
 #define PCCMD_NUM_CHANNELS      121     // The PC wants to know the number of utilized channels
 #define PCCMD_STARTSTREAM_RADIO 122     // The PC wants us to stream channel pulse-widths
 #define PCCMD_STOPSTREAM_RADIO  123     // The PC wants us to stop streaming channel data
-
 #define PCCMD_UPDATE_EEPROM     124     // PC has given us a value to write to EEPROM
 #define PCCMD_READ_EEPROM       126     // PC wants us to read EEPROM and return value
 #define PCCMD_READ_VERSION      128     // PC wants to know what firmware version we're running
