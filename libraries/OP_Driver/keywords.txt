@@ -35,6 +35,8 @@ getDecelRampFrequency	KEYWORD2
 setTurnMode	KEYWORD2
 
 getTurnMode	KEYWORD2
+setNeutralTurnAllowed	KEYWORD2
+getNeutralTurnAllowed	KEYWORD2
 GetDriveSpeed	KEYWORD2
 
 GetThrottleSpeed	KEYWORD2

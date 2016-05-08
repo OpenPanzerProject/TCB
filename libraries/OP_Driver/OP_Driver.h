@@ -100,6 +100,8 @@ public:
     static uint8_t getDecelRampFrequency(void);         // Return
     static void setTurnMode(uint8_t);
     static uint8_t getTurnMode();
+    static void setNeutralTurnAllowed(boolean);
+    static boolean getNeutralTurnAllowed(void);
     int GetDriveSpeed(int, int, _driveModes, boolean);      // What is the *drive* speed. This is used to control the tank movement. 
     int GetThrottleSpeed(int, int, int, _driveModes, boolean, OP_TBS*); // What is the *engine* speed (different from drive speed) - this is used for the sound and smoker outputs
     int ScaleTurnCommand(int, int);                         // This scales a turn command to some lesser amount, used for neutral turns (tank mode) and turn command applied to rear treads in halftrack mode.

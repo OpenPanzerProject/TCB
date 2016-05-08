@@ -682,6 +682,17 @@ uint8_t OP_Driver::getTurnMode(void)
     return TurnMode;
 }
 
+// The user can select the neutral turn allowed status in OP Config, but we also allow them to change it on the fly.
+void OP_Driver::setNeutralTurnAllowed(boolean allowed)
+{
+    NeutralTurnAllowed = allowed; 
+}
+
+boolean OP_Driver::getNeutralTurnAllowed(void)
+{
+    return NeutralTurnAllowed; 
+}
+
 // This mixes throttle and turn commands and spits out left and right tread commands. We can manipulate the mix formula in different ways, 
 // we call these "Turn Modes" and the user has several to select from. 
 void OP_Driver::MixSteering(int DriveSpeed, int TurnAmount, int *RightSpeed, int *LeftSpeed) 
