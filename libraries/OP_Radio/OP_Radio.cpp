@@ -383,8 +383,13 @@ boolean OP_Radio::GetCommands()
             // radio has them. If you do so, this will be automatically disabled by setting UsingSpecialPositions = false.
             if (UsingSpecialPositions) 
             {
-                if (SpecialStick.Position != MC) { Sticks.Elevation.ignore = Sticks.Azimuth.ignore = true; }
-                else
+                if (SpecialStick.Position != MC) 
+                {   // MC (middle center) covers the stick centered position but also the entire analog range of movement up to the actual corner limits. 
+                    // So if SpecialStick is _not_ MC, that means it is at one of the extremes, and regardless of whether we have any ignoreTurretDelay set, 
+                    // we want to ignore the stick movement at these points, and apply only the special stick command. 
+                    Sticks.Elevation.ignore = Sticks.Azimuth.ignore = true; 
+                }
+                else if (ignoreTurretDelay_mS > 0)  // The rest only applies to stick movements right when they begin to leave center, and we only ignore them briefly if ignoreTurretDelay_mS is not 0
                 {
                     // We do each stick separately, this is elevation
                     if (Sticks.Elevation.started) // If the stick was at center, but is now moving towards one of the edges
@@ -411,6 +416,12 @@ boolean OP_Radio::GetCommands()
                         // In this case we don't want to ignore it, so clear the ignore flag. 
                         if (radioTimer.isEnabled(IgnoreAzimuthTimerID) == false) { Sticks.Azimuth.ignore = false; }
                     }    
+                }
+                else
+                {   // In this case special stick position is MC so we don't have to worry about that, and the ignoreTurretDelay_mS is 0 so we
+                    // don't do any delay ignoring either. 
+                    Sticks.Elevation.ignore = false;
+                    Sticks.Azimuth.ignore = false;
                 }
             }
     
