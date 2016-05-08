@@ -1,4 +1,4 @@
-![Open Panzer](http://www.openpanzer.org/images/github/openpanzertcb.png)
+![Open Panzer](http://www.openpanzer.org/images/github/tcb_intro_git.jpg)
 # Introduction
   * [Open Panzer](http://www.openpanzer.org) is a community project to develop open source products for the RC tank market. 
   * The TCB (tank control board) is a highly capable circuit board designed specifically for RC model tanks, but also suitable for halftracks, cars, or even battleships. The hardware is based on an ATmega 2560 processor and the firmware consists of an Arduino sketch as well as various C++ libraries. The repository you are in now contains the TCB source code. 
