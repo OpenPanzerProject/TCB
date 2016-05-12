@@ -238,7 +238,7 @@ void DumpDriveSettings()
     PrintDebugLine();
     DebugSerial->println(F("DRIVE SETTINGS"));
     PrintDebugLine();
-    DebugSerial->print(F("Accel Ramp Enabled:     ")); PrintYesNo(eeprom.ramcopy.AccelRampEnabled);
+    DebugSerial->print(F("Accel Ramp Enabled:     ")); PrintYesNo(eeprom.ramcopy.AccelRampEnabled); 
     if (eeprom.ramcopy.AccelRampEnabled) 
     { 
         DebugSerial->print(F(" (Level: ")); 
@@ -251,9 +251,10 @@ void DumpDriveSettings()
         }
         DebugSerial->print(F(", Preset: ")); 
         DebugSerial->print(eeprom.ramcopy.AccelPreset, DEC);
-        DebugSerial->println(F(")"));
+        DebugSerial->print(F(")"));
     }
-    DebugSerial->print(F("Decel Ramp Enabled:     ")); PrintYesNo(eeprom.ramcopy.DecelRampEnabled);
+    DebugSerial->println();
+    DebugSerial->print(F("Decel Ramp Enabled:     ")); PrintYesNo(eeprom.ramcopy.DecelRampEnabled); 
     if (eeprom.ramcopy.DecelRampEnabled) 
     { 
         DebugSerial->print(F(" (Level: ")); 
@@ -266,8 +267,9 @@ void DumpDriveSettings()
         }
         DebugSerial->print(F(", Preset: ")); 
         DebugSerial->print(eeprom.ramcopy.DecelPreset, DEC);
-        DebugSerial->println(F(")"));
+        DebugSerial->print(F(")"));
     }
+    DebugSerial->println();
     DebugSerial->print(F("Motor Nudge Enabled:    ")); 
     if (eeprom.ramcopy.MotorNudgePct == 0) PrintLnYesNo(false);
     else
