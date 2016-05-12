@@ -897,8 +897,15 @@ if (Startup)
                         {   
                             // Ok, we have enough times in a row to allow a transition, but now we need to check it against the transition time constraint. 
                             // This is a user-setting that limits how quicky the tank can change directions, for example from forward to reverse
-                            if (DriveFlag == false && (((millis() - TransitionStart) >= eeprom.ramcopy.TimeToShift_mS) || (DriveMode_LastDirection == DriveModeCommand)))
-                            {   // Enough time at stop has passed that we allow a change to another drive mode (or we are going in the same direction we were previously)
+                            if (eeprom.ramcopy.TimeToShift_mS > 0) 
+                            {
+                                if (DriveFlag == false && (((millis() - TransitionStart) >= eeprom.ramcopy.TimeToShift_mS) || (DriveMode_LastDirection == DriveModeCommand)))
+                                {   // Enough time at stop has passed that we allow a change to another drive mode (or we are going in the same direction we were previously)
+                                    DriveFlag = true;
+                                }
+                            }
+                            else
+                            {   // If the user set TimeToShif_mS = 0 then there is no time constraint
                                 DriveFlag = true;
                             }
                             if (DriveFlag)
@@ -925,9 +932,18 @@ if (Startup)
         
                         // We could be commanding the opposite direction, in which case, we are braking
                         Braking = Driver.GetBrakeFlag(DriveModeActual, DriveModeCommand);
+                                             
+                        if (Braking && eeprom.ramcopy.TimeToShift_mS == 0 && !eeprom.ramcopy.DecelRampEnabled && !eeprom.ramcopy.AccelRampEnabled)
+                        {   // If brake flag is set we know we are presently going either forward or reverse and we have just commanded the opposite direction.
+                            // If TimeToShift_mS has been disabled (set to 0), and if there are no deceleration or acceleration constraints set, then allow the change directly without
+                            // coming to a stop first. This is not good for your gearboxes but if someone wants to do it, we allow them. 
+                            Braking = false;                    // Clear the brake flag, we are not going to brake, we are going to slam directly into the opposite direction
+                            DriveModeActual = DriveModeCommand; // Set actual to command. 
+                        }
                         
-                        // If not that, we are moving forward/reverse and are commanding a STOP or a NEUTRAL TURN
-                        // Either way, we ignore the new *mode* but proceed with the actual throttle command, which in fact will be zero. 
+                        // If we are not braking, we are moving forward/reverse and are commanding a STOP or a NEUTRAL TURN.
+                        // Either way, we ignore the new *mode* for now, but proceed with the actual throttle command, which in fact will be zero (no throttle command at stop or neutral turn).
+                        // We will set the DriveModeActual to STOP or NEUTRAL TURN once we have actually stopped or the neutral turn is allowed. 
                 }
             }
             else
