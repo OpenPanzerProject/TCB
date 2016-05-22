@@ -58,7 +58,7 @@ void OP_Sabertooth::command(byte command, byte value) const
 
 void OP_Sabertooth::throttleCommand(byte command, int speed) const
 {
-  speed = constrain(speed, -126, 126);
+  speed = constrain(speed, -127, 127);
   this->command(command, (byte)abs(speed));
 }
 
