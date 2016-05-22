@@ -94,9 +94,6 @@ const PROGMEM uint16_t TaigenSig[Taigen_BITS+1] = {Taigen_MARK, Taigen_SPACE, Ta
 #define VsTank_TIMESTOSEND  5       // VSTank repeats their signal five times which takes about 1/8th of a second. 
 #define VsTank_HIT_VALUE    91      // 0x5B
 
-#define WALTERSON72_TEAM_A_VALUE    1   // THESE VALUES ARE ONLY PLACEHOLDERS. 
-#define WALTERSON72_TEAM_B_VALUE    2   // FILL IN WITH EXACT VALUES LATER
-
 #define Clark_REPAIR_CODE   16
 #define Clark_MG_CODE       1040
 #define Clark_REPAIR_TIMESTOSEND 3  // Clark only sends the repair code once. We increase it to at least 3, but more wouldn't hurt. 
