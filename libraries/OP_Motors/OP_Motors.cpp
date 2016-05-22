@@ -135,12 +135,7 @@ void Sabertooth_SerialESC::begin(void)
     // For the 2x5, valid baud rates for packetized serial are 2400, 9600, 19200, and 38400. Some of the other controllers (2x60 for example)
     // can also work at 115200. For "simple serial" the baud rate can be set manually with dip-switches on the Sabertooth device, but 
     // we are not using "simple serial" mode, we are using packetized serial. Those same switches in packetized serial mode now set the address! 
-    
-    // The dipswitches on the Sabertooth should be set as such:
-    // 1 - 3 OFF
-    // 4 - 6 ON if using the controller for drive motors
-    // 4 - 6 OFF is using the controller for turret motors
-    
+        
     // 9600 is the default baud rate for Sabertooth packet serial for all their products, however, it does not work well with Arduino! 
     // 38400 works fine in testing. 19200 may also work but faster is better. 
     // For purposes of Open Panzer, 38400 is the recommended baud rate (for all serial controllers).
@@ -197,7 +192,13 @@ void Sabertooth_SerialESC::stop(void)
 // ------------------------------------------------------------------------------------------------------------------>>
 void OPScout_SerialESC::begin(void)
 {
-    //
+    // Initialize motor serial
+    // The Scout ESC doesn't have auto-baud, instead the rate is set by dipswitches on the device. So we assume the user has set both the TCB (via OP Config) 
+    // and the Scout (via dipswitches) to the same baud rate. 
+
+    // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
+    set_InternalRange(-127,127, 0);
+    set_DefaultInternalRange(-127,127, 0);
 }
 
 void OPScout_SerialESC::setSpeed(int s)
@@ -207,11 +208,23 @@ void OPScout_SerialESC::setSpeed(int s)
     
     // make sure we are using the internal range
     s = map_Range(s);
-}
+    
+    if (ESC_Position == SIDEA)
+    {   //SIDEA - Shown as "M1" on the Scout board
+        // Use for Left tread, or turret Rotation motor
+        OPScout_SerialESC::motor(1, s);
+    }
+    else if (ESC_Position == SIDEB)
+    {   //SIDEB - Shown as "M2" on Scout board
+        // Use for Right tread, or turret Elevation motor
+        OPScout_SerialESC::motor(2, s);
+    }
+}    
 
 void OPScout_SerialESC::stop(void)
 {
-
+    curspeed = 0;
+    OPScout_SerialESC::allStop();
 }
 
 
@@ -221,9 +234,9 @@ void OPScout_SerialESC::stop(void)
 // ------------------------------------------------------------------------------------------------------------------>>
 void Onboard_ESC::begin(void)
 {
-    // Set the internal speed range (min, max, middle). We are using 8 bit PWM so the values are 0-255
-        set_InternalRange(-255,255, 0);
-        set_DefaultInternalRange(-255,255, 0);
+    // Set the internal speed range (min, max, middle). We are using a custom TOP value for our PWM calculations, see OP_Settings.h (TOP = 381)
+        set_InternalRange(-MOTOR_PWM_TOP, MOTOR_PWM_TOP, 0);
+        set_DefaultInternalRange(-MOTOR_PWM_TOP, MOTOR_PWM_TOP, 0);
 
     // The onboard motor controller uses Timer5 for PWM. See OP_Settings.h for details. 
 
@@ -262,8 +275,7 @@ void Onboard_ESC::setSpeed(int s)
     // Note that "s" here is speed but is actually a PWM duty cycle applied to the EN (enable) pin of the motor driver. 
     // However according to the Atmega2560 datasheet (pg 156), the two extremes of the duty cycle setting are special cases:
     // If s = 0 then the pin will be set to low (for non-inverted mode, which is what we're using). In other words, no PWM. 
-    // Likewise if s = MAX (whatever our TOP value is, we are using WGM Mode 1 where TOP=255) then likewise no PWM will be coming out the 
-    // pin, it will simply be set to output high. 
+    // Likewise if s = MAX (whatever our TOP value is) then no PWM will be coming out the pin, it will simply be set to output high. 
     if (ESC_Position == SIDEA)
     {   //SIDEA - motor A
         if (s < 0)

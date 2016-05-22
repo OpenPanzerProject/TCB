@@ -41,6 +41,7 @@
 #include "OP_Servo.h"
 #include "OP_Sabertooth.h"
 #include "OP_PololuQik.h"
+#include "OP_Scout.h"
 
 // ESC Position type. Motor controllers we will be using (including the onboard L298) are all dual, so we have SIDEA and SIDEB.
 // We can also use servo outputs to control speed controllers, there are 8 possible positions for those. 
@@ -165,9 +166,9 @@ class Pololu_SerialESC: public Motor, public OP_PololuQik {
     static boolean sendAutobaud;
 };
 
-class OPScout_SerialESC: public Motor {
+class OPScout_SerialESC: public Motor, public OP_Scout {
   public:
-    OPScout_SerialESC(ESC_POS_t pos, int min, int max, int middle) : Motor(pos,min,max,middle) {}
+    OPScout_SerialESC(ESC_POS_t pos, int min, int max, int middle, byte addr, HardwareSerial *hwSerial) : Motor(pos,min,max,middle), OP_Scout(addr,hwSerial) {}
     void setSpeed(int s);
     void begin(void);
     void stop(void);
@@ -180,7 +181,6 @@ class Onboard_ESC: public Motor {
     void begin(void);   
     void stop(void);
 };
-
 
 class Onboard_Smoker: public Motor {
   public:

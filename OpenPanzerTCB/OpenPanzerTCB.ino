@@ -26,6 +26,7 @@
 #include "OP_Servo.h"
 #include "OP_Sabertooth.h"
 #include "OP_PololuQik.h"
+#include "OP_Scout.h"
 #include "OP_SimpleTimer.h"
 #include "OP_Driver.h"
 #include "OP_IRLib.h"

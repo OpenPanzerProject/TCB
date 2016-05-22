@@ -44,7 +44,7 @@ void InstantiateMotorObjects()
                 
             case OP_SCOUT:
                 // For a single rear drive motor, connect it to SIDE A
-                DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);    
+                DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
                 break;
     
             case ONBOARD:
@@ -89,8 +89,8 @@ void InstantiateMotorObjects()
                 break;
                 
             case OP_SCOUT:
-                LeftTread = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);    
-                RightTread = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                LeftTread = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
+                RightTread = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);
                 break;
     
             case ONBOARD:
@@ -157,7 +157,7 @@ void InstantiateMotorObjects()
              TurretRotation = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_TURRET_ID,&MotorSerial);
             break;
         case OP_SCOUT:
-            TurretRotation = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+            TurretRotation = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial);
             break;
         case ONBOARD:
             TurretRotation = new Onboard_ESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
@@ -200,7 +200,7 @@ void InstantiateMotorObjects()
             TurretElevation = new Pololu_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_TURRET_ID,&MotorSerial);
             break;
         case OP_SCOUT:
-            TurretElevation = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+            TurretElevation = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial);
             break;
         case ONBOARD:
             TurretElevation = new Onboard_ESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
