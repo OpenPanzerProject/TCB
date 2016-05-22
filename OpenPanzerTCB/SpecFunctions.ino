@@ -423,23 +423,29 @@ uint8_t SkipNum_from_AnalogInput(uint16_t val)
 }
 // These re-direct functions take care of mapping the analog value to the value expected by the accel/decel functions
 void SF_SetAccelRampFreq(uint16_t val)
-{ 
-    uint8_t sn = SkipNum_from_AnalogInput(val); 
-    // Only update if changed
-    if (sn != Driver.getAccelRampFrequency())
-    {
-        Driver.setAccelRampFrequency(sn); 
-        if (DEBUG) { DebugSerial->print(F("Set Accel Ramp Level: ")); DebugSerial->println(sn); } 
+{
+    if (eeprom.ramcopy.AccelRampEnabled)
+    { 
+        uint8_t sn = SkipNum_from_AnalogInput(val); 
+        // Only update if changed
+        if (sn != Driver.getAccelRampFrequency())
+        {
+            Driver.setAccelRampFrequency(sn); 
+            if (DEBUG) { DebugSerial->print(F("Set Accel Ramp Level: ")); DebugSerial->println(sn); } 
+        }
     }
 }
 void SF_SetDecelRampFreq(uint16_t val)
 { 
-    uint8_t sn = SkipNum_from_AnalogInput(val); 
-    // Only update if changed
-    if (sn != Driver.getDecelRampFrequency())
-    {
-        Driver.setDecelRampFrequency(sn); 
-        if (DEBUG) { DebugSerial->print(F("Set Decel Ramp Level: ")); DebugSerial->println(sn); }
+    if (eeprom.ramcopy.DecelRampEnabled)
+    { 
+        uint8_t sn = SkipNum_from_AnalogInput(val); 
+        // Only update if changed
+        if (sn != Driver.getDecelRampFrequency())
+        {
+            Driver.setDecelRampFrequency(sn); 
+            if (DEBUG) { DebugSerial->print(F("Set Decel Ramp Level: ")); DebugSerial->println(sn); }
+        }
     }
 }
 
