@@ -123,8 +123,8 @@ void PPMDecode::clearTicks()
 }
 
 void PPMDecode::shutdown()
-{   // If we end up using SBus input instead, we will want to disable the interrupt function of this pin,
-    // otherwise the SBus would be setting it off
+{   // If we end up using a different radio protocol instead, we will want to disable the interrupt function of this pin,
+    // otherwise the iBus would be setting it off
     EIMSK &= ~(1 << INT5);  // Disable interrupt 5  
     EIFR |= (1 << INTF5);   // Clear any interrupt flag (clear by writing logic one to bit)
     
