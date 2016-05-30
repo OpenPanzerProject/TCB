@@ -101,7 +101,7 @@
     //    last signal, it knows how long the pulse-width is
     // [] OP_Servos - uses Timer 1's Output Compare A to set a timed interrupt to generate servo pulse widths
     // [] IRsendBase - uses Timer 1's Output Compare B to set a timed interrupt to generate infra-red pulses. IRsend also uses Timer 2 for the actual PWM.
-    // [] SBusDecode - uses Timer 1's Output Compare C to set a timed interrupt that we use for error checking of the incoming pulse stream
+    // [] SBusDecode/iBusDecode - uses Timer 1's Output Compare C to set a timed interrupt that we use for error checking of the incoming pulse stream
 
     // We set up Timer 1 in Normal Mode: count starts from BOTTOM (0), goes to TOP (0xFFFF / 65,535), then rolls over. 
     // We set prescaler to 8. With a 16MHz clock that gives us 1 clock tick every 0.5 uS (0.0000005 seconds).
@@ -187,28 +187,25 @@
     // Prescaler settings for PWM frequency:
     // - On the Mega, for 16 bit timers only 1, 3, 4, and 5 (not timers 0 or 2), 
     // - using 16mHz system clock, 
-    // - Phase correct PWM with TOP at 255
-    /*  
-        If TCCRnB = xxxxx000, no clock, timer stopped
-        If TCCRnB = xxxxx001, frequency is 31.37kHz - no prescaling                     0.0625 uS per tick
-        If TCCRnB = xxxxx010, frequency is 3.92 kHz - prescaler 8 (clock/8)             0.5 uS per tick
-        If TCCRnB = xxxxx011, frequency is 490   Hz - prescaler 64 (Arduino default)    4 uS per tick
-        If TCCRnB = xxxxx100, frequency is 123   Hz - prescaler 256                     16 uS per tick
-        If TCCRnB = xxxxx101, frequency is 31    Hz - prescaler 1024                    64 uS per tick
-        If TCCRnB = xxxxx11x, external clock source, we don't care about. 
-    
-        PWM frequency can be adjusted even more precisely by setting a custom TOP value - 
-        But this can come at a reduction in PWM duty cycle resolution:      
-        For example you could get 20kHz exactly by setting the prescaler to 8 and the TOP value to 50, but then duty cycle
-        would be 0-50, not 0-255. Basically keeping TOP at 255, prescaler of 1 gives us the best result (~31kHZ).
-        Or you could increase TOP to 7-bit (511) thus doubling your duty-cycle, and lowering the frequency at prescaler=1 to
-        15.6kHz. But we don't need 511 bits of resolution and 15.6kHz is still under 20kHz (but would still probably be rather quiet in practice). 
-    */
+    // - Phase correct PWM with TOP at 255 (8-bit)
+    //
+    //    If TCCRnB = xxxxx000, no clock, timer stopped
+    //    If TCCRnB = xxxxx001, frequency is 31.37kHz - no prescaling                     0.0625 uS per tick
+    //    If TCCRnB = xxxxx010, frequency is 3.92 kHz - prescaler 8 (clock/8)             0.5 uS per tick
+    //    If TCCRnB = xxxxx011, frequency is 490   Hz - prescaler 64 (Arduino default)    4 uS per tick
+    //    If TCCRnB = xxxxx100, frequency is 123   Hz - prescaler 256                     16 uS per tick
+    //    If TCCRnB = xxxxx101, frequency is 31    Hz - prescaler 1024                    64 uS per tick
+    //    If TCCRnB = xxxxx11x, external clock source, we don't care about. 
+    //
+    // PWM frequency can be adjusted even more precisely by setting a custom TOP value - for example the Scout ESC uses a custom TOP
+    // to generate PWM near 20KHz, but it has an odd duty cycle range of 0-381. We can do the same here if we find 31KHz creates too much heat
+    // but the turret motors are low current and in testing so far it has not been an issue. The convenient aspect of this arrangement is that our
+    // duty cycle is 0-255 which is the same as our motor speed range. 
     
     // Several settings need to be made 
     // Waveform Generation Mode bits (WGM): split across TCCRnA and TCCRnB. These set the PWM modes, there are three possible (in addition to Normal): 
     //      Fast PWM, Phase Correct PWM, or Phase and Frequency Correct PWM. We will use Phase Correct where TOP is 255
-    // Clock Select: three bits which control the control the prescaler, we want prescaler of 1/none to achieve ultrasonic frequencey. Prescaler is set with last three bits of 
+    // Clock Select: three bits which control the prescaler, we want prescaler of 1 (none) to achieve the frequency shown above. Prescaler is set with last three bits of 
     //      TCCRnB (CSn2, CSn1, CSn0)
     // Compare Match Output A,B, C Mode bits (COMnA,B,C): these enable/disable/invert outputs A,B,C
     //      Two bits each, in TCCRnA register
@@ -227,6 +224,7 @@
     //OCR5B = 0-255;    // To set duty cycle on Arduino pin 45
     //OCR5C = 0-255;    // To set duty cycle on Arduino pin 44
 
+    #define MOTOR_PWM_TOP 255       // In case we decide to change it later, we won't have to modify the Onboard_ESC object since it will refer to this define.
     #define SetupTimer5() ({ \  
         TCCR5A = 0xA9;       \
         TCCR5B = 0x01;       \
@@ -236,7 +234,6 @@
         OCR5A = 0;           \
         OCR5B = 0;           \
         OCR5C = 0;  })
-
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -263,8 +260,8 @@
     // Multiple Sabertooth devices:
     // Sabertooth ESCs have address values from 128-135 set by dipswitches on the device
     // We use address 128 (default) for the drive motors, 135 for turret motors
-    #define Sabertooth_DRIVE_Address    128     // On the Sabertooth, set dipswitches 1-3 OFF, 4-6 ON
-    #define Sabertooth_TURRET_Address   135     // On the Sabertooth, set dipswitches 1-6 OFF
+    #define Sabertooth_DRIVE_Address    128     // On the Sabertooth, set dipswitches 1-2 OFF, 3-6 ON
+    #define Sabertooth_TURRET_Address   135     // On the Sabertooth, set dipswitche 3 ON, all the others OFF
 
     // Multiple Pololu Qik devices:
     // Pololu Qik ESCs have address (they call it Device ID) values from 0-127
@@ -273,6 +270,14 @@
     #define Pololu_DRIVE_ID             10  
     #define Pololu_TURRET_ID            13  
 
+    // Multiple Open Panzer Scout ESCs: 
+    // The Scout ESC has two possible addresses set by a switch on the device.
+    // We use Address A for the drive motors, and B for the turret motors.
+    // The Scout uses the same protocol as the Dimension Engineering Sabertooth controllers, and these addresses are valid Sabertooth 
+    // addresses, just not the same Sabertooth addresses we use for the TCB. 
+    #define OPScout_DRIVE_Address       131     // Set Address switch to Position A
+    #define OPScout_TURRET_Address      132     // Set Address switch to Position B
+    
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // MOTOR DRIVERS - GENERAL

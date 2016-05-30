@@ -193,8 +193,7 @@ void Sabertooth_SerialESC::stop(void)
 void OPScout_SerialESC::begin(void)
 {
     // Initialize motor serial
-    // The Scout ESC doesn't have auto-baud, instead the rate is set by dipswitches on the device. So we assume the user has set both the TCB (via OP Config) 
-    // and the Scout (via dipswitches) to the same baud rate. 
+    // The Scout ESC doesn't have auto-baud, so we assume the user has set the TCB (via OP Config) to the correct rate. 
 
     // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
     set_InternalRange(-127,127, 0);
@@ -234,7 +233,7 @@ void OPScout_SerialESC::stop(void)
 // ------------------------------------------------------------------------------------------------------------------>>
 void Onboard_ESC::begin(void)
 {
-    // Set the internal speed range (min, max, middle). We are using a custom TOP value for our PWM calculations, see OP_Settings.h (TOP = 381)
+    // Set the internal speed range (min, max, middle), this is defined by the TOP value for our PWM calculations, see OP_Settings.h 
         set_InternalRange(-MOTOR_PWM_TOP, MOTOR_PWM_TOP, 0);
         set_DefaultInternalRange(-MOTOR_PWM_TOP, MOTOR_PWM_TOP, 0);
 
