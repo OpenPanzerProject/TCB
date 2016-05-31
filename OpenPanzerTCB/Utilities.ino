@@ -234,39 +234,49 @@ void DumpMotorInfo()
 
 void DumpDriveSettings()
 {
+boolean Profile_1; 
+boolean AccelRampEnabled;
+boolean DecelRampEnabled;
+
+if (DrivingProfile == 2) Profile_1 = false;
+else                     Profile_1 = true; 
+Profile_1 ? AccelRampEnabled = eeprom.ramcopy.AccelRampEnabled_1 : AccelRampEnabled = eeprom.ramcopy.AccelRampEnabled_2; 
+Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_2; 
+    
     DebugSerial->println();
     PrintDebugLine();
     DebugSerial->println(F("DRIVE SETTINGS"));
     PrintDebugLine();
-    DebugSerial->print(F("Accel Ramp Enabled:     ")); PrintYesNo(eeprom.ramcopy.AccelRampEnabled); 
-    if (eeprom.ramcopy.AccelRampEnabled) 
+    DebugSerial->print(F("Active Driving Profile: ")); DebugSerial->println(DrivingProfile);
+    DebugSerial->print(F("Accel Ramp Enabled:     ")); PrintYesNo(AccelRampEnabled); 
+    if (AccelRampEnabled) 
     { 
         DebugSerial->print(F(" (Level: ")); 
-        DebugSerial->print(eeprom.ramcopy.AccelSkipNum); 
-        if (eeprom.ramcopy.AccelSkipNum != Driver.getAccelRampFrequency())
+        Profile_1 ? DebugSerial->print(eeprom.ramcopy.AccelSkipNum_1) : DebugSerial->print(eeprom.ramcopy.AccelSkipNum_2); 
+        if ((Profile_1 == true && eeprom.ramcopy.AccelSkipNum_1 != Driver.getAccelRampFrequency()) || (Profile_1 == false && eeprom.ramcopy.AccelSkipNum_2 != Driver.getAccelRampFrequency()))
         {
             DebugSerial->print(F(" (Adjusted to "));
             DebugSerial->print(Driver.getAccelRampFrequency());
             DebugSerial->print(F(")")); 
         }
         DebugSerial->print(F(", Preset: ")); 
-        DebugSerial->print(eeprom.ramcopy.AccelPreset, DEC);
+        Profile_1 ? DebugSerial->print(eeprom.ramcopy.AccelPreset_1, DEC) : DebugSerial->print(eeprom.ramcopy.AccelPreset_2, DEC);
         DebugSerial->print(F(")"));
     }
     DebugSerial->println();
-    DebugSerial->print(F("Decel Ramp Enabled:     ")); PrintYesNo(eeprom.ramcopy.DecelRampEnabled); 
-    if (eeprom.ramcopy.DecelRampEnabled) 
+    DebugSerial->print(F("Decel Ramp Enabled:     ")); PrintYesNo(DecelRampEnabled); 
+    if (DecelRampEnabled) 
     { 
         DebugSerial->print(F(" (Level: ")); 
-        DebugSerial->print(eeprom.ramcopy.DecelSkipNum); 
-        if (eeprom.ramcopy.DecelSkipNum != Driver.getDecelRampFrequency())
+        Profile_1 ? DebugSerial->print(eeprom.ramcopy.DecelSkipNum_1) : DebugSerial->print(eeprom.ramcopy.DecelSkipNum_2); 
+        if ((Profile_1 == true && eeprom.ramcopy.DecelSkipNum_1 != Driver.getDecelRampFrequency()) || (Profile_1 == false && eeprom.ramcopy.DecelSkipNum_2 != Driver.getDecelRampFrequency()))
         {
             DebugSerial->print(F(" (Adjusted to "));
             DebugSerial->print(Driver.getDecelRampFrequency());
             DebugSerial->print(F(")")); 
         }
         DebugSerial->print(F(", Preset: ")); 
-        DebugSerial->print(eeprom.ramcopy.DecelPreset, DEC);
+        Profile_1 ? DebugSerial->print(eeprom.ramcopy.DecelPreset_1, DEC) : DebugSerial->print(eeprom.ramcopy.DecelPreset_2, DEC);
         DebugSerial->print(F(")"));
     }
     DebugSerial->println();

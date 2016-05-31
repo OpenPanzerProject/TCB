@@ -445,14 +445,21 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.SmokerIdleSpeed = 89;           // 35 percent
         ramcopy.SmokerFastIdleSpeed = 128;      // 50 percent
         ramcopy.SmokerMaxSpeed = 255;           // 100 percent
+        ramcopy.SmokerDestroyedSpeed = 255;     // 100 percent
 
     // Driving adjustments
-        ramcopy.AccelRampEnabled = true;
-        ramcopy.AccelSkipNum = 4;
-        ramcopy.AccelPreset = 0;
-        ramcopy.DecelRampEnabled = true;
-        ramcopy.DecelSkipNum = 4;
-        ramcopy.DecelPreset = 0;
+        ramcopy.AccelRampEnabled_1 = true;      // Profile 1 settings - mild
+        ramcopy.AccelSkipNum_1 = 4;
+        ramcopy.AccelPreset_1 = 0;
+        ramcopy.DecelRampEnabled_1 = true;
+        ramcopy.DecelSkipNum_1 = 4;
+        ramcopy.DecelPreset_1 = 0;
+        ramcopy.AccelRampEnabled_2 = false;     // Profile 2 settings - nothing
+        ramcopy.AccelSkipNum_2 = 1;
+        ramcopy.AccelPreset_2 = 0;
+        ramcopy.DecelRampEnabled_2 = false;
+        ramcopy.DecelSkipNum_2 = 1;
+        ramcopy.DecelPreset_2 = 0;          
         ramcopy.BrakeSensitivityPct = 40;       // NOT PRESENTLY IMPLEMENTED
         ramcopy.TimeToShift_mS = 1000;          // Default to 1 second
         ramcopy.EnginePauseTime_mS = 1000;      // Default to 1 second

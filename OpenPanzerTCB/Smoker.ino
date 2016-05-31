@@ -44,6 +44,14 @@ void Smoker_RestoreSpeed(void)
         Smoker->restore_Speed(); 
     }
 }
+void Smoker_SetDestroyedSpeed()
+{
+    if (eeprom.ramcopy.SmokerControlAuto && eeprom.ramcopy.SmokerDestroyedSpeed > 0)
+    {
+        Smoker->restore_Speed();    // The speed range may have been diminished during battle, we want to restore the full range
+        Smoker->setSpeed(eeprom.ramcopy.SmokerDestroyedSpeed);  // Now apply the user's smoker speed setting for when the tank is destroyed
+    }
+}
 
 // This function is called if the user wants to control the smoker output manually. Any motor could be attached to the output and run 
 // in a single direction at variable speed with an analog input. 

@@ -124,6 +124,7 @@
     int IdleOffTimerID = 0;                       // User has the option of setting a length of time, after which, if the engine has been idle the whole time, the engine will automatically turn off. 
 
 // DRIVING ADJUSTMENTS
+    uint8_t DrivingProfile = 1;                   // There are 2 driving profiles possible - we default to 1, but if the user implements a special function they can change it to 2 (alternate) on the fly
     boolean Nudge = false;                        // We can nudge the motors when first moving from a stop, for a crisper response. When the Nudge flag is true, the nudge effect will be active. 
 
 // INERTIAL MEASUREMENT UNIT (IMU)
@@ -234,13 +235,8 @@ void setup()
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
-                     eeprom.ramcopy.NeutralTurnAllowed, 
-                     eeprom.ramcopy.AccelRampEnabled, 
-                     eeprom.ramcopy.DecelRampEnabled, 
-                     eeprom.ramcopy.AccelSkipNum, 
-                     eeprom.ramcopy.DecelSkipNum,
-                     eeprom.ramcopy.AccelPreset,
-                     eeprom.ramcopy.DecelPreset);                     
+                     eeprom.ramcopy.NeutralTurnAllowed);
+        SetDrivingProfile(DrivingProfile);   // See Driving tab
         TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
         TankTransmission.begin(SAVE_DEBUG, DebugSerial);
         TankSound.begin();
@@ -934,7 +930,7 @@ if (Startup)
                         // We could be commanding the opposite direction, in which case, we are braking
                         Braking = Driver.GetBrakeFlag(DriveModeActual, DriveModeCommand);
                                              
-                        if (Braking && eeprom.ramcopy.TimeToShift_mS == 0 && !eeprom.ramcopy.DecelRampEnabled && !eeprom.ramcopy.AccelRampEnabled)
+                        if (Braking && eeprom.ramcopy.TimeToShift_mS == 0 && Driver.isDecelRampEnabled() == false && Driver.isAccelRampEnabled() == false)
                         {   // If brake flag is set we know we are presently going either forward or reverse and we have just commanded the opposite direction.
                             // If TimeToShift_mS has been disabled (set to 0), and if there are no deceleration or acceleration constraints set, then allow the change directly without
                             // coming to a stop first. This is not good for your gearboxes but if someone wants to do it, we allow them. 
@@ -1315,6 +1311,8 @@ if (Startup)
             if (DEBUG) { DebugSerial->println(F("TANK DESTROYED")); }
             Alive = false;
             StopEverything();
+            // But we might not want to stop the smoker, the user can set it to run while the tank is destroyed. 
+            Smoker_SetDestroyedSpeed();
         }
     }
 
@@ -1340,7 +1338,7 @@ if (Startup)
     if (!Alive && !Tank.isDestroyed && HavePower)
     {   // We're now alive
             Alive = true;
-        // While battling, the motors had their speed cut to simulate damage. Now restore them. 
+        // While battling, the motors had their speed range cut to simulate damage. Now restore to full range - this doesn't actually set a speed, it just restores the speed *range* 
         // The actual motors will differ depending on the vehicle type. 
             if (eeprom.ramcopy.DriveType != DT_CAR)
             {

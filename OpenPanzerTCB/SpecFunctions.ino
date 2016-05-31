@@ -103,6 +103,9 @@ void LoadFunctionTriggers()
                 case SF_NT_ENABLE:                  SF_Callback[i] = &SF_NT_Enable;                                 break;
                 case SF_NT_DISABLE:                 SF_Callback[i] = &SF_NT_Disable;                                break;
                 case SF_NT_TOGGLE:                  SF_Callback[i] = &SF_NT_Toggle;                                 break;
+                case SF_DRIVEPROFILE_1:             SF_Callback[i] = &SF_DriveProfile_1;                            break;
+                case SF_DRIVEPROFILE_2:             SF_Callback[i] = &SF_DriveProfile_2;                            break;
+                case SF_DRIVEPROFILE_TOGGLE:        SF_Callback[i] = &SF_DriveProfile_Toggle;                       break;
             }
         }
     }
@@ -387,6 +390,9 @@ void SF_HillPhysics_Toggle(uint16_t ignoreMe)   { ToggleHillPhysics();      }
 void SF_UserFunc1(uint16_t ignoreMe)            { UserFunction1();          }
 void SF_UserFunc2(uint16_t ignoreMe)            { UserFunction2();          }
 void SF_DumpDebug(uint16_t ignoreMe)            { DumpSysInfo();            }
+void SF_DriveProfile_1(uint16_t ignoreMe)       { SetDrivingProfile(1);     }
+void SF_DriveProfile_2(uint16_t ignoreMe)       { SetDrivingProfile(2);     }
+void SF_DriveProfile_Toggle(uint16_t ignoreMe)  { ToggleDrivingProfile();   }
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -424,7 +430,7 @@ uint8_t SkipNum_from_AnalogInput(uint16_t val)
 // These re-direct functions take care of mapping the analog value to the value expected by the accel/decel functions
 void SF_SetAccelRampFreq(uint16_t val)
 {
-    if (eeprom.ramcopy.AccelRampEnabled)
+    if ((DrivingProfile == 1 && eeprom.ramcopy.AccelRampEnabled_1) || (DrivingProfile == 2 && eeprom.ramcopy.AccelRampEnabled_2))
     { 
         uint8_t sn = SkipNum_from_AnalogInput(val); 
         // Only update if changed
@@ -437,7 +443,7 @@ void SF_SetAccelRampFreq(uint16_t val)
 }
 void SF_SetDecelRampFreq(uint16_t val)
 { 
-    if (eeprom.ramcopy.DecelRampEnabled)
+    if ((DrivingProfile == 1 && eeprom.ramcopy.DecelRampEnabled_1) || (DrivingProfile == 2 && eeprom.ramcopy.DecelRampEnabled_2))
     { 
         uint8_t sn = SkipNum_from_AnalogInput(val); 
         // Only update if changed
@@ -532,7 +538,7 @@ void MotorB_ManualControl(uint16_t level)
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // The user is able to modify several variables on the fly that also have default values in EEPROM. Although we don't want to update EEPROM
 // every time an adjustment is made, because that would wear out the EEPROM, we do want to save them in certain cases. 
-// A) The user presses the input button - this causes a save before we dump the sytem info. 
+// A) The user presses the input button - this causes a save before we dump the system info. 
 // That's the only case for now... but we might think of others. 
 void SaveAdjustments()
 {
@@ -541,10 +547,20 @@ void SaveAdjustments()
     EEPROM.updateByte(offsetof(_eeprom_data, TurnMode), eeprom.ramcopy.TurnMode);
 
     // Accel/Decel Level
-    eeprom.ramcopy.AccelSkipNum = Driver.getAccelRampFrequency();
-    EEPROM.updateByte(offsetof(_eeprom_data, AccelSkipNum), eeprom.ramcopy.AccelSkipNum);
-    eeprom.ramcopy.DecelSkipNum = Driver.getDecelRampFrequency();
-    EEPROM.updateByte(offsetof(_eeprom_data, DecelSkipNum), eeprom.ramcopy.DecelSkipNum);
+    if (DrivingProfile == 1)
+    {
+        eeprom.ramcopy.AccelSkipNum_1 = Driver.getAccelRampFrequency();
+        EEPROM.updateByte(offsetof(_eeprom_data, AccelSkipNum_1), eeprom.ramcopy.AccelSkipNum_1);
+        eeprom.ramcopy.DecelSkipNum_1 = Driver.getDecelRampFrequency();
+        EEPROM.updateByte(offsetof(_eeprom_data, DecelSkipNum_1), eeprom.ramcopy.DecelSkipNum_1);
+    }
+    else
+    {
+        eeprom.ramcopy.AccelSkipNum_2 = Driver.getAccelRampFrequency();
+        EEPROM.updateByte(offsetof(_eeprom_data, AccelSkipNum_2), eeprom.ramcopy.AccelSkipNum_2);
+        eeprom.ramcopy.DecelSkipNum_2 = Driver.getDecelRampFrequency();
+        EEPROM.updateByte(offsetof(_eeprom_data, DecelSkipNum_2), eeprom.ramcopy.DecelSkipNum_2);
+    }
     
     // Barrel stabilization/Hill physics sensitivity
     eeprom.ramcopy.BarrelSensitivity = BarrelSensitivity;

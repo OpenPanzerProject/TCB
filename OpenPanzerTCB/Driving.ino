@@ -7,6 +7,51 @@ void Nudge_End()
 }
 
 
+// SPECIAL FUNCTIONS: Driving Profile
+// -------------------------------------------------------------------------------------------------------------------------------------------------->
+void SetDrivingProfile(uint8_t profile)
+{
+    if (profile == 2)
+    {
+        Driver.setDrivingProfileSettings(
+                 eeprom.ramcopy.AccelRampEnabled_2, 
+                 eeprom.ramcopy.DecelRampEnabled_2, 
+                 eeprom.ramcopy.AccelPreset_2,
+                 eeprom.ramcopy.DecelPreset_2,
+                 eeprom.ramcopy.AccelSkipNum_2, 
+                 eeprom.ramcopy.DecelSkipNum_2);            
+    }
+    else
+    {
+        Driver.setDrivingProfileSettings(
+                 eeprom.ramcopy.AccelRampEnabled_1, 
+                 eeprom.ramcopy.DecelRampEnabled_1, 
+                 eeprom.ramcopy.AccelPreset_1,
+                 eeprom.ramcopy.DecelPreset_1,
+                 eeprom.ramcopy.AccelSkipNum_1, 
+                 eeprom.ramcopy.DecelSkipNum_1);
+    }
+
+    // Update our global variable
+    if (profile != DrivingProfile)
+    {
+        DrivingProfile = profile;
+
+        if (DEBUG)
+        {
+            DebugSerial->print(F("Driving Profile set to #"));
+            DebugSerial->println(profile);
+        }
+    }
+}
+
+void ToggleDrivingProfile(void)
+{
+    if (DrivingProfile == 1) SetDrivingProfile(2);
+    else                     SetDrivingProfile(1);
+}
+
+
 // SPECIAL FUNCTIONS: Engine
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void EngineOn()

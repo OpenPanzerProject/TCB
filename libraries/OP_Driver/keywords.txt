@@ -17,60 +17,37 @@ OP_Transmission	KEYWORD1
 # KEYWORD2 - Methods, functions, members
 #-------------------------------------------------------------
 begin	KEYWORD2
-
-OCR3A_ISR	KEYWORD2
-
+setDrivingProfileSettings   KEYWORD2
 GetBrakeFlag	KEYWORD2
-
 GetDriveMode	KEYWORD2
-
+isAccelRampEnabled  KEYWORD2
+isDecelRampEnabled  KEYWORD2
 setAccelRampFrequency	KEYWORD2
-
 getAccelRampFrequency	KEYWORD2
-
 setDecelRampFrequency	KEYWORD2
-
 getDecelRampFrequency	KEYWORD2
-
 setTurnMode	KEYWORD2
-
 getTurnMode	KEYWORD2
 setNeutralTurnAllowed	KEYWORD2
 getNeutralTurnAllowed	KEYWORD2
 GetDriveSpeed	KEYWORD2
-
 GetThrottleSpeed	KEYWORD2
-
 ScaleTurnCommand	KEYWORD2
-
 MixSteering	KEYWORD2
 
-
 begin	KEYWORD2
-
 Running	KEYWORD2
-
 StartEngine	KEYWORD2
-
 StopEngine	KEYWORD2
-
 UpdateTimer	KEYWORD2
-
 
 begin	KEYWORD2
-
 Engaged	KEYWORD2
-
-PUtInGear	KEYWORD2
-
+PutInGear	KEYWORD2
 PutInNeutral	KEYWORD2
-
-PUtInGear_Delay	KEYWORD2
-
+PutInGear_Delay	KEYWORD2
 DelayedGearComplete	KEYWORD2
-
 UpdateTimer	KEYWORD2
-
 
 
 #-------------------------------------------------------------

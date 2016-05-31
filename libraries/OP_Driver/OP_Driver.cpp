@@ -96,21 +96,13 @@ OP_Driver::OP_Driver(void)
     Forward_FullStopCmd = abs(MOTOR_MAX_REVSPEED) - COMPLETE_STOP_NEARLIMIT;
 }
 
-
-void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta, boolean are, boolean dre, uint8_t asn, uint8_t dsn, ACCEL_DRIVE_PRESET adp, DECEL_DRIVE_PRESET ddp)
+void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta)
 {
     DriveType = dt;                                 // Is this a tank with independent treads for steering? Or a halftrack with independent treads and also steerable front wheels?     
                                                     // Or a car with a single rear drive and steerable front wheels (also a halftrack with synchronized rear treads)
     TurnMode = tm;                                  // What turn mode to start off with
     NeutralTurnAllowed = nta;                       // Are neutral turns allowed
     
-    AccelRampEnabled = are;                         // This can be changed by the user. Even if enabled, ramping may not always be used in all conditions
-    DecelRampEnabled = dre;                         // UseDriveRamp will be the flag that indicates whether it is presently active. 
-    AccelPreset = adp;                              // Accel/decel presets 
-    DecelPreset = ddp;
-    AccelSkipNum = asn;                             // These are the number of interrupts to skip before incrementing the drive speed, when drive ramping is enabled.
-    DecelSkipNum = dsn;                             // The interrupt occurs 256 times a second, but we don't have to increment the speed each time. 
-
 
     // SET INTERRUPT FREQUENCY
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
@@ -197,6 +189,18 @@ void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta, boolean are, boolea
         //OP_Driver::DisableRampInterrupt();    // Start with the interrupt turned off
 }
 
+void OP_Driver::setDrivingProfileSettings(boolean are, boolean dre, ACCEL_DRIVE_PRESET adp, DECEL_DRIVE_PRESET ddp, uint8_t asn, uint8_t dsn)
+{
+    // We can have two "driving profiles" each with independent settings for accel/decel. But in this class we don't bother knowing anything about these profiles, rather
+    // we let the main sketch remember which one we're on, and if we change, call this function with the correct settings for the profile. This lets us keep only a single
+    // copy of the settings in this class. 
+    AccelRampEnabled = are;                         // This can be changed by the user. Even if enabled, ramping may not always be used in all conditions
+    DecelRampEnabled = dre;                         //     UseDriveRamp will be the flag that indicates whether it is presently active. 
+    AccelPreset = adp;                              // Accel/decel presets 
+    DecelPreset = ddp;
+    AccelSkipNum = asn;                             // These are the number of interrupts to skip before incrementing the drive speed, when drive ramping is enabled.
+    DecelSkipNum = dsn;                             // The interrupt occurs 256 times a second, but we don't have to increment the speed each time. 
+}
 
 void OP_Driver::SetRampInterrupt()
 {

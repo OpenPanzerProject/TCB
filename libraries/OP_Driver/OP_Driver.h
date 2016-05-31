@@ -82,10 +82,9 @@ public:
     OP_Driver(void);
 
     // Also configures timer3
-    static void begin(DRIVETYPE, uint8_t, boolean, boolean, boolean, uint8_t, uint8_t, ACCEL_DRIVE_PRESET, DECEL_DRIVE_PRESET); 
-    // Variables are: Drive type, Turn mode, Neutral turn allowed, accel ramp enabled, decel ramp enabled, 
-    // accel skip num, decel skip num, accel preset, decel preset
-
+    static void begin(DRIVETYPE, uint8_t, boolean);         // Variables are: Drive type, Turn mode, Neutral turn allowed
+    static void setDrivingProfileSettings(boolean, boolean, ACCEL_DRIVE_PRESET, DECEL_DRIVE_PRESET, uint8_t, uint8_t); // Variables are: accel ramp enabled, decel ramp enabled, accel preset, decel preset, accel skip num, decel skip num
+    
     // called by the timer interrupt service routine, see the cpp file for details.
     static void OCR3A_ISR(void);                            // The ISR simply adjusts RampedDriveSpeed/RampedThrottleSpeed by +/- Step
     
@@ -94,10 +93,12 @@ public:
     
 
     // We may want to change these on the fly
-    static void setAccelRampFrequency(uint8_t);         // Modify the acceleration ramp frequency. 
-    static uint8_t getAccelRampFrequency(void);         // Return
-    static void setDecelRampFrequency(uint8_t);         // Modify the deceleration ramp frequency. 
-    static uint8_t getDecelRampFrequency(void);         // Return
+    static boolean isAccelRampEnabled(void) { return AccelRampEnabled; }
+    static boolean isDecelRampEnabled(void) { return DecelRampEnabled; }
+    static void setAccelRampFrequency(uint8_t);             // Modify the acceleration ramp frequency. 
+    static uint8_t getAccelRampFrequency(void);             // Return
+    static void setDecelRampFrequency(uint8_t);             // Modify the deceleration ramp frequency. 
+    static uint8_t getDecelRampFrequency(void);             // Return
     static void setTurnMode(uint8_t);
     static uint8_t getTurnMode();
     static void setNeutralTurnAllowed(boolean);
