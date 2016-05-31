@@ -537,7 +537,7 @@ void OP_Radio::GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength
     
     uint8_t StartChan;
     uint8_t EndChan;
-    int16_t NewPulse[ChannelsUtilized];    // Temporary array of pulses
+    int16_t NewPulse[channelCount];        // Temporary array of pulses - in this case we always use all channels available, even if more than ChannelsUtilized
     String str = "";                       // String
 
     // Initialize total length
@@ -548,17 +548,17 @@ void OP_Radio::GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength
     {
         case PROTOCOL_PPM:
             HiLo = LOW; // By definition, PPM only goes up to 8 channels, so we only return the low 8 regardless of what was passed
-            PPMDecoder->GetPPM_Frame(NewPulse, ChannelsUtilized);
+            PPMDecoder->GetPPM_Frame(NewPulse, channelCount);
             break;
         
         case PROTOCOL_SBUS:
             // We will only call this function if we checked for a new frame first, so we don't need to poll SBus again here
-            SBusDecoder->GetSBus_Frame(NewPulse, ChannelsUtilized);
+            SBusDecoder->GetSBus_Frame(NewPulse, channelCount);
             break;      
 
         case PROTOCOL_iBUS:
             // We will only call this function if we checked for a new frame first, so we don't need to poll iBus again here
-            iBusDecoder->GetiBus_Frame(NewPulse, ChannelsUtilized);
+            iBusDecoder->GetiBus_Frame(NewPulse, channelCount);
             break;      
 
         case PROTOCOL_NONE:
@@ -571,10 +571,10 @@ void OP_Radio::GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength
     str.reserve(5*(COUNT_STRING_CHANNELS+1));   // Each channel can take up to 5 characters including delimiter. Set the string size 1 more than this to be safe.
     
     // Decide which (up to) 8 channels to send
-    if (ChannelsUtilized <= COUNT_STRING_CHANNELS)
+    if (channelCount <= COUNT_STRING_CHANNELS)
     {   // We can fit all channels into a single string
         StartChan = 0;
-        EndChan = ChannelsUtilized;
+        EndChan = channelCount;
     }
     else if (HiLo == LOW)
     {   // We have more channels than can fit, and we are only going to send the first half
@@ -584,7 +584,7 @@ void OP_Radio::GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength
     else if (HiLo == HIGH)
     {   // We have more channels than can fit, and we are sending all channels beyond the first half
         StartChan = COUNT_STRING_CHANNELS;
-        EndChan = ChannelsUtilized;
+        EndChan = channelCount;
     }
 
     // Create a sring of channels 

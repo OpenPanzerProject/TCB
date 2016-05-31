@@ -379,7 +379,7 @@ OP_PololuQik * Qik;
             else
             {   // Success, give the computer our number of channels, but first begin the radio object if it hasn't been already. 
                 if (!_radio->hasBegun()) _radio->begin(&_op_eeprom->ramcopy);  
-                GivePC_Int(PCCMD_NUM_CHANNELS, _radio->ChannelsUtilized);
+                GivePC_Int(PCCMD_NUM_CHANNELS, _radio->getChannelCount());
             }
             break;
         
@@ -413,7 +413,7 @@ OP_PololuQik * Qik;
                 prefixToByteArray(s, prefixString, VALUE_BUFF, prefixLength);   // Construct the sentence prefix: "Command|ID|"
 
                 // We may need two prefixes depending on if we're sending the first 8 channels or the second 8
-                if (_radio->ChannelsUtilized > 8)
+                if (_radio->getChannelCount() > 8)
                 {
                     altS.Command = DVCMD_RETURN_VALUE;
                     altS.ID = DVID_RADIOSTREAM_HI;                              // Let the PC know these are channels 9-(up to)16
@@ -459,7 +459,7 @@ OP_PololuQik * Qik;
                         _serial->flush();                       // This is supposed to wait until the transmission is done
                         
                         // Now if we have more than 8 channels to send, send the opposite 8 next time around
-                        if (_radio->ChannelsUtilized > 8) HiLo == LOW ? HiLo = HIGH : HiLo = LOW;
+                        if (_radio->getChannelCount() > 8) HiLo == LOW ? HiLo = HIGH : HiLo = LOW;
                     }
                     _radio->Update();                   // Update the radio
                     updateTimer();                      // Update the PC comm watchdog timer
