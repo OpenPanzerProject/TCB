@@ -27,6 +27,14 @@
 #include <Arduino.h>
 
 
+// Commands
+#define SCOUT_CMD_SET_FAN_SPEED             0x14    // 20
+#define SCOUT_CMD_SET_AUTO_FAN_CONTROL      0x15    // 21
+#define SCOUT_CMD_SET_MAX_CURRENT           0x16    // 22
+#define SCOUT_CMD_ENABLE_SERIAL_WATCHDOG    0x17    // 23
+#define SCOUT_CMD_DISABLE_SERIAL_WATCHDOG   0x18    // 24
+
+
 class OP_Scout
 {
 public:

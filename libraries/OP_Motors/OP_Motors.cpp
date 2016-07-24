@@ -195,6 +195,11 @@ void OPScout_SerialESC::begin(void)
     // Initialize motor serial
     // The Scout ESC doesn't have auto-baud, so we assume the user has set the TCB (via OP Config) to the correct rate. 
 
+    // Enable SerialWatchdog with a timeout of 1/2 second
+    // The function for converting watchdog time to command data is Value = (desired time in mS - 50) / 10 
+    // (500 - 50) / 10 = 45
+    OPScout_SerialESC::command(SCOUT_CMD_ENABLE_SERIAL_WATCHDOG, 45);    
+    
     // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
     set_InternalRange(-127,127, 0);
     set_DefaultInternalRange(-127,127, 0);

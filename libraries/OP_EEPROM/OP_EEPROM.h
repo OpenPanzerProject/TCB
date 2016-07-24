@@ -48,7 +48,7 @@
 // and the sketch will exhibit unstable behavior!
 // 
 
-    #define EEPROM_INIT             0xAA60
+    #define EEPROM_INIT             0xAA88
 //
 //
 //=======================================================================================================================================>>
