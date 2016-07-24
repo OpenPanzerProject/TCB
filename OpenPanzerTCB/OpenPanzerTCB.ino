@@ -1,7 +1,15 @@
 /* OpenPanzerTCB    Open Panzer Tank Control Board (TCB) firmware
  * Source:          openpanzer.org              
  * Authors:         Luke Middleton
+ * 
+ * Copyright 2016 Open Panzer
  *   
+ * For more information, see the Open Panzer Wiki:
+ * http://openpanzer.org/wiki/
+ * 
+ * TCB GitHub Repository:
+ * https://github.com/OpenPanzerProject/TCB
+ *    
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or

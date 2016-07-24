@@ -3,7 +3,7 @@
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void CheckVoltage(void)
 {
-    // LOW VOLTAGE c CUTOFF & BATTERY UNPLUGGED
+    // LOW VOLTAGE CUTOFF & BATTERY UNPLUGGED
     // ------------------------------------------------------------------------------------------------------------------------------------------------>  
     // The program starts with BatteryUnplugged set to true. We only do this check until the battery is first detected. Once it is, we don't check again. 
     // Even if the user later unplugs the battery, it will be considered an LVC condition. 
@@ -109,7 +109,7 @@ const float multiplier = 3.1277;    // Multiply this by our measured voltage and
 const float vAdj = 0.3;         // Our adjustment factor 
 
 // To reduce the effect of noise, we run our voltage through a low-pass filter.
-// With an alpha of 0.9, it is like giving the current reading a weight of 10%, and past readings a weight of 90%
+// With an alpha of 0.9, it is like giving the voltage reading a weight of 10%, and past readings a weight of 90%
 const float alpha = 0.9;
 
     // Ok, here we go: first take an analog reading (will give us a number between 0-1023)
@@ -122,7 +122,7 @@ const float alpha = 0.9;
     // Now convert the measured voltage to the external battery voltage by accounting for our voltage divider
         Voltage = filteredVoltage * multiplier;
     // Now also add our adjustment factor to account for the voltage drop on the input polarity diode
-        Voltage += 0.3;
+        Voltage += vAdj;
 
     // In testing this results in a pretty accurate reading
     // Takes about 700 microSeconds (0.7 mS = 0.0007 seconds)
