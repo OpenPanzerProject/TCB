@@ -98,8 +98,11 @@
         Motor * RightTread;
         Motor * LeftTread;
     // For cars and half-tracks with synchronized track speeds, we have a steering servo and a drive motor
-        Motor * SteeringServo;
         Motor * DriveMotor;
+        Motor * SteeringServo;
+    // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
+    // we have a "SteeringMotor" which will be the secondary output to a dual-motor serial controller (if using hobby ESCs, connect the steering motor to the SteeringServo output instead)
+        Motor * SteeringMotor;
     // We always have turret rotation & elevation motors
         Motor * TurretRotation;
         Motor * TurretElevation;
@@ -1137,6 +1140,7 @@ if (Startup)
                 if (DriveSpeed_Previous != DriveSpeed)
                 {
                     DriveMotor->setSpeed(DriveSpeed);
+                    // We set the front wheel steering a bit later, outside of this code block because we want steering control even when the engine is not running
                 }
             }
 
@@ -1181,7 +1185,16 @@ if (Startup)
     if (eeprom.ramcopy.DriveType != DT_TANK && HavePower)
     {
         // The servo object knows that "setSpeed" actually means "set servo position." 
-        SteeringServo->setSpeed(Radio.Sticks.Turn.command);        
+        SteeringServo->setSpeed(Radio.Sticks.Turn.command);   
+        
+        // There are a few odd gearboxes like the very early Tamiyas and the DKLM RC "Propulsion Dynamics" gearbox that outwardly appear like the standard dual-drive boxes with two motors, 
+        // but instead of one motor for each tread, there is actually one motor for drive and a second motor for steering. For compatibility with these units the user should (somewhat confusingly)
+        // set the drive type to Car and then select a serial-motor controller. We will pipe the steering signal out to the second motor output of the dual motor controllers.
+        // Alternatively the user can set the drive type to Car and use hobby ESCs on the correct servo outputs.
+        if (eeprom.ramcopy.DriveMotors == OP_SCOUT || eeprom.ramcopy.DriveMotors == SABERTOOTH || eeprom.ramcopy.DriveMotors || POLOLU)
+        {
+            SteeringMotor->setSpeed(Radio.Sticks.Turn.command);     
+        }
     }
 
     // RUN SPECIAL FUNCTIONS - But only if tank hasn't been destroyed, and if the battery voltage level is sufficient

@@ -35,16 +35,28 @@ void InstantiateMotorObjects()
             case OP_SCOUT:
                 // For a single rear drive motor, connect it to M1
                 DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
+                
+                // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
+                // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
+                SteeringMotor = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
                 break;
                 
             case SABERTOOTH:
                 // For a single rear drive motor, connect it to M1
                 DriveMotor = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
+                
+                // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
+                // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
+                SteeringMotor = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
                 break;
     
             case POLOLU:
                 // For a single rear drive motor, connect it to M0
                 DriveMotor = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
+
+                // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
+                // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
+                SteeringMotor = new Pololu_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
                 break;
     
             case ONBOARD:
