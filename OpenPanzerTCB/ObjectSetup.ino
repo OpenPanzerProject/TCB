@@ -32,29 +32,29 @@ void InstantiateMotorObjects()
     {   
         switch (eeprom.ramcopy.DriveMotors)
         {
+            case OP_SCOUT:
+                // For a single rear drive motor, connect it to M1
+                DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
+                break;
+                
             case SABERTOOTH:
-                // For a single rear drive motor, connect it to SIDE A
+                // For a single rear drive motor, connect it to M1
                 DriveMotor = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
                 break;
     
             case POLOLU:
-                // For a single rear drive motor, connect it to SIDE A
+                // For a single rear drive motor, connect it to M0
                 DriveMotor = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
-                break;
-                
-            case OP_SCOUT:
-                // For a single rear drive motor, connect it to SIDE A
-                DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
                 break;
     
             case ONBOARD:
-                // For a single rear drive motor, connect it to SIDE A
+                // For a single rear drive motor, connect it to  MOTOR A
                 DriveMotor = new Onboard_ESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                 MotorA_Available = false;
                 break;
                 
             case SERVO_ESC:
-                // For a single rear drive motor, connect it to the "Left" servo port
+                // For a single rear drive motor, connect it to the "Left" servo port (Servo 1)
                 DriveMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                 RCOutput1_Available = false;
                 break;
@@ -73,27 +73,26 @@ void InstantiateMotorObjects()
     {   // The user wants independent tread speeds. 
         switch (eeprom.ramcopy.DriveMotors)
         {
+            case OP_SCOUT:
+                // Left drive to M1, Right drive to M2. 
+                LeftTread = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
+                RightTread = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);
+                break;
+                
             case SABERTOOTH:
-                // The Sabertooth ESC additionally needs an address (values between 128-135) and the assignment of the serial port to use.
-                // The address is set physically on the Sabertooth device with dip-switches, see the Sabertooth manual. 128 is probably the default.
-                // We define different addresses for drive motors and turret, in the event the user wants to use two Sabertooth dual controllers,
-                // one for drive and one for turret. 
-                // Serial port gets set in OP_Settings.h. On the TCB board it is Serial2. 
+                // Left drive to M1, Right drive to M2. 
                 LeftTread = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
                 RightTread = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
                 break;
     
             case POLOLU:
+                // Left drive to M0, Right drive to M1
                 LeftTread = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
                 RightTread = new Pololu_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
                 break;
-                
-            case OP_SCOUT:
-                LeftTread = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);    
-                RightTread = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial);
-                break;
     
             case ONBOARD:
+                // Left drive to Motor A, Right drive to Motor B
                 LeftTread = new Onboard_ESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                 RightTread = new Onboard_ESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                 MotorA_Available = false;
@@ -147,19 +146,18 @@ void InstantiateMotorObjects()
     
     // TURRET MOTOR DEFINITION - ROTATION
     // -------------------------------------------------------------------------------------------------------------------------------------->>
-    // We define turret rotation as SIDEA for all serial controllers
     switch (eeprom.ramcopy.TurretRotationMotor)
     {
-        case SABERTOOTH:
-            TurretRotation = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_TURRET_Address,&MotorSerial);
-            break;
-        case POLOLU:
-             TurretRotation = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_TURRET_ID,&MotorSerial);
-            break;
-        case OP_SCOUT:
+        case OP_SCOUT:      // M1
             TurretRotation = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial);
             break;
-        case ONBOARD:
+        case SABERTOOTH:    // M1
+            TurretRotation = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_TURRET_Address,&MotorSerial);
+            break;
+        case POLOLU:        // M0
+             TurretRotation = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_TURRET_ID,&MotorSerial);
+            break;
+        case ONBOARD:       // Motor A
             TurretRotation = new Onboard_ESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             MotorA_Available = false;
             break;
@@ -190,19 +188,18 @@ void InstantiateMotorObjects()
 
     // TURRET MOTOR DEFINITION - ELEVATION
     // -------------------------------------------------------------------------------------------------------------------------------------->>
-    // We define turret elevation as SIDEB for all serial controllers
     switch (eeprom.ramcopy.TurretElevationMotor)
     {
-        case SABERTOOTH:
-            TurretElevation = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_TURRET_Address,&MotorSerial);
-            break;
-        case POLOLU:
-            TurretElevation = new Pololu_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_TURRET_ID,&MotorSerial);
-            break;
-        case OP_SCOUT:
+        case OP_SCOUT:      // M2
             TurretElevation = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial);
             break;
-        case ONBOARD:
+        case SABERTOOTH:    // M2
+            TurretElevation = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_TURRET_Address,&MotorSerial);
+            break;
+        case POLOLU:        // M1
+            TurretElevation = new Pololu_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_TURRET_ID,&MotorSerial);
+            break;
+        case ONBOARD:       // Motor B
             TurretElevation = new Onboard_ESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             MotorB_Available = false;
             break;

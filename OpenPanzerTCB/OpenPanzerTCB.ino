@@ -1121,7 +1121,7 @@ if (Startup)
                 // RightSpeed and LeftSpeed are passed by reference and updated by the function
                 Driver.MixSteering(DriveSpeed, TurnSpeed, &RightSpeed, &LeftSpeed);  
 
-                //Finally! We send the motor commands out to the motors, but only if something has changed since last time.
+                //Finally! We send the motor commands out to the motors, but only if something has changed since last time. 
                 if ((RightSpeed_Previous != RightSpeed) || (LeftSpeed_Previous != LeftSpeed))
                 {
                     RightTread->setSpeed(RightSpeed);
@@ -1132,8 +1132,12 @@ if (Startup)
             }
             else    // DriveType = Car (single rear axle speed)
             {
-                // In this case, there is only a single rear axle speed, and no such thing as neutral turns
-                DriveMotor->setSpeed(DriveSpeed);
+                // In this case, there is only a single rear axle speed, and no such thing as neutral turns. 
+                // Send the signal if the DriveSpeed has changed
+                if (DriveSpeed_Previous != DriveSpeed)
+                {
+                    DriveMotor->setSpeed(DriveSpeed);
+                }
             }
 
             // Other checks to do when we're moving: 

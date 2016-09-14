@@ -16,6 +16,14 @@ void UpdateSimpleTimers()
     TankTransmission.UpdateTimer();     // Transmission timer (see OP_Driver library)
     TankSound.UpdateTimer();            // Sound timer (see OP_TBS library)
     Tank.UpdateTimer();                 // General tank object (see OP_Tank library)
+    
+    // Now we also update the four motor objects. The motor update() routines will only do something if the motor type is a serial controller. 
+    // We use this to force send serial commands at a set interval, this keeps us from tripping the serial watchdog that for example 
+    // the Scout ESC implements. 
+    if (eeprom.ramcopy.DriveType == DT_CAR) { DriveMotor->update(); }
+    else { RightTread->update(); LeftTread->update(); }
+    TurretRotation->update();
+    TurretElevation->update();
 }
 
 
