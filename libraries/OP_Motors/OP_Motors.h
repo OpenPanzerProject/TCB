@@ -143,8 +143,21 @@ class Motor {
     virtual void setSpeed(int) =0;                  // Purely virtual
     virtual void begin(void) =0;
     virtual void stop(void) =0;
+    virtual void update(void) =0;
 };
 
+
+
+class OPScout_SerialESC: public Motor, public OP_Scout {
+  public:
+    OPScout_SerialESC(ESC_POS_t pos, int min, int max, int middle, byte addr, HardwareSerial *hwSerial) : Motor(pos,min,max,middle), OP_Scout(addr,hwSerial) {}
+    void setSpeed(int s);
+    void begin(void);
+    void stop(void);
+    void update(void);
+  private:
+    uint32_t LastUpdate_mS;
+};
 
 class Sabertooth_SerialESC: public Motor, public OP_Sabertooth {
   public:
@@ -152,8 +165,10 @@ class Sabertooth_SerialESC: public Motor, public OP_Sabertooth {
     void setSpeed(int s);
     void begin(void);
     void stop(void);
+    void update(void);
   private:
     static boolean sendAutobaud;
+    uint32_t LastUpdate_mS;    
 };
 
 class Pololu_SerialESC: public Motor, public OP_PololuQik {
@@ -162,16 +177,10 @@ class Pololu_SerialESC: public Motor, public OP_PololuQik {
     void setSpeed(int s);
     void begin(void);
     void stop(void);
+    void update(void);
   private:
     static boolean sendAutobaud;
-};
-
-class OPScout_SerialESC: public Motor, public OP_Scout {
-  public:
-    OPScout_SerialESC(ESC_POS_t pos, int min, int max, int middle, byte addr, HardwareSerial *hwSerial) : Motor(pos,min,max,middle), OP_Scout(addr,hwSerial) {}
-    void setSpeed(int s);
-    void begin(void);
-    void stop(void);
+    uint32_t LastUpdate_mS;        
 };
 
 class Onboard_ESC: public Motor {
@@ -180,6 +189,7 @@ class Onboard_ESC: public Motor {
     void setSpeed(int s);
     void begin(void);   
     void stop(void);
+    void update(void) { return; }   // Do nothing, we only need the update for serial controllers
 };
 
 class Onboard_Smoker: public Motor {
@@ -190,6 +200,7 @@ class Onboard_Smoker: public Motor {
     void stop(void);
     void setIdle(void);
     void setFastIdle(void);
+    void update(void) { return; }   // Do nothing, we only need the update for serial controllers
 private:
     const int _IdleSpeed;
     const int _FastIdleSpeed;
@@ -202,6 +213,7 @@ class Servo_ESC: public Motor, public OP_Servos {
     void setSpeed(int s) { setPos(s); } // We keep this for compatibility with the other motor classes, but in this case, it actually sets the servo *position* directly, it has nothing to do with speed.
     void begin(void);
     void stop(void);
+    void update(void) { return; }   // Do nothing, we only need the update for serial controllers
 };
 
 class Servo_PAN: public Motor, public OP_Servos {
@@ -214,6 +226,7 @@ class Servo_PAN: public Motor, public OP_Servos {
     int16_t PulseWidth(void);   // We won't know what the actual position of the pan servo is, so this will tell us
     void begin(void);
     void stop(void);
+    void update(void) { return; }   // Do nothing, we only need the update for serial controllers
   private: 
     boolean canSetFixedPos; 
 };
@@ -228,6 +241,7 @@ class Servo_RECOIL: public Motor, public OP_Servos {
     void stop(void);    // This doesn't do anything for this particular derived class
     void Recoil(void)
         { this->StartRecoil(this->ESC_Position); }
+    void update(void) { return; }   // Do nothing
   private:
     const uint16_t _RecoilmS;
     const uint16_t _ReturnmS;

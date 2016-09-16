@@ -85,7 +85,7 @@
     // that is the resolution of the IR read function. 
     
     // We could easily change the IRrecvPCI class to check against Timer 1 (TCNT1) and convert the ticks to uS. Not only would this remove any dependence on the micros()
-    // function, it would probably be faster, and it would enhance resolution though that isn't strictly necessary. This is on the list of things to do. 
+    // function, it would probably be faster, and it would enhance resolution though that isn't strictly necessary.  
 
     // OP_SimpleTimer, OP_Button, and the main sketch all use calls to the Arduino built-in function millis(), which is also based on Timer 0. Again, these could
     // be modified to use Timer 1 but so far have not. We would want to write our own custom micros() and millis() functions if so. 
@@ -255,8 +255,16 @@
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// MOTOR DRIVERS - SERIAL, SPECIFIC
+// MOTOR DRIVERS - SERIAL
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
+    // Multiple Open Panzer Scout ESCs: 
+    // The Scout ESC has two possible addresses set by a switch on the device.
+    // We use Address A for the drive motors, and B for the turret motors.
+    // The Scout uses the same protocol as the Dimension Engineering Sabertooth controllers, and these addresses are valid Sabertooth 
+    // addresses, just not the same Sabertooth addresses we use for the TCB. 
+    #define OPScout_DRIVE_Address       131     // Set Address switch to Position A
+    #define OPScout_TURRET_Address      132     // Set Address switch to Position B
+    
     // Multiple Sabertooth devices:
     // Sabertooth ESCs have address values from 128-135 set by dipswitches on the device
     // We use address 128 (default) for the drive motors, 135 for turret motors
@@ -270,14 +278,23 @@
     #define Pololu_DRIVE_ID             10  
     #define Pololu_TURRET_ID            13  
 
-    // Multiple Open Panzer Scout ESCs: 
-    // The Scout ESC has two possible addresses set by a switch on the device.
-    // We use Address A for the drive motors, and B for the turret motors.
-    // The Scout uses the same protocol as the Dimension Engineering Sabertooth controllers, and these addresses are valid Sabertooth 
-    // addresses, just not the same Sabertooth addresses we use for the TCB. 
-    #define OPScout_DRIVE_Address       131     // Set Address switch to Position A
-    #define OPScout_TURRET_Address      132     // Set Address switch to Position B
+    // Serial refresh rate
+    // Unlike RC signals which repeat many times per second even if the command doesn't change, serial controllers will maintain their last speed command indefinitely.
+    // Although unlikely, it is possible a speed command could be sent to a serial controller, and then the cable become disconnected, or some other issue on the master
+    // device occur, so that a later stop command is never received. In this case the serial controller will maintain the last speed forever. On the Scout ESC we have
+    // the option of enabling a serial watchdog that will automatically stop the motors if no serial command is received within a specific length of time, which we set here:
+    #define OPScout_WatchdogTimeout_mS  1000    // in milliseconds
     
+    // Now, to save processing time the TCB usually does not repeat serial commands until the command has changed, but that will no lnoger work. The consequence of a serial
+    // watchdog is that we need to routinely send serial commands to the serial controller even if the command hasn't changed from the last time, in order to keep it going. 
+    // The time between repeat commands must be less than the serial watchdog timeout: 
+    #define MotorSignal_Repeat_mS        500     // in milliseconds
+    
+    // We set these values fairly large. We are protecting against a case that is highly unlikely to occur. And although 1 second is a long time for a processor, it is plenty
+    // fast enough for a model to stop in the event of a disconnected cable. 
+    
+    // Final note: the Sabertooth and Pololu controllers don't implement a serial watchdog, but it won't hurt them to receive the same signal repeated every half second. 
+   
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // MOTOR DRIVERS - GENERAL

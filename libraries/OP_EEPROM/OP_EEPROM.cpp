@@ -76,16 +76,18 @@ boolean OP_EEPROM::readSerialEEPROM_byID(uint16_t ID, char *chrArray, uint8_t bu
     arrayPos = findStorageVarInfo(svi, ID);
     
     // TESTING:
-    /*
-    Serial.print(F("ID: "));
-    Serial.println(ID);
-    Serial.print(F("Array pos: "));
-    Serial.println(arrayPos);
-    Serial.print(F("Var Type: "));
-    Serial.println(printVarType(svi.varType));
-    Serial.print(F("Offset: "));
-    Serial.println(svi.varOffset);
-    */
+/*    if (ID == 1015)
+    {
+    Serial1.print(F("ID: "));
+    Serial1.println(ID);
+    Serial1.print(F("Array pos: "));
+    Serial1.println(arrayPos);
+    Serial1.print(F("Var Type: "));
+    Serial1.println(printVarType(svi.varType));
+    Serial1.print(F("Offset: "));
+    Serial1.println(svi.varOffset);
+    }
+*/
     
     if (arrayPos == 0)
     {
@@ -261,7 +263,7 @@ uint16_t OP_EEPROM::findStorageVarInfo(_storage_var_info &svi, uint16_t findID)
         
         // When we moved it to PROGMEM_FAR (out beyond the first 64k of program memory) we could no longer
         // address it with an 8-bit pointer. Instead we use the "pgm_get_far_address" macro
-        // to return a 32-bit pointer to the start address of the struct. This precludes use from obtain individual 
+        // to return a 32-bit pointer to the start address of the struct. This precludes us from obtaining individual 
         // elements of the array in the traditional manner, or the struct members likewise. Here we get the starting address, 
         // then to get the first word of the i-th struct we multiply i by 5 which is the number of bytes in each struct, or 
         // in other words, the number of bytes for each element of the array. See below for other machinations to get 

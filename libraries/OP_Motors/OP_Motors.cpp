@@ -45,6 +45,10 @@ const __FlashStringHelper *ptrDriveType(Drive_t dType) {
 };
 
 
+
+// ------------------------------------------------------------------------------------------------------------------>>
+// GENERIC MOTOR CONTROL FUNCTIONS
+// ------------------------------------------------------------------------------------------------------------------>>
 // This function will cut motor speed by whatever percent is passed. It can be used to temporarily modify the maximum
 // speed a motor can go (useful for battle damage). We can always restore the motor to whatever its full speed is by 
 // calling restore_Speed();
@@ -73,59 +77,66 @@ void Motor::set_MaxSpeedPct(uint8_t max_pct)
 }
 
 
+
 // ------------------------------------------------------------------------------------------------------------------>>
-boolean Pololu_SerialESC::sendAutobaud = false;     // Declare static variables globally
-void Pololu_SerialESC::begin(void)
+// OPEN PANZER SCOUT ESC 
+// ------------------------------------------------------------------------------------------------------------------>>
+void OPScout_SerialESC::begin(void)
 {
     // Initialize motor serial
-    // Pololu controllers can work at baud rates from 1200 to 115,200. The baud rate can be hard-set manually by using one of the baud 
-    // jumpers. On the 2s12v10 the jumper can select 9600, 38400, or 115200. On the 2s9v1, the jumper will only select 38400. 
-    // For purposes of Open Panzer, 38400 is the recommended baud rate (for all serial controllers).
-    // It is easier to tell the user not to worry about jumpers, and we will just send the autobaud command. 
-    if (!sendAutobaud)  // We might have multiple Pololu objects, but we only need to do this part once. 
-    {
-        Pololu_SerialESC::autobaud(true);  // This simply sends 0xAA. The "true" means skip the long waiting. 
-        sendAutobaud = true;
-    }
+    // The Scout ESC doesn't have auto-baud, so we assume the user has set the TCB (via OP Config) to the correct rate (38400) 
 
-    // Set the internal speed range (min, max). Pololu Qik devices in 7-bit mode accept commands from -127 to 127
-    // Although the Pololu Qik controllers also have an 8 bit mode, we use 7-bit for consistency with the Sabertooth,
-    // and also because it affords us the highest PWM frequncy (19.7kHz, which is ultrasonic).
-    // If you use 8-bit mode on the Qiks the highest PWM frequency you can achieve is 9.8kHz
-    set_InternalRange(-127,127, 0);         // Range of -127 to 127 with middle of 0
+    // Enable SerialWatchdog with a timeout of 1/2 second
+    // The function for converting watchdog time to command data is Value = (desired time in mS - 50) / 10 
+    // OPScout_WatchdogTimeout_mS is defined in OP_Settings.h
+    OPScout_SerialESC::command(SCOUT_CMD_ENABLE_SERIAL_WATCHDOG, (OPScout_WatchdogTimeout_mS - 50) / 10);    
+    
+    // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
+    set_InternalRange(-127,127, 0);
     set_DefaultInternalRange(-127,127, 0);
 }
 
-void Pololu_SerialESC::setSpeed(int s)  
+void OPScout_SerialESC::setSpeed(int s)
 {
     // save current speed
     curspeed = s;
     
     // make sure we are using the internal range
     s = map_Range(s);
-
+    
     if (ESC_Position == SIDEA)
-    {   //SIDEA - Shown as "M0" on Pololu board
+    {   //SIDEA - Shown as "M1" on the Scout board
         // Use for Left tread, or turret Rotation motor
-        Pololu_SerialESC::motor(1, s);
+        OPScout_SerialESC::motor(1, s);
     }
     else if (ESC_Position == SIDEB)
-    {   //SIDEB - Shown as "M1" on Pololu board
+    {   //SIDEB - Shown as "M2" on Scout board
         // Use for Right tread, or turret Elevation motor
-        Pololu_SerialESC::motor(2, s);
+        OPScout_SerialESC::motor(2, s);
+    }
+    
+    LastUpdate_mS = millis();           // Save the time
+}    
+
+void OPScout_SerialESC::stop(void)
+{
+    curspeed = 0;
+    OPScout_SerialESC::allStop();
+    LastUpdate_mS = millis();           // Save the time
+}
+
+void OPScout_SerialESC::update(void)
+{
+    if (millis() - LastUpdate_mS > MotorSignal_Repeat_mS)
+    {
+        OPScout_SerialESC::setSpeed(curspeed);
     }
 }
 
-void Pololu_SerialESC::stop(void)
-{
-    curspeed = 0;
-    Pololu_SerialESC::allStop();
-}
 
 
-
-
-
+// ------------------------------------------------------------------------------------------------------------------>>
+// DIMENSION ENGINEERING SABERTOOTH CONTROLLERS
 // ------------------------------------------------------------------------------------------------------------------>>
 boolean Sabertooth_SerialESC::sendAutobaud = false;     // Declare static variables globally
 
@@ -177,64 +188,93 @@ void Sabertooth_SerialESC::setSpeed(int s)
         // Use for Right tread, or turret Elevation motor
         Sabertooth_SerialESC::motor(2, s);
     }
+    
+    LastUpdate_mS = millis();           // Save the time
 }
 
 void Sabertooth_SerialESC::stop(void)
 {
     curspeed = 0;
     Sabertooth_SerialESC::allStop();
+    LastUpdate_mS = millis();           // Save the time
 }
 
-
+void Sabertooth_SerialESC::update(void)
+{
+    if (millis() - LastUpdate_mS > MotorSignal_Repeat_mS)
+    {
+        Sabertooth_SerialESC::setSpeed(curspeed);
+    }
+}
 
 
 
 // ------------------------------------------------------------------------------------------------------------------>>
-void OPScout_SerialESC::begin(void)
+// POLOLU QIK CONTROLLERS
+// ------------------------------------------------------------------------------------------------------------------>>
+boolean Pololu_SerialESC::sendAutobaud = false;     // Declare static variables globally
+void Pololu_SerialESC::begin(void)
 {
     // Initialize motor serial
-    // The Scout ESC doesn't have auto-baud, so we assume the user has set the TCB (via OP Config) to the correct rate. 
+    // Pololu controllers can work at baud rates from 1200 to 115,200. The baud rate can be hard-set manually by using one of the baud 
+    // jumpers. On the 2s12v10 the jumper can select 9600, 38400, or 115200. On the 2s9v1, the jumper will only select 38400. 
+    // For purposes of Open Panzer, 38400 is the recommended baud rate (for all serial controllers).
+    // It is easier to tell the user not to worry about jumpers, and we will just send the autobaud command. 
+    if (!sendAutobaud)  // We might have multiple Pololu objects, but we only need to do this part once. 
+    {
+        Pololu_SerialESC::autobaud(true);  // This simply sends 0xAA. The "true" means skip the long waiting. 
+        sendAutobaud = true;
+    }
 
-    // Enable SerialWatchdog with a timeout of 1/2 second
-    // The function for converting watchdog time to command data is Value = (desired time in mS - 50) / 10 
-    // (500 - 50) / 10 = 45
-    OPScout_SerialESC::command(SCOUT_CMD_ENABLE_SERIAL_WATCHDOG, 45);    
-    
-    // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
-    set_InternalRange(-127,127, 0);
+    // Set the internal speed range (min, max). Pololu Qik devices in 7-bit mode accept commands from -127 to 127
+    // Although the Pololu Qik controllers also have an 8 bit mode, we use 7-bit for consistency with the Sabertooth,
+    // and also because it affords us the highest PWM frequncy (19.7kHz, which is ultrasonic).
+    // If you use 8-bit mode on the Qiks the highest PWM frequency you can achieve is 9.8kHz
+    set_InternalRange(-127,127, 0);         // Range of -127 to 127 with middle of 0
     set_DefaultInternalRange(-127,127, 0);
 }
 
-void OPScout_SerialESC::setSpeed(int s)
+void Pololu_SerialESC::setSpeed(int s)  
 {
     // save current speed
     curspeed = s;
     
     // make sure we are using the internal range
     s = map_Range(s);
-    
+
     if (ESC_Position == SIDEA)
-    {   //SIDEA - Shown as "M1" on the Scout board
+    {   //SIDEA - Shown as "M0" on Pololu board
         // Use for Left tread, or turret Rotation motor
-        OPScout_SerialESC::motor(1, s);
+        Pololu_SerialESC::motor(1, s);
     }
     else if (ESC_Position == SIDEB)
-    {   //SIDEB - Shown as "M2" on Scout board
+    {   //SIDEB - Shown as "M1" on Pololu board
         // Use for Right tread, or turret Elevation motor
-        OPScout_SerialESC::motor(2, s);
+        Pololu_SerialESC::motor(2, s);
     }
-}    
+    
+    LastUpdate_mS = millis();           // Save the time
+}
 
-void OPScout_SerialESC::stop(void)
+void Pololu_SerialESC::stop(void)
 {
     curspeed = 0;
-    OPScout_SerialESC::allStop();
+    Pololu_SerialESC::allStop();
+    LastUpdate_mS = millis();           // Save the time
+}
+
+void Pololu_SerialESC::update(void)
+{
+    if (millis() - LastUpdate_mS > MotorSignal_Repeat_mS)
+    {
+        Pololu_SerialESC::setSpeed(curspeed);
+    }
 }
 
 
 
-
-
+// ------------------------------------------------------------------------------------------------------------------>>
+// ONBOARD MOTOR CONTROLLERS A & B
 // ------------------------------------------------------------------------------------------------------------------>>
 void Onboard_ESC::begin(void)
 {
@@ -312,7 +352,6 @@ void Onboard_ESC::setSpeed(int s)
     }   
 }
 
-
 void Onboard_ESC::stop(void)
 {
     if (ESC_Position == SIDEA)
@@ -327,8 +366,8 @@ void Onboard_ESC::stop(void)
 
 
 
-
-
+// ------------------------------------------------------------------------------------------------------------------>>
+// ONBOARD SMOKER CONTROLLER
 // ------------------------------------------------------------------------------------------------------------------>>
 void Onboard_Smoker::begin(void)
 {
@@ -383,8 +422,8 @@ void Onboard_Smoker::setFastIdle(void)
 
 
 
-
-
+// ------------------------------------------------------------------------------------------------------------------>>
+// ABSTRACT SERVO CONTROLLER
 // ------------------------------------------------------------------------------------------------------------------>>
 void Servo_ESC::begin(void)
 {
@@ -394,7 +433,6 @@ void Servo_ESC::begin(void)
     set_InternalRange(1000, 2000, 1500);
     set_DefaultInternalRange(1000, 2000, 1500);
 }
-
 
 void Servo_ESC::setPos(int s)
 {   //Set a servo's position *position*
@@ -416,8 +454,8 @@ void Servo_ESC::stop(void)
 
 
 
-
-
+// ------------------------------------------------------------------------------------------------------------------>>
+// PAN SERVO CONTROLLER
 // ------------------------------------------------------------------------------------------------------------------>>
 void Servo_PAN::begin(void)
 {
@@ -517,8 +555,8 @@ void Servo_PAN::setLimits(uint16_t min, uint16_t max)
 
 
 
-
-
+// ------------------------------------------------------------------------------------------------------------------>>
+// RECOIL SERVO CONTROL
 // ------------------------------------------------------------------------------------------------------------------>>
 void Servo_RECOIL::begin(void)
 {
