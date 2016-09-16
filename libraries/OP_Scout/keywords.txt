@@ -1,13 +1,12 @@
 #-------------------------------------------------------------
 # Syntax Coloring Map
-# Words separated by TAB, not SPACE
+# Words separated by a single TAB, not SPACE
 #-------------------------------------------------------------
 
 
 #-------------------------------------------------------------
 # KEYWORD1 - Classes
 #-------------------------------------------------------------
-
 OP_Scout	KEYWORD1
 
 
@@ -19,11 +18,20 @@ port	KEYWORD2
 command	KEYWORD2
 motor	KEYWORD2
 allStop	KEYWORD2
+SetFanSpeed KEYWORD2
+AutoFanControl  KEYWORD2
+EnableWatchdog  KEYWORD2
+DisableWatchdog KEYWORD2
 
 
 #-------------------------------------------------------------
 # LITERAL1 - Constants & Defines
 #-------------------------------------------------------------
-
-
+SCOUT_ADDRESS_A LITERAL1
+SCOUT_ADDRESS_B LITERAL1
+SCOUT_CMD_SET_FAN_SPEED LITERAL1
+SCOUT_CMD_SET_AUTO_FAN_CONTROL  LITERAL1
+SCOUT_CMD_SET_MAX_CURRENT   LITERAL1
+SCOUT_CMD_ENABLE_SERIAL_WATCHDOG    LITERAL1
+SCOUT_CMD_DISABLE_SERIAL_WATCHDOG   LITERAL1
 
