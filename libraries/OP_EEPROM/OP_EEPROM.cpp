@@ -419,8 +419,8 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.SF_Trigger[3].TriggerID = BR;
         ramcopy.SF_Trigger[3].specialFunction = SF_LIGHT1_TOGGLE;
         
-    // 4 main motor drive types. We default motors to Sabertooth serial controller and turret to onboard
-        ramcopy.DriveMotors = SABERTOOTH;
+    // 4 main motor drive types. We default motors to the OP Scout ESC and turret to onboard
+        ramcopy.DriveMotors = OP_SCOUT;
         ramcopy.TurretRotationMotor = ONBOARD;
         ramcopy.TurretElevationMotor = ONBOARD;
 
