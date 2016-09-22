@@ -260,7 +260,16 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
             DebugSerial->print(F(")")); 
         }
         DebugSerial->print(F(", Preset: ")); 
-        Profile_1 ? DebugSerial->print(eeprom.ramcopy.AccelPreset_1, DEC) : DebugSerial->print(eeprom.ramcopy.AccelPreset_2, DEC);
+        if (Profile_1)
+        {
+            if (eeprom.ramcopy.AccelPreset_1 == 0) DebugSerial->print(F("None"));
+            else DebugSerial->print(eeprom.ramcopy.AccelPreset_1, DEC);
+        }
+        else
+        {
+            if (eeprom.ramcopy.AccelPreset_2 == 0) DebugSerial->print(F("None"));
+            else DebugSerial->print(eeprom.ramcopy.AccelPreset_2, DEC);
+        }
         DebugSerial->print(F(")"));
     }
     DebugSerial->println();
@@ -276,7 +285,17 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
             DebugSerial->print(F(")")); 
         }
         DebugSerial->print(F(", Preset: ")); 
-        Profile_1 ? DebugSerial->print(eeprom.ramcopy.DecelPreset_1, DEC) : DebugSerial->print(eeprom.ramcopy.DecelPreset_2, DEC);
+        if (Profile_1)
+        {
+            if   (eeprom.ramcopy.DecelPreset_1 == 0) DebugSerial->print(F("None"));
+            else DebugSerial->print(eeprom.ramcopy.DecelPreset_1, DEC);
+        }
+        else
+        {
+            if   (eeprom.ramcopy.DecelPreset_2 == 0) DebugSerial->print(F("None"));
+            else DebugSerial->print(eeprom.ramcopy.DecelPreset_2, DEC);    
+        }
+        
         DebugSerial->print(F(")"));
     }
     DebugSerial->println();
@@ -435,7 +454,7 @@ void DumpVoltage()
     else
     {
         DebugSerial->println(F("Yes"));
-        DebugSerial->print(F("Current Voltage:  "));
+        DebugSerial->print(F("Voltage:          "));
         DebugSerial->print(ReadVoltage(),2);
         DebugSerial->println(F("v"));
     }
