@@ -45,8 +45,6 @@ begin	KEYWORD2
 Engaged	KEYWORD2
 PutInGear	KEYWORD2
 PutInNeutral	KEYWORD2
-PutInGear_Delay	KEYWORD2
-DelayedGearComplete	KEYWORD2
 UpdateTimer	KEYWORD2
 
 

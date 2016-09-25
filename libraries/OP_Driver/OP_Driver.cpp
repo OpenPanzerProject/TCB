@@ -869,26 +869,19 @@ void OP_Driver::MixSteering(int DriveSpeed, int TurnAmount, int *RightSpeed, int
 
 // Static variables must be initialized outside the class 
 uint16_t        OP_Engine::EnginePauseTime;         // How long to wait before engine can change state, in milliseconds (1000 mS = 1 second)
-boolean         OP_Engine::EngineTimerComplete;     // Timer flag
 boolean         OP_Engine::EngineRunning;
-OP_SimpleTimer  OP_Engine::EngineTimer;    
-int             OP_Engine::EngineTimerID;
 boolean         OP_Engine::_debug;
 HardwareSerial *OP_Engine::_debugSerial;
+uint32_t        OP_Engine::EngineTimerStartTime;
+boolean         OP_Engine::EngineTimerComplete;
 
 void OP_Engine::begin(uint16_t howLong, boolean debug, HardwareSerial * debugSerial)
 {
     OP_Engine::EnginePauseTime = howLong;       
     OP_Engine::_debug = debug;
     OP_Engine::_debugSerial = debugSerial;
-    ClearEngineTimer();
-    EngineRunning = false;      // Initialize to engine off
-}
-
-
-void OP_Engine::ClearEngineTimer()
-{
-    EngineTimerComplete = true;
+    EngineRunning = false;          // Initialize to engine off
+    EngineTimerComplete = true;     // Initialize timer complete
 }
 
 void OP_Engine::StartEngineTimer()
@@ -896,31 +889,32 @@ void OP_Engine::StartEngineTimer()
     if (EnginePauseTime > 0)
     {
         // Start the engine timer. Until it expires, it will not be possible to change that status of the engine. 
-        if (!EngineTimer.isEnabled(EngineTimerID))
+        if (EngineTimerComplete)    // Meaning, the timer is not running
         {
-            EngineTimerID = EngineTimer.setTimeout(EnginePauseTime, ClearEngineTimer);    // Will call function "ClearEngineTimer" after "EnginePauseTime" milliseconds have elapsed. 
+            EngineTimerStartTime = millis();
+            EngineTimerComplete = false;
         }
     }
     else
     {
         // No pause time specified, we allow immediate changes
-        ClearEngineTimer();
+        EngineTimerComplete = true;
     }
 }
 
 boolean OP_Engine::Running()
 {
-    EngineTimer.run();
+    UpdateTimer();
     return EngineRunning;
 }
 
 boolean OP_Engine::StartEngine()
 {
-    EngineTimer.run();
-    if (EngineTimerComplete && !EngineRunning)    // Only change engine status if some length of time has passed since last change
-    {                                             // AND only if we are already stopped
-        EngineRunning = true;           // Change state to running
-        EngineTimerComplete = false;    // Reset engine timer
+    UpdateTimer();
+    if (EngineTimerComplete && !EngineRunning)  // Only change engine status if some length of time has passed since last change
+    {                                           // AND only if we are already stopped
+        EngineRunning = true;                   // Change state to running
+        EngineTimerComplete = false;            // Reset engine timer
         StartEngineTimer();
         if (_debug) { _debugSerial->println(F("Turn Engine On")); }
         return true;
@@ -933,11 +927,11 @@ boolean OP_Engine::StartEngine()
 
 void OP_Engine::StopEngine()
 {
-    EngineTimer.run();
-    if (EngineTimerComplete && EngineRunning)    // Only change engine status if some length of time has passed since last change
-    {                                            // AND only if we are already running
-        EngineRunning = false;          // Change state to stopped
-        EngineTimerComplete = false;    // Reset engine timer
+    UpdateTimer();
+    if (EngineTimerComplete && EngineRunning)   // Only change engine status if some length of time has passed since last change
+    {                                           // AND only if we are already running
+        EngineRunning = false;                  // Change state to stopped
+        EngineTimerComplete = false;            // Reset engine timer
         StartEngineTimer();
         if (_debug) { _debugSerial->println(F("Turn Engine Off")); }
     }
@@ -945,9 +939,14 @@ void OP_Engine::StopEngine()
 
 void OP_Engine::UpdateTimer()
 {
-    EngineTimer.run();
+    if (!EngineTimerComplete)
+    {
+        if ((millis() - EngineTimerStartTime) > EnginePauseTime)
+        {   // Time's up
+            EngineTimerComplete = true;
+        }
+    }
 }
-
 
 
 
@@ -957,74 +956,65 @@ void OP_Engine::UpdateTimer()
 
 // Static variables must be initialized outside the class 
 uint16_t        OP_Transmission::TransmissionPauseTime;         // How long to wait before transmission can change state, in milliseconds (1000 mS = 1 second)
-boolean         OP_Transmission::TransmissionTimerComplete;     // Timer flag
 boolean         OP_Transmission::TransmissionEngaged;
-OP_SimpleTimer  OP_Transmission::TransmissionTimer;    
-int             OP_Transmission::TransmissionTimerID;
 boolean         OP_Transmission::_debug;
 HardwareSerial *OP_Transmission::_debugSerial;
+uint32_t        OP_Transmission::TransmissionTimerStartTime;
+boolean         OP_Transmission::TransmissionTimerComplete;     
 
 void OP_Transmission::begin(boolean debug, HardwareSerial *debugSerial)
 {
     OP_Transmission::TransmissionPauseTime = 100;       // HARD-CODED TO 1/10th of a SECOND. This is the minimum amount of time that must transpire between transmission state changes.
     OP_Transmission::_debug = debug;                    // ^ This delay is probably unnecessary and it would save code & RAM space to get rid of the TransmissionTimer entirely.
     OP_Transmission::_debugSerial = debugSerial;
-    ClearTransmissionTimer();
-    TransmissionEngaged = false;        // Initialize to transmission disengaged off
-}
-
-
-void OP_Transmission::ClearTransmissionTimer()
-{
-    TransmissionTimerComplete = true;
+    TransmissionEngaged = false;                        // Initialize to transmission disengaged off
+    TransmissionTimerComplete = true;                   // Initialize timer complete
 }
 
 void OP_Transmission::StartTransmissionTimer()
 {
-    // Start the transmission timer. Until it expires, it will not be possible to change that status of the transmission. 
-    TransmissionTimerComplete = false;
-    TransmissionTimerID = TransmissionTimer.setTimeout(TransmissionPauseTime, ClearTransmissionTimer);    // Will call function "ClearTransmissionTimer" after "TransmissionPauseTime" milliseconds have elapsed. 
+    if (TransmissionPauseTime > 0)
+    {
+        // Start the transmission timer. Until it expires, it will not be possible to change that status of the transmission. 
+        if (TransmissionTimerComplete)    // Meaning, the timer is not running
+        {
+            TransmissionTimerStartTime = millis();
+            TransmissionTimerComplete = false;
+        }
+    }
+    else
+    {
+        // No pause time specified, we allow immediate changes
+        TransmissionTimerComplete = true;
+    }
+
 }
 
 boolean OP_Transmission::Engaged()
 {
-    TransmissionTimer.run();
+    UpdateTimer();
     return TransmissionEngaged;
 }
 
 void OP_Transmission::PutInGear()
 {
-    TransmissionTimer.run();
-    if (TransmissionTimerComplete && !TransmissionEngaged)    // Engage transmission if some length of time has passed since last change
-    {                                                          // AND only if we are already disengaged
-        TransmissionEngaged = true;           // Change state to engaged
+    UpdateTimer();
+    if (TransmissionTimerComplete && !TransmissionEngaged)  // Engage transmission if some length of time has passed since last change
+    {                                                       // AND only if we are already disengaged
+        TransmissionEngaged = true;                         // Change state to engaged
+        TransmissionTimerComplete = false;                  // Reset transmission timer
         StartTransmissionTimer();
         if (_debug) { _debugSerial->println(F("Engage Transmission")); }
     }
-}
-
-void OP_Transmission::DelayedGearComplete()
-{
-    // Same as above except we don't check the status of the transition timer
-    if (!TransmissionEngaged)                 // Engage transmission only if we are disengaged
-    {                                           
-        TransmissionEngaged = true;           // Change state to engaged
-        StartTransmissionTimer();
-        if (_debug) { _debugSerial->println(F("Engage Transmission")); }
-    }
-}
-
-void OP_Transmission::PutInGear_Delay(uint16_t howLong)
-{
-    TransmissionTimerID = TransmissionTimer.setTimeout(howLong, DelayedGearComplete);    // Will call function "PutInGear" after "howLong" milliseconds have elapsed. 
 }
 
 void OP_Transmission::PutInNeutral()
 {
-    TransmissionTimer.run();
-    if (TransmissionTimerComplete && TransmissionEngaged)    // Disengage transmission if some length of time has passed since last change
-    {                                                        // AND only if we are already engaged
-        TransmissionEngaged = false;          // Change state to disengaged
+    UpdateTimer();
+    if (TransmissionTimerComplete && TransmissionEngaged)   // Disengage transmission if some length of time has passed since last change
+    {                                                       // AND only if we are already engaged
+        TransmissionEngaged = false;                        // Change state to disengaged
+        TransmissionTimerComplete = false;                  // Reset transmission timer
         StartTransmissionTimer();
         if (_debug) { _debugSerial->println(F("Disengage Transmission")); }
     }
@@ -1032,6 +1022,12 @@ void OP_Transmission::PutInNeutral()
 
 void OP_Transmission::UpdateTimer()
 {
-    TransmissionTimer.run();
+    if (!TransmissionTimerComplete)
+    {
+        if ((millis() - TransmissionTimerStartTime) > TransmissionPauseTime)
+        {   // Time's up
+            TransmissionTimerComplete = true;
+        }
+    }
 }
 

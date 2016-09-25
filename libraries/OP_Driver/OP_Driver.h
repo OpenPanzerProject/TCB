@@ -25,7 +25,6 @@
 #include "OP_Settings.h"
 #include "OP_Motors.h"
 #include "OP_TBS.h"
-#include "OP_SimpleTimer.h"
                                                     
 
 typedef char DRIVETYPE;
@@ -162,10 +161,9 @@ public:
 
 private:
     static uint16_t EnginePauseTime;            // How long to wait before engine can change state, in milliseconds (1000 mS = 1 second)
-    static boolean EngineTimerComplete;         // Timer flag
-    static boolean EngineRunning;
-    static OP_SimpleTimer EngineTimer;
-    static int EngineTimerID;
+    static uint32_t EngineTimerStartTime;
+    static boolean  EngineTimerComplete;         // Timer flag
+    static boolean  EngineRunning;
     static void StartEngineTimer(void);         // If these are not declared static they can't be used without first creating an object
     static void ClearEngineTimer(void);         // But we want the class to use them internally, so set them to static. 
     static boolean _debug;                      // If true, send debug messages out the serial port
@@ -181,16 +179,13 @@ public:
     static boolean Engaged(void);               // Returns transmission state
     static void    PutInGear(void);             // Engage transmission
     static void    PutInNeutral(void);          // Disengage transmission
-    static void    PutInGear_Delay(uint16_t);   // We can also engage transmission after some delay
-    static void    DelayedGearComplete(void);   // And this is the function it will call after the delay
     static void    UpdateTimer(void);           // This updates the transmission timer
 
 private:
     static uint16_t TransmissionPauseTime;      // How long to wait before transmission can change state, in milliseconds (1000 mS = 1 second)
+    static uint32_t TransmissionTimerStartTime;
     static boolean TransmissionTimerComplete;   // Timer flag
     static boolean TransmissionEngaged;
-    static OP_SimpleTimer TransmissionTimer;    
-    static int TransmissionTimerID; 
     static void StartTransmissionTimer(void);   // If these are not declared static they can't be used without first creating an object
     static void ClearTransmissionTimer(void);   // But we want the class to use them internally, so set them to static. 
     static boolean _debug;                      // If true, send debug messages out the serial port
