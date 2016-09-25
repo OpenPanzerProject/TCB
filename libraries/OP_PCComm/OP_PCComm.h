@@ -121,7 +121,6 @@
 #include <avr/pgmspace.h>
 #include "EEPROMex.h"
 #include "OP_EEPROM.h"
-#include "OP_SimpleTimer.h"
 #include "OP_Radio.h"
 #include "OP_Settings.h"
 
@@ -162,7 +161,11 @@
 #define MIN_EEPROM_ID           1000    // Any ID over this number will be the ID of an eeprom variable. Any ID below it will be something else
 
 // Safety
-#define SERIAL_COMM_TIMEOUT     7000    // How many milliseconds of inactivity do we wait before we just disconnect from the computer (1000 ms = 1 second)
+#define SERIAL_COMM_TIMEOUT     8500    // How many milliseconds of inactivity do we wait before we just disconnect from the computer (1000 ms = 1 second)
+                                        // We set this to slightly more than 2 times the STAY_AWAKE_BEEP_TIME in OPConfig (4000). That means the PC 
+                                        // can send up to 2 stay awake commands without a response from us (or without being able to read the response from us)
+                                        // before it initiates a disconnection. It also means we get multiple chances at reading the stay awake command before we
+                                        // initiate a disconnect. 
 #define MAX_COMM_ERRORCOUNT     10      // How many communication errors do we permit before simply disconnecting
 
 
@@ -227,7 +230,6 @@ class OP_PCComm
         static int16_t calcrc(char *ptr, int16_t count);
         
         static void startWatchdog(void);
-        static void stopWatchdog(void);
         static void resetWatchdog(void);
         static void triggerWatchdog(void);
         static void updateTimer(void);
@@ -241,8 +243,7 @@ class OP_PCComm
         static OP_EEPROM        *_op_eeprom;
         static HardwareSerial   *_serial;
         static OP_Radio         *_radio;
-        static OP_SimpleTimer   commTimer;
-        static int              watchdogTimerID;
+        static uint32_t         WatchdogStartTime;
         static boolean          Timeout;
         static boolean          Disconnect;
         static boolean          eepromUpdated;

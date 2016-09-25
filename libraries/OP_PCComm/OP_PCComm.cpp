@@ -24,8 +24,7 @@
 OP_EEPROM       * OP_PCComm::_op_eeprom;
 HardwareSerial  * OP_PCComm::_serial;
 OP_Radio        * OP_PCComm::_radio;
-OP_SimpleTimer    OP_PCComm::commTimer;
-int               OP_PCComm::watchdogTimerID;
+uint32_t         OP_PCComm::WatchdogStartTime;
 boolean           OP_PCComm::Timeout;
 boolean           OP_PCComm::Disconnect;
 boolean           OP_PCComm::eepromUpdated;
@@ -44,7 +43,6 @@ void OP_PCComm::begin(OP_EEPROM * opeeprom, OP_Radio * radio)       // Begin
     _op_eeprom = opeeprom;
     _radio = radio;
     _serial = &DEFAULT_SERIAL_PORT; // Initialize to default set in OP_PCComm.h
-    watchdogTimerID = 0;
     Timeout = false;
     Disconnect = false;
     eepromUpdated = false;
@@ -766,14 +764,11 @@ void OP_PCComm::requireCRC(void)
 
 void OP_PCComm::startWatchdog(void)
 {
-    // Make sure no other timer is running
-    stopWatchdog();
-    
     // Clear the timeout flag
     Timeout = false;
     
     // Start the timer
-    watchdogTimerID = commTimer.setTimeout(SERIAL_COMM_TIMEOUT, triggerWatchdog);
+    WatchdogStartTime = millis();
 }
 
 void OP_PCComm::triggerWatchdog(void)
@@ -787,17 +782,17 @@ void OP_PCComm::resetWatchdog(void)
     // Every time we receive a valid sentence over the serial port, we "reset" the watchdog
     // timer, meaning we start it over counting from now. So long as data keeps coming in, 
     // the timer will keep getting reset, and we won't hit the timeout
-    commTimer.restartTimer(watchdogTimerID);
-}
-
-void OP_PCComm::stopWatchdog(void)
-{
-    if (commTimer.isEnabled(watchdogTimerID)) { commTimer.deleteTimer(watchdogTimerID); }
+    WatchdogStartTime = millis();
 }
 
 void OP_PCComm::updateTimer(void)
 {
-    commTimer.run();
+    // Check if the watchdog has expired
+    if ((millis() - WatchdogStartTime) > SERIAL_COMM_TIMEOUT)
+    {   
+        Timeout = true;
+    }
+
     UpdateLEDs();
 }
 
