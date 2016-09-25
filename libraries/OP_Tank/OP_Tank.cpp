@@ -22,7 +22,7 @@
 
 // Static variables must be declared outside the class
 battle_settings OP_Tank::BattleSettings;
-OP_SimpleTimer  OP_Tank::TankTimer;    
+OP_SimpleTimer * OP_Tank::TankTimer;    
 boolean         OP_Tank::IR_Enabled;
 IRsend          OP_Tank::IR_Tx;
 IRrecvPCI     * OP_Tank::IR_Rx;
@@ -94,9 +94,12 @@ OP_Tank::OP_Tank()
 }
 
 
-void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, uint8_t mgint, Servo_RECOIL * sr, OP_TBS * ts)
+void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, uint8_t mgint, Servo_RECOIL * sr, OP_TBS * ts, OP_SimpleTimer * t)
 {
     // Save settings
+    
+    // Sketch's SimpleTimer
+    TankTimer = t;
     
     // Battle Settings
     BattleSettings = BS;
@@ -308,7 +311,7 @@ void OP_Tank::Fire(void)
             _TankSound->Repair();       // Start playing the repair sound
             Repair_BlinkHandler();      // Do the special repair light effect (start blinking slow and gradually increase faster and faster)
             // Start the repair timer. During this time we can not fire the repair signal again, nor can we move (the move disabling is handled by the sketch)
-            TankTimer.setTimeout(REPAIR_TIME_mS, RepairOver);   // REPAIR_TIME_mS is set in OP_BattleTimes.h
+            TankTimer->setTimeout(REPAIR_TIME_mS, RepairOver);   // REPAIR_TIME_mS is set in OP_BattleTimes.h
             Cannon_StartReload();   // Start the reload timer - but we actually still won't be able to fire again until after the repair is over, which takes longer than reloading.
             Cannon_SendIR();        // Send the IR code
         }
@@ -345,7 +348,7 @@ void OP_Tank::Fire(void)
                     // To coordinate all the actions, the user can specify a small delay so the remaining effects occur right when the barrel is recoiling
                     if (_RecoilDelay > 0)
                     {
-                        TankTimer.setTimeout(_RecoilDelay, Fire_Part2);
+                        TankTimer->setTimeout(_RecoilDelay, Fire_Part2);
                     }
                     else
                     {
@@ -430,7 +433,7 @@ void OP_Tank::Cannon_StartReload(void)
 {
     // Start the reload timer. Further canon fire will not be possible until the timer completes. 
     CannonReloadComplete = false;
-    TankTimer.setTimeout(BattleSettings.ClassSettings.reloadTime, ReloadComplete);    // Will call function "ReloadComplete" after the correct amount of time has passed for this weight class. 
+    TankTimer->setTimeout(BattleSettings.ClassSettings.reloadTime, ReloadComplete);    // Will call function "ReloadComplete" after the correct amount of time has passed for this weight class. 
 }
 void OP_Tank::ReloadComplete(void)
 {
@@ -448,30 +451,30 @@ boolean OP_Tank::CannonReloaded(void)
 void OP_Tank::MachineGun()
 {   
     // Start the Machine Gun, unless we are already going for some reason
-    if (!TankTimer.isEnabled(MG_BlinkTimerID))
+    if (!TankTimer->isEnabled(MG_BlinkTimerID))
     {
-        MG_BlinkTimerID = TankTimer.setInterval(_MGLightBlink_mS, MG_BlinkLight);
+        MG_BlinkTimerID = TankTimer->setInterval(_MGLightBlink_mS, MG_BlinkLight);
         _TankSound->MachineGun();           // Start the machine gun sound 
         // Now also start a timer to send the IR code repeatedly, if specified
-        if (BattleSettings.Use_MG_Protocol && !TankTimer.isEnabled(MG_FireTimerID))
+        if (BattleSettings.Use_MG_Protocol && !TankTimer->isEnabled(MG_FireTimerID))
         {
             // Start by firing once
             MG_Fire_IR();
             // Now set a timer to repeat the IR signal every MG_REPEAT_TIME milliseconds (defined in OP_IRLibMatch.h)
-            MG_FireTimerID = TankTimer.setInterval(MG_REPEAT_TIME_mS, MG_Fire_IR);
+            MG_FireTimerID = TankTimer->setInterval(MG_REPEAT_TIME_mS, MG_Fire_IR);
         }
     }
 }
 void OP_Tank::MachineGun_Stop(void)
 {
-    if (TankTimer.isEnabled(MG_BlinkTimerID)) 
+    if (TankTimer->isEnabled(MG_BlinkTimerID)) 
     {
-        TankTimer.deleteTimer(MG_BlinkTimerID); 
+        TankTimer->deleteTimer(MG_BlinkTimerID); 
         _TankSound->StopMachineGun();    // Stop machine gun sound
     }
-    if (TankTimer.isEnabled(MG_FireTimerID))
+    if (TankTimer->isEnabled(MG_FireTimerID))
     {
-        TankTimer.deleteTimer(MG_FireTimerID);  // Stop sending the IR signal
+        TankTimer->deleteTimer(MG_FireTimerID);  // Stop sending the IR signal
     }
     MG_LightOff();   
 }
@@ -536,7 +539,7 @@ void OP_Tank::FireAirsoft(void)
     
     // To avoid any momentary bouncing as the motor first begins that might be falsely interpreted as a falling edge, we could enable the interrupt
     // after a slight delay. However in practice this wasn't necessary. 
-        //TankTimer.setTimeout(AIRSOFT_DEBOUNCE_mS, Enable_MechRecoilInterrupt);
+        //TankTimer->setTimeout(AIRSOFT_DEBOUNCE_mS, Enable_MechRecoilInterrupt);
     // So instead I enable the interrupt right away. There will be transients, but the interrupt will know to discard them. 
         Enable_MechRecoilInterrupt();
     
@@ -544,7 +547,7 @@ void OP_Tank::FireAirsoft(void)
     // ------------------------------------------------------------------------------------------------------------------------>>
     // In case something goes wrong, and we never get the signal from the trigger switch telling us to stop the airsoft motor, we want to shut it 
     // down after some length of time. The time is arbitrary... here it is 5 seconds
-        MechRecoilTimeoutTimerID = TankTimer.setTimeout(5000, StopMechRecoilMotor);     
+        MechRecoilTimeoutTimerID = TankTimer->setTimeout(5000, StopMechRecoilMotor);     
 }
 void OP_Tank::MechanicalRecoil(void)
 {
@@ -581,7 +584,7 @@ void OP_Tank::MechanicalRecoil(void)
     // we know we're at the end and we can stop the recoil motor. We have the interrupt set to only occur on rising edges, but to avoid
     // any momentary bouncing as the motor first begins that might be falsely interpreted as a rising edge, we only enable the interrupt
     // after a slight delay
-        // TankTimer.setTimeout(MECH_RECOIL_DEBOUNCE_mS, Enable_MechRecoilInterrupt);
+        // TankTimer->setTimeout(MECH_RECOIL_DEBOUNCE_mS, Enable_MechRecoilInterrupt);
         Enable_MechRecoilInterrupt();
         // EDIT ABOVE: The only problem with this is that sending the IR signal can take some time and while it's going the TankTimer is not being updated.
         // So we need to make sure this really does get enabled before the recoil is over. So we enable it right away and then take care of bouncy-signals
@@ -592,7 +595,7 @@ void OP_Tank::MechanicalRecoil(void)
     // ------------------------------------------------------------------------------------------------------------------------>>
     // In case something goes wrong, and we never get the signal from the trigger switch telling us to stop the recoil motor, we want to shut it 
     // down after some length of time. Tamiya will run it for 10 seconds before shutting down, I think 5 seconds is more than enough. 
-        MechRecoilTimeoutTimerID = TankTimer.setTimeout(5000, StopMechRecoilMotor);
+        MechRecoilTimeoutTimerID = TankTimer->setTimeout(5000, StopMechRecoilMotor);
 
 }
 void OP_Tank::StartMechRecoilMotor(void)
@@ -603,7 +606,7 @@ void OP_Tank::StartMechRecoilMotor(void)
 void OP_Tank::StopMechRecoilMotor(void)
 {
     digitalWrite(pin_MechRecoilMotor, LOW);
-    if (TankTimer.isEnabled(MechRecoilTimeoutTimerID)) TankTimer.deleteTimer(MechRecoilTimeoutTimerID);
+    if (TankTimer->isEnabled(MechRecoilTimeoutTimerID)) TankTimer->deleteTimer(MechRecoilTimeoutTimerID);
 }
 void OP_Tank::Enable_MechRecoilInterrupt(void)
 {
@@ -684,7 +687,7 @@ void OP_Tank::TriggerMuzzleFlash(void)
 {
     // This one is a PNP transistor, so logic HIGH = OFF, LOW = ON
     digitalWrite(pin_MuzzleFlash, LOW);
-    TankTimer.setTimeout(MUZZLE_FLASH_TRIGGER_mS, ClearMuzzleFlash);
+    TankTimer->setTimeout(MUZZLE_FLASH_TRIGGER_mS, ClearMuzzleFlash);
 }
 void OP_Tank::ClearMuzzleFlash(void)
 {
@@ -813,7 +816,7 @@ boolean TwoShotHit = false;
                     // After that time it will automatically recover itself. During invulnerability time, the tank can fire but is impervious to enemy fire. 
                     // Invulnerabilty time is dependent on the weight class. 
                     isDestroyed = true;
-                    TankTimer.setTimeout(DESTROYED_INOPERATIVE_TIME_mS, ResetBattle);   // DESTROYED_INOPERATIVE_TIME_mS is defined in OP_BattleTimes.h
+                    TankTimer->setTimeout(DESTROYED_INOPERATIVE_TIME_mS, ResetBattle);   // DESTROYED_INOPERATIVE_TIME_mS is defined in OP_BattleTimes.h
                     // Start the destroyed light effect
                     HitLEDs_CannonHit();    // After the cannon hit effect, because isDestroyed is true, the subsequent HitLEDs_Destroyed effect will start automatically
                 }
@@ -825,7 +828,7 @@ boolean TwoShotHit = false;
                     HitLEDs_CannonHit();
                     // Start a brief invulnerability timer. Each IR signal is sent multiple times, but we only want to count 
                     // one hit per shot. For the next second after being hit, we ignore further hits
-                    TankTimer.setTimeout(HIT_FILTER_mS, EnableHitReception);
+                    TankTimer->setTimeout(HIT_FILTER_mS, EnableHitReception);
                 }
                 return HIT_TYPE_CANNON; // Return cannon hit type 
             }
@@ -858,7 +861,7 @@ boolean TwoShotHit = false;
                     // After that time it will automatically recover itself. During invulnerability time, the tank can fire but is impervious to enemy fire. 
                     // Invulnerability time is dependent on the weight class. 
                     isDestroyed = true;
-                    TankTimer.setTimeout(DESTROYED_INOPERATIVE_TIME_mS, ResetBattle);   // DESTROYED_INOPERATIVE_TIME_mS is defined in OP_BattleTimes.h
+                    TankTimer->setTimeout(DESTROYED_INOPERATIVE_TIME_mS, ResetBattle);   // DESTROYED_INOPERATIVE_TIME_mS is defined in OP_BattleTimes.h
                     // Start the destroyed light effect directly
                     HitLEDs_Destroyed();    
                 }
@@ -886,7 +889,7 @@ boolean TwoShotHit = false;
                 // Reenable hit reception immediately. The point is that while being repaired, the tank is vulnerable. 
                 EnableHitReception();
                 // Start the repair timer. During this time we can not be repaired again, nor can we move (the move disabling is handled by the sketch)
-                RepairTimerID = TankTimer.setTimeout(REPAIR_TIME_mS, RepairOver);   // REPAIR_TIME_mS is set in OP_BattleTimes.h
+                RepairTimerID = TankTimer->setTimeout(REPAIR_TIME_mS, RepairOver);   // REPAIR_TIME_mS is set in OP_BattleTimes.h
                 // Return "hit" type
                 return HIT_TYPE_REPAIR;
                 // Note - we don't decrease the damage just yet. That only happens at the end of the repair operation, if the vehicle makes it that long
@@ -936,7 +939,7 @@ void OP_Tank::RepairOver(void)
 void OP_Tank::StopRepair(void)
 {
     // Stop this timer from running
-    if (TankTimer.isEnabled(RepairTimerID)) { TankTimer.deleteTimer(RepairTimerID); }
+    if (TankTimer->isEnabled(RepairTimerID)) { TankTimer->deleteTimer(RepairTimerID); }
     
     if (RepairOngoing) 
     { 
@@ -980,7 +983,7 @@ void OP_Tank::EnableHitReception(void)
         // We want to enable reception, but we are also still in the middle of sending a signal out. 
         // Start a repeating timer that will keep checking back, and auto enable hit reception
         // when the transmission is done. 
-        TankTimer.setTimeout(5, EnableHitReception);
+        TankTimer->setTimeout(5, EnableHitReception);
     }
 }
 
@@ -1069,7 +1072,7 @@ void OP_Tank::ResetBattle(void)
     MGHitsTaken = 0;
     DamagePct = 0;
     DisableHitReception();      // Ignore enemy fire
-    TankTimer.setTimeout(BattleSettings.ClassSettings.recoveryTime, EnableHitReception);    // Enable hits after recovery (invulnerability) time has passed
+    TankTimer->setTimeout(BattleSettings.ClassSettings.recoveryTime, EnableHitReception);    // Enable hits after recovery (invulnerability) time has passed
 }
 
 
@@ -1108,17 +1111,17 @@ void OP_Tank::HitLEDs_CannonHit(void)
 
     // If we are still in the middle of running a flickering effect, just 
     // extend the time it runs. 
-    if (TankTimer.isEnabled(HitLED_TimerID)) 
+    if (TankTimer->isEnabled(HitLED_TimerID)) 
     { 
         // Delete the currently running timeout timer
-        TankTimer.deleteTimer(HitLED_TimerID); 
+        TankTimer->deleteTimer(HitLED_TimerID); 
         // Start a new one
-        HitLED_TimerID = TankTimer.setTimeout(FLICKER_EFFECT_LENGTH_mS, CannonHitLEDs_Stop);
+        HitLED_TimerID = TankTimer->setTimeout(FLICKER_EFFECT_LENGTH_mS, CannonHitLEDs_Stop);
         // In the meanwhile, the flickering effect will continue to run
     }
     
     // In this case the previous effect is over, so start a new one
-    if (!TankTimer.isEnabled(FadeStep_TimerID))
+    if (!TankTimer->isEnabled(FadeStep_TimerID))
     {
         // We will set FadeOut = true later, when we are done with the effect and want to fade out
         FadeOut = false;
@@ -1132,9 +1135,9 @@ void OP_Tank::HitLEDs_CannonHit(void)
         // Pick some random fade speed to get there
         FadeStep = -random(MIN_FADE_STEP, MAX_FADE_STEP);   // negative step value      
         // Start the fade timer, it will decrement the brightness by FadeStep every FADE_UPDATE_mS milliseconds until it reaches FadeTarget
-        FadeStep_TimerID = TankTimer.setInterval(FADE_UPDATE_mS, CannonHitLEDs_Update);
+        FadeStep_TimerID = TankTimer->setInterval(FADE_UPDATE_mS, CannonHitLEDs_Update);
         // Now start another one-shot timer to cancel the overall effect after FLICKER_EFFECT_LENGTH_mS milliseconds
-        HitLED_TimerID = TankTimer.setTimeout(FLICKER_EFFECT_LENGTH_mS, CannonHitLEDs_Stop);
+        HitLED_TimerID = TankTimer->setTimeout(FLICKER_EFFECT_LENGTH_mS, CannonHitLEDs_Stop);
     }
 }
 void OP_Tank::CannonHitLEDs_Update(void)
@@ -1170,9 +1173,9 @@ static boolean StopNextTime = false;
         {
             // We've reached the end of the last fade. Stop the timer and turn off the lights
             // (but they should already be off)
-            if (TankTimer.isEnabled(FadeStep_TimerID))
+            if (TankTimer->isEnabled(FadeStep_TimerID))
             {
-                TankTimer.deleteTimer(FadeStep_TimerID);
+                TankTimer->deleteTimer(FadeStep_TimerID);
                 HitLEDs_Off();
                 CurrentFadeLevel = 0;
                 // Reset
@@ -1192,7 +1195,7 @@ static boolean StopNextTime = false;
 }
 void OP_Tank::CannonHitLEDs_Stop(void)
 {
-    if (TankTimer.isEnabled(FadeStep_TimerID))
+    if (TankTimer->isEnabled(FadeStep_TimerID))
     {
         FadeOut = true;
     }
@@ -1219,14 +1222,14 @@ void OP_Tank::HitLEDs_MGHit(void)
         {
             HitLEDs_Off();
             // Come back to this routine after the specified time for this step is up
-            TankTimer.setTimeout(time[curStep], HitLEDs_MGHit);
+            TankTimer->setTimeout(time[curStep], HitLEDs_MGHit);
         } 
         // Even numbers get turned on
         else        
         {
             HitLEDs_On();
             // Come back to this routine after the specified time for this step is up
-            TankTimer.setTimeout(time[curStep], HitLEDs_MGHit);
+            TankTimer->setTimeout(time[curStep], HitLEDs_MGHit);
         }
         curStep += 1;
     }
@@ -1254,13 +1257,13 @@ void OP_Tank::HitLEDs_Destroyed()
     {   // In this case, we are just starting at the beginning of being destroyed.
     
         // Shoudn't need to, but delete the timer if it already exists
-        if (TankTimer.isEnabled(DestroyedBlinkerID)) { TankTimer.deleteTimer(DestroyedBlinkerID); } 
+        if (TankTimer->isEnabled(DestroyedBlinkerID)) { TankTimer->deleteTimer(DestroyedBlinkerID); } 
         
         // Turn the lights on
         HitLEDs_On();   
         
         // Now set a timer to keep coming back here after a short interval so we can blink the lights
-        DestroyedBlinkerID = TankTimer.setInterval(450, HitLEDs_Destroyed);     // This is a slow blink, about half a second
+        DestroyedBlinkerID = TankTimer->setInterval(450, HitLEDs_Destroyed);     // This is a slow blink, about half a second
         
         // The effect has been started
         started = true;
@@ -1274,9 +1277,9 @@ void OP_Tank::HitLEDs_Destroyed()
         if (HitLEDsOn)
         {
             // In this case, we can start fading out slowly
-            TankTimer.deleteTimer(DestroyedBlinkerID);
+            TankTimer->deleteTimer(DestroyedBlinkerID);
             // Start a new timer that will call us much more frequently
-            DestroyedBlinkerID = TankTimer.setInterval(FADE_UPDATE_mS, HitLEDs_Destroyed);
+            DestroyedBlinkerID = TankTimer->setInterval(FADE_UPDATE_mS, HitLEDs_Destroyed);
             started = false; // Change this to false
         }
         else
@@ -1296,7 +1299,7 @@ void OP_Tank::HitLEDs_Destroyed()
         else
         {
             // We're completely done
-            TankTimer.deleteTimer(DestroyedBlinkerID);
+            TankTimer->deleteTimer(DestroyedBlinkerID);
             HitLEDs_Off();
             fadeLevel = 255;    // reset for next time
         }
@@ -1315,7 +1318,7 @@ void OP_Tank::Repair_BlinkHandler(void)
     }
     else 
     {   // Stop the repair blinking effect
-        if (TankTimer.isEnabled(HitLED_TimerID)) TankTimer.deleteTimer(HitLED_TimerID);
+        if (TankTimer->isEnabled(HitLED_TimerID)) TankTimer->deleteTimer(HitLED_TimerID);
         HitLEDs_Off();
     }
 }
@@ -1359,12 +1362,12 @@ void OP_Tank::HitLEDs_Repair(void)
         effectStarted = false;
         HitLEDs_Off();
         // Effect is done, go back to Repair_BlinkHandler. It will restart the blinking effect if appropriate. 
-        HitLED_TimerID = TankTimer.setTimeout(250,Repair_BlinkHandler);
+        HitLED_TimerID = TankTimer->setTimeout(250,Repair_BlinkHandler);
     }
     else
     {
         // Now set a timer to come back here and toggle it after the correct length of time has passed.
-        HitLED_TimerID = TankTimer.setTimeout(Interval, HitLEDs_Repair);
+        HitLED_TimerID = TankTimer->setTimeout(Interval, HitLEDs_Repair);
     }
 
     // For next time
@@ -1372,11 +1375,4 @@ void OP_Tank::HitLEDs_Repair(void)
 }
 
 
-//------------------------------------------------------------------------------------------------------------------------>>
-// MISC
-//------------------------------------------------------------------------------------------------------------------------>>
-void OP_Tank::UpdateTimer()
-{
-    TankTimer.run();
-}
 

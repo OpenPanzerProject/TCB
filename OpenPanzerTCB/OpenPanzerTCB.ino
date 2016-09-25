@@ -62,7 +62,7 @@
 // DEBUG FLAG
     boolean DEBUG = false;                       // Start at false, but it will later get set to whatever value is stored in EEPROM
     boolean SAVE_DEBUG = false;                  // We may temporarily want to disable the debug, but we save a copy of the actual state so we can revert it
-    HardwareSerial *DebugSerial;                 // Which serial port to print debug messages to
+    HardwareSerial *DebugSerial;                 // Which serial port to print debug messages to (HardwareSerial is equal to Serial0/Serial Port 0/USART0)
 
 // RADIO INPUTS
     OP_Radio Radio;
@@ -90,7 +90,7 @@
     OP_Driver Driver;                         
     OP_Engine TankEngine;
     OP_Transmission TankTransmission;
-    OP_TBS TankSound;
+    OP_TBS TankSound;                            // If we end up with other sound cards, we will need to make this a generic sound object of some kind and then select the specific type based on user selection similar to motor drive types
     OP_Tank Tank;                              
 
 // MOTOR OBJECTS
@@ -244,13 +244,14 @@ void setup()
 
     // OTHER OBJECTS - BEGIN
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
+        Radio.begin(&timer);                        // Doesn't really begin anything, but we do need to pass it our timer object
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
                      eeprom.ramcopy.NeutralTurnAllowed);
         SetDrivingProfile(DrivingProfile);   // See Driving tab
         TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
         TankTransmission.begin(SAVE_DEBUG, DebugSerial);
-        TankSound.begin();
+        TankSound.begin(&timer);     // This class takes a reference to our SimpleTimer
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
         // whether we are running an airsoft unit or mechanical recoil, the mechanical recoil delay, the machine gun blink interval, 
         // and it also needs a pointer to our Servo_RECOIL object and the TankSound object. RecoilServo is already a pointer, but TankSound we pass by reference.
@@ -277,7 +278,8 @@ void setup()
                    eeprom.ramcopy.HiFlashWithCannon,
                    eeprom.ramcopy.MGLightBlink_mS,
                    RecoilServo, 
-                   &TankSound);
+                   &TankSound,
+                   &timer);
 
 
     // SPECIAL FUNCTIONS - has to come after object creation, because we may assign function pointers to object member functions

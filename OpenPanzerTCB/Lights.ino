@@ -430,6 +430,7 @@ static boolean Toggle = true;
     digitalWrite(pin_Light2, !Toggle);
     digitalWrite(pin_Brakelights, !Toggle);   
     digitalWrite(pin_HitNotifyLEDs, Toggle);
+    AuxOutputOff(); // This one doesn't toggle, just always stays off. 
     Toggle ? MGLightOff() : MGLightOn();
     // Swap for next time
     Toggle = !Toggle;
@@ -453,17 +454,19 @@ const int FailsafeBlinkRate = 50;
     // Start the failsafe blinker if it isn't already
     if (timer.isEnabled(RxSignalLostTimerID) == false)   
     {
+        // Start with all lights off. This keeps off any outputs that we aren't going to include in the blinking effect (ie Aux output which may not be driving a light anyway)
+        AllLightsOff();
+            
         // The user has the option of blinking all the lights if radio signal is lost, but if not, 
         // we still blink the on-board LEDs (green and red)
         if (eeprom.ramcopy.FlashLightsWhenSignalLost) 
         {
+            // Blink all lights
             RxSignalLostTimerID = timer.setInterval(FailsafeBlinkRate, RandomLights);
         }
         else 
         {   
-            // We may not be blinking the off-board LEDs, but we still turn them off
-            AllLightsOff();
-            // Blink the onboard LEDs
+            // Blink only the onboard LEDs
             RxSignalLostTimerID = timer.setInterval(FailsafeBlinkRate, RandomLightsOnboardOnly);
         }
     }

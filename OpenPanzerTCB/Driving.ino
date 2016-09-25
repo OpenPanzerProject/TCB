@@ -69,7 +69,6 @@ void EngineOn()
                 {   // In this case the user has set a delay from the time the engine starts to when the transmission should be engaged. Typically this is to prevent the 
                     // transmission from engaging before the engine startup sound is complete. So we set a timer that will engage it after the set amount of time. 
                     timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngage); 
-                    // TankTransmission.PutInGear_Delay(TransmissionDelay_mS);   // Alternate way which doesn't seem to work as well, never figured out why
     
                     // Also start the smoker. We start in fast idle until the transmission engages
                     SetSmoker_FastIdle();

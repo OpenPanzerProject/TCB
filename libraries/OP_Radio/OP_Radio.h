@@ -55,6 +55,8 @@ class OP_Radio
 {
     public: 
         OP_Radio();                                                     // Constructor
+        static void             begin(OP_SimpleTimer * t);              // Get a reference to the sketch's SimpleTimer
+        
         static void             detect(void);                           // See what kind of signal is attached
         static void             begin(_eeprom_data *storage);           // This loads the save eeprom information into the radio object, and does basic initialization
         static boolean          hasBegun(void);                         // Did we already call the begin() function yet? 
@@ -108,7 +110,7 @@ class OP_Radio
         static void             pollSBus(void);                         // SBus needs polling
         static void             polliBus(void);                         // iBus needs polling
         
-        static OP_SimpleTimer   radioTimer;                             // Used for watchdog timer and other stuff
+        static OP_SimpleTimer * radioTimer;                             // Used for watchdog timer and other stuff. Pointer to the sketch's SimpleTimer, rather than creating a new instance of the class. 
         static uint8_t          channelCount;                           // How many channels were detected in the PPM stream
         static common_channel_settings  ptrCommonChannelSettings[(STICKCHANNELS + AUXCHANNELS)];    // This array of pointers to common channel settings for all channels allows us to loop through them quickly, see GetPPMFrame() in RadioInputs tab. 
                                                                                                     // And yes, it says "ptr" but you see no *. But look in OP_RadioDefines.h for the struct definition, it is all pointers. 

@@ -32,6 +32,7 @@
 #define OP_SIMPLETIMER_H
 
 #include <Arduino.h>
+#include "OP_Settings.h"
 
 typedef void (*timer_callback)(void);
 
@@ -39,7 +40,7 @@ class OP_SimpleTimer {
 
 public:
     // maximum number of timers
-    const static int MAX_TIMERS = 10;
+    const static int MAX_TIMERS = MAX_SIMPLETIMER_SLOTS;    // See OP_Settings.h under the SIMPER TIMER heading for the definition of MAX_SIMPLETIMER_SLOTS and how it was calculated. 
 
     // setTimer() constants
     const static int RUN_FOREVER = 0;

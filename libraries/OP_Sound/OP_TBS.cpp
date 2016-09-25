@@ -27,7 +27,7 @@
  
 // Static variables must be initialized outside the class 
 OP_Servos     * OP_TBS::TBSProp;
-OP_SimpleTimer  OP_TBS::TBSTimer;
+OP_SimpleTimer * OP_TBS::TBSTimer;
 int             OP_TBS::TBSProp2TimerID;
 boolean         OP_TBS::Prop2TimerComplete;
 int             OP_TBS::TBSProp3TimerID;
@@ -91,8 +91,10 @@ OP_TBS::OP_TBS()
 }
 
 
-void OP_TBS::begin(void)
+void OP_TBS::begin(OP_SimpleTimer * t)
 {
+    OP_TBS::TBSTimer = t;                                   // We will use the sketch's SimpleTimer object rather than creating a new instance of the class
+    
     TBSProp->attach(PROP1);
     TBSProp->attach(PROP2);
     TBSProp->attach(PROP3);
@@ -134,14 +136,14 @@ void OP_TBS::StartProp2Timer(void)
 {
     // Start the timer to briefly toggle the Prop2 input
     Prop2TimerComplete = false;
-    TBSProp2TimerID = TBSTimer.setTimeout(TBS_SIGNAL_mS, ClearProp2Timer);
+    TBSProp2TimerID = TBSTimer->setTimeout(TBS_SIGNAL_mS, ClearProp2Timer);
 }
 
 void OP_TBS::StartProp2Timer(int HowLong_mS)
 {
     // Start the timer and leave it on for the set amount of time
     Prop2TimerComplete = false;
-    TBSProp2TimerID = TBSTimer.setTimeout(HowLong_mS, ClearProp2Timer);
+    TBSProp2TimerID = TBSTimer->setTimeout(HowLong_mS, ClearProp2Timer);
 }
 
 void OP_TBS::ClearProp2Timer(void)
@@ -231,7 +233,7 @@ void OP_TBS::StartProp3Timer(void)
 {
     // Start the timer to briefly send a special sound signal. 
     Prop3TimerComplete = false;
-    TBSProp3TimerID = TBSTimer.setTimeout(TBS_SIGNAL_mS, ClearProp3Timer);    
+    TBSProp3TimerID = TBSTimer->setTimeout(TBS_SIGNAL_mS, ClearProp3Timer);    
 }
 
 void OP_TBS::ClearProp3Timer(void)
@@ -393,7 +395,7 @@ void OP_TBS::StartSqueaks(void)
     // SQUEAK_DELAY_mS time before truly starting them
     if (AllSqueaks_Active == false)
     {   // It doesn't matter what ID we use for this, so long as it's one that will get cleared when StopSqueaks() gets called
-        Squeak1TimerID = TBSTimer.setTimeout(SQUEAK_DELAY_mS, StartSqueaksForReal);
+        Squeak1TimerID = TBSTimer->setTimeout(SQUEAK_DELAY_mS, StartSqueaksForReal);
         AllSqueaks_Active = true;
     }
 }
@@ -435,7 +437,7 @@ void OP_TBS::Squeak1(void)
         // Play the squeak sound
         TriggerSpecialSound(SOUND_SQUEAK_1);
         // Wait some random amount of time, then call me again
-        Squeak1TimerID = TBSTimer.setTimeout(random(SQUEAK1_MIN_mS,SQUEAK1_MAX_mS), Squeak1);    
+        Squeak1TimerID = TBSTimer->setTimeout(random(SQUEAK1_MIN_mS,SQUEAK1_MAX_mS), Squeak1);    
     }
 }
 void OP_TBS::Squeak1_Activate(void)
@@ -449,7 +451,7 @@ void OP_TBS::Squeak1_Activate(void)
 }
 void OP_TBS::Squeak1_Pause(void)
 {
-    TBSTimer.deleteTimer(Squeak1TimerID);
+    TBSTimer->deleteTimer(Squeak1TimerID);
     Squeak1_Active = false;
 }
 
@@ -473,7 +475,7 @@ void OP_TBS::Squeak2(void)
         // Play the squeak sound
         TriggerSpecialSound(SOUND_SQUEAK_2);
         // Wait some random amount of time, then call me again
-        Squeak2TimerID = TBSTimer.setTimeout(random(SQUEAK2_MIN_mS,SQUEAK2_MAX_mS), Squeak2);       
+        Squeak2TimerID = TBSTimer->setTimeout(random(SQUEAK2_MIN_mS,SQUEAK2_MAX_mS), Squeak2);       
     }
 }
 void OP_TBS::Squeak2_Activate(void)
@@ -487,7 +489,7 @@ void OP_TBS::Squeak2_Activate(void)
 }
 void OP_TBS::Squeak2_Pause(void)
 {
-    TBSTimer.deleteTimer(Squeak2TimerID);
+    TBSTimer->deleteTimer(Squeak2TimerID);
     Squeak2_Active = false;
 }
 
@@ -511,7 +513,7 @@ void OP_TBS::Squeak3(void)
         // Play the squeak sound
         TriggerSpecialSound(SOUND_SQUEAK_3);
         // Wait some random amount of time, then call me again
-        Squeak3TimerID = TBSTimer.setTimeout(random(SQUEAK3_MIN_mS,SQUEAK3_MAX_mS), Squeak3);    
+        Squeak3TimerID = TBSTimer->setTimeout(random(SQUEAK3_MIN_mS,SQUEAK3_MAX_mS), Squeak3);    
     }
 }
 void OP_TBS::Squeak3_Activate(void)
@@ -525,18 +527,10 @@ void OP_TBS::Squeak3_Activate(void)
 }
 void OP_TBS::Squeak3_Pause(void)
 {
-    TBSTimer.deleteTimer(Squeak3TimerID);
+    TBSTimer->deleteTimer(Squeak3TimerID);
     Squeak3_Active = false;
 }
 
-
-//------------------------------------------------------------------------------------------------------------------------>>
-// UPDATE TBS TIMER
-//------------------------------------------------------------------------------------------------------------------------>>
-void OP_TBS::UpdateTimer(void)
-{
-    TBSTimer.run();
-}
 
 
 //------------------------------------------------------------------------------------------------------------------------>>

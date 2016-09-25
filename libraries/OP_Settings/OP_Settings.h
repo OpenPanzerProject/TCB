@@ -237,6 +237,26 @@
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// SIMPLE TIMER
+// ------------------------------------------------------------------------------------------------------------------------------------------------------->>
+    // We use the OP_SimpleTimer class for convenient timing functions throughout the project, it is a modified and improved version 
+    // of SimpleTimer: http://playground.arduino.cc/Code/SimpleTimer
+    // The class needs to know how many simultaneous timers may be active at any one time. We don't want this number too low or operation will be eratic, 
+    // but setting it too high will waste RAM. Each additional slot costs 19 bytes of global RAM. 
+
+    // Our best estimate as of 9/22/2016 (version 00.91.06) is: 
+    // Main Sketch:     7       At least 14 slots but shouldn't be more than 7 active at any one time
+    // OP_Radio:        3       4 slots but only up to 3 utilized at one time (radio detect, watchdog, elevation & azimuth ignore timers)
+    // OP_Tank:         11      At least 15 slots but shouldn't be possible for more than 11 to be active at one time
+    // OP_TBS (sound):  5       Prop2, Prop3, plus 3 squeak slots, all could be active simultaneously
+    //-----------------------
+    // TOTAL:           26   
+
+    #define MAX_SIMPLETIMER_SLOTS       30          // Based on the calculations above, this gives us a few extra slots in case we miscalculated or if we need to add more
+                                                    // But any time you add more you should re-visit this list. Sometimes extra timer slots can be used that would only 
+                                                    // operate at times when other timers must be inactive, so not all new timers require the creation of new slots. 
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // SERVO OUTPUTS 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // What pulsewidth for stopping a "servo" ESC. Should be 1500. 

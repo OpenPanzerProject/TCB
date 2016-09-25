@@ -135,7 +135,7 @@ class OP_TBS
 public:
     // Initalize
     OP_TBS();                                   // Constructor
-    static void begin(void);                    // Attach servo outputs and initialize
+    static void begin(OP_SimpleTimer * t);      // Attach servo outputs and initialize
 
     // PROP1: Engine speed sound
     static void SetEngineSpeed(int);            // Send the engine speed to TBS
@@ -188,14 +188,13 @@ public:
     static void SetSqueak3_Interval(unsigned int, unsigned int);
 
     // Utilities
-    static void UpdateTimer(void);
     static void TeachEncoder(void);
 
     
 
  private:   
     static OP_Servos  * TBSProp;
-    static OP_SimpleTimer TBSTimer;
+    static OP_SimpleTimer * TBSTimer;           // Pointer to the sketch's simple timer so we don't have to create a whole new one.
     // PROP 2
     static int          TBSProp2TimerID;
     static boolean      Prop2TimerComplete; 

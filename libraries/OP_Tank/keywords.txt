@@ -15,7 +15,6 @@ OP_Tank	KEYWORD1
 # KEYWORD2 - Methods, functions, members
 #-------------------------------------------------------------
 begin	KEYWORD2
-UpdateTimer	KEYWORD2
 Fire	KEYWORD2
 CannonReloaded	KEYWORD2
 SetMechBarrelWithCannon	KEYWORD2

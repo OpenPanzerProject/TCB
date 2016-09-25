@@ -11,15 +11,13 @@ void PerLoopUpdates(void)
 void UpdateSimpleTimers()
 {
     timer.run();                        // This timer is local to the sketch. It is used in the main loop and elsewhere (eg Machine Gun). 
-    Radio.Update();                     // Radio timer (watchdog, SBus polling)
+    Radio.Update();                     // Radio update (polls SBus and iBus)
     TankEngine.UpdateTimer();           // Engine timer (see OP_Driver library)
     TankTransmission.UpdateTimer();     // Transmission timer (see OP_Driver library)
-    TankSound.UpdateTimer();            // Sound timer (see OP_TBS library)
-    Tank.UpdateTimer();                 // General tank object (see OP_Tank library)
     
     // Now we also update the four motor objects. The motor update() routines will only do something if the motor type is a serial controller. 
-    // We use this to force send serial commands at a set interval, this keeps us from tripping the serial watchdog that for example 
-    // the Scout ESC implements. 
+    // We can use this to force serial commands be sent at set intervals even if the command hasn't changed; this keeps us from tripping the serial 
+    // watchdog that for example the Scout ESC implements. 
     if (eeprom.ramcopy.DriveType == DT_CAR) { DriveMotor->update(); }
     else { RightTread->update(); LeftTread->update(); }
     TurretRotation->update();

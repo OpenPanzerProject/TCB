@@ -15,8 +15,7 @@ boolean                     OP_Radio::PPMFailed;
 boolean                     OP_Radio::SBusFailed;
 boolean                     OP_Radio::iBusFailed;       
 RADIO_PROTOCOL              OP_Radio::Protocol;                     // Which protocol detected
-
-OP_SimpleTimer              OP_Radio::radioTimer;
+OP_SimpleTimer            * OP_Radio::radioTimer;
 uint8_t                     OP_Radio::channelCount;
 common_channel_settings     OP_Radio::ptrCommonChannelSettings[(STICKCHANNELS + AUXCHANNELS)];    // This array of pointers to common channel settings for all channels allows us to loop through them quickly, see GetPPMFrame() in RadioInputs tab. 
 int16_t                     OP_Radio::ignoreTurretDelay_mS;
@@ -74,6 +73,11 @@ OP_Radio::OP_Radio()
 }
 
 
+void OP_Radio::begin(OP_SimpleTimer * t)
+{   // All we do here is save a pointer to the sketch's SimpleTimer
+    radioTimer = t;
+}
+
 void OP_Radio::detect(void)
 {
 // This function tries to detect a radio signal (PPM, SBus, or iBus). It tries one, if it fails, it tries the next,
@@ -97,7 +101,7 @@ static boolean started = false;
                     PPMDecoder = new PPMDecode;
                     PPMDecoder->begin();
                     // Start a try timer
-                    radioTimer.setTimeout(PPM_TRY_TIME, failPPM);
+                    radioTimer->setTimeout(PPM_TRY_TIME, failPPM);
                     started = true;
                     //Serial.println(F("Seaching for PPM..."));
                 }
@@ -109,7 +113,7 @@ static boolean started = false;
                     SBusDecoder = new SBusDecode;
                     SBusDecoder->begin();
                     // Start a try timer
-                    radioTimer.setTimeout(SBUS_TRY_TIME, failSBus);
+                    radioTimer->setTimeout(SBUS_TRY_TIME, failSBus);
                     started = true;
                     //Serial.println(F("Seaching for SBus..."));
                 }
@@ -121,7 +125,7 @@ static boolean started = false;
                     iBusDecoder = new iBusDecode;
                     iBusDecoder->begin();
                     // Start a try timer
-                    radioTimer.setTimeout(iBUS_TRY_TIME, failiBus);
+                    radioTimer->setTimeout(iBUS_TRY_TIME, failiBus);
                     started = true;
                     //Serial.println(F("Seaching for iBus..."));
                 }
@@ -396,12 +400,12 @@ boolean OP_Radio::GetCommands()
                     {
                         Sticks.Elevation.ignore = true;  // Ignore the commands
                         // Keep ignoring them until the timer is up
-                        if (radioTimer.isEnabled(IgnoreElevationTimerID) == false) { IgnoreElevationTimerID = radioTimer.setTimeout(ignoreTurretDelay_mS, EnableElevationStick); }
+                        if (radioTimer->isEnabled(IgnoreElevationTimerID) == false) { IgnoreElevationTimerID = radioTimer->setTimeout(ignoreTurretDelay_mS, EnableElevationStick); }
                     }
                     else
                     {
                         // In this case we don't want to ignore it, so clear the ignore flag. 
-                        if (radioTimer.isEnabled(IgnoreElevationTimerID) == false) { Sticks.Elevation.ignore = false; }
+                        if (radioTimer->isEnabled(IgnoreElevationTimerID) == false) { Sticks.Elevation.ignore = false; }
                     }
 
                     // This is azimuth
@@ -409,12 +413,12 @@ boolean OP_Radio::GetCommands()
                     {
                         Sticks.Azimuth.ignore = true;  // Ignore the commands
                         // Keep ignoring them until the timer is up
-                        if (radioTimer.isEnabled(IgnoreAzimuthTimerID) == false) { IgnoreAzimuthTimerID = radioTimer.setTimeout(ignoreTurretDelay_mS, EnableAzimuthStick); }
+                        if (radioTimer->isEnabled(IgnoreAzimuthTimerID) == false) { IgnoreAzimuthTimerID = radioTimer->setTimeout(ignoreTurretDelay_mS, EnableAzimuthStick); }
                     }
                     else
                     {
                         // In this case we don't want to ignore it, so clear the ignore flag. 
-                        if (radioTimer.isEnabled(IgnoreAzimuthTimerID) == false) { Sticks.Azimuth.ignore = false; }
+                        if (radioTimer->isEnabled(IgnoreAzimuthTimerID) == false) { Sticks.Azimuth.ignore = false; }
                     }    
                 }
                 else
@@ -462,18 +466,18 @@ boolean OP_Radio::GetCommands()
 void OP_Radio::startWatchdog()
 {
     // Start the watchdog timer
-    if (!radioTimer.isEnabled(WatchdogTimerID))
+    if (!radioTimer->isEnabled(WatchdogTimerID))
     {
-        WatchdogTimerID = radioTimer.setTimeout(RADIO_FAILSAFE_MS, SetChannelsFailSafe);  
+        WatchdogTimerID = radioTimer->setTimeout(RADIO_FAILSAFE_MS, SetChannelsFailSafe);  
     }
 }
 
 void OP_Radio::restartWatchdog()
 {
-    if (radioTimer.isEnabled(WatchdogTimerID))
+    if (radioTimer->isEnabled(WatchdogTimerID))
     {   
         // Re-set the timer to the beginning
-        radioTimer.restartTimer(WatchdogTimerID);
+        radioTimer->restartTimer(WatchdogTimerID);
     }
     else
     {   // In this case the timer hasn't been created yet, so do it now. 
@@ -913,7 +917,8 @@ void OP_Radio::Update(void)
 {   
     pollSBus();
     polliBus();
-    radioTimer.run();
+    // We don't need to update radioTimer because it is just a pointer to the sketch's timer, 
+    // and the sketch will update that itself. 
 }
 
 void OP_Radio::pollSBus(void)

@@ -117,11 +117,8 @@ typedef struct battle_settings{
 class OP_Tank
 {   public:
         OP_Tank(void);                              // Constructor
-        static void     begin(battle_settings, bool, bool, bool, int, bool, uint8_t, Servo_RECOIL *, OP_TBS *);     
-        // battle_settings, boolean mechanical barrel with cannon, boolean airsoft, boolean servo recoil with cannon, int recoil delay, bool flash with cannon, uint8_t machine gun blink interval, pointers to recoil servo and sound object
-    
-        // Functions - general
-        static void     UpdateTimer(void);          // This updates the timer
+        static void     begin(battle_settings, bool, bool, bool, int, bool, uint8_t, Servo_RECOIL *, OP_TBS *, OP_SimpleTimer *);     
+        // battle_settings, boolean mechanical barrel with cannon, boolean airsoft, boolean servo recoil with cannon, int recoil delay, bool flash with cannon, uint8_t machine gun blink interval, pointers to recoil servo, sound object, and sketch's SimpleTimer
         
         // Functions - Cannon Fire
         static void     Fire(void);                 // Fires the correct IR signal based on the IR protocol 
@@ -149,7 +146,7 @@ class OP_Tank
                 
         // Mechanical recoil switch interrupt
         static void     INT6_RECOIL_ISR(void);      // The actual ISR will call this public member function, in order that it can access class variables
-                                                    // Arduino gives us an error if we put this in protected
+                                                    // We don't need this to be a public function but Arduino gives us an error if we put it in protected
         // Machine Gun
         static void     MachineGun(void);
         static void     MachineGun_Stop(void);
@@ -248,7 +245,7 @@ class OP_Tank
 
         // Misc
         static boolean  IR_Enabled;                 // True if either cannon or MG enabled, false if both disabled
-        static OP_SimpleTimer TankTimer;
+        static OP_SimpleTimer * TankTimer;
         static Servo_RECOIL * _RecoilServo;
         static OP_TBS   * _TankSound;
         
