@@ -126,7 +126,7 @@ void OPScout_SerialESC::stop(void)
 }
 
 void OPScout_SerialESC::update(void)
-{
+{   // MotorSignal_Repeat_mS is defined in OP_Settings.h
     if (millis() - LastUpdate_mS > MotorSignal_Repeat_mS)
     {
         OPScout_SerialESC::setSpeed(curspeed);
@@ -202,7 +202,7 @@ void Sabertooth_SerialESC::stop(void)
 void Sabertooth_SerialESC::update(void)
 {
     if (millis() - LastUpdate_mS > MotorSignal_Repeat_mS)
-    {
+    {   // MotorSignal_Repeat_mS is defined in OP_Settings.h
         Sabertooth_SerialESC::setSpeed(curspeed);
     }
 }
@@ -266,7 +266,7 @@ void Pololu_SerialESC::stop(void)
 void Pololu_SerialESC::update(void)
 {
     if (millis() - LastUpdate_mS > MotorSignal_Repeat_mS)
-    {
+    {   // MotorSignal_Repeat_mS is defined in OP_Settings.h
         Pololu_SerialESC::setSpeed(curspeed);
     }
 }
@@ -386,38 +386,127 @@ void Onboard_Smoker::begin(void)
         {   // For safety's sake, set the output duty cycle to 0 before starting. This should also already have been done in SetupTimer5()
             OB_SMOKER_OCR = 0;  
         }
+    
+    // Smoker effect - none right now
+        smoker_effect = NONE;
 }
 
 void Onboard_Smoker::setSpeed(int s)
 {
-    // make sure we are using the internal range
-    // We don't do reverse so negative values are converted to positive with abs()
-    s = map_Range(abs(s));
+    clearSmokerEffect();        // Clear any special effect - they only run when manual commands are not being given
+    
+    s = map_Range(abs(s));      // make sure we are using the internal range
+                                // We don't do reverse so negative values are converted to positive with abs()
     
     // Set the PWM duty cycle
-    OB_SMOKER_OCR = (s);    // OB_SMOKER_OCR is defined in OP_Settings.h
+    OB_SMOKER_OCR = (s);        // OB_SMOKER_OCR is defined in OP_Settings.h
+
+    curspeed = s;               // Save current speed    
+    LastUpdate_mS = millis();   // Save the time
+}
+
+void Onboard_Smoker::setSpeed_wEffect(int s)
+{   // The only difference here from setSpeed is that we don't clear the smoker effect, and we also don't call this function publicly, 
+    // only privately
+    
+    s = map_Range(abs(s));      // make sure we are using the internal range
+                                // We don't do reverse so negative values are converted to positive with abs()
+    
+    // Set the PWM duty cycle
+    OB_SMOKER_OCR = (s);        // OB_SMOKER_OCR is defined in OP_Settings.h
+
+    curspeed = s;               // Save current speed    
+    LastUpdate_mS = millis();   // Save the time
 }
 
 void Onboard_Smoker::stop(void)
-{                           // This first line is probably not necessary, but for safety's sake, 
-    restore_Speed();        // we restore our internal range to default values, where the minimum possible speed is 0 (off)
-    OB_SMOKER_OCR = 0;      // Now we explicitly set duty cycle to 0, pin low - output is off. 
+{                           
+    clearSmokerEffect();        // Clear any special effect - they only run when manual commands are not being given
+    
+    restore_Speed();            // This line is probably not necessary, but for safety's sake, 
+                                // we restore our internal range to default values, where the minimum possible speed is 0 (off)
+
+    OB_SMOKER_OCR = 0;          // Now we explicitly set duty cycle to 0, pin low - output is off. 
+
+    curspeed = 0;               // Save current speed
+    LastUpdate_mS = millis();   // Save the time    
 }
 
 void Onboard_Smoker::setIdle(void)
 {
+    clearSmokerEffect();        // Clear any special effect - they only run when manual commands are not being given
+    
     // When idling, we want the minimum speed (speed at input of 0) to be IdleSpeed
     // The easiest way to do this is just change the internal range. 
     set_InternalRange(_IdleSpeed, 255, _IdleSpeed);
     this->setSpeed(0);
+    
+    curspeed = 0;               // Save current speed
+    LastUpdate_mS = millis();   // Save the time
 }
 
 void Onboard_Smoker::setFastIdle(void)
 {
+    clearSmokerEffect();        // Clear any special effect - they only run when manual commands are not being given
+    
     // At fast idle (idle with transmission disengaged) we want the minimum speed (speed at input of 0) to be FastIdleSpeed
     // The easiest way to do this is just change the internal range. 
     this->set_InternalRange(_FastIdleSpeed, 255, _FastIdleSpeed);
     this->setSpeed(0);
+
+    curspeed = 0;               // Save current speed    
+    LastUpdate_mS = millis();   // Save the time    
+}
+
+void Onboard_Smoker::Shutdown(boolean engaged)
+{
+    // Here we are going to slowly turn off the smoker. We can't use the ramp feature of ThrottleSpeed in the main sketch because the smoker
+    // treats 0 throttle as idle speed (non-zero). In other words, ThrottleSpeed can only ramp us down to idle (or fast idle, depending), but not
+    // to zero. However when the user turns off the engine, smoker speed is going to have to go from idle (or fast idle) to a complete stop, and
+    // we don't want this to be abrupt. That is why we've created smoker effects, though they may have other uses as well. 
+
+    // Restore the internal range to full so we can actually get down to zero speed
+    restore_Speed();
+
+    // But now we need to modify our curspeed varialbe so the shutdown effect knows where to start from. Under normal operation we modify the internal speed range of the 
+    // smoker object, setting the minimum to something greater than zero, which becomes idle. Under that scheme, curspeed of 0 actually represents some none-zero smoker speed. 
+    // Now that we are using the full speed scale range where 0 actually means 0 (stopped), we need to adjust our prior curspeed variable to the new range. The adjustment 
+    // depends on whether the transmission was engaged or not. 
+    if (curspeed == 0)
+    {
+        engaged == true ? curspeed = _IdleSpeed : curspeed = _FastIdleSpeed; 
+    }
+
+    // Set the active effect
+    smoker_effect = SHUTDOWN;
+    
+    // Now the sketch will poll the update() function which will take care of the effect
+}
+
+void Onboard_Smoker::update(void)
+{
+
+    if (smoker_effect != NONE && (millis() - LastUpdate_mS > smoker_update_rate_mS))
+    {   
+        switch (smoker_effect)
+        {
+            case SHUTDOWN:
+                // This effect simply turns off the smoker gradually instead of all at once. Each update through we reduce the speed by 1. 
+                // In most cases we assume the user decides to turn off the engine while the tank is stopped, so already the smoker should 
+                // probably be down to idle speed, which is not very fast to begin with. Therefore even with only reducing the speed by 1 step
+                // per pass it won't take long to get to zero.
+                curspeed -= 1;
+                if (curspeed <= 0) 
+                {
+                    Onboard_Smoker::stop(); // Stop the smoker - this will also clear the effect so we don't keep coming back here. 
+                }
+                else
+                {
+                    Onboard_Smoker::setSpeed_wEffect(curspeed); // We use the private "_wEffect" version of setSpeed so it doesn't clear the effect
+                }
+                break;
+        }
+    }
 }
 
 

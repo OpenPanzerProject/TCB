@@ -22,6 +22,9 @@ void UpdateSimpleTimers()
     else { RightTread->update(); LeftTread->update(); }
     TurretRotation->update();
     TurretElevation->update();
+
+    // We also update the smoker object because it can have special effects that require polling
+    Smoker->update();
 }
 
 

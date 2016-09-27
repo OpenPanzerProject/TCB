@@ -9,11 +9,21 @@
 // smoker speed automatically, but they all check for the the SmokerControlAuto flag, and only
 // perform the action if it is enabled. 
 
+// In other words, we use these functions instead of direct calls to the Smoker object so we 
+// can implement the auto check. 
+
 void StopSmoker(void)
 {
     if (eeprom.ramcopy.SmokerControlAuto)
     {
         Smoker->stop();
+    }
+}
+void ShutdownSmoker(boolean engaged)
+{
+    if (eeprom.ramcopy.SmokerControlAuto)
+    {
+        Smoker->Shutdown(engaged);
     }
 }
 void SetSmoker_Idle(void)

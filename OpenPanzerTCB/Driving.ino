@@ -91,13 +91,16 @@ void EngineOff()
     // (for example, see StopEverything() below)
     if (!Tank.isRepairOngoing())
     {
-        // Stop the engine object and disengage the transmission object
+        // Stop the engine object 
             TankEngine.StopEngine();
-            TankTransmission.PutInNeutral();    // No need to have transmission in gear if engine is off
+        // Stop the smoker
+            // As opposed to StopSmoker, Shutdown will let the smoker turn off slowly for a more realistic effect. 
+            // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.
+            TankTransmission.Engaged() ? ShutdownSmoker(true) : ShutdownSmoker(false);
+        // Now disengage the transmission object (no need to have transmission in gear if engine is off)
+            TankTransmission.PutInNeutral();    
         // Play the engine stop sound
             TankSound.ToggleEngineSound();
-        // Stop the smoker
-            StopSmoker();
         // Stop the drive motor(s)
             if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
             else { RightTread->stop(); LeftTread->stop(); }  

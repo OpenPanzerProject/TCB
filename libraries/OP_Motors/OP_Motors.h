@@ -200,10 +200,24 @@ class Onboard_Smoker: public Motor {
     void stop(void);
     void setIdle(void);
     void setFastIdle(void);
-    void update(void) { return; }   // Do nothing, we only need the update for serial controllers
+    void update(void);              // Actually we will use the update routine on the smoker for special effects
+    void Shutdown(boolean);         // This will trigger the shutdown smoker effect (slowly turn off smoker)
 private:
     const int _IdleSpeed;
     const int _FastIdleSpeed;
+    uint32_t LastUpdate_mS;    
+    
+    // These can be used for special smoker effects. The main sketch will poll the update() function routinely, 
+    // which can then create changes in smoker speeds over time. We use this presently to slowly reduce speed
+    // from idle when the engine is turned off. 
+    #define smoker_update_rate_mS   15
+    typedef enum smoker_effect_t
+    {   NONE = 0,
+        SHUTDOWN
+    };
+    smoker_effect_t smoker_effect;
+    void setSpeed_wEffect(int s);   // The update() routine can call this version of setSpeed without clearing the special effect
+    void clearSmokerEffect(void) { if (smoker_effect != NONE) smoker_effect = NONE; }
 };
 
 class Servo_ESC: public Motor, public OP_Servos {
