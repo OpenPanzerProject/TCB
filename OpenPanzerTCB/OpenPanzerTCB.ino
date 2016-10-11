@@ -106,7 +106,7 @@
     // We always have turret rotation & elevation motors
         Motor * TurretRotation;
         Motor * TurretElevation;
-        Servo_PAN * Barrel;         // In cases where TurretElevation type = SERVO_PAN, we will also create a Servo_PAN object directliy and call it barrel, for use in barrel stabilization.
+        Servo_PAN * Barrel;         // In cases where TurretElevation type = SERVO_PAN, we will also create a Servo_PAN object directly and call it barrel, for use in barrel stabilization.
     // We always have a recoil servo
         Servo_RECOIL * RecoilServo;
     // And of course we always have the mechanical smoker motor
