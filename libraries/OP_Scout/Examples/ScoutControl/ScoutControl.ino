@@ -24,14 +24,13 @@ void setup()
     // The watchdog will expect a serial command within an interval you set, if none is received in that time the motors will 
     // be shut down. This can be a useful safety feature but it also requires your control sketch to send the command at routine 
     // intervals even if the command hasn't changed. 
-    // with a timeout of 1/2 second
     
-    // The watchdog timeout can range from 50mS to 2.6 seconds. 
+    // The watchdog timeout can range from 100mS to 25.5 seconds in 100mS increments
     // The function for converting desired watchdog time to data byte is 
-    //      Data byte = (Desired time in mS - 50) / 10 
+    //      Data byte = Desired time in mS / 100
     // Let's enable the serial watchdog with a timeout of 1 second (1000mS), so data byte will be:
-    //      (1000 - 50) / 10 = 95
-    Scout.EnableWatchdog(95); 
+    //      1000 / 100 = 10
+    Scout.EnableWatchdog(10); 
     
 }
 

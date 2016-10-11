@@ -50,12 +50,24 @@
 // Addresses
 #define SCOUT_ADDRESS_A                     0x83    // 131
 #define SCOUT_ADDRESS_B                     0x84    // 132
-// Commands
-#define SCOUT_CMD_SET_FAN_SPEED             0x14    // 20
-#define SCOUT_CMD_SET_AUTO_FAN_CONTROL      0x15    // 21
-#define SCOUT_CMD_SET_MAX_CURRENT           0x16    // 22
-#define SCOUT_CMD_ENABLE_SERIAL_WATCHDOG    0x17    // 23
-#define SCOUT_CMD_DISABLE_SERIAL_WATCHDOG   0x18    // 24
+
+// Commands                                         // 0    Motor 1 forward
+                                                    // 1    Motor 1 reverse
+                                                    // 2    Set minimum voltage
+                                                    // 3        Reserved for Set maximum voltage - not presently implemented
+                                                    // 4    Motor 2 forward
+                                                    // 5    Motor 2 reverse
+                                                    // 6        Reserved for Motor 1 7-bit commands - not presently implemented
+                                                    // 7        Reserved for Motor 2 7-bit commands - not presently implemented
+                                                    // 8-13     Reserved - could add compatibility with Sabertooth mixed-mode commands, not presently implemented
+#define SCOUT_CMD_SERIAL_WATCHDOG           0x0E    // 14
+#define SCOUT_CMD_BAUD_RATE                 0x0F    // 15
+                                                    // 16       Reserved for future compatibility with Sabertooth ramping features
+                                                    // 17       Reserved for future compatibility with Sabertooth deadband feature
+                                                    // 19   Unused
+#define SCOUT_CMD_SET_FAN_SPEED             0x14    // 20   Direct fan speed control (or use it as a third, uni-directional ESC)
+#define SCOUT_CMD_SET_AUTO_FAN_CONTROL      0x15    // 21   Revert fan control to Scout auto control (based on temperature)
+#define SCOUT_CMD_SET_MAX_CURRENT           0x16    // 22   Set maximum current
 
 
 class OP_Scout
@@ -95,10 +107,10 @@ public:
     inline void AutoFanControl() { command(SCOUT_CMD_SET_AUTO_FAN_CONTROL, 0); }
   
     // Enable serial watchdog
-    inline void EnableWatchdog(byte timeout) { command(SCOUT_CMD_ENABLE_SERIAL_WATCHDOG, timeout); }
+    inline void EnableWatchdog(byte timeout) { command(SCOUT_CMD_SERIAL_WATCHDOG, timeout); }
     
-    // Disable serial watchdog
-    inline void DisableWatchdog() { command(SCOUT_CMD_DISABLE_SERIAL_WATCHDOG, 0); }
+    // Disable serial watchdog (send timeout value of 0)
+    inline void DisableWatchdog() { command(SCOUT_CMD_SERIAL_WATCHDOG, 0); }
     
     
   
