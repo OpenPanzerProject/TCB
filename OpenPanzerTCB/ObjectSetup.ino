@@ -77,6 +77,7 @@ void InstantiateMotorObjects()
                 eeprom.ramcopy.DriveMotors = SABERTOOTH;
                 EEPROM.writeInt(offsetof(_eeprom_data, DriveMotors), SABERTOOTH);
                 DriveMotor = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
+                SteeringMotor = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
         }
         // Now initialize the motor
         DriveMotor->begin();
