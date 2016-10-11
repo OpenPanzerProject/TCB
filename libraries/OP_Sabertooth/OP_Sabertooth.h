@@ -30,6 +30,16 @@
 
 #include <Arduino.h>
 
+#define SABERTOOTH_CMD_SERIALTIMEOUT    0x0E    // Decimal 14
+#define SABERTOOTH_CMD_BAUDRATE         0x0F    // Decimal 15
+    #define SABERTOOTH_BAUD_2400        1       //      Baud value byte for 2400
+    #define SABERTOOTH_BAUD_9600        2       //      Baud value byte for 9600
+    #define SABERTOOTH_BAUD_19200       3       //      Baud value byte for 19200
+    #define SABERTOOTH_BAUD_38400       4       //      Baud value byte for 38400
+    #define SABERTOOTH_BAUD_115200      5       //      Baud value byte for 115200
+#define SABERTOOTH_CMD_RAMPING          0x10    // Decimal 16   NOT USED IN OP
+#define SABERTOOTH_CMD_DEADBAND         0x11    // Decimal 17   NOT USED IN OP
+
 
 /*!
 \class OP_Sabertooth
@@ -72,7 +82,7 @@ public:
   \param dontWait If false, a delay is added to give the driver time to start up.
   */
   static void autobaud(HardwareSerial *port, boolean dontWait = false);
-  
+    
   /*!
   Sends a packet serial command to the motor driver.
   \param command The number of the command.

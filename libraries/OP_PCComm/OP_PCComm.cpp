@@ -24,7 +24,7 @@
 OP_EEPROM       * OP_PCComm::_op_eeprom;
 HardwareSerial  * OP_PCComm::_serial;
 OP_Radio        * OP_PCComm::_radio;
-uint32_t         OP_PCComm::WatchdogStartTime;
+uint32_t          OP_PCComm::WatchdogStartTime;
 boolean           OP_PCComm::Timeout;
 boolean           OP_PCComm::Disconnect;
 boolean           OP_PCComm::eepromUpdated;
@@ -473,6 +473,81 @@ OP_PololuQik * Qik;
             AskForNextSentence();
             break;
 
+        case PCCMD_SABERTOOTH_BAUD:
+            byte desired_baud_num; 
+            uint32_t desired_baud;
+            uint32_t wait;
+            desired_baud_num = SentenceIN.Value;    // Not the actual baud rate, but a numbe representing a baud rate
+            
+            // The value passed should map to one of the 5 Sabertooth baud rate definitions
+            if (desired_baud_num < SABERTOOTH_BAUD_2400 || desired_baud_num > SABERTOOTH_BAUD_115200)
+            {
+                // Desired baud is not recognized
+                sendNullValueSentence(DVCMD_NOSUCH_VALUE);
+                break;
+            }
+
+            // Determine also the actual baud rate (uin32_t) associated with the baud rate _number_ that was passed, we will need this later. 
+            switch (desired_baud_num)
+            {
+                case 1: desired_baud = 2400;    break;
+                case 2: desired_baud = 9600;    break;
+                case 3: desired_baud = 19200;   break;                      
+                case 4: desired_baud = 38400;   break;
+                case 5: desired_baud = 115200;  break;
+            }
+                
+            // We can't know what baud rate the Sabertooth is presently at. So we cycle through all 5 possible rates, and tell it at each one what we want the rate to be. 
+            for (uint8_t i = 0; i < 5; i++)
+            {
+                switch (i)
+                {
+                    case 0: MotorSerial.begin(2400);    break;          // Temporarily go to 2400 baud
+                    case 1: MotorSerial.begin(9600);    break;          // Temporarily go to 9600 baud
+                    case 2: MotorSerial.begin(19200);   break;          // Temporarily go to 19200 baud
+                    case 3: MotorSerial.begin(38400);   break;          // Temporarily go to 38400 baud
+                    case 4: MotorSerial.begin(115200);  break;          // Temporarily go to 115200 baud
+                }
+                MotorSerial.flush();
+
+                // Give time for the serial port to switchover (no idea if this is necessary)
+                wait = millis() + 50;
+                do {UpdateLEDs();} while (millis() < wait);                
+                
+                // Do this for drive Sabertooth
+                MotorSerial.write(Sabertooth_DRIVE_Address);            // At the current baud rate, tell the Sabertooth to go to the desired baud rate
+                MotorSerial.write(SABERTOOTH_CMD_BAUDRATE);             // This is the command that tells it to change baud rate
+                MotorSerial.write(desired_baud_num);                    // This tells it what baud rate to change it to
+                MotorSerial.write((Sabertooth_DRIVE_Address + SABERTOOTH_CMD_BAUDRATE + desired_baud_num) & B01111111);
+                
+                // Brief delay
+                wait = millis() + 10;
+                do {UpdateLEDs();} while (millis() < wait);                
+
+                // And for turret Sabertooth
+                MotorSerial.write(Sabertooth_TURRET_Address);           // At the current baud rate, tell the Sabertooth to go to the desired baud rate
+                MotorSerial.write(SABERTOOTH_CMD_BAUDRATE);             // This is the command that tells it to change baud rate
+                MotorSerial.write(desired_baud_num);                    // This tells it what baud rate to change it to
+                MotorSerial.write((Sabertooth_TURRET_Address + SABERTOOTH_CMD_BAUDRATE + desired_baud_num) & B01111111);                
+
+                MotorSerial.flush();                
+
+                // Sabertooth takes about 200 ms after setting the baud rate to respond to commands again (it restarts).
+                wait = millis() + 350;
+                do {UpdateLEDs();} while (millis() < wait);                
+            }
+
+            // Hopefully the Sabertooth got the message. Now switch ourselves to the user desired baud rate from here on out
+            MotorSerial.begin(desired_baud); 
+            
+            // We also update the setting in EEPROM in case this differs from what is saved there now
+            _op_eeprom->ramcopy.MotorSerialBaud = desired_baud; 
+            EEPROM.updateLong(offsetof(_eeprom_data, MotorSerialBaud), desired_baud);
+
+            // We're done
+            AskForNextSentence();
+            break;
+        
         case PCCMD_CONFPOLOLU_DRIVE:
             Qik = new OP_PololuQik (Pololu_DRIVE_ID, &MotorSerial);     // We need to include a DeviceID in the constructor but for this purpose it won't be used. 
             Qik->configurePololu(Pololu_DRIVE_ID);                      // Pololu_DRIVE_ID is defined in OP_Settings.h. Presently we don't have a way to know if the configuration succeeded or not,

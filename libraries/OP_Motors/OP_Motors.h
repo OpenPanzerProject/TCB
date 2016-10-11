@@ -167,7 +167,7 @@ class Sabertooth_SerialESC: public Motor, public OP_Sabertooth {
     void stop(void);
     void update(void);
   private:
-    static boolean sendAutobaud;
+    static boolean sentAutobaud;
     uint32_t LastUpdate_mS;    
 };
 

@@ -138,7 +138,7 @@ void OPScout_SerialESC::update(void)
 // ------------------------------------------------------------------------------------------------------------------>>
 // DIMENSION ENGINEERING SABERTOOTH CONTROLLERS
 // ------------------------------------------------------------------------------------------------------------------>>
-boolean Sabertooth_SerialESC::sendAutobaud = false;     // Declare static variables globally
+boolean Sabertooth_SerialESC::sentAutobaud = false;     // Declare static variables globally
 
 void Sabertooth_SerialESC::begin(void)
 {
@@ -150,19 +150,14 @@ void Sabertooth_SerialESC::begin(void)
     // 9600 is the default baud rate for Sabertooth packet serial for all their products, however, it does not work well with Arduino! 
     // 38400 works fine in testing. 19200 may also work but faster is better. 
     // For purposes of Open Panzer, 38400 is the recommended baud rate (for all serial controllers).
-        if (!sendAutobaud)  // We might have multiple Sabertooth objects, but we only need to do this part once. 
+        if (!sentAutobaud)  // We might have multiple Sabertooth objects, but we only need to do this part once. 
         {
-            Sabertooth_SerialESC::autobaud(true);   //The "true" means skip the long waiting. 
-            sendAutobaud = true;
+            Sabertooth_SerialESC::autobaud(true);   // This will ONLY take care of Sabertooth 2x5, 2x10, and 2x25 V1 devices. 
+            sentAutobaud = true;                    // For those with Sabertooth 2x12, 2x25 V2, or 2x60 the baud rate must be set (once) using the utility provided on the Misc tab of OP Config. 
         }
-        // Send the autobaud command to the Sabertooth controller(s).
-         // NOTE: *Not all* Sabertooth controllers need this command.
-         //       It doesn't hurt anything, but V2 controllers use an
-         //       EEPROM setting (changeable with the function setBaudRate) to set
-         //       the baud rate instead of detecting with autobaud.
-         //       If you have a 2x12, 2x25 V2, 2x60 or SyRen 50, you can remove
-         //       the autobaud line and save yourself two seconds of startup delay.
-         // But most will use the 2x5 so keep it in. You can pass "true" as the dontWait parameter and the startup will go faster
+
+    // Some Sabertooth devices have the option of a serial timeout watchdog, which we enable (2x12, 2x25 V2, 2x32, or 2x60). If we are connected to 2x5 this command will have no effect.
+    Sabertooth_SerialESC::command(SABERTOOTH_CMD_SERIALTIMEOUT, (byte)((constrain(Sabertooth_WatchdogTimeout_mS, 0, 12700) + 99) / 100));
 
     // Set the internal speed range (min, max). Sabertooth serial devices using packetized serial
     // accept commands from -127 to 127 with a middle point of 0

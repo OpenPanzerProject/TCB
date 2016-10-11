@@ -132,6 +132,7 @@
 // Commands received from PC
 #define INIT_STRING             "OPZ"   // The initialization string that tells us to start communicating with the PC
                                         // Can't be more characters than VALUE_BUFF - 1 
+#define PCCMD_SABERTOOTH_BAUD   118     // PC wants us to set the baud rate on certain Sabertooth devices connected to Serial 2
 #define PCCMD_CONFPOLOLU_DRIVE  119     // PC wants us to configure a Pololu device connected to Serial 2 for use with drive motors
 #define PCCMD_CONFPOLOLU_TURRET 120     // PC wants us to configure a Pololu device connected to Serial 2 for use with turret motors
 #define PCCMD_NUM_CHANNELS      121     // The PC wants to know the number of utilized channels
