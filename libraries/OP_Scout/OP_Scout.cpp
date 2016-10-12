@@ -13,9 +13,6 @@
  *
  * Unlike the Sabertooth line which have 8 device addresses (128-135), the Scout only has two possible addresses: 131 (Address A) and 132 (Address B). The device address is selected by the 
  * physical swich on the Scout. 
- * 
- * Another difference from the Sabertooth line is that the Scout can't do auto-baud detection. The baud rate is hardcoded into the Scout firmware, the default is 38400 but you can change it if you re-flash your Scout. 
- * Perhaps someday this feature can be added. 
  *
  *
  * FURTHER RESOURCES

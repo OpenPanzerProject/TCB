@@ -14,9 +14,6 @@
  * Unlike the Sabertooth line which have 8 device addresses (128-135), the Scout only has two possible addresses: 131 (Address A) and 132 (Address B). The device address is selected by the 
  * physical swich on the Scout. 
  * 
- * Another difference from the Sabertooth line is that the Scout can't do auto-baud detection. The baud rate is hardcoded into the Scout firmware, the default is 38400 but you can change it if you re-flash your Scout. 
- * Perhaps someday this feature can be added. 
- *
  *
  * FURTHER RESOURCES
  * ===============================================================================================================
@@ -69,6 +66,13 @@
 #define SCOUT_CMD_SET_AUTO_FAN_CONTROL      0x15    // 21   Revert fan control to Scout auto control (based on temperature)
 #define SCOUT_CMD_SET_MAX_CURRENT           0x16    // 22   Set maximum current
 
+// Codes
+#define SCOUT_BAUD_CODE_2400                   1    // Codes for changing baud rates
+#define SCOUT_BAUD_CODE_9600                   2    // These are the same codes used by certain Dimension Engineering Sabertooth controllers
+#define SCOUT_BAUD_CODE_19200                  3    //
+#define SCOUT_BAUD_CODE_38400                  4    //    
+#define SCOUT_BAUD_CODE_115200                 5    //
+#define SCOUT_BAUD_CODE_57600                  6    // The preceding codes are numbered identically to the codes used for Sabertooth controllers, which does not include 57600. That is why 57600 is number 6 and not number 5. 
 
 class OP_Scout
 {

@@ -84,13 +84,33 @@ void Motor::set_MaxSpeedPct(uint8_t max_pct)
 void OPScout_SerialESC::begin(void)
 {
     // Initialize motor serial
-    // The Scout ESC doesn't have auto-baud, so we assume the user has set the TCB (via OP Config) to the correct rate (38400) 
 
-    // Enable SerialWatchdog with a timeout of 1/2 second
-    // The function for converting watchdog time to command data is Value = (desired time in mS - 50) / 10 
-    // OPScout_WatchdogTimeout_mS is defined in OP_Settings.h
-    OPScout_SerialESC::command(SCOUT_CMD_ENABLE_SERIAL_WATCHDOG, (OPScout_WatchdogTimeout_mS - 50) / 10);    
-    
+    // Baud Rates
+    // The Scout always initializes to a baud rate of 38400. It can function at any baud rate up to 115200 but in order to command it to a different baud, we need to tell it 
+    // to change and that message needs to go at 38400. 
+    if (*motorbaud != 38400)            // If the desired rate is 38400 we know the Scout already booted to that, so no change is needed. Otherwise proceed. 
+    {
+        MotorSerial.begin(38400);       // Temporarily change serial motor baud rate on the TCB to 38400, so we can communicate with the Scout.
+        delay(20);
+        switch (*motorbaud)             // Now at a rate of 38400, tell the Scout what baud rate we want it to actually go to. 
+        {
+            case 2400:   OPScout_SerialESC::command(SCOUT_CMD_BAUD_RATE,SCOUT_BAUD_CODE_2400);   break;
+            case 9600:   OPScout_SerialESC::command(SCOUT_CMD_BAUD_RATE,SCOUT_BAUD_CODE_9600);   break;
+            case 19200:  OPScout_SerialESC::command(SCOUT_CMD_BAUD_RATE,SCOUT_BAUD_CODE_19200);  break;
+          //case 38400:  OPScout_SerialESC::command(SCOUT_CMD_BAUD_RATE,SCOUT_BAUD_CODE_38400);  break; // This case is unnecessary because we already checked above to make see if the baud was anything but 38400
+            case 57600:  OPScout_SerialESC::command(SCOUT_CMD_BAUD_RATE,SCOUT_BAUD_CODE_57600);  break;
+            case 115200: OPScout_SerialESC::command(SCOUT_CMD_BAUD_RATE,SCOUT_BAUD_CODE_115200); break;
+        }
+        MotorSerial.flush();            // Wait for transmission to complete
+        MotorSerial.begin(*motorbaud);  // Now return the TCB to our originally-desired baud rate (which the Scout should also have switched to)
+        delay(20);                      // Give the Scout time to change rates
+    }                                   // We can now proceed at the new rate and the Scout should be on the same page
+
+    // SerialWatchdog 
+    // We want to enable the serial timeout feature on the Scout. The function for converting watchdog time to command data is Value = desired time in mS / 100 
+    // (OPScout_WatchdogTimeout_mS is defined in OP_Settings.h)
+    OPScout_SerialESC::command(SCOUT_CMD_SERIAL_WATCHDOG, (OPScout_WatchdogTimeout_mS / 100));    
+
     // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
     set_InternalRange(-127,127, 0);
     set_DefaultInternalRange(-127,127, 0);
