@@ -160,8 +160,8 @@
     // in the IR apple. These LEDs are dimmed and faded in and out to create various effects. 
     
     // This timer has been left at default Arduino settings, most likely phase correct PWM with top at 256 and prescaler at 64. This would mean, 
-    // ~490Hz PWM frequency which is really terrible. But you are free to change it without messing up anything. It's a 16 bit timer so I should set
-    // it to the same frequency as Timer 5.
+    // ~490Hz PWM frequency which is really terrible for motor control, but fine for LEDs. We are free to change it without messing up anything. 
+    // It's a 16 bit timer so I should really just set it to the same frequency as Timer 5.
     
     #define SetupTimer4() ({ \  
         TCCR4A = 0xA9;       \
