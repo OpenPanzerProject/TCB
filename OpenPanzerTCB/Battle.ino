@@ -15,7 +15,7 @@ void FireCannon()
             {
                 // If we are a repair tank, we immobilze the tank when firing the repair signal. 
                 // This is very similar to what we do if we *receive* a repair signal
-                RepairOngoing = true;   // This marks the start of a repair operation
+                RepairOngoing = REPAIR_OTHER;   // This marks the start of a repair operation - we are repairing an other vehicle
                 if (DEBUG) { DebugSerial->println(F("Fire Repair Signal")); }
                 
                 // Disengage the transmission - we will keep it in neutral until the repair is over. 

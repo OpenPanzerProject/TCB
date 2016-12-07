@@ -111,6 +111,7 @@
         Servo_RECOIL * RecoilServo;
     // And of course we always have the mechanical smoker motor
         Onboard_Smoker * Smoker;
+        boolean SmokerEnabled = true;   // The user can enable/disable the smoker on the fly, we assume it is enabled to begin with. 
     // We may optionally have up to 4 general purpose RC outputs, depending on how the user sets up the other motor objects. The user can choose to have them be regular RC pass-through
     // or create them as Pan servo pass-throughs by selecting the appropriate function in OP Config. 
         Servo_ESC * RCOutput1;      // If the drive motors are onboard or serial controllers, this will be available
@@ -157,7 +158,10 @@
     int LVC_BlinkTimerID = 0;                     // Timer used to blink lights when the battery voltage has got too low
 
 // REPAIR
-    boolean RepairOngoing = false;                // Are we in the midst of a repair operation (if so, the tank should be immobilized)
+    #define REPAIR_NONE     0                     // No repair operation ongoing
+    #define REPAIR_SELF     1                     // We are being repaired by another tank
+    #define REPAIR_OTHER    2                     // We are repairing another tank
+    uint8_t RepairOngoing = REPAIR_NONE;          // Init 
 
 // INPUT BUTTON
     OP_Button InputButton = OP_Button(pin_Button, true, true, 25);   // Initialize a button object. Set pin, internal pullup = true, inverted = true, debounce time = 25 mS
@@ -1278,7 +1282,7 @@ if (Startup)
                     // Were we in the middle of a repair?
                     if (RepairOngoing) { DebugSerial->println(F("REPAIR OPERATION CANCELLED")); }
                 }
-                if (RepairOngoing) { RepairOngoing = false; }   // End repair if we were in the middle of one
+                if (RepairOngoing) { RepairOngoing = REPAIR_NONE; }   // End repair if we were in the middle of one
                 break;
             case HIT_TYPE_MG:
                 if (DEBUG) 
@@ -1289,13 +1293,13 @@ if (Startup)
                     // Were we in the middle of a repair?
                     if (RepairOngoing) { DebugSerial->println(F("REPAIR OPERATION CANCELLED")); }
                 }
-                if (RepairOngoing) { RepairOngoing = false; }   // End repair if we were in the middle of one
+                if (RepairOngoing) { RepairOngoing = REPAIR_NONE; }   // End repair if we were in the middle of one
                 break;
             case HIT_TYPE_REPAIR:
                 if (!RepairOngoing && Tank.isRepairOngoing()) 
                 {                   
                     // This marks the start of a repair operation
-                    RepairOngoing = true;
+                    RepairOngoing = REPAIR_SELF;    // Repair self, meaning, we are the one being repaired
                     if (DEBUG) 
                     { 
                         DebugSerial->print(F("VEHICLE REPAIR STARTED (")); 
@@ -1347,17 +1351,17 @@ if (Startup)
     // Were we in a repair operation, and now is it complete? 
     if (RepairOngoing && !Tank.isRepairOngoing()) 
     {                   
+        if (DEBUG && REPAIR_SELF) // Only show our health level if we were the one being repaired (as opposed to repairing someone else)
+        { 
+            DebugSerial->println(F("VEHICLE REPAIR COMPLETE")); 
+            DebugSerial->print(F("Health Level: ")); DebugSerial->print(Tank.PctHealthRemaining()); DebugSerial->println(F("%")); 
+        }  
         // Tank repair is over. 
-        RepairOngoing = false;
+        RepairOngoing = REPAIR_NONE;        
         // Repair sound was started automatically, but for complicated reasons we need to shut it off manually
         TankSound.StopRepairSound();
         // If the engine is still running, as  courtesy to the user let's automatically re-engage the transmission. 
         TransmissionEngage();
-        if (DEBUG) 
-        { 
-            DebugSerial->println(F("VEHICLE REPAIR COMPLETE")); 
-            DebugSerial->print(F("Health Level: ")); DebugSerial->print(Tank.PctHealthRemaining()); DebugSerial->println(F("%")); 
-        }       
     }
 
     
