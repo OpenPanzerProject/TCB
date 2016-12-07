@@ -12,6 +12,35 @@
 // In other words, we use these functions instead of direct calls to the Smoker object so we 
 // can implement the auto check. 
 
+// In some cases we also check if the user has the SmokerEnable flag set to true. 
+// This flag can be controlled by the user on-the-fly if they want to temporarily disable the smoker
+// from the transmitter. 
+
+void EnableSmoker()
+{
+    if (!SmokerEnabled)
+    {
+        SmokerEnabled = true;
+        if (DEBUG) { DebugSerial->println(F("Smoker enabled")); }
+    }
+}
+
+void DisableSmoker()
+{
+    if (SmokerEnabled)
+    {
+        SmokerEnabled = false;
+        StopSmoker();
+        if (DEBUG) { DebugSerial->println(F("Smoker disabled")); }
+    }
+}
+
+void ToggleSmoker()
+{
+    if (SmokerEnabled) DisableSmoker();
+    else               EnableSmoker();
+}
+
 void StopSmoker(void)
 {
     if (eeprom.ramcopy.SmokerControlAuto)
@@ -28,35 +57,35 @@ void ShutdownSmoker(boolean engaged)
 }
 void SetSmoker_Idle(void)
 {
-    if (eeprom.ramcopy.SmokerControlAuto)
+    if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled)
     {
         Smoker->setIdle();
     }
 }
 void SetSmoker_FastIdle(void)
 {
-    if (eeprom.ramcopy.SmokerControlAuto)
+    if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled)
     {
         Smoker->setFastIdle();
     }
 }
 void SetSmoker_Speed(int smoker_speed)
 {
-    if (eeprom.ramcopy.SmokerControlAuto)
+    if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled)
     {
         Smoker->setSpeed(smoker_speed);
     }
 }
 void Smoker_RestoreSpeed(void)
 {
-    if (eeprom.ramcopy.SmokerControlAuto)
+    if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled)
     {
         Smoker->restore_Speed(); 
     }
 }
 void Smoker_SetDestroyedSpeed()
 {
-    if (eeprom.ramcopy.SmokerControlAuto && eeprom.ramcopy.SmokerDestroyedSpeed > 0)
+    if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled && eeprom.ramcopy.SmokerDestroyedSpeed > 0)
     {
         Smoker->restore_Speed();    // The speed range may have been diminished during battle, we want to restore the full range
         Smoker->setSpeed(eeprom.ramcopy.SmokerDestroyedSpeed);  // Now apply the user's smoker speed setting for when the tank is destroyed

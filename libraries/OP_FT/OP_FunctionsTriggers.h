@@ -37,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 82;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 85;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -122,7 +122,10 @@ enum _special_function : byte {
     SF_NT_TOGGLE        = 78,       // 78
     SF_DRIVEPROFILE_1   = 79,       // 79
     SF_DRIVEPROFILE_2   = 80,       // 80
-    SF_DRIVEPROFILE_TOGGLE = 81     // 81
+    SF_DRIVEPROFILE_TOGGLE = 81,    // 81
+    SF_SMOKER_ENABLE    = 82,       // 82
+    SF_SMOKER_DISABLE   = 83,       // 83
+    SF_SMOKER_TOGGLE    = 84        // 84
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -138,7 +141,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,0,0,0,0,0,0,0,0,   // 50-59    52-59 analog
  0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
- 1,1                    // 80-81
+ 1,1,1,1,1              // 80-84
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -233,7 +236,10 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Neutral Turn - Toggle",                     // 78
     "Drive Profile - Set to 1",                  // 79
     "Drive Profile - Set to 2",                  // 80
-    "Drive Profile - Toggle"                     // 81           
+    "Drive Profile - Toggle",                    // 81           
+    "Smoker - Enable",                           // 82
+    "Smoker - Disable",                          // 83
+    "Smoker - Toggle"                            // 84
 };
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>

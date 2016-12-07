@@ -106,6 +106,9 @@ void LoadFunctionTriggers()
                 case SF_DRIVEPROFILE_1:             SF_Callback[i] = &SF_DriveProfile_1;                            break;
                 case SF_DRIVEPROFILE_2:             SF_Callback[i] = &SF_DriveProfile_2;                            break;
                 case SF_DRIVEPROFILE_TOGGLE:        SF_Callback[i] = &SF_DriveProfile_Toggle;                       break;
+                case SF_SMOKER_ENABLE:              SF_Callback[i] = &SF_Smoker_Enable;                             break;
+                case SF_SMOKER_DISABLE:             SF_Callback[i] = &SF_Smoker_Disable;                            break;
+                case SF_SMOKER_TOGGLE:              SF_Callback[i] = &SF_Smoker_Toggle;                             break;
             }
         }
     }
@@ -393,6 +396,9 @@ void SF_DumpDebug(uint16_t ignoreMe)            { DumpSysInfo();            }
 void SF_DriveProfile_1(uint16_t ignoreMe)       { SetDrivingProfile(1);     }
 void SF_DriveProfile_2(uint16_t ignoreMe)       { SetDrivingProfile(2);     }
 void SF_DriveProfile_Toggle(uint16_t ignoreMe)  { ToggleDrivingProfile();   }
+void SF_Smoker_Enable(uint16_t ignoreMe)        { EnableSmoker();           }
+void SF_Smoker_Disable(uint16_t ignoreMe)       { DisableSmoker();          }
+void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
