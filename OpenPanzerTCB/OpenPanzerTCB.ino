@@ -778,7 +778,7 @@ if (Startup)
         // We have two different sets of code for dealing with the barrel. If barrel stabilization is enabled, we manipulate the 
         // Servo_PAN class object called "Barrel"
         // EDIT: THIS IS TESTED TO WORK WELL. IF YOU GET THE IMU TO WORK RELIABLY, YOU CAN SIMPLY UN-COMMENT THE STUFF BELOW
-/*        if (eeprom.ramcopy.EnableBarrelStabilize)
+/*        if (eeprom.ramcopy.EnableBarrelStabilize) // This will only be enabled if the elevation motor is of the correct type (SERVO_PAN)
         {
             // Move barrel up/down in response to user commands
             if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
@@ -824,21 +824,28 @@ if (Startup)
         else
         {
 */            
-            // Move barrel up/down in response to user commands
-            if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
-            {   
-                TurretElevation->setSpeed(Radio.Sticks.Elevation.command); 
-            }                
+            if (eeprom.ramcopy.TurretElevationMotor != DRIVE_DETACHED)  // Only apply turret stick movements if we have specified an actual motor type
+            {
+                // Move barrel up/down in response to user commands
+                if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
+                {   
+                    TurretElevation->setSpeed(Radio.Sticks.Elevation.command); 
+                }                
+            }
 //        }
 
         // TURRET LEFT / RIGHT
         // Move turret left/right if command has changed. Also check if there is a turret sound associated with this movement
-        if (Radio.Sticks.Azimuth.updated && (Radio.Sticks.Azimuth.ignore == false))     
-        {   TurretRotation->setSpeed(Radio.Sticks.Azimuth.command);
-            // If turret rotation sound is enabled, play or stop the sound as appropriate
-            if (eeprom.ramcopy.TurretSound_Enabled)
-            {
-                Radio.Sticks.Azimuth.command == 0 ? TankSound.StopSpecialSounds() : TankSound.Turret();  
+        if (eeprom.ramcopy.TurretRotationMotor != DRIVE_DETACHED)  // Only apply turret stick movements if we have specified an actual motor type
+        {
+            if (Radio.Sticks.Azimuth.updated && (Radio.Sticks.Azimuth.ignore == false))     
+            {  
+                TurretRotation->setSpeed(Radio.Sticks.Azimuth.command);
+                // If turret rotation sound is enabled, play or stop the sound as appropriate
+                if (eeprom.ramcopy.TurretSound_Enabled)
+                {
+                    Radio.Sticks.Azimuth.command == 0 ? TankSound.StopSpecialSounds() : TankSound.Turret();  
+                }
             }
         }
     }

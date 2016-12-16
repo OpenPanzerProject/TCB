@@ -40,6 +40,7 @@ const __FlashStringHelper *ptrDriveType(Drive_t dType) {
   F("Servo/ESC"), 
   F("Pan Servo"), 
   F("Recoil Servo"),
+  F("Detached/NA"),
   F("Unknown")};
   return Names[dType];
 };

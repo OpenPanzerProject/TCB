@@ -182,6 +182,14 @@ void InstantiateMotorObjects()
             TurretRotation = new Servo_PAN (SERVONUM_TURRETROTATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             RCOutput3_Available = false;
             break;
+        case DRIVE_DETACHED:
+            // In this case we don't need a turret motor object, and even if we create one, it won't be controlled in any way by the turret stick. 
+            // However we do in fact create one, because so much code refers to the TurretRotation object it would be difficult to maintain as well as
+            // cumbersome to always add a check for drive type before any action to be taken on the object. We will of course need to check the drive 
+            // type in some cases, most importantly when processing turret stick movements, which should apply only if the drive type is not DRIVE_DETACHED.
+            // Most other instances are harmless, but would become bugs if an object didn't exist. We use a special Null_Motor object that does nothing. 
+            TurretRotation = new Null_Motor();
+            break;
         default:
             // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime
             // We set it to SERVO_ESC, and save it to EEPROM so we don't end up here next time. 
@@ -228,6 +236,14 @@ void InstantiateMotorObjects()
             Barrel = new Servo_PAN (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             Barrel->begin();    // Initialize the barrel
             RCOutput4_Available = false;
+            break;
+        case DRIVE_DETACHED:
+            // In this case we don't need a turret motor object, and even if we create one, it won't be controlled in any way by the turret stick. 
+            // However we do in fact create one, because so much code refers to the TurretRotation object it would be difficult to maintain as well as
+            // cumbersome to always add a check for drive type before any action to be taken on the object. We will of course need to check the drive 
+            // type in some cases, most importantly when processing turret stick movements, which should apply only if the drive type is not DRIVE_DETACHED.
+            // Most other instances are harmless, but would become bugs if an object didn't exist. We use a special Null_Motor object that does nothing. 
+            TurretElevation = new Null_Motor();
             break;
         default:
             // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime

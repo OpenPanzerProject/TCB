@@ -74,8 +74,9 @@ typedef char Drive_t;
 #define SERVO_ESC   12
 #define SERVO_PAN   13
 #define SERVO_RECOIL 14
+#define DRIVE_DETACHED    15
 //#define ADDITIONAL (number)
-#define LAST_DRIVE_TYPE SERVO_RECOIL
+#define LAST_DRIVE_TYPE DRIVE_DETACHED
 const __FlashStringHelper *ptrDriveType(Drive_t dType); //Returns a character string that is name of drive type (see OP_Motors.cpp)
 
 
@@ -246,7 +247,6 @@ class Servo_PAN: public Motor, public OP_Servos {
     boolean canSetFixedPos; 
 };
 
-
 class Servo_RECOIL: public Motor, public OP_Servos {
   public:
     Servo_RECOIL(ESC_POS_t pos, int min, int max, int middle, uint16_t mS_Recoil, uint16_t mS_Return, uint8_t Reversed) : Motor(pos,min,max,middle), _RecoilmS(mS_Recoil), _ReturnmS(mS_Return), _Reversed(Reversed) {}
@@ -263,7 +263,15 @@ class Servo_RECOIL: public Motor, public OP_Servos {
     const uint8_t  _Reversed;   
 };
 
-
+// This sub-class is empty and does nothing. 
+class Null_Motor: public Motor {
+  public:
+    Null_Motor() : Motor(ESC_POS_t(0),0,0,0) {}
+    void setSpeed(int s) { return; }
+    void begin(void)     { return; }  
+    void stop(void)      { return; }
+    void update(void)    { return; }
+};
 
 
 #endif //OP_Motors_h

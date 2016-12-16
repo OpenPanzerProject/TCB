@@ -1,9 +1,12 @@
-00.91.06	4/12/2016 - Fixed debug LED behavior on braking. PCComm class can now try to initialize the radio after communication with 
-                            PC has started, in the event the user forgets to turn their radio on until after, or communcation begins before
-                            the sketch has a chance to set it up. Fixed machine gun LED pin number, was incorrect for current board. 
-00.91.05        4/02/2016 - Added FlySky iBus support, up to 14 channels. Required board change to Rev 0.19. 
-                            Tested with FlySky i10 transmitter and FS-iA10 and FS-iA6B receivers.
-00.91.04        3/25/2016 - Local dev copy
-00.91.03        3/25/2016 - Added printed function names in Debug dump
-                          - RC Output pass-throughs can now be of type regular or Pan Servo
-00.91.02        3/13/2016 - Posted to GitHub
+00.90.20        12/15/2016 - Add a Null_Motor drive type, which can be used when the user chooses to detach the turret stick controls 
+                             from actually controlling the turret. 
+00.90.19        12/05/2016 - A million things I didn't bother recording during development.
+00.90.16	    4/12/2016  - Fixed debug LED behavior on braking. PCComm class can now try to initialize the radio after communication with 
+                             PC has started, in the event the user forgets to turn their radio on until after, or communcation begins before
+                             the sketch has a chance to set it up. Fixed machine gun LED pin number, was incorrect for current board. 
+00.90.15        4/02/2016  - Added FlySky iBus support, up to 14 channels. Required board change to Rev 0.19. 
+                             Tested with FlySky i10 transmitter and FS-iA10 and FS-iA6B receivers.
+00.90.14        3/25/2016  - Local dev copy
+00.90.13        3/25/2016  - Added printed function names in Debug dump
+                           - RC Output pass-throughs can now be of type regular or Pan Servo
+00.90.12        3/13/2016  - Posted to GitHub

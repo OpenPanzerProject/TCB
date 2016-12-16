@@ -17,7 +17,7 @@ Onboard_Smoker	KEYWORD1
 Servo_ESC	KEYWORD1
 Servo_PAN	KEYWORD1
 Servo_RECOIL	KEYWORD1
-
+Null_Motor  KEYWORD1
 
 
 #-------------------------------------------------------------
@@ -78,3 +78,5 @@ ONBOARD	LITERAL1
 SERVO_ESC	LITERAL1
 SERVO_PAN	LITERAL1
 SERVO_RECOIL	LITERAL1
+DRIVE_DETACHED  LITERAL1
+

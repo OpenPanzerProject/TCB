@@ -219,12 +219,14 @@ void DumpMotorInfo()
     DebugSerial->print(F("Turret Rotation:   ")); DebugSerial->print(ptrDriveType(eeprom.ramcopy.TurretRotationMotor)); 
     switch (eeprom.ramcopy.TurretRotationMotor) {
         case ONBOARD: DebugSerial->println(F(" (A)")); break;
+        case OP_SCOUT:   // Fall through
         case SABERTOOTH: DebugSerial->println(F(" (M1)")); break;
         case POLOLU: DebugSerial->println(F(" (M0)")); break;
         default: DebugSerial->println(); }
     DebugSerial->print(F("Barrel Elevation:  ")); DebugSerial->print(ptrDriveType(eeprom.ramcopy.TurretElevationMotor)); 
     switch (eeprom.ramcopy.TurretElevationMotor) {
         case ONBOARD: DebugSerial->println(F(" (B)")); break;
+        case OP_SCOUT:   // Fall through
         case SABERTOOTH: DebugSerial->println(F(" (M2)")); break;
         case POLOLU: DebugSerial->println(F(" (M1)")); break;
         default: DebugSerial->println(); }
