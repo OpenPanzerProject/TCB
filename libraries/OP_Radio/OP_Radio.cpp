@@ -262,8 +262,16 @@ void OP_Radio::begin(_eeprom_data *storage)
         // portion of the stick by modifying the pulse min and max 
         if (UsingSpecialPositions) AdjustTurretStickEndPoints();
 
-        // Save this setting locally either way: 
-        ignoreTurretDelay_mS = storage->IgnoreTurretDelay_mS;
+        // Regardless we save the ignoreTurretDelay_mS setting locally. 
+        // But, caveat - if the turret stick has been detached from the turret motor control, we set the delay to 0 (disable) regardless of what it might default or be set to otherwise
+        if (storage->TurretRotationMotor == DRIVE_DETACHED && storage->TurretElevationMotor == DRIVE_DETACHED)
+        {
+            ignoreTurretDelay_mS = 0;
+        }
+        else
+        {
+            ignoreTurretDelay_mS = storage->IgnoreTurretDelay_mS;
+        }
 
     // Initialize our abstract "special stick"
         SpecialStick.Position = MC;                  // Initialize to stick centered

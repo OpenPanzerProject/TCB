@@ -26,6 +26,7 @@
 #include "OP_PPMDecode.h"
 #include "OP_SBusDecode.h"
 #include "OP_iBusDecode.h"
+#include "OP_Motors.h"
 
 
 typedef char RADIO_PROTOCOL; 
