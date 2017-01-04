@@ -1,3 +1,4 @@
+00.90.21        01/03/2017 - Fixed a small bug with the smoker that only presented itself when manually enabled/disabled using a function trigger.
 00.90.20        12/15/2016 - Add a Null_Motor drive type, which can be used when the user chooses to detach the turret stick controls 
                              from actually controlling the turret. 
 00.90.19        12/05/2016 - A million things I didn't bother recording during development.

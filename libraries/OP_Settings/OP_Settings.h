@@ -16,7 +16,7 @@
 // OPEN PANZER TANK CONTROL BOARD (TCB) - FIRMWARE VERSION NUMBER
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is the firmware version that will be returned to the desktop application when it checks. It will be split into three, two-digit numbers
-    #define FIRMWARE_VERSION "00.90.20"     // version. Last update 12/15/2016
+    #define FIRMWARE_VERSION "00.90.21"     // version. Last update 01/03/2017
     
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
