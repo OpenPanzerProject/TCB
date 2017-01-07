@@ -844,7 +844,7 @@ if (Startup)
                 // If turret rotation sound is enabled, play or stop the sound as appropriate
                 if (eeprom.ramcopy.TurretSound_Enabled)
                 {
-                    Radio.Sticks.Azimuth.command == 0 ? TankSound.StopSpecialSounds() : TankSound.Turret();  
+                    Radio.Sticks.Azimuth.command == 0 ? TankSound.StopTurret() : TankSound.Turret();                      
                 }
             }
         }
@@ -1080,7 +1080,7 @@ if (Startup)
         // This lets us activate an acceleration sound effect, let the throttle decrease slowly (so engine sound doesn't go directly to idle from full speed), etc... 
         if (DriveModeActual==NEUTRALTURN)
         {   // In this case, there is no drive speed, instead we pass the turn command (which is actually our drive speed in a neutral turn)
-            ThrottleSpeed = Driver.GetThrottleSpeed(TurnCommand, ThrottleSpeed_Previous, TurnCommand, DriveModeActual, Braking, &TankSound); 
+            ThrottleSpeed = Driver.GetThrottleSpeed(TurnCommand, ThrottleSpeed_Previous, TurnCommand, DriveModeActual, Braking); 
         }
         else
         {   
@@ -1093,7 +1093,7 @@ if (Startup)
             if (TankTransmission.Engaged() && DriveSpeed == 0) { ThrottleCommand = 0; }
             
             // Now we calculate a throttle speed based on the command and other parameters
-            ThrottleSpeed = Driver.GetThrottleSpeed(ThrottleCommand, ThrottleSpeed_Previous, DriveSpeed, DriveModeActual, Braking, &TankSound); 
+            ThrottleSpeed = Driver.GetThrottleSpeed(ThrottleCommand, ThrottleSpeed_Previous, DriveSpeed, DriveModeActual, Braking); 
         }
 
         // Now pass the throttle speed to the sound unit and the smoker 

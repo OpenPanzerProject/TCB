@@ -99,11 +99,16 @@ void OP_TBS::begin(OP_SimpleTimer * t)
     TBSProp->attach(PROP2);
     TBSProp->attach(PROP3);
 
+    InitializeOutputs();
+}
+
+void OP_TBS::InitializeOutputs(void)
+{
     TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);          // Initialize to speed = 0
     TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_OFF);    // Initialize to engine off
     TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));  // Initialize to no special sounds
+    ClearProp3Timer();
 }
-
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -314,6 +319,11 @@ void OP_TBS::TurretSound_SetEnabled(boolean enabled)
 void OP_TBS::Turret(void)
 {
     if (TurretSound_Enabled) TriggerSpecialSound(SOUND_TURRET);
+}
+
+void OP_TBS::StopTurret(void)
+{
+    if (TurretSound_Enabled) StopSpecialSounds();
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>

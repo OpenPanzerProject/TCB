@@ -136,6 +136,7 @@ public:
     // Initalize
     OP_TBS();                                   // Constructor
     static void begin(OP_SimpleTimer * t);      // Attach servo outputs and initialize
+    static void InitializeOutputs();            // Initialize outputs
 
     // PROP1: Engine speed sound
     static void SetEngineSpeed(int);            // Send the engine speed to TBS
@@ -162,6 +163,7 @@ public:
     static void MachineGun(void);               // Play machine gun sound
     static void StopMachineGun(void);           // Explicit call to stop the machine gun
     static void Turret(void);                   // Play turret rotation sound
+    static void StopTurret(void);               // Stop playing turret rotation sound    
     static void MGHit(void);                    // Play machine gun hit sound
     static void CannonHit(void);                // Play cannon hit sound
     static void Destroyed(void);                // Play tank destroyed sound

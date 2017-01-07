@@ -16,9 +16,7 @@ void TBS_Setup()
     PrintDebugLine();
     
     // Initialize TBS outputs
-    TankSound.IdleEngine();         // Initialize PROP1: set engine speed to idle
-    TankSound.PROP2_OFF();          // Initialize PROP2: set to middle position (1500 PWM). That way TBS knows we have a 3-way switch.
-    TankSound.StopSpecialSounds();  // Initialize PROP3: set to off
+    TankSound.InitializeOutputs();  // Set all outputs to defaults    
 
     // Tell user to press TBS Button. TBS will record neutral positions
     DebugSerial->println(F("Press TBS Button"));
