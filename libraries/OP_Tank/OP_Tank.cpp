@@ -37,7 +37,7 @@ int             OP_Tank::MechRecoilTimeoutTimerID;
 boolean         OP_Tank::isInvulnerable;            
 boolean         OP_Tank::isDestroyed;           
 Servo_RECOIL  * OP_Tank::_RecoilServo;
-OP_TBS        * OP_Tank::_TankSound;
+OP_Sound      * OP_Tank::_TankSound;
 uint8_t         OP_Tank::_MGLightBlink_mS;
 int             OP_Tank::MG_BlinkTimerID;
 int             OP_Tank::MG_FireTimerID;
@@ -94,7 +94,7 @@ OP_Tank::OP_Tank()
 }
 
 
-void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, uint8_t mgint, Servo_RECOIL * sr, OP_TBS * ts, OP_SimpleTimer * t)
+void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, uint8_t mgint, Servo_RECOIL * sr, OP_Sound * os, OP_SimpleTimer * t)
 {
     // Save settings
     
@@ -121,7 +121,7 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     
     // Pointers to objects
     _RecoilServo = sr;
-    _TankSound = ts;
+    _TankSound = os;
 
     // Sanity check the MG IR setting
     if (BattleSettings.IR_MGProtocol == IR_DISABLED) { BattleSettings.Use_MG_Protocol = false; }

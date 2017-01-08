@@ -26,7 +26,7 @@
 #include "OP_IRLib.h"
 #include "OP_SimpleTimer.h"
 #include "OP_Motors.h"
-#include "OP_TBS.h"
+#include "OP_Sound.h"
 #include "OP_BattleTimes.h"
 
 #define MECHRECOIL_TRIGGER_MODE     RISING  // Arduino defines these as:
@@ -117,7 +117,7 @@ typedef struct battle_settings{
 class OP_Tank
 {   public:
         OP_Tank(void);                              // Constructor
-        static void     begin(battle_settings, bool, bool, bool, int, bool, uint8_t, Servo_RECOIL *, OP_TBS *, OP_SimpleTimer *);     
+        static void     begin(battle_settings, bool, bool, bool, int, bool, uint8_t, Servo_RECOIL *, OP_Sound *, OP_SimpleTimer *);     
         // battle_settings, boolean mechanical barrel with cannon, boolean airsoft, boolean servo recoil with cannon, int recoil delay, bool flash with cannon, uint8_t machine gun blink interval, pointers to recoil servo, sound object, and sketch's SimpleTimer
         
         // Functions - Cannon Fire
@@ -247,7 +247,7 @@ class OP_Tank
         static boolean  IR_Enabled;                 // True if either cannon or MG enabled, false if both disabled
         static OP_SimpleTimer * TankTimer;
         static Servo_RECOIL * _RecoilServo;
-        static OP_TBS   * _TankSound;
+        static OP_Sound   * _TankSound;
         
 };
 

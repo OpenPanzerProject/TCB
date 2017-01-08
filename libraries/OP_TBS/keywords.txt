@@ -7,57 +7,83 @@
 #-------------------------------------------------------------
 # KEYWORD1 - Classes
 #-------------------------------------------------------------
-OP_Sound    KEYWORD1
-BenediniTBS KEYWORD1
-OP_TeensySound  KEYWORD1
+OP_TBS	KEYWORD1
 
 
 #-------------------------------------------------------------
 # KEYWORD2 - Methods, functions, members
 #-------------------------------------------------------------
 begin	LITERAL2
-StartEngine LITERAL2
-StopEngine  LITERAL2
 SetEngineSpeed	LITERAL2
 IdleEngine	LITERAL2
+PROP2_OFF	LITERAL2
+ToggleEngineSound	LITERAL2
 Repair	LITERAL2
 StopRepairSound	LITERAL2
+Beep	LITERAL2
+ForceBeep	LITERAL2
+ForceBeeps	LITERAL2
+TriggerSpecialSound	LITERAL2
+StopSpecialSounds	LITERAL2
 Cannon	LITERAL2
-CannonHit	LITERAL2
-Destroyed	LITERAL2
 MachineGun	LITERAL2
 StopMachineGun	LITERAL2
-MGHit	LITERAL2
 Turret	LITERAL2
 StopTurret  LITERAL2
-TurretSound_SetEnabled	LITERAL2
-Barrel  LITERAL2
-StopBarrel  LITERAL2
-BarrelSound_SetEnabled  LITERAL2
+MGHit	LITERAL2
+CannonHit	LITERAL2
+Destroyed	LITERAL2
 HeadlightSound	LITERAL2
-HeadlightSound_SetEnabled	LITERAL2
 UserSound1	LITERAL2
 UserSound1_Repeat	LITERAL2
 UserSound1_Stop	LITERAL2
 UserSound2	LITERAL2
 UserSound2_Repeat	LITERAL2
 UserSound2_Stop	LITERAL2
+Squeak1_SetEnabled	LITERAL2
+Squeak2_SetEnabled	LITERAL2
+Squeak3_SetEnabled	LITERAL2
+HeadlightSound_SetEnabled	LITERAL2
+TurretSound_SetEnabled	LITERAL2
 StartSqueaks	LITERAL2
 StopSqueaks	LITERAL2
 AreSqueaksActive	LITERAL2
 SetSqueak1_Interval	LITERAL2
 SetSqueak2_Interval	LITERAL2
 SetSqueak3_Interval	LITERAL2
-Squeak1_SetEnabled	LITERAL2
-Squeak2_SetEnabled	LITERAL2
-Squeak3_SetEnabled	LITERAL2
-Beep	LITERAL2
-Beeps	LITERAL2
+TeachEncoder	LITERAL2
 
 
 #-------------------------------------------------------------
 # LITERAL1 - Constants & Defines
 #-------------------------------------------------------------
-SOUND_DEVICE    LITERAL1
+PROP1	LITERAL1
+PROP2	LITERAL1
+PROP3	LITERAL1
+PROP1_IDLE	LITERAL1
+PROP1_JUST_MOVING	LITERAL1
+PROP1_FULL_SPEED	LITERAL1
+PROP2_SWITCH_OFF	LITERAL1
+PROP2_SWITCH_1	LITERAL1
+PROP2_SWITCH_2	LITERAL1
+BEEP_LENGTH_mS	LITERAL1
+SOUND_OFF	LITERAL1
+SOUND_CANNON	LITERAL1
+SOUND_MG	LITERAL1
+SOUND_TURRET	LITERAL1
+SOUND_MG_HIT	LITERAL1
+SOUND_CANNON_HIT	LITERAL1
+SOUND_BATTLE_DESTROY	LITERAL1
+SOUND_HEADLIGHTS	LITERAL1
+SOUND_SQUEAK_1	LITERAL1
+SOUND_SQUEAK_2	LITERAL1
+SOUND_SQUEAK_3	LITERAL1
+SOUND_USER_1	LITERAL1
+SOUND_USER_2	LITERAL1
+Prop3Settings	LITERAL1
+TBS_SIGNAL_mS	LITERAL1
+DEFAULT_SQUEAK_MIN_mS	LITERAL1
+DEFAULT_SQUEAK_MAX_mS	LITERAL1
+SQUEAK_DELAY_mS LITERAL1
 
 

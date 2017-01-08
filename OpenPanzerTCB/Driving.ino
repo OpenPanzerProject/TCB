@@ -63,7 +63,7 @@ void EngineOn()
         if (TankEngine.StartEngine())
         {
             // Play the engine start sound
-                TankSound.ToggleEngineSound();
+                TankSound->StartEngine();
             // Should the transmission be engaged now too? 
                 if (eeprom.ramcopy.TransmissionDelay_mS > 0)
                 {   // In this case the user has set a delay from the time the engine starts to when the transmission should be engaged. Typically this is to prevent the 
@@ -100,7 +100,7 @@ void EngineOff()
         // Now disengage the transmission object (no need to have transmission in gear if engine is off)
             TankTransmission.PutInNeutral();    
         // Play the engine stop sound
-            TankSound.ToggleEngineSound();
+            TankSound->StopEngine();
         // Stop the drive motor(s)
             if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
             else { RightTread->stop(); LeftTread->stop(); }  
@@ -197,9 +197,9 @@ void StopEverything()
     if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
     else { RightTread->stop(); LeftTread->stop(); }
     // We're not moving, so stop the squeaking
-    TankSound.StopSqueaks();
+    TankSound->StopSqueaks();
     // TBS throttle speed = idle
-    TankSound.IdleEngine();
+    TankSound->IdleEngine();
     // Make sure we clear any ongoing repairs, otherwise the engine won't turn off
     Tank.StopRepair(); 
     // Turn Engine off

@@ -5,14 +5,14 @@
 void Light1On()
 {
     digitalWrite(pin_Light1, HIGH);    
-    TankSound.HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
+    TankSound->HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
     if (DEBUG) { DebugSerial->println(F("Light 1 On")); }
 }
 
 void Light1Off()
 {
     digitalWrite(pin_Light1, LOW);
-    TankSound.HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
+    TankSound->HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
     if (DEBUG) { DebugSerial->println(F("Light 1 Off")); }
 }
 

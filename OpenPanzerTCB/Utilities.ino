@@ -132,6 +132,9 @@ void DumpSysInfo()
     DumpTurretInfo();
         PerLoopUpdates();
         DebugSerial->flush();    
+    DumpSoundInfo();
+        PerLoopUpdates();
+        DebugSerial->flush();        
     DumpIMUInfo();
         PerLoopUpdates();
         DebugSerial->flush();    
@@ -345,6 +348,16 @@ void DumpTurretInfo()
     }
     else { PrintLnYesNo(0); }    
     
+}
+
+void DumpSoundInfo()
+{
+    DebugSerial->println();
+    PrintDebugLine();
+    DebugSerial->println(F("SOUND CARD"));
+    PrintDebugLine();    
+    DebugSerial->print(F("Sound card: ")); 
+    DebugSerial->println(printSoundDevice(eeprom.ramcopy.SoundDevice));
 }
 
 void DumpIMUInfo()

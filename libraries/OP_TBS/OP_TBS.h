@@ -25,7 +25,6 @@
 #ifndef OP_TBS_H
 #define OP_TBS_H
 
-#include <Arduino.h>
 #include "OP_Settings.h"
 #include "OP_Servo.h"
 #include "OP_Motors.h"
@@ -131,87 +130,84 @@ const char _sound_descr_table_[PROP3_NUM_SOUNDS][SOUNDNAME_CHARS] PROGMEM_FAR =
 
 class OP_TBS
 {
-    // We are using static for everything because we only want one instance of this class. 
 public:
-    // Initalize
-    OP_TBS();                                   // Constructor
-    static void begin(OP_SimpleTimer * t);      // Attach servo outputs and initialize
-    static void InitializeOutputs();            // Initialize outputs
+    OP_TBS(OP_SimpleTimer * t);          // Constructor
+    void begin();                        // Attach servo outputs and initialize
+    void InitializeOutputs(void);        // Initialize
 
     // PROP1: Engine speed sound
-    static void SetEngineSpeed(int);            // Send the engine speed to TBS
-    static void IdleEngine(void);               // Idle engine
+    void SetEngineSpeed(int);            // Send the engine speed to TBS
+    void IdleEngine(void);               // Idle engine
     
     // PROP2: Engine startup/shutdown and second sound 
-    static void PROP2_OFF(void);                // Direct control of the Prop2 switch
-    static void ToggleEngineSound(void);        // Toggle engine startup/shutdown
-    static void Repair(void);                   // Tank repair sound
-    static void StopRepairSound(void);          // Explicit call to quit repair sound
+    void PROP2_OFF(void);                // Direct control of the Prop2 switch
+    void ToggleEngineSound(void);        // Toggle engine startup/shutdown
+    void Repair(void);                   // Tank repair sound
+    void StopRepairSound(void);          // Explicit call to quit repair sound
 
 //  All Beeping stuff was removed to make space for another sound
 //  static void Beep(void);                     // Program beep
 //  static void ForceBeep(void);                // Blocking call to beep
 //  static void ForceBeeps(int);                // Beep number of times in a row (blocks code)
 
-    // PROP3: Generic special sound functions
-    static void TriggerSpecialSound(int, bool); // eg, TriggerSpecialSound(SOUND_CANNON); // will trigger cannon sound. The second parameter is an optional boolean 
-                                                // to keep the sound on indefinitely, rather than triggering it once (if nothing is passed, it will trigger once)
-    static void StopSpecialSounds(void);        // Most special sounds only run once, but for repeated sounds (like machine gun), we can use this to turn them off.
-
     // PROP3: Individual Sounds
-    static void Cannon(void);                   // Play cannon fire sound
-    static void MachineGun(void);               // Play machine gun sound
-    static void StopMachineGun(void);           // Explicit call to stop the machine gun
-    static void Turret(void);                   // Play turret rotation sound
-    static void StopTurret(void);               // Stop playing turret rotation sound    
-    static void MGHit(void);                    // Play machine gun hit sound
-    static void CannonHit(void);                // Play cannon hit sound
-    static void Destroyed(void);                // Play tank destroyed sound
-    static void HeadlightSound(void);           // Play the headlight on/off sound
-    static void UserSound1(void);               // Play user sound 1 once
-    static void UserSound1_Repeat(void);        // Repeat user sound 1
-    static void UserSound1_Stop(void);          // Stop user sound 1
-    static void UserSound2(void);               // Play user sound 2 once
-    static void UserSound2_Repeat(void);        // Repeat user sound 2
-    static void UserSound2_Stop(void);          // Stop user sound 2
+    void Cannon(void);                   // Play cannon fire sound
+    void MachineGun(void);               // Play machine gun sound
+    void StopMachineGun(void);           // Explicit call to stop the machine gun
+    void Turret(void);                   // Play turret rotation sound
+    void StopTurret(void);               // Stop playing turret rotation sound
+    void MGHit(void);                    // Play machine gun hit sound
+    void CannonHit(void);                // Play cannon hit sound
+    void Destroyed(void);                // Play tank destroyed sound
+    void HeadlightSound(void);           // Play the headlight on/off sound
+    void UserSound1(void);               // Play user sound 1 once
+    void UserSound1_Repeat(void);        // Repeat user sound 1
+    void UserSound1_Stop(void);          // Stop user sound 1
+    void UserSound2(void);               // Play user sound 2 once
+    void UserSound2_Repeat(void);        // Repeat user sound 2
+    void UserSound2_Stop(void);          // Stop user sound 2
     
     // Set enabled status of certain sounds
-    static void Squeak1_SetEnabled(boolean);        // Enabled or disable Squeak1 
-    static void Squeak2_SetEnabled(boolean);        // Enabled or disable Squeak2
-    static void Squeak3_SetEnabled(boolean);        // Enabled or disable Squeak3 
-    static void HeadlightSound_SetEnabled(boolean); // Headlight sound enabled or not
-    static void TurretSound_SetEnabled(boolean);    // Turret sound enabled or not
+    void Squeak1_SetEnabled(boolean);        // Enabled or disable Squeak1 
+    void Squeak2_SetEnabled(boolean);        // Enabled or disable Squeak2
+    void Squeak3_SetEnabled(boolean);        // Enabled or disable Squeak3 
+    void HeadlightSound_SetEnabled(boolean); // Headlight sound enabled or not
+    void TurretSound_SetEnabled(boolean);    // Turret sound enabled or not
     
     static void StartSqueaks(void);             // starts all squeaks
-    static void StopSqueaks(void);              // Stops all squeaks
-    static boolean AreSqueaksActive(void);      // Returns true or false if sqeaks are active
-    static void SetSqueak1_Interval(unsigned int, unsigned int);
-    static void SetSqueak2_Interval(unsigned int, unsigned int);
-    static void SetSqueak3_Interval(unsigned int, unsigned int);
+    void StopSqueaks(void);              // Stops all squeaks
+    boolean AreSqueaksActive(void);      // Returns true or false if sqeaks are active
+    void SetSqueak1_Interval(unsigned int, unsigned int);
+    void SetSqueak2_Interval(unsigned int, unsigned int);
+    void SetSqueak3_Interval(unsigned int, unsigned int);
 
     // Utilities
-    static void TeachEncoder(void);
-
-    
+    void TeachEncoder(void);
 
  private:   
     static OP_Servos  * TBSProp;
     static OP_SimpleTimer * TBSTimer;           // Pointer to the sketch's simple timer so we don't have to create a whole new one.
+
     // PROP 2
     static int          TBSProp2TimerID;
     static boolean      Prop2TimerComplete; 
     static void         StartProp2Timer(void);
     static void         StartProp2Timer(int);   // Overloaded, in case we want to keep it on for a set amount of time. 
     static void         ClearProp2Timer(void);
+    
     // PROP 3
+    static void         TriggerSpecialSound(int, bool); // eg, TriggerSpecialSound(SOUND_CANNON); // will trigger cannon sound. The second parameter is an optional boolean 
+                                                 // to keep the sound on indefinitely, rather than triggering it once (if nothing is passed, it will trigger once)
+    static void         StopSpecialSounds(void);        // Most special sounds only run once, but for repeated sounds (like machine gun), we can use this to turn them off.
+    
     static int          TBSProp3TimerID;
     static boolean      Prop3TimerComplete; 
     static void         StartProp3Timer(void);
     static void         ClearProp3Timer(void);
     static void         PulseDelayProp3(int);
     static uint8_t      currentProp3SoundNum;   // Which sound number is currently playing
-    static boolean      HeadlightSound_Enabled;
-    static boolean      TurretSound_Enabled;
+    boolean      HeadlightSound_Enabled;
+    boolean      TurretSound_Enabled;
     
     static void         StartSqueaksForReal(void);
     static void         Squeak1_Activate(void);

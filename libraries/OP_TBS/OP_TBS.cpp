@@ -23,18 +23,15 @@
  */ 
 
 #include <OP_TBS.h>
-
  
 // Static variables must be initialized outside the class 
-OP_Servos     * OP_TBS::TBSProp;
 OP_SimpleTimer * OP_TBS::TBSTimer;
+OP_Servos      * OP_TBS::TBSProp;
 int             OP_TBS::TBSProp2TimerID;
 boolean         OP_TBS::Prop2TimerComplete;
 int             OP_TBS::TBSProp3TimerID;
 boolean         OP_TBS::Prop3TimerComplete;
 uint8_t         OP_TBS::currentProp3SoundNum;
-boolean         OP_TBS::HeadlightSound_Enabled;
-boolean         OP_TBS::TurretSound_Enabled;
 // Squeaky stuff
 boolean         OP_TBS::Squeak1_Enabled;
 boolean         OP_TBS::Squeak2_Enabled;
@@ -43,20 +40,22 @@ boolean         OP_TBS::Squeak1_Active;
 boolean         OP_TBS::Squeak2_Active;
 boolean         OP_TBS::Squeak3_Active;
 boolean         OP_TBS::AllSqueaks_Active;
+int             OP_TBS::Squeak1TimerID;
+int             OP_TBS::Squeak2TimerID;
+int             OP_TBS::Squeak3TimerID;
 unsigned int    OP_TBS::SQUEAK1_MIN_mS;
 unsigned int    OP_TBS::SQUEAK1_MAX_mS;
 unsigned int    OP_TBS::SQUEAK2_MIN_mS;
 unsigned int    OP_TBS::SQUEAK2_MAX_mS;
 unsigned int    OP_TBS::SQUEAK3_MIN_mS;
 unsigned int    OP_TBS::SQUEAK3_MAX_mS;
-int             OP_TBS::Squeak1TimerID;
-int             OP_TBS::Squeak2TimerID;
-int             OP_TBS::Squeak3TimerID;
 
 
 // CONSTRUCTOR 
-OP_TBS::OP_TBS() 
+OP_TBS::OP_TBS(OP_SimpleTimer * t) 
 {
+    TBSTimer = t;                       // We will use the sketch's SimpleTimer object rather than creating a new instance of the class
+    
     TBSProp = new OP_Servos; 
     
     // Initialize
@@ -87,18 +86,14 @@ OP_TBS::OP_TBS()
     // Initialize these as well, but again, they will in the end be set by the user's preference
     HeadlightSound_Enabled = true;
     TurretSound_Enabled = false;
-    
 }
 
 
-void OP_TBS::begin(OP_SimpleTimer * t)
+void OP_TBS::begin()
 {
-    OP_TBS::TBSTimer = t;                                   // We will use the sketch's SimpleTimer object rather than creating a new instance of the class
-    
     TBSProp->attach(PROP1);
     TBSProp->attach(PROP2);
     TBSProp->attach(PROP3);
-
     InitializeOutputs();
 }
 

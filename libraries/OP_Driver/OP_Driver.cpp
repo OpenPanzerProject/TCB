@@ -506,7 +506,7 @@ boolean neg;
 // instead of ramped. 
 
 // For now, all we do here is try to prevent the throttle sound from stopping suddenly. 
-int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int DriveSpeed, _driveModes DriveMode, boolean Brake, OP_TBS * SoundObject)
+int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int DriveSpeed, _driveModes DriveMode, boolean Brake)
 {
     int8_t t_ThrottleSkipNum = 0;           // Temporary number of interrupts to skip before incrementing throttle speed. Initialize to zero, but it needs to be set to something else below (if ramping is used). 
     int8_t t_ThrottleRampStep = 0;          // Temporary ThrottleRampStep value
@@ -537,7 +537,7 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
         if (Brake && ThrottleCMD >= FullStopCmd)
         {   // This is the same calculation as we did above for drive speed, this means a full stop brake command. 
             // In the drive speed case, we set the tank to stop immediately. Here, we could play a special hard braking sound
-            // or whatever
+            // or whatever (you would have to pass in a pointer to the OP_Sound object to this function)
         }
 
         // While the tank may be able to slow down very quickly, there is no "brake" on the engine RPM. Think of a real car, 

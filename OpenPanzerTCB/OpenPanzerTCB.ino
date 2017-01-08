@@ -39,6 +39,7 @@
 #include "OP_Driver.h"
 #include "OP_IRLib.h"
 #include "OP_IRLibMatch.h"
+#include "OP_Sound.h"
 #include "OP_TBS.h"
 #include "OP_Button.h"
 #include "OP_EEPROM.h"
@@ -90,7 +91,7 @@
     OP_Driver Driver;                         
     OP_Engine TankEngine;
     OP_Transmission TankTransmission;
-    OP_TBS TankSound;                            // If we end up with other sound cards, we will need to make this a generic sound object of some kind and then select the specific type based on user selection similar to motor drive types
+    OP_Sound * TankSound;
     OP_Tank Tank;                              
 
 // MOTOR OBJECTS
@@ -255,7 +256,7 @@ void setup()
         SetDrivingProfile(DrivingProfile);   // See Driving tab
         TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
         TankTransmission.begin(SAVE_DEBUG, DebugSerial);
-        TankSound.begin(&timer);     // This class takes a reference to our SimpleTimer
+        InstantiateSoundObject();
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
         // whether we are running an airsoft unit or mechanical recoil, the mechanical recoil delay, the machine gun blink interval, 
         // and it also needs a pointer to our Servo_RECOIL object and the TankSound object. RecoilServo is already a pointer, but TankSound we pass by reference.
@@ -282,7 +283,7 @@ void setup()
                    eeprom.ramcopy.HiFlashWithCannon,
                    eeprom.ramcopy.MGLightBlink_mS,
                    RecoilServo, 
-                   &TankSound,
+                   TankSound,
                    &timer);
 
 
@@ -296,16 +297,16 @@ void setup()
     // SETUP SOUND STUFF
     // -------------------------------------------------------------------------------------------------------------------------------------------------->            
         // We retreived our squeak intervals from EEPROM, now load into the sound object
-        TankSound.SetSqueak1_Interval(eeprom.ramcopy.Squeak1_MinInterval_mS, eeprom.ramcopy.Squeak1_MaxInterval_mS);
-        TankSound.SetSqueak2_Interval(eeprom.ramcopy.Squeak2_MinInterval_mS, eeprom.ramcopy.Squeak2_MaxInterval_mS);
-        TankSound.SetSqueak3_Interval(eeprom.ramcopy.Squeak3_MinInterval_mS, eeprom.ramcopy.Squeak3_MaxInterval_mS); 
+        TankSound->SetSqueak1_Interval(eeprom.ramcopy.Squeak1_MinInterval_mS, eeprom.ramcopy.Squeak1_MaxInterval_mS);
+        TankSound->SetSqueak2_Interval(eeprom.ramcopy.Squeak2_MinInterval_mS, eeprom.ramcopy.Squeak2_MaxInterval_mS);
+        TankSound->SetSqueak3_Interval(eeprom.ramcopy.Squeak3_MinInterval_mS, eeprom.ramcopy.Squeak3_MaxInterval_mS); 
         // Also whether squeaks are even enabled
-        TankSound.Squeak1_SetEnabled(eeprom.ramcopy.Squeak1_Enabled);
-        TankSound.Squeak2_SetEnabled(eeprom.ramcopy.Squeak2_Enabled);
-        TankSound.Squeak3_SetEnabled(eeprom.ramcopy.Squeak3_Enabled);
+        TankSound->Squeak1_SetEnabled(eeprom.ramcopy.Squeak1_Enabled);
+        TankSound->Squeak2_SetEnabled(eeprom.ramcopy.Squeak2_Enabled);
+        TankSound->Squeak3_SetEnabled(eeprom.ramcopy.Squeak3_Enabled);
         // And whether some other sounds are enabled
-        TankSound.HeadlightSound_SetEnabled(eeprom.ramcopy.HeadlightSound_Enabled);
-        TankSound.TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);
+        TankSound->HeadlightSound_SetEnabled(eeprom.ramcopy.HeadlightSound_Enabled);
+        TankSound->TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);
 
     
     // INERTIAL MEASUREMENT UNIT    (Bosch BNO055 on Adafruit breakout board)
@@ -844,7 +845,7 @@ if (Startup)
                 // If turret rotation sound is enabled, play or stop the sound as appropriate
                 if (eeprom.ramcopy.TurretSound_Enabled)
                 {
-                    Radio.Sticks.Azimuth.command == 0 ? TankSound.StopTurret() : TankSound.Turret();                      
+                    Radio.Sticks.Azimuth.command == 0 ? TankSound->StopTurret() : TankSound->Turret();                      
                 }
             }
         }
@@ -1099,7 +1100,7 @@ if (Startup)
         // Now pass the throttle speed to the sound unit and the smoker 
         if (ThrottleSpeed != ThrottleSpeed_Previous)    // But only if the command has changed from last time...
         {
-                TankSound.SetEngineSpeed(ThrottleSpeed);    // Sound unit speed
+                TankSound->SetEngineSpeed(ThrottleSpeed);    // Sound unit speed
                 SetSmoker_Speed(ThrottleSpeed);             // Smoker speed
         }
 
@@ -1120,7 +1121,7 @@ if (Startup)
             }
             
             // We're not moving, so stop the squeaking
-            TankSound.StopSqueaks();
+            TankSound->StopSqueaks();
 
             // If the user set brake lights to come on automatically at stop, turn them on - but only if the engine is running,
             // which by definition it should be if we are at this point in the code
@@ -1160,8 +1161,8 @@ if (Startup)
             // Other checks to do when we're moving: 
 
             // Start squeaking if we haven't already. The sound object will automatically ignore any squeaks the user disabled in settings. 
-            if (TankSound.AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed) { TankSound.StartSqueaks(); }
-            else if (TankSound.AreSqueaksActive() && abs(DriveSpeed) <= MinSqueakSpeed)     { TankSound.StopSqueaks();  }
+            if (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed) { TankSound->StartSqueaks(); }
+            else if (TankSound->AreSqueaksActive() && abs(DriveSpeed) <= MinSqueakSpeed)     { TankSound->StopSqueaks();  }
 
             // If the user set brake lights to come on automatically at stop, turn them off now, because we are no longer stopped
             if (eeprom.ramcopy.BrakesAutoOnAtStop && BrakeLightsActive) { BrakeLightsOff(); }
@@ -1186,7 +1187,7 @@ if (Startup)
             Braking = false;
             BrakeLightsOff();      // Don't leave the brake lights on when the engine stops
             WasRunning = false;    // The engine is no longer running
-            TankSound.StopSqueaks(); 
+            TankSound->StopSqueaks(); 
             StopEngineIdleTimer();  // Stop the timer that turns off the engine after a set amount of time, since the engine is now already off. 
         }
     }
@@ -1366,7 +1367,7 @@ if (Startup)
         // Tank repair is over. 
         RepairOngoing = REPAIR_NONE;        
         // Repair sound was started automatically, but for complicated reasons we need to shut it off manually
-        TankSound.StopRepairSound();
+        TankSound->StopRepairSound();
         // If the engine is still running, as  courtesy to the user let's automatically re-engage the transmission. 
         TransmissionEngage();
     }
