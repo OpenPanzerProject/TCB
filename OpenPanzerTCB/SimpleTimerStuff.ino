@@ -10,7 +10,7 @@ void PerLoopUpdates(void)
 
 void UpdateSimpleTimers()
 {
-    timer.run();                        // This timer is local to the sketch. It is used in the main loop and elsewhere (eg Machine Gun). 
+    timer.run();                        // Our simple timer object, used all over the place including by various libraries.  
     Radio.Update();                     // Radio update (polls SBus and iBus)
     TankEngine.UpdateTimer();           // Engine timer (see OP_Driver library)
     TankTransmission.UpdateTimer();     // Transmission timer (see OP_Driver library)

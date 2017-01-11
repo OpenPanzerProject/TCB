@@ -12,7 +12,7 @@
  * The serial packet is 4 bytes long: Address byte, command byte, data byte, checksum. 
  *
  * Unlike the Sabertooth line which have 8 device addresses (128-135), the Scout only has two possible addresses: 131 (Address A) and 132 (Address B). The device address is selected by the 
- * physical swich on the Scout. 
+ * physical switch on the Scout. 
  * 
  *
  * FURTHER RESOURCES

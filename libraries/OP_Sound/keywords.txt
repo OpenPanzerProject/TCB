@@ -9,7 +9,7 @@
 #-------------------------------------------------------------
 OP_Sound    KEYWORD1
 BenediniTBS KEYWORD1
-OP_TeensySound  KEYWORD1
+OP_SoundCard    KEYWORD1
 
 
 #-------------------------------------------------------------
@@ -36,12 +36,19 @@ StopBarrel  LITERAL2
 BarrelSound_SetEnabled  LITERAL2
 HeadlightSound	LITERAL2
 HeadlightSound_SetEnabled	LITERAL2
+SetVolume   LITERAL2
 UserSound1	LITERAL2
 UserSound1_Repeat	LITERAL2
 UserSound1_Stop	LITERAL2
 UserSound2	LITERAL2
 UserSound2_Repeat	LITERAL2
 UserSound2_Stop	LITERAL2
+UserSound3	LITERAL2
+UserSound3_Repeat	LITERAL2
+UserSound3_Stop	LITERAL2
+UserSound4	LITERAL2
+UserSound4_Repeat	LITERAL2
+UserSound4_Stop	LITERAL2
 StartSqueaks	LITERAL2
 StopSqueaks	LITERAL2
 AreSqueaksActive	LITERAL2

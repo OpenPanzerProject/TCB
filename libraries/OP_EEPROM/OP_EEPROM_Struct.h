@@ -125,6 +125,16 @@ struct _eeprom_data {
     uint8_t  MinSqueakSpeedPct;                // Prevent squeaks from occuring when vehicle is moving slower than this percent of movement
     boolean  HeadlightSound_Enabled;           // Is the headlight sound enabled or not
     boolean  TurretSound_Enabled;              // Is turret rotation sound enabled or not
+    boolean  BarrelSound_Enabled;              // Is barrel elevation sound enabled or not
+    uint16_t Squeak4_MinInterval_mS;           // Minimum length of time between Squeak 4 intervals
+    uint16_t Squeak4_MaxInterval_mS;           // Maximum length of time between Squeak 4 intervals 
+    uint16_t Squeak5_MinInterval_mS;           // Minimum length of time between Squeak 5 intervals
+    uint16_t Squeak5_MaxInterval_mS;           // Maximum length of time between Squeak 5 intervals 
+    uint16_t Squeak6_MinInterval_mS;           // Minimum length of time between Squeak 6 intervals
+    uint16_t Squeak6_MaxInterval_mS;           // Maximum length of time between Squeak 6 intervals 
+    boolean  Squeak4_Enabled;                  // Is Squeak4 enabled or not
+    boolean  Squeak5_Enabled;                  // Is Squeak5 enabled or not
+    boolean  Squeak6_Enabled;                  // Is Squeak6 enabled or not
 
 // Battle settings
     IRTYPES IR_FireProtocol;                   // Which battle protocol are we *sending* by cannon fire

@@ -501,6 +501,16 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.MinSqueakSpeedPct = 25;                 // Percent of full movement before squeaks are activated (if squeaks are even enabled)
         ramcopy.HeadlightSound_Enabled = true;
         ramcopy.TurretSound_Enabled = false;
+        ramcopy.BarrelSound_Enabled = false;   
+        ramcopy.Squeak4_MinInterval_mS = 1000;
+        ramcopy.Squeak4_MaxInterval_mS = 2000;
+        ramcopy.Squeak5_MinInterval_mS = 3000;
+        ramcopy.Squeak5_MaxInterval_mS = 4000;
+        ramcopy.Squeak6_MinInterval_mS = 5000;
+        ramcopy.Squeak6_MaxInterval_mS = 6000;
+        ramcopy.Squeak4_Enabled = false;       
+        ramcopy.Squeak5_Enabled = false;       
+        ramcopy.Squeak6_Enabled = false;       
         
     // Battle settings
         ramcopy.IR_FireProtocol = IR_TAMIYA;            // Default to Tamiya IR battle protocol

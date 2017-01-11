@@ -249,7 +249,7 @@ void setup()
 
     // OTHER OBJECTS - BEGIN
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
-        Radio.begin(&timer);                        // Doesn't really begin anything, but we do need to pass it our timer object
+        Radio.saveTimer(&timer);                        // Pass the radio a pointer our timer object
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
                      eeprom.ramcopy.NeutralTurnAllowed);
@@ -785,8 +785,15 @@ if (Startup)
             if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
             {   
                 Barrel->setSpeed(Radio.Sticks.Elevation.command);   
+                
                 // If we are changing the position of the barrel, set the position changed flag
                 if (Radio.Sticks.Elevation.command != 0) BarrelPosChanged = true;
+                
+                // If barrel elevation sound is enabled, play or stop the sound as appropriate
+                if (eeprom.ramcopy.BarrelSound_Enabled)
+                {
+                    Radio.Sticks.Elevation.command == 0 ? TankSound->StopBarrel() : TankSound->Barrel();                      
+                }                  
             }
     
             // In addition to barrel movement commanded by the user, we will also move the barrel to keep it stable as measured by the accelerometer. 
@@ -831,6 +838,11 @@ if (Startup)
                 if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
                 {   
                     TurretElevation->setSpeed(Radio.Sticks.Elevation.command); 
+                    // If barrel elevation sound is enabled, play or stop the sound as appropriate
+                    if (eeprom.ramcopy.BarrelSound_Enabled)
+                    {
+                        Radio.Sticks.Elevation.command == 0 ? TankSound->StopBarrel() : TankSound->Barrel();                      
+                    }                    
                 }                
             }
 //        }

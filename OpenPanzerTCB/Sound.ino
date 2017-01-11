@@ -14,11 +14,12 @@ void InstantiateSoundObject(void)
             TankSound = new BenediniTBS(&timer);
             break;
             
-        case SD_OP_TEENSY:
-            TankSound = new OP_TeensySound();
+        case SD_OP_SOUND_CARD:
+            TankSound = new OP_SoundCard(&MotorSerial); // We communicate on the same serial port as we use for serial motor controllers
             break;
 
         case SD_BEIER_USMRC2:
+            // Not available yet
             break;
 
         default:
@@ -36,6 +37,10 @@ void InstantiateSoundObject(void)
 
 void TBS_Setup()
 {
+    // When input button held down for 2 seconds and dipswitch 3 is in the off position while dipswitch 4 is in the on position, 
+    // we will enter this menu, that allows teaching the TBS our servo positions on its 3 "prop" inputs. 
+    // This setup menu could be rendered unnecessary if Benedini releases a TBS update. 
+    
     // Temporary pointer to OP_TBS class directly (not through OP_Sound)
     OP_TBS * TBS;
     TBS = new OP_TBS (&timer);
@@ -97,6 +102,23 @@ void TBS_Setup()
 
 // We need local functions here in the sketch so we can assign these to our
 // special function callbacks in LoadFunctionTriggers() in the ObjectSetup tab
+
+void SetVolume(uint16_t unmapped_level)
+{
+    static uint8_t last_level = 0;
+
+    // TankSound volume adjustment function expects a uint8_t value from 0-100
+    uint8_t level = map(unmapped_level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 0, 100); 
+    
+    // Only update if changed
+    if (level != last_level)
+    {
+        TankSound->SetVolume(level);
+        last_level = level; 
+        if (DEBUG) { DebugSerial->print(F("Set volume: ")); PrintLnPct(level); } 
+    }
+}
+
 void TriggerUserSound1()
 {
     TankSound->UserSound1();
@@ -127,6 +149,38 @@ void UserSound2_Stop()
 {
     TankSound->UserSound2_Stop();
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2 - Stop")); }
+}
+
+void TriggerUserSound3()
+{
+    TankSound->UserSound3();
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("3")); }
+}
+void UserSound3_Repeat()
+{
+    TankSound->UserSound3_Repeat();
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("3 - Start Repeating")); }
+}
+void UserSound3_Stop()
+{
+    TankSound->UserSound3_Stop();
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("3 - Stop")); }
+}
+
+void TriggerUserSound4()
+{
+    TankSound->UserSound4();
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("4")); }
+}
+void UserSound4_Repeat()
+{
+    TankSound->UserSound4_Repeat();
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("4 - Start Repeating")); }
+}
+void UserSound4_Stop()
+{
+    TankSound->UserSound4_Stop();
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("4 - Stop")); }
 }
 
 void PrintUserSound()

@@ -37,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 85;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 92;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -76,7 +76,7 @@ enum _special_function : byte {
     SF_AUXOUT_TOGGLEBLINK = 32,     // 32
     SF_AUXOUT_REVOLVE   = 33,       // 33
     SF_AUXOUT_TOGGLEREVOLVE = 34,   // 34
-    SF_USER_SOUND1_ONCE = 35,       // 35
+    SF_USER_SOUND1_ONCE = 35,       // 35   -- see also 86-91 for user sounds 3 & 4
     SF_USER_SOUND1_RPT  = 36,       // 36
     SF_USER_SOUND1_OFF  = 37,       // 37
     SF_USER_SOUND2_ONCE = 38,       // 38
@@ -125,7 +125,14 @@ enum _special_function : byte {
     SF_DRIVEPROFILE_TOGGLE = 81,    // 81
     SF_SMOKER_ENABLE    = 82,       // 82
     SF_SMOKER_DISABLE   = 83,       // 83
-    SF_SMOKER_TOGGLE    = 84        // 84
+    SF_SMOKER_TOGGLE    = 84,       // 84
+    SF_SET_VOLUME       = 85,       // 85
+    SF_USER_SOUND3_ONCE = 86,       // 86   -- see also 35-40 for user sounds 1 & 2
+    SF_USER_SOUND3_RPT  = 87,       // 87
+    SF_USER_SOUND3_OFF  = 88,       // 88
+    SF_USER_SOUND4_ONCE = 89,       // 89
+    SF_USER_SOUND4_RPT  = 90,       // 90
+    SF_USER_SOUND4_OFF  = 91        // 91    
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -141,7 +148,8 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,0,0,0,0,0,0,0,0,   // 50-59    52-59 analog
  0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
- 1,1,1,1,1              // 80-84
+ 1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
+ 1,1                    // 90-91    
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -190,7 +198,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Aux Output - Toggle Blink",                 // 32
     "Aux Output - Revolving Light",              // 33 
     "Aux Output - Toggle Revolving Light",       // 34
-    "User Sound 1 - Play Once",                  // 35
+    "User Sound 1 - Play Once",                  // 35   -- see also 86-91 for user sounds 3 & 4
     "User Sound 1 - Repeat",                     // 36
     "User Sound 1 - Stop",                       // 37
     "User Sound 2 - Play Once",                  // 38
@@ -239,7 +247,14 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Drive Profile - Toggle",                    // 81           
     "Smoker - Enable",                           // 82
     "Smoker - Disable",                          // 83
-    "Smoker - Toggle"                            // 84
+    "Smoker - Toggle",                           // 84
+    "Sound Card - Set Volume",                   // 85
+    "User Sound 3 - Play Once",                  // 86   -- see also 35-40 for user sounds 1 & 2
+    "User Sound 3 - Repeat",                     // 87
+    "User Sound 3 - Stop",                       // 88
+    "User Sound 4 - Play Once",                  // 89
+    "User Sound 4 - Repeat",                     // 90
+    "User Sound 4 - Stop"                        // 91
 };
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>

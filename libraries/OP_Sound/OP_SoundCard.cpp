@@ -1,7 +1,9 @@
-/* OP_Sound.cpp     Open Panzer Sound - container class for various supported sound devices
- * Source:          openpanzer.org              
- * Authors:         Luke Middleton
- *   
+/* OP_SoundCard.cpp     Library for communicating via serial with Open Panzer sound cards
+ * Source:              openpanzer.org      
+ * Authors:             Luke Middleton
+ *
+ * LICENSE
+ * ===============================================================================================================
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,20 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */ 
- 
 
 #include <OP_Sound.h>
 
-// Little function to help us print out actual sound device names, rather than numbers. 
-// To use, call something like this:  Serial.print(printSoundDevice(SOUND_DEVICE))
-const __FlashStringHelper *printSoundDevice(SOUND_DEVICE Device)
+
+void OP_SoundCard::begin()
 {
-    if(Device>SD_LAST_SD) Device=SD_LAST_SD+1;
-    const __FlashStringHelper *Names[SD_LAST_SD+2]={F("Benedini TBS Mini"),F("OP Teensy Sound Card"),F("Beier USM-RC-2"),F("UNKNOWN")};
-    return Names[Device];
+    // Initialize
+    _squeaksActive = false;
 }
 
+void OP_SoundCard::command(byte command, byte value) const
+{
+  _port->write(OPSC_ADDRESS);
+  _port->write(command);
+  _port->write(value);
+  _port->write((OPSC_ADDRESS + command + value) & B01111111);
+}
 
+void OP_SoundCard::command(byte command) const
+{
+  this->command(command, 0);
+}
 
 
 

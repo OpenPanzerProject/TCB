@@ -59,12 +59,19 @@ void LoadFunctionTriggers()
                 case SF_AUXOUT_TOGGLEBLINK:         SF_Callback[i] = &SF_AuxOutputToggleBlink;                      break;
                 case SF_AUXOUT_REVOLVE:             SF_Callback[i] = &SF_AuxOutputRevolve;                          break;
                 case SF_AUXOUT_TOGGLEREVOLVE:       SF_Callback[i] = &SF_AuxOutputToggleRevolve;                    break;                    
+                case SF_SET_VOLUME:                 SF_Callback[i] = &SetVolume;                                    break; // Analog function
                 case SF_USER_SOUND1_ONCE:           SF_Callback[i] = &SF_TriggerUserSound1;                         break;
                 case SF_USER_SOUND1_RPT:            SF_Callback[i] = &SF_UserSound1_Repeat;                         break;
                 case SF_USER_SOUND1_OFF:            SF_Callback[i] = &SF_UserSound1_Stop;                           break;
                 case SF_USER_SOUND2_ONCE:           SF_Callback[i] = &SF_TriggerUserSound2;                         break;
                 case SF_USER_SOUND2_RPT:            SF_Callback[i] = &SF_UserSound2_Repeat;                         break;
                 case SF_USER_SOUND2_OFF:            SF_Callback[i] = &SF_UserSound2_Stop;                           break;
+                case SF_USER_SOUND3_ONCE:           SF_Callback[i] = &SF_TriggerUserSound3;                         break;
+                case SF_USER_SOUND3_RPT:            SF_Callback[i] = &SF_UserSound3_Repeat;                         break;
+                case SF_USER_SOUND3_OFF:            SF_Callback[i] = &SF_UserSound3_Stop;                           break;
+                case SF_USER_SOUND4_ONCE:           SF_Callback[i] = &SF_TriggerUserSound4;                         break;
+                case SF_USER_SOUND4_RPT:            SF_Callback[i] = &SF_UserSound4_Repeat;                         break;
+                case SF_USER_SOUND4_OFF:            SF_Callback[i] = &SF_UserSound4_Stop;                           break;
                 case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
@@ -378,6 +385,12 @@ void SF_UserSound1_Stop(uint16_t ignoreMe)      { UserSound1_Stop();        }
 void SF_TriggerUserSound2(uint16_t ignoreMe)    { TriggerUserSound2();      }
 void SF_UserSound2_Repeat(uint16_t ignoreMe)    { UserSound2_Repeat();      }
 void SF_UserSound2_Stop(uint16_t ignoreMe)      { UserSound2_Stop();        }
+void SF_TriggerUserSound3(uint16_t ignoreMe)    { TriggerUserSound3();      }
+void SF_UserSound3_Repeat(uint16_t ignoreMe)    { UserSound3_Repeat();      }
+void SF_UserSound3_Stop(uint16_t ignoreMe)      { UserSound3_Stop();        }
+void SF_TriggerUserSound4(uint16_t ignoreMe)    { TriggerUserSound4();      }
+void SF_UserSound4_Repeat(uint16_t ignoreMe)    { UserSound4_Repeat();      }
+void SF_UserSound4_Stop(uint16_t ignoreMe)      { UserSound4_Stop();        }
 void SF_PortA_Toggle(uint16_t ignoreMe)         { PortA_Toggle();           }
 void SF_PortA_On(uint16_t ignoreMe)             { PortA_On();               }
 void SF_PortA_Off(uint16_t ignoreMe)            { PortA_Off();              }
