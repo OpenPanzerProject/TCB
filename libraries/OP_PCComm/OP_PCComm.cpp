@@ -337,7 +337,7 @@ char prefixString[VALUE_BUFF];
 uint8_t prefixLength = 0;
 
 // Radio detect time
-#define WaitForRadio 600   // Time in mS we will wait for the radio if the PC asks us to stream and it's not ready. OP Config response timeout occurs at 1 second, so this needs to be less than that. 
+#define WaitForRadio 800   // Time in mS we will wait for the radio if the PC asks us to stream and it's not ready. OP Config response timeout occurs at 1 second, so this needs to be less than that. 
                            // If there really is a radio connected, we should be able to get it pretty quickly.
 uint32_t lastTime;
 
@@ -364,9 +364,9 @@ OP_PololuQik * Qik;
             lastTime = millis();
             while((_radio->Status() != READY_state) && ((millis() - lastTime) < WaitForRadio))    
             {   
-                _radio->detect();       // This will try to detect the radio signal
-                _radio->Update();       // Update the radio
-                updateTimer();          // Update the PC comm watchdog timer
+                _radio->detect();        // This will try to detect the radio signal 
+                _radio->Update();        // Update the radio
+                updateTimer();           // Update the PC comm watchdog timer
             }
             
             // Time up, or we sucessfully read the radio.
@@ -396,11 +396,14 @@ OP_PololuQik * Qik;
                 // That means at 115200 we easily have enough time to transmit each PPM frame out the serial port. 
                 // SBus is a different story. Although there are theoretically different SBus frame rates, the FrSky X4R we tested sent a new frame every 9mS and the frame
                 // itself takes 3mS to read at the SBus baud rate of 100000. That only leaves a 6mS gap to send a 8.5mS sentence to the PC (assuming we sent all 16 channels). 
-                // That would not be possible. We do two things to get around this problem with SBus:  
-                // First, we don't send a sentence with 16 channels. We set the max to 8 and in the case of SBus we sent channels 1-8 one time, then 9-16 the next time, then back to 1-8, etc... 
+                // That would not be possible. The situation is similar with iBus, and in fact slightly worse since it operates at 115k baud. We do two things to get around this problem:  
+                // First, we don't send a sentence with 16 channels. We set the max to 8 and we send channels 1-8 one time, then 9-16 the next time, then back to 1-8, etc... 
                 // But even this is very tight - recall we have a 6mS gap between SBus frames and sending an 8 channel sentence to the PC takes 5mS at least. So: 
-                // Secondly, we toss every other SBus frame. This is taken care of in the OP_SBusDecode class. The refresh rate is still more than adequate and although we increase latency 
-                // a little, it's not noticeable and the advantage is we can do this PC communication business, and gives us more time generally in the main sketch as well. 
+                // Secondly, we toss every other (or some other number) of SBus/iBus frames. In fact we may choose to toss a frame even in normal operation but we can tell the decoder 
+                // to toss even more for the purpose of slowing down the stream sent to the PC, we do this by calling the slowDownForPCComm() function of the Radio class. The actual number of frames
+                // discarded is defined in the .h files of the decoding classes (SBusDecode.h, iBusDecode.h, and any others we may add in the future). 
+                // When we are done streaming we call defaultSpeed() to restore the protocol back to its normal operating speed. 
+                _radio->slowDownForPCComm();
 
                 // Start with this set to true
                 StreamRadio = true;
@@ -465,6 +468,8 @@ OP_PololuQik * Qik;
                 } while (!Disconnect && StreamRadio && !Timeout && numErrors < MAX_COMM_ERRORCOUNT);
             }
             //AskForNextSentence();
+            // We're done streaming - restore radio speed
+            _radio->defaultSpeed();
             break;
             
         case PCCMD_STOPSTREAM_RADIO:

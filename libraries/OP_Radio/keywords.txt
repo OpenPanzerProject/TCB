@@ -23,6 +23,7 @@ decodeState_t	KEYWORD1
 #-------------------------------------------------------------
 # KEYWORD2 - Methods, functions, members
 #-------------------------------------------------------------
+saveTimer   KEYWORD2
 detect	KEYWORD2
 begin	KEYWORD2
 hasBegun    KEYWORD2

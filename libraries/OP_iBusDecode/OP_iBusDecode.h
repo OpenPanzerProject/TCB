@@ -7,7 +7,7 @@
  * Dave Borthwick       ibus_pic12f1572     https://bitbucket.org/daveborthwick/ibus_pic12f1572       (05-Dec-2015) 
  * 
  * This library reads the 32 byte iBus protocol and converts the data into 14 analog channels. Although the iBus protocol supports 14 channels, 
- * as of mid-2016 FlySky has yet to release a radio that will more than 10 (FS-i10, FS-i6S - the FS-i6 can also be hacked to transmit 10 channels).
+ * as of mid-2016 FlySky has yet to release a radio that will more than 10 (FS-i10, FS-i6S, FS-i6X - the FS-i6 can also be hacked to transmit 10 channels).
  * They announced an 18 channel transmitter several years ago but it has not yet materialized. 
  *
  * The iBus protocol is 115,200 baud serial. That is a standard baud rate and the signal is not inverted so no hardware is needed, just connect to any UART. 
@@ -132,13 +132,14 @@
                                                         
 #define iBus_ACQUISITION_COUNT      4           // Must have this many consecutive valid frames to transition to the ready state.
 
-#define DISCARD_FRAMES              1           // If you want to only keep every N frames, set this to some number greater than 0. If 1, it will keep every other frame. 
-                                                // Best keep it at 1. A new iBus frame starts every ~7.7mS which is a refresh rate of 130 Hz. 
+#define IBUS_DEFAULT_DISCARD_FRAMES 1           // If you want to only keep every N frames, set this to some number greater than 0. If 1, it will keep every other frame. 
+#define IBUS_PCCOMM_DISCARD_FRAMES  2           // A new iBus frame starts every ~7.7mS which is a refresh rate of 130 Hz. 
                                                 // Even half the refresh rate (65 Hz) is more than fast enough, although we do introduce some latency by skipping frames. 
-                                                // But this is not a racing quad, this is a model tank. 
-                                                // The other reason to skip every other frame is to give ourselves time to send data to the PC in radio setup mode. If we 
+                                                // But this is a tank, not a racing quad. So leave the default at 1 (every other). 
+                                                // The second setting (IBUS_PCCOMM_DISCARD_FRAMES) is an optionally slower level for streaming to the PC during the Radio Setup routin. If we 
                                                 // try to send even 8 channels of data every 8mS and it takes 5mS to send the packet and we need 3mS to read the next incoming 
-                                                // sentence, timing becomes very tight and in testing I couldn't maintain stable comms. 
+                                                // sentence, timing becomes very tight and in testing I couldn't maintain stable comms. In fact, even discarding every other frame
+                                                // it was glitchy, so we set this to 2 (keep one frame out of every 3). This is only in effect during PC streaming, not normal operation. 
 
 // iBUS_TICKS_PER_uS is defined in OP_Settings.h
 #define iBus_MIN_TICKS_BEFORE_START     (3500 * iBUS_TICKS_PER_uS)  // We set the min time between end of frame and beginning of next start byte to 3.5 mS (3500 uS)
@@ -156,6 +157,8 @@ class iBusDecode
         void                    GetiBus_Frame(int16_t pulseArray[], int16_t chanCount);  // Copy a complete frame of pulses 
         static boolean          NewFrame;                       // Has an unread frame of data arrived? 
         void                    update(void);
+        void                    slowDownForPCComm(void);        // Adjust on the fly how many frames we choose to discard, this will set it to IBUS_PCCOMM_DISCARD_FRAMES
+        void                    defaultSpeed(void);             // Revert to the default number of discarded frames IBUS_DEFAULT_DISCARD_FRAMES
         
     private:
         static HardwareSerial   *_serial;                       // Hardware serial pointer
@@ -166,6 +169,7 @@ class iBusDecode
         static uint8_t          stateCount;                     // counts the number of times this state has been repeated  
         static decodeState_t    State;                          // The current state
         static uint8_t          frameCount;                     // Used to keep track of frames for the purpose of discarding some
+        static uint8_t          framesToDiscard;                // How many frames to discard for each frame we read
 };
 
 

@@ -25,7 +25,7 @@
 const __FlashStringHelper *printSoundDevice(SOUND_DEVICE Device)
 {
     if(Device>SD_LAST_SD) Device=SD_LAST_SD+1;
-    const __FlashStringHelper *Names[SD_LAST_SD+2]={F("Benedini TBS Mini"),F("OP Teensy Sound Card"),F("Beier USM-RC-2"),F("UNKNOWN")};
+    const __FlashStringHelper *Names[SD_LAST_SD+2]={F("Benedini TBS Mini"),F("Open Panzer Sound Card"),F("Beier USM-RC-2"),F("UNKNOWN")};
     return Names[Device];
 }
 

@@ -43,6 +43,7 @@ uint8_t                 SBusDecode::stateCount;                         // count
 decodeState_t           SBusDecode::State;                              // The current state
 boolean                 SBusDecode::NewFrame;                           // Boolean variable to indicate a new complete PPM frame has arrived or been read. 
 uint8_t                 SBusDecode::frameCount;                         // 
+uint8_t                 SBusDecode::framesToDiscard;                    // How many frames to skip for every one read
 
 // Constructor
 SBusDecode::SBusDecode(){}
@@ -103,6 +104,9 @@ void SBusDecode::begin()
     {
         Pulses[i] = DEFAULT_PULSE_CENTER;       
     }
+    
+    // Set the number of frames to skip to the default
+    defaultSpeed();
 }
 
 void SBusDecode::shutdown()
@@ -193,7 +197,7 @@ uint8_t UART_error;
                                     State = READY_state;        // Valid frame, keep at Ready
                                 }
 
-                                if (++frameCount > DISCARD_FRAMES)
+                                if (++frameCount > framesToDiscard)
                                 {
                                     // Set the new frame flag
                                     NewFrame = true;
@@ -283,4 +287,16 @@ uint8_t SBusDecode::getChanCount()
     return SBUS_CHANNELS;
 }
 
+void SBusDecode::slowDownForPCComm(void)
+{
+    // Discard even more frames so that streaming data to the PC doesn't bog down
+    framesToDiscard = SBUS_PCCOMM_DISCARD_FRAMES;
+}
+
+void SBusDecode::defaultSpeed(void)
+{
+    // Revert to the default number of discarded frames DEFAULT_DISCARD_FRAMES,
+    // this gives us maximum responsiveness when in normal operation
+    framesToDiscard = SBUS_DEFAULT_DISCARD_FRAMES;    
+}
 

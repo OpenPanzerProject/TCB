@@ -43,6 +43,7 @@ uint8_t                 iBusDecode::stateCount;                         // count
 decodeState_t           iBusDecode::State;                              // The current state
 boolean                 iBusDecode::NewFrame;                           // Boolean variable to indicate a new complete PPM frame has arrived or been read. 
 uint8_t                 iBusDecode::frameCount;                         // 
+uint8_t                 iBusDecode::framesToDiscard;                    // How many frames to skip for every one read
 
 // Constructor
 iBusDecode::iBusDecode(){}
@@ -105,6 +106,9 @@ void iBusDecode::begin()
     
     // Start frame at zero
     iBus_pointer = 0;
+    
+    // Set the number of frames to skip to the default
+    defaultSpeed();
 }
 
 void iBusDecode::shutdown()
@@ -222,7 +226,7 @@ uint16_t temp;
                                     State = READY_state;        // Valid frame, keep at Ready
                                 }
 
-                                if (++frameCount > DISCARD_FRAMES)
+                                if (++frameCount > framesToDiscard)
                                 {
                                     // Set the new frame flag
                                     NewFrame = true;
@@ -278,4 +282,16 @@ uint8_t iBusDecode::getChanCount()
     return iBus_CHANNELS;
 }
 
+void iBusDecode::slowDownForPCComm(void)
+{
+    // Discard even more frames so that streaming data to the PC doesn't bog down
+    framesToDiscard = IBUS_PCCOMM_DISCARD_FRAMES;
+}
+
+void iBusDecode::defaultSpeed(void)
+{
+    // Revert to the default number of discarded frames DEFAULT_DISCARD_FRAMES,
+    // this gives us maximum responsiveness when in normal operation
+    framesToDiscard = IBUS_DEFAULT_DISCARD_FRAMES;    
+}
 

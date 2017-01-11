@@ -127,14 +127,14 @@
                                                         
 #define SBUS_ACQUISITION_COUNT      4           // Must have this many consecutive valid frames to transition to the ready state.
 
-#define DISCARD_FRAMES              1           // If you want to only keep every N frames, set this to some number greater than 0. If 1, it will keep every other frame. 
-                                                // Best keep it at 1. FrSky SBus data is sent every 9mS which is a refresh rate of 111 Hz. There is some indication FrSky may
+#define SBUS_DEFAULT_DISCARD_FRAMES 1           // If you want to only keep every N frames, set this to some number greater than 0. If 1, it will keep every other frame. 
+#define SBUS_PCCOMM_DISCARD_FRAMES  1           // FrSky SBus data is sent every 9mS which is a refresh rate of 111 Hz. There is some indication FrSky may
                                                 // only update the data every other frame anyway (US firmware). Even half the refresh rate (55 Hz) is more than fast enough, 
-                                                // although we do introduce some latency by skipping frames. But this is not a racing quad, this is a model tank. 
-                                                // 9/1000ths-of-a-second latency is acceptable. 
-                                                // The other reason to skip every other frame is to give ourselves time to send data to the PC in radio setup mode. If we 
-                                                // try to send even 8 channels of data every 9mS and it takes 5mS to send the packet and we need 3mS to read the next incoming 
-                                                // sentence, timing becomes very tight and in testing I couldn't maintain stable comms. 
+                                                // although we do introduce some latency by skipping frames. But this is tank, not a racing quad. 9/1000ths-of-a-second latency is acceptable. 
+                                                // The second setting (SBUS_PCCOMM_DISCARD_FRAMES) is an optionally slower level for streaming to the PC during the Radio Setup routine. 
+                                                // If we try to send even 8 channels of data every 9mS and it takes 5mS to send the packet and we need 3mS to read the next incoming 
+                                                // sentence, timing becomes very tight and in testing I couldn't maintain stable comms without skipping every other. 
+                                                // However for now it doesn't seem necessary to slow it down more than the default so we can leave it at 1 as well. 
 
 // SBUS_TICKS_PER_uS is defined in OP_Settings.h
 #define SBUS_MIN_TICKS_BEFORE_START     (3000 * SBUS_TICKS_PER_uS)  // Min time between end of frame and beginning of next start byte is 3 mS (3000 uS)
@@ -151,6 +151,8 @@ class SBusDecode
         void                    GetSBus_Frame(int16_t pulseArray[], int16_t chanCount);  // Copy a complete frame of pulses 
         static boolean          NewFrame;                       // Has an unread frame of data arrived? 
         void                    update(void);
+        void                    slowDownForPCComm(void);        // Adjust on the fly how many frames we choose to discard, this will set it to SBUS_PCCOMM_DISCARD_FRAMES
+        void                    defaultSpeed(void);             // Revert to the default number of discarded frames SBUS_DEFAULT_DISCARD_FRAMES        
         
     private:
         static void             ConvertSBus_to_PWM(void);       // Convert a frame of SBus data to pulse-widths
@@ -163,6 +165,7 @@ class SBusDecode
         static uint8_t          stateCount;                     // counts the number of times this state has been repeated  
         static decodeState_t    State;                          // The current state
         static uint8_t          frameCount;                     // Used to keep track of frames for the purpose of discarding some
+        static uint8_t          framesToDiscard;                // How many frames to discard for each frame we read
 };
 
 

@@ -34,7 +34,8 @@ typedef char RADIO_PROTOCOL;
 #define PROTOCOL_PPM    1                   // PPM protocol
 #define PROTOCOL_SBUS   2                   // SBus protocol
 #define PROTOCOL_iBUS   3                   // iBus protocol
-#define LAST_RADIOPROTOCOL PROTOCOL_iBUS    // So we know how to identify invalid values
+#define FIRST_RADIOPROTOCOL PROTOCOL_PPM    // So we know how to identify invalid values
+#define LAST_RADIOPROTOCOL  PROTOCOL_iBUS   // 
 const __FlashStringHelper *RadioProtocol(RADIO_PROTOCOL RP); // Returns a pointer to a flash-stored character string that is the name of the radio protocol
 
 // This one is to print out turret stick positions
@@ -44,9 +45,11 @@ const __FlashStringHelper *TurretStickPosition(uint8_t TSP); // Returns a pointe
 const PROGMEM uint8_t TurretStickPositionStringLengths[SPECIALPOSITIONS+1] = { 7, 8, 9, 9, 11, 12, 12, 11, 12, 12 }; // We add one for "unknown"
 #define TS_PositionString_Length(p) pgm_read_byte_far(&TurretStickPositionStringLengths[p])
 
-#define PPM_TRY_TIME        400     // How long to try detecting a PPM signal, in mS. Only used in detect mode at startup. 
-#define SBUS_TRY_TIME       400     // How long to try detecting an SBus signal, in mS. Only used in detect mode at startup. 
-#define iBUS_TRY_TIME       400     // How long to try detecting an iBus signal, in mS. Only used in detect mode at startup. 
+                                    // From OP_PCComm.cpp we know we only have 800 mS to try all three protocols on the Read Radio routine (actually we can have up to 1 second but 
+                                    // the setting is 800mS). So we set these to something that will let us try all three in that time frame. 1/4 second should be enough. 
+#define PPM_TRY_TIME        250     // How long to try detecting a PPM signal, in mS. Only used in detect mode at startup. 
+#define SBUS_TRY_TIME       250     // How long to try detecting an SBus signal, in mS. Only used in detect mode at startup. 
+#define iBUS_TRY_TIME       250     // How long to try detecting an iBus signal, in mS. Only used in detect mode at startup. 
 
 #define RADIO_FAILSAFE_MS   300     // If we exceed this amount of time in milliseconds without reading a valid radio frame, go into failsafe. 
                                     // 250 milliseconds is 1/4 second. That is a long time for an RC receiver, normally 12 PPM frames and over 25 SBus
@@ -56,10 +59,10 @@ class OP_Radio
 {
     public: 
         OP_Radio();                                                     // Constructor
-        static void             begin(OP_SimpleTimer * t);              // Get a reference to the sketch's SimpleTimer
-        
-        static void             detect(void);                           // See what kind of signal is attached
+        static void             saveTimer(OP_SimpleTimer * t);          // Get a reference to the sketch's SimpleTimer
         static void             begin(_eeprom_data *storage);           // This loads the save eeprom information into the radio object, and does basic initialization
+        
+        static void             detect();                               // See what kind of signal is attached
         static boolean          hasBegun(void);                         // Did we already call the begin() function yet? 
         static boolean          GetCommands();                          // High level command handler
         static RADIO_PROTOCOL   getProtocol();                          // Return currently detected protocol
@@ -78,7 +81,8 @@ class OP_Radio
 
         static void             Update(void);                           // Update the radioTimer, and poll the SBus decoder if we're using it (PPM updates itself automatically)
         static void             GetStringFrame(char *chrArray, uint8_t buffer, uint8_t &StrLength, char delimiter, uint8_t HiLo = LOW); // Returns a string of pulses separated by delimiter. Used for PC comms
-        
+        static void             slowDownForPCComm(void);                // Some protocols may operate at a speed too fast for reliable streaming to the PC, we can use this to slow them down temporarily when performing Read Radio from OP Config
+        static void             defaultSpeed(void);                     // This reverts the protocol back to its default speed for normal operation
 
     private:
     

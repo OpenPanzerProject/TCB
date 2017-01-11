@@ -73,7 +73,7 @@ OP_Radio::OP_Radio()
 }
 
 
-void OP_Radio::begin(OP_SimpleTimer * t)
+void OP_Radio::saveTimer(OP_SimpleTimer * t)
 {   // All we do here is save a pointer to the sketch's SimpleTimer
     radioTimer = t;
 }
@@ -85,7 +85,7 @@ void OP_Radio::detect(void)
 // so the calling routine needs to also be checking OP_Radio.Status(). When status returns READY_state, then the calling routine knows a protocol
 // has been successfully detected. At that time the calling routine can check OP_Radio.getProtocol() to find out which one we found. 
 
-static uint8_t tryProtocol = PROTOCOL_SBUS;     // Whatever you set here, will be the first one checked
+static RADIO_PROTOCOL tryProtocol = PROTOCOL_SBUS;     // Whatever you set here, will be the first one checked
 static boolean started = false;
 
     // START TRYING A PROTOCOL
@@ -103,7 +103,7 @@ static boolean started = false;
                     // Start a try timer
                     radioTimer->setTimeout(PPM_TRY_TIME, failPPM);
                     started = true;
-                    //Serial.println(F("Seaching for PPM..."));
+                    //Serial.println(F("Searching for PPM..."));
                 }
                 break;
                 
@@ -115,7 +115,7 @@ static boolean started = false;
                     // Start a try timer
                     radioTimer->setTimeout(SBUS_TRY_TIME, failSBus);
                     started = true;
-                    //Serial.println(F("Seaching for SBus..."));
+                    //Serial.println(F("Searching for SBus..."));
                 }
                 break;
 
@@ -127,7 +127,7 @@ static boolean started = false;
                     // Start a try timer
                     radioTimer->setTimeout(iBUS_TRY_TIME, failiBus);
                     started = true;
-                    //Serial.println(F("Seaching for iBus..."));
+                    //Serial.println(F("Searching for iBus..."));
                 }
                 break;
         }
@@ -186,7 +186,7 @@ static boolean started = false;
                 
                 // Try the next protocol - iBus
                 iBusFailed = started = false;
-                tryProtocol = PROTOCOL_iBUS;     
+                tryProtocol = PROTOCOL_iBUS;    
             }
             break;
 
@@ -203,6 +203,11 @@ static boolean started = false;
             }
             break;
     }
+    
+    // Every time this function is called, update the timer.
+    // We may be calling this from the PCComm class outside of the sketch, 
+    // so we can't count on the main loop updating it
+    radioTimer->run();
 }
 
 void OP_Radio::failPPM(void)
@@ -938,3 +943,27 @@ void OP_Radio::polliBus(void)
 {   // This checks if we're using the iBus protocol, and if so, updates it
     if (Protocol == PROTOCOL_iBUS) { iBusDecoder->update(); }
 }
+
+void OP_Radio::slowDownForPCComm(void)
+{
+    // Some protocols may operate at a speed too fast for reliable streaming to the PC, 
+    // we can use this to slow them down temporarily when performing Read Radio from OP Config
+    switch (Protocol)
+    {
+        case PROTOCOL_PPM:                                      break;   // No slow down implemented for PPM
+        case PROTOCOL_SBUS: SBusDecoder->slowDownForPCComm();   break;
+        case PROTOCOL_iBUS: iBusDecoder->slowDownForPCComm();   break;
+    }
+}
+    
+void OP_Radio::defaultSpeed(void)
+{
+    // This reverts the protocol back to its default speed for normal operation
+    switch (Protocol)
+    {
+        case PROTOCOL_PPM:                                      break;   // No change needed for PPM
+        case PROTOCOL_SBUS: SBusDecoder->defaultSpeed();        break;
+        case PROTOCOL_iBUS: iBusDecoder->defaultSpeed();        break;
+    }
+}
+
