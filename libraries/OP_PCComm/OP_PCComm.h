@@ -219,12 +219,13 @@ class OP_PCComm
         static void ProcessCommand(void);                           // Do whatever the computer asked us to
         
         static void AskForNextSentence(void);
+        static void AskForNextSentence_wError(void);
         static void RepeatSentence(void);
         static void TellPC_Goodbye(void);
         static void GivePC_Value_byID(uint16_t ID);                 // Sends an eeprom value by eeprom variable ID
         static void GivePC_Int(uint16_t returnID, int32_t val);     // Sends an arbitrary value up to int32
         static void GivePC_FirmwareVersion(void);
-        static void sendNullValueSentence(uint8_t command);
+        static void sendNullValueSentence(uint8_t command, boolean setValueFlag = false);
         static void prefixToByteArray(SentencePrefix s, char *prefixOut, uint8_t prefixBUFF, uint8_t &returnStrLen);
 
         static int32_t constructNumber(char *c, int numBytes);

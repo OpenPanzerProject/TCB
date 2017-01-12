@@ -573,9 +573,10 @@ OP_PololuQik * Qik;
             else
             {
                 // In this case, some error occured updating the EEPROM value
-                numErrors += 1;
-                // Tell the computer to repeat
-                RepeatSentence();
+                // The most likely error is that we requested an update to a variable which the TCB doesn't know about, which can occur when the TCB is 
+                // running a firmware older than the version of OP Config being used. 
+                // We don't fail, we still ask for the next sentence, but we set a flag in the response so OP Config will know this variable was unable to be written. 
+                AskForNextSentence_wError();
             }
             // Set this flag so we know an update was performed
             if (!eepromUpdated) eepromUpdated = true;
@@ -716,6 +717,14 @@ void OP_PCComm::AskForNextSentence(void)
     sendNullValueSentence(DVCMD_NEXT_SENTENCE);
 }
 
+void OP_PCComm::AskForNextSentence_wError(void)
+{
+    // In this case the prior request (usually to save a setting to EEPROM) 
+    // failed but we still want to continue with the next command. 
+    // To let OP Config know, we ask for the next sentence but set the Value to 1 instead of 0
+    sendNullValueSentence(DVCMD_NEXT_SENTENCE, true);
+}
+
 void OP_PCComm::RepeatSentence(void)
 {
     sendNullValueSentence(DVCMD_REPEAT_SENTENCE);
@@ -726,7 +735,7 @@ void OP_PCComm::TellPC_Goodbye(void)
     sendNullValueSentence(DVCMD_GOODBYE);
 }
 
-void OP_PCComm::sendNullValueSentence(uint8_t command)
+void OP_PCComm::sendNullValueSentence(uint8_t command, boolean setValueFlag /*=false*/)
 {
     char sentenceOut[SENTENCE_BUFF];
     uint8_t strLen;
@@ -737,7 +746,8 @@ void OP_PCComm::sendNullValueSentence(uint8_t command)
     // Now convert the command | ID | to a byte array
     prefixToByteArray(s, sentenceOut, SENTENCE_BUFF, strLen);
     // Add the null value and the final delimiter
-    sentenceOut[strLen++] = '0';    // no value
+    if (setValueFlag)   sentenceOut[strLen++] = '1';    // with value 1 (flag) - indicates error on prior operation
+    else                sentenceOut[strLen++] = '0';    // no value - typical
     sentenceOut[strLen++] = DELIMITER; 
     sentenceOut[strLen] = '\0'; // Mark the end of the array
     // Now print command | ID | 0 |
