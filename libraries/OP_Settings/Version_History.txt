@@ -1,3 +1,21 @@
+00.90.22        01/11/2017 - IMPORTANT NOTE: This release requires an OP Config 00.90.22
+                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. It is advised 
+                             to save an OPZ file of your settings before re-flashing. 
+                           - Fixed bug with radio detect routine when being run from within OP_PCComm (sketches timer was not being updated)
+                           - Adjusted timing of radio detection to make it feasible to test for all three protocols within the 1 second alloted by OP Config
+                           - Adjusted number of frames thrown out for iBus when streaming data to the PC in order not to overload OP Config, iBus is an even 
+                             worse case than SBus due to the slightly higher baud rate. Now we keep only 1 out of every 3 frames when streaming to OP Config, but
+                             in normal operation we keep every other, same as SBus. Also made it easy to adjust these parameters for both SBus and iBus, there is
+                             a distinct setting now for the number of frames discarded during normal operation and the number discarded during streaming to the PC, 
+                             see the .h files for both classes. PPM doesn't need this functionality. 
+                           - When being asked by OP Config to save the value to some variable which the TCB does not recognize, the TCB used to respond with a
+                             repeat command. Changed this to a response for next sentence (same as it would if it did recognize the variable), althought it does
+                             set a flag in the response so OP Config will know. The most common cause for this issue to occur, as I discovered, is running a 
+                             version of OP Config more recent than the firmware version on the TCB. In that case the user should re-flash but it's also probably
+                             fine to just skip the unknown variable. 
+                           - A good deal of changes to the sound class. OP_TBS is now a sub-class of OP_Sound, as is the new OP_SoundCard subclass which will
+                             be used to communicate with a future Open Panzer sound card. Various other additional variables were created for the additional 
+                             sounds that will be possible with the OP card, as well as new functions such as setting the volume with an analog trigger. 
 00.90.21        01/03/2017 - Fixed a small bug with the smoker that only presented itself when manually enabled/disabled using a function trigger.
 00.90.20        12/15/2016 - Add a Null_Motor drive type, which can be used when the user chooses to detach the turret stick controls 
                              from actually controlling the turret. 
