@@ -197,7 +197,7 @@ class OP_Tank
         // Incoming hits
         static void     EnableHitReception(void);
         static void     DisableHitReception(void);
-        static void     ResetBattle(void);
+        static void     ResetBattle(boolean immediate=false);
         static IRTYPES  _lastHit;
         static IRTEAMS  _lastTeam;
         

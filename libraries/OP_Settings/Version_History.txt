@@ -1,3 +1,6 @@
+00.90.23        01/19/2017 - Removed the invulnerability period when TCB first boots. This causes endless confusion when you attempt to test IR reception and for the first 
+                             10-15 seconds after applying power (depending on weight class) the tank is invulnerable. Invulnerability is really intended to apply only after 
+                             the tank has been destroyed and is in the process of regenerating; we don't need it at boot. 
 00.90.22        01/11/2017 - IMPORTANT NOTE: This release requires an OP Config 00.90.22
                            - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. It is advised 
                              to save an OPZ file of your settings before re-flashing. 

@@ -165,8 +165,8 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     //Serial.print(F("Damage per Cannon Hit: "));   Serial.println(DamagePctPerCannonHit,2);
     //Serial.print(F("Damage per MG Hit: "));       Serial.println(DamagePctPerMGHit,2);
 
-    // Clear hit count and start off invulnerable
-    ResetBattle();
+    // Clear hit count and enable IR reception immediately (with the true flag). 
+    ResetBattle(true);
     
     // Set up an external interrupt to read the mechanical airsoft or recoil trigger switch
     // SETUP EXTERNAL INTERRUPT PIN
@@ -1063,7 +1063,7 @@ int cut_Pct;
     }
 
 }
-void OP_Tank::ResetBattle(void)
+void OP_Tank::ResetBattle(boolean immediate /* =false */)
 {
     // This function is called when the tank is "regenerating" or "recovering" after being destroyed (or when the TCB has just rebooted). 
     // During invulnerability time the tank is invulnerable to enemy fire for a length of time dependent on its class. 
@@ -1071,8 +1071,15 @@ void OP_Tank::ResetBattle(void)
     CannonHitsTaken = 0;        // Reset the hit counter
     MGHitsTaken = 0;
     DamagePct = 0;
-    DisableHitReception();      // Ignore enemy fire
-    TankTimer->setTimeout(BattleSettings.ClassSettings.recoveryTime, EnableHitReception);    // Enable hits after recovery (invulnerability) time has passed
+    if (immediate)
+    {
+        EnableHitReception();   // Enable hits right away (we use this on bootup)
+    }
+    else
+    {
+        DisableHitReception();      // Ignore enemy fire
+        TankTimer->setTimeout(BattleSettings.ClassSettings.recoveryTime, EnableHitReception);    // Enable hits after recovery (invulnerability) time has passed
+    }
 }
 
 

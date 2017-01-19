@@ -72,7 +72,7 @@
 #define SCOUT_BAUD_CODE_19200                  3    //
 #define SCOUT_BAUD_CODE_38400                  4    //    
 #define SCOUT_BAUD_CODE_115200                 5    //
-#define SCOUT_BAUD_CODE_57600                  6    // The preceding codes are numbered identically to the codes used for Sabertooth controllers, which does not include 57600. That is why 57600 is number 6 and not number 5. 
+#define SCOUT_BAUD_CODE_57600                  6    // The preceding codes are numbered identically to the codes used for Sabertooth controllers, which do not include 57600. That is why 57600 is number 6 and not number 5. 
 
 class OP_Scout
 {
