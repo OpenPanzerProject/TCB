@@ -240,9 +240,9 @@ void SetupServo(ESC_POS_t servoNum)
             eeprom.ramcopy.TurretElevation_EPMax = pulseMax;
             eeprom.ramcopy.TurretElevation_Reversed = reversed;
             // Update eeprom too so it's permanent
-            EEPROM.writeInt(offsetof(_eeprom_data, TurretElevation_EPMin), pulseMin);
-            EEPROM.writeInt(offsetof(_eeprom_data, TurretElevation_EPMax), pulseMax);
-            EEPROM.writeByte(offsetof(_eeprom_data, TurretElevation_Reversed), reversed);
+            EEPROM.updateInt(offsetof(_eeprom_data, TurretElevation_EPMin), pulseMin);
+            EEPROM.updateInt(offsetof(_eeprom_data, TurretElevation_EPMax), pulseMax);
+            EEPROM.updateByte(offsetof(_eeprom_data, TurretElevation_Reversed), reversed);
             // Finally, set the actual end-point limits to the servo class
             servo->setMinPulseWidth(SERVONUM_TURRETELEVATION, pulseMin);
             servo->setMaxPulseWidth(SERVONUM_TURRETELEVATION, pulseMax);
@@ -278,9 +278,9 @@ void SetupServo(ESC_POS_t servoNum)
             eeprom.ramcopy.RecoilServo_EPMax = pulseMax;
             eeprom.ramcopy.RecoilReversed = reversed;
             // Update eeprom too so it's permanent
-            EEPROM.writeInt(offsetof(_eeprom_data, RecoilServo_EPMin), pulseMin);
-            EEPROM.writeInt(offsetof(_eeprom_data, RecoilServo_EPMax), pulseMax);
-            EEPROM.writeByte(offsetof(_eeprom_data, RecoilReversed), reversed);
+            EEPROM.updateInt(offsetof(_eeprom_data, RecoilServo_EPMin), pulseMin);
+            EEPROM.updateInt(offsetof(_eeprom_data, RecoilServo_EPMax), pulseMax);
+            EEPROM.updateByte(offsetof(_eeprom_data, RecoilReversed), reversed);
             // Finally, set the actual end-point limits to the servo class
             servo->setMinPulseWidth(SERVONUM_RECOIL, pulseMin);
             servo->setMaxPulseWidth(SERVONUM_RECOIL, pulseMax);

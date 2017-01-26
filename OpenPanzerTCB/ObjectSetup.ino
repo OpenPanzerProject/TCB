@@ -25,7 +25,7 @@ void InstantiateMotorObjects()
     if (eeprom.ramcopy.DriveType < DT_TANK || eeprom.ramcopy.DriveType > LAST_DT)
     {   // Default to tank if we have some invalid value, and update EEPROM too
         eeprom.ramcopy.DriveType = DT_TANK;
-        EEPROM.writeInt(offsetof(_eeprom_data, DriveType), DT_TANK);
+        EEPROM.updateInt(offsetof(_eeprom_data, DriveType), DT_TANK);
     }
    
     if (eeprom.ramcopy.DriveType == DT_CAR)
@@ -75,7 +75,7 @@ void InstantiateMotorObjects()
                 // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime.
                 // We set it to SABERTOOTH, and save it to EEPROM so we don't end up here again next time
                 eeprom.ramcopy.DriveMotors = SABERTOOTH;
-                EEPROM.writeInt(offsetof(_eeprom_data, DriveMotors), SABERTOOTH);
+                EEPROM.updateInt(offsetof(_eeprom_data, DriveMotors), SABERTOOTH);
                 DriveMotor = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
                 SteeringMotor = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
         }
@@ -121,7 +121,7 @@ void InstantiateMotorObjects()
                     // What do we do? We change drive type to tank and proceed as if that had been the selection. 
                     eeprom.ramcopy.DriveType = DT_TANK;
                     // We change it in EEPROM as well, so it will be fixed next time
-                    EEPROM.writeInt(offsetof(_eeprom_data, DriveType), DT_TANK);
+                    EEPROM.updateInt(offsetof(_eeprom_data, DriveType), DT_TANK);
                 }
                 // In this case they have selected DriveType = DT_TANK. That means they won't be needing a steering servo. 
                 LeftTread = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
@@ -134,7 +134,7 @@ void InstantiateMotorObjects()
                 // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime
                 // We set it to SABERTOOTH, and save it to EEPROM so we don't end up here again next time
                 eeprom.ramcopy.DriveMotors = SABERTOOTH;
-                EEPROM.writeInt(offsetof(_eeprom_data, DriveMotors), SABERTOOTH);
+                EEPROM.updateInt(offsetof(_eeprom_data, DriveMotors), SABERTOOTH);
                 LeftTread = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
                 RightTread = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
         }
@@ -194,7 +194,7 @@ void InstantiateMotorObjects()
             // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime
             // We set it to SERVO_ESC, and save it to EEPROM so we don't end up here next time. 
             eeprom.ramcopy.TurretRotationMotor = SERVO_ESC;
-            EEPROM.writeInt(offsetof(_eeprom_data, TurretRotationMotor), SERVO_ESC);
+            EEPROM.updateInt(offsetof(_eeprom_data, TurretRotationMotor), SERVO_ESC);
             TurretRotation = new Servo_ESC (SERVONUM_TURRETROTATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             RCOutput3_Available = false;
     }
@@ -249,7 +249,7 @@ void InstantiateMotorObjects()
             // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime
             // We set it to SERVO_ESC, and save it to EEPROM so we don't end up here next time. 
             eeprom.ramcopy.TurretElevationMotor = SERVO_ESC;
-            EEPROM.writeInt(offsetof(_eeprom_data, TurretElevationMotor), SERVO_ESC);            
+            EEPROM.updateInt(offsetof(_eeprom_data, TurretElevationMotor), SERVO_ESC);            
             TurretElevation = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             RCOutput4_Available = false;
     }
