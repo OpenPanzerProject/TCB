@@ -101,6 +101,7 @@ const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 #define DEFAULT_SQUEAK_MIN_mS 800       // Min time between squeaks defaults to 0.8 seconds
 #define DEFAULT_SQUEAK_MAX_mS 3500      // Max time between squeaks defaults to 3.5 seconds
 #define SQUEAK_DELAY_mS       3000      // We don't start squeaking until this amount of time has passed after we first start moving
+                                        // I suppose this should probably be stuck in EEPROM and let the user adjust it... 
 
 // Let's create descriptions of these 12 sounds so we can print them out during the teaching routine. These must match
 // the order they were defined in (see above). If SOUNDNAME_CHARS is 31, that means you have 30 (not 31) chars for the name.
@@ -174,7 +175,7 @@ public:
     void HeadlightSound_SetEnabled(boolean); // Headlight sound enabled or not
     void TurretSound_SetEnabled(boolean);    // Turret sound enabled or not
     
-    static void StartSqueaks(void);             // starts all squeaks
+    static void StartSqueaks(void);      // Starts all squeaks
     void StopSqueaks(void);              // Stops all squeaks
     boolean AreSqueaksActive(void);      // Returns true or false if sqeaks are active
     void SetSqueak1_Interval(unsigned int, unsigned int);
