@@ -165,8 +165,8 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     //Serial.print(F("Damage per Cannon Hit: "));   Serial.println(DamagePctPerCannonHit,2);
     //Serial.print(F("Damage per MG Hit: "));       Serial.println(DamagePctPerMGHit,2);
 
-    // Clear hit count and enable IR reception immediately (with the true flag). 
-    ResetBattle(true);
+    // Clear hit count and enable IR reception immediately. 
+    ResetBattleImmediate();
     
     // Set up an external interrupt to read the mechanical airsoft or recoil trigger switch
     // SETUP EXTERNAL INTERRUPT PIN
@@ -1063,7 +1063,7 @@ int cut_Pct;
     }
 
 }
-void OP_Tank::ResetBattle(boolean immediate /* =false */)
+void OP_Tank::ResetBattle(void)
 {
     // This function is called when the tank is "regenerating" or "recovering" after being destroyed (or when the TCB has just rebooted). 
     // During invulnerability time the tank is invulnerable to enemy fire for a length of time dependent on its class. 
@@ -1071,18 +1071,19 @@ void OP_Tank::ResetBattle(boolean immediate /* =false */)
     CannonHitsTaken = 0;        // Reset the hit counter
     MGHitsTaken = 0;
     DamagePct = 0;
-    if (immediate)
-    {
-        EnableHitReception();   // Enable hits right away (we use this on bootup)
-    }
-    else
-    {
-        DisableHitReception();      // Ignore enemy fire
-        TankTimer->setTimeout(BattleSettings.ClassSettings.recoveryTime, EnableHitReception);    // Enable hits after recovery (invulnerability) time has passed
-    }
+    DisableHitReception();      // Ignore enemy fire
+    TankTimer->setTimeout(BattleSettings.ClassSettings.recoveryTime, EnableHitReception);    // Enable hits after recovery (invulnerability) time has passed
 }
-
-
+void OP_Tank::ResetBattleImmediate(void)
+{
+    // This function is called when the TCB has just rebooted. 
+    // We do the same thing as ResetBattle() except we don't wait to enable hit reception.
+    isDestroyed = false;        // We are not longer destroyed
+    CannonHitsTaken = 0;        // We have not been hit by anything yet
+    MGHitsTaken = 0;
+    DamagePct = 0;              // We have no damage yet
+    EnableHitReception();       // Enable hits right now
+}
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
