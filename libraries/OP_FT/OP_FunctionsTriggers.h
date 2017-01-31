@@ -37,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 92;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 98;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -96,7 +96,7 @@ enum _special_function : byte {
     SF_SMOKER           = 52,       // 52   -- analog function
     SF_MOTOR_A          = 53,       // 53   -- analog function
     SF_MOTOR_B          = 54,       // 54   -- analog function
-    SF_RC1_PASS         = 55,       // 55   -- analog function ("PASS" for pass-through)
+    SF_RC1_PASS         = 55,       // 55   -- analog function ("PASS" for pass-through) -- see also 92-97 for pass-throughs 6-8
     SF_RC2_PASS         = 56,       // 56   -- analog function
     SF_RC3_PASS         = 57,       // 57   -- analog function
     SF_RC4_PASS         = 58,       // 58   -- analog function
@@ -132,7 +132,13 @@ enum _special_function : byte {
     SF_USER_SOUND3_OFF  = 88,       // 88
     SF_USER_SOUND4_ONCE = 89,       // 89
     SF_USER_SOUND4_RPT  = 90,       // 90
-    SF_USER_SOUND4_OFF  = 91        // 91    
+    SF_USER_SOUND4_OFF  = 91,       // 91
+    SF_RC6_PASS         = 92,       // 92   -- analog function ("PASS" for pass-through) -- see also 55-62 for pass-throughs 1-4
+    SF_RC7_PASS         = 93,       // 93   -- analog function
+    SF_RC8_PASS         = 94,       // 94   -- analog function
+    SF_RC6_PASS_PAN     = 95,       // 95   -- analog function (Pan servo passthrough signal)
+    SF_RC7_PASS_PAN     = 96,       // 96   -- analog function
+    SF_RC8_PASS_PAN     = 97        // 97   -- analog function    
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -149,7 +155,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
- 1,1                    // 90-91    
+ 1,1,0,0,0,0,0,0        // 90-97    92-97 analog    
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -218,7 +224,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Smoker - Manual Control",                   // 52
     "Motor A - Manual Control",                  // 53
     "Motor B - Manual Control",                  // 54
-    "RC Output 1 - Pass-through",                // 55
+    "RC Output 1 - Pass-through",                // 55   -- see also 92-97 for pass-throughs 6-8
     "RC Output 2 - Pass-through",                // 56
     "RC Output 3 - Pass-through",                // 57
     "RC Output 4 - Pass-through",                // 58
@@ -254,7 +260,13 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 3 - Stop",                       // 88
     "User Sound 4 - Play Once",                  // 89
     "User Sound 4 - Repeat",                     // 90
-    "User Sound 4 - Stop"                        // 91
+    "User Sound 4 - Stop",                       // 91
+    "RC Output 6 - Pass-through",                // 92   -- see also 55-62 for pass-throughs 1-4
+    "RC Output 7 - Pass-through",                // 93
+    "RC Output 8 - Pass-through",                // 94
+    "RC Output 6 - Pan Servo",                   // 95   
+    "RC Output 7 - Pan Servo",                   // 96
+    "RC Output 8 - Pan Servo"                    // 97   
 };
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>

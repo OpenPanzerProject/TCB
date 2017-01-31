@@ -113,20 +113,29 @@
     // And of course we always have the mechanical smoker motor
         Onboard_Smoker * Smoker;
         boolean SmokerEnabled = true;   // The user can enable/disable the smoker on the fly, we assume it is enabled to begin with. 
-    // We may optionally have up to 4 general purpose RC outputs, depending on how the user sets up the other motor objects. The user can choose to have them be regular RC pass-through
-    // or create them as Pan servo pass-throughs by selecting the appropriate function in OP Config. 
+    // We may optionally have up to 7 general purpose RC outputs, depending on how the user sets up the other motor objects and sound cards. The user can choose to have them be regular RC pass-through
+    // or create them as Pan servo pass-throughs by selecting the appropriate function in OP Config. RC output #5 is always reserved for recoil no matter what, so it can't be repurposed for anything else. 
         Servo_ESC * RCOutput1;      // If the drive motors are onboard or serial controllers, this will be available
         Servo_ESC * RCOutput2;      // If the drive motors are onboard or serial controllers, AND if there is no steering servo specified (ie not car or halftrack), this will be available
         Servo_ESC * RCOutput3;      // If the turret rotation motor is serial or onboard, this will be available
         Servo_ESC * RCOutput4;      // If the turret elevation motor is serial or onboard, this will be available
+        Servo_ESC * RCOutput6;      // May be available depending on which sound card is implemented (not with Benedini or Taigen)
+        Servo_ESC * RCOutput7;      // May be available depending on which sound card is implemented (not with Benedini)
+        Servo_ESC * RCOutput8;      // May be available depending on which sound card is implemented (not with Benedini)
         Servo_PAN * ServoOutput1;   // If the drive motors are onboard or serial controllers, this will be available
         Servo_PAN * ServoOutput2;   // If the drive motors are onboard or serial controllers, AND if there is no steering servo specified (ie not car or halftrack), this will be available
         Servo_PAN * ServoOutput3;   // If the turret rotation motor is serial or onboard, this will be available
         Servo_PAN * ServoOutput4;   // If the turret elevation motor is serial or onboard, this will be available
+        Servo_PAN * ServoOutput6;   // May be available depending on which sound card is implemented (not with Benedini or Taigen)
+        Servo_PAN * ServoOutput7;   // May be available depending on which sound card is implemented (not with Benedini)
+        Servo_PAN * ServoOutput8;   // May be available depending on which sound card is implemented (not with Benedini)
         boolean RCOutput1_Available = false;
         boolean RCOutput2_Available = false;
         boolean RCOutput3_Available = false;
         boolean RCOutput4_Available = false;
+        boolean RCOutput6_Available = false;
+        boolean RCOutput7_Available = false;
+        boolean RCOutput8_Available = false;
     // We may also be able to control the onboard motors A or B directly if they are not assigned to any drive or turret function
         Onboard_ESC * MotorA;
         Onboard_ESC * MotorB;
@@ -244,7 +253,7 @@ void setup()
         
     // MOTOR OBJECTS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
-        TankServos.begin();             // Do this before setting up motor objects
+        TankServos.begin();                             // Do this before setting up motor objects
         InstantiateMotorObjects();
 
     // OTHER OBJECTS - BEGIN
@@ -253,10 +262,11 @@ void setup()
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
                      eeprom.ramcopy.NeutralTurnAllowed);
-        SetDrivingProfile(DrivingProfile);   // See Driving tab
+        SetDrivingProfile(DrivingProfile);              // See Driving tab
         TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
         TankTransmission.begin(SAVE_DEBUG, DebugSerial);
-        InstantiateSoundObject();
+        InstantiateSoundObject();                       // Do this after TankServos.begin();
+        InstantiateOptionalServoOutputs();              // Do this after InstantiateSoundObject();
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
         // whether we are running an airsoft unit or mechanical recoil, the mechanical recoil delay, the machine gun blink interval, 
         // and it also needs a pointer to our Servo_RECOIL object and the TankSound object. RecoilServo is already a pointer, but TankSound we pass by reference.
@@ -299,14 +309,21 @@ void setup()
         // We retreived our squeak intervals from EEPROM, now load into the sound object
         TankSound->SetSqueak1_Interval(eeprom.ramcopy.Squeak1_MinInterval_mS, eeprom.ramcopy.Squeak1_MaxInterval_mS);
         TankSound->SetSqueak2_Interval(eeprom.ramcopy.Squeak2_MinInterval_mS, eeprom.ramcopy.Squeak2_MaxInterval_mS);
-        TankSound->SetSqueak3_Interval(eeprom.ramcopy.Squeak3_MinInterval_mS, eeprom.ramcopy.Squeak3_MaxInterval_mS); 
+        TankSound->SetSqueak3_Interval(eeprom.ramcopy.Squeak3_MinInterval_mS, eeprom.ramcopy.Squeak3_MaxInterval_mS);
+        TankSound->SetSqueak4_Interval(eeprom.ramcopy.Squeak4_MinInterval_mS, eeprom.ramcopy.Squeak4_MaxInterval_mS);
+        TankSound->SetSqueak5_Interval(eeprom.ramcopy.Squeak5_MinInterval_mS, eeprom.ramcopy.Squeak5_MaxInterval_mS);
+        TankSound->SetSqueak6_Interval(eeprom.ramcopy.Squeak6_MinInterval_mS, eeprom.ramcopy.Squeak6_MaxInterval_mS);          
         // Also whether squeaks are even enabled
         TankSound->Squeak1_SetEnabled(eeprom.ramcopy.Squeak1_Enabled);
         TankSound->Squeak2_SetEnabled(eeprom.ramcopy.Squeak2_Enabled);
         TankSound->Squeak3_SetEnabled(eeprom.ramcopy.Squeak3_Enabled);
+        TankSound->Squeak4_SetEnabled(eeprom.ramcopy.Squeak4_Enabled);
+        TankSound->Squeak5_SetEnabled(eeprom.ramcopy.Squeak5_Enabled);
+        TankSound->Squeak6_SetEnabled(eeprom.ramcopy.Squeak6_Enabled);        
         // And whether some other sounds are enabled
         TankSound->HeadlightSound_SetEnabled(eeprom.ramcopy.HeadlightSound_Enabled);
         TankSound->TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);
+        TankSound->BarrelSound_SetEnabled(eeprom.ramcopy.BarrelSound_Enabled);
 
     
     // INERTIAL MEASUREMENT UNIT    (Bosch BNO055 on Adafruit breakout board)
@@ -857,7 +874,7 @@ if (Startup)
                 // If turret rotation sound is enabled, play or stop the sound as appropriate
                 if (eeprom.ramcopy.TurretSound_Enabled)
                 {
-                    Radio.Sticks.Azimuth.command == 0 ? TankSound->StopTurret() : TankSound->Turret();                      
+                    Radio.Sticks.Azimuth.command == 0 ? TankSound->StopTurret() : TankSound->Turret();
                 }
             }
         }
@@ -908,6 +925,7 @@ if (Startup)
                         TurnCommand = 0;
                         DriveModeCommand = STOP;
                         DriveSpeed = 0;
+                        ThrottleSpeed = 0;
                         TurnSpeed = 0;
                 }
             }
@@ -1113,7 +1131,7 @@ if (Startup)
         if (ThrottleSpeed != ThrottleSpeed_Previous)    // But only if the command has changed from last time...
         {
                 TankSound->SetEngineSpeed(ThrottleSpeed);    // Sound unit speed
-                SetSmoker_Speed(ThrottleSpeed);             // Smoker speed
+                SetSmoker_Speed(ThrottleSpeed);              // Smoker speed
         }
 
         // SET DRIVE SPEED 
@@ -1190,6 +1208,7 @@ if (Startup)
         if (WasRunning) // Means, we were running last time we checked
         {   // So turn this stuff off
             DriveSpeed = 0;
+            ThrottleSpeed = 0;
             TurnSpeed = 0;
             RightSpeed = 0;
             LeftSpeed = 0;

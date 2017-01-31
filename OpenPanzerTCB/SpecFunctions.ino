@@ -89,11 +89,17 @@ void LoadFunctionTriggers()
                 case SF_RC1_PASS:                   SF_Callback[i] = &RC_Passthrough_1;                             break; // Analog function
                 case SF_RC2_PASS:                   SF_Callback[i] = &RC_Passthrough_2;                             break; // Analog function
                 case SF_RC3_PASS:                   SF_Callback[i] = &RC_Passthrough_3;                             break; // Analog function
-                case SF_RC4_PASS:                   SF_Callback[i] = &RC_Passthrough_4;                             break; // Analog function
+                case SF_RC4_PASS:                   SF_Callback[i] = &RC_Passthrough_4;                             break; // Analog function // No passthrough for 5 - that is always reserved for recoil
+                case SF_RC6_PASS:                   SF_Callback[i] = &RC_Passthrough_6;                             break; // Analog function
+                case SF_RC7_PASS:                   SF_Callback[i] = &RC_Passthrough_7;                             break; // Analog function
+                case SF_RC8_PASS:                   SF_Callback[i] = &RC_Passthrough_8;                             break; // Analog function
                 case SF_RC1_PASS_PAN:               SF_Callback[i] = &RC_PanServo_1;                                break; // Analog function
                 case SF_RC2_PASS_PAN:               SF_Callback[i] = &RC_PanServo_2;                                break; // Analog function
                 case SF_RC3_PASS_PAN:               SF_Callback[i] = &RC_PanServo_3;                                break; // Analog function
-                case SF_RC4_PASS_PAN:               SF_Callback[i] = &RC_PanServo_4;                                break; // Analog function
+                case SF_RC4_PASS_PAN:               SF_Callback[i] = &RC_PanServo_4;                                break; // Analog function  // No pan for 5 - that is always reserved for recoil
+                case SF_RC6_PASS_PAN:               SF_Callback[i] = &RC_PanServo_6;                                break; // Analog function
+                case SF_RC7_PASS_PAN:               SF_Callback[i] = &RC_PanServo_7;                                break; // Analog function
+                case SF_RC8_PASS_PAN:               SF_Callback[i] = &RC_PanServo_8;                                break; // Analog function
                 case SF_BARREL_STAB_ON:             SF_Callback[i] = &SF_BarrelStab_On;                             break;                    
                 case SF_BARREL_STAB_OFF:            SF_Callback[i] = &SF_BarrelStab_Off;                            break;                    
                 case SF_BARREL_STAB_TOGGLE:         SF_Callback[i] = &SF_BarrelStab_Toggle;                         break;                                        
@@ -518,6 +524,18 @@ void RC_Passthrough_4(uint16_t level)
 {
     if (RCOutput4_Available) RCOutput4->setPos(level);
 }
+void RC_Passthrough_6(uint16_t level)
+{
+    if (RCOutput6_Available) RCOutput6->setPos(level);
+}
+void RC_Passthrough_7(uint16_t level)
+{
+    if (RCOutput7_Available) RCOutput7->setPos(level);
+}
+void RC_Passthrough_8(uint16_t level)
+{
+    if (RCOutput8_Available) RCOutput8->setPos(level);
+}
 // These are the pan servo variants. Here we set the pan speed instead of the actual position
 void RC_PanServo_1(uint16_t level)
 {
@@ -534,6 +552,18 @@ void RC_PanServo_3(uint16_t level)
 void RC_PanServo_4(uint16_t level)
 {
     if (RCOutput4_Available) ServoOutput4->setSpeed(level);
+}
+void RC_PanServo_6(uint16_t level)
+{
+    if (RCOutput6_Available) ServoOutput6->setSpeed(level);
+}
+void RC_PanServo_7(uint16_t level)
+{
+    if (RCOutput7_Available) ServoOutput7->setSpeed(level);
+}
+void RC_PanServo_8(uint16_t level)
+{
+    if (RCOutput8_Available) ServoOutput8->setSpeed(level);
 }
 
 

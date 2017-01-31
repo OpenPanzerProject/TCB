@@ -4,12 +4,6 @@
 // This function assigns the correct motor object to the drive, turret and recoil motors based on the user's selections which we retrieved from EEPROM
 void InstantiateMotorObjects() 
 { 
-    // Temp vars
-    boolean RCOutput1_Assigned = false;
-    boolean RCOutput2_Assigned = false;
-    boolean RCOutput3_Assigned = false;
-    boolean RCOutput4_Assigned = false;
-
     // Start these as true, and set to false below if necessary
     RCOutput1_Available = true;    
     RCOutput2_Available = true;    
@@ -310,100 +304,6 @@ void InstantiateMotorObjects()
         }
         Smoker->begin();
 
-    // OPTIONAL RC OUTPUTS
-    // -------------------------------------------------------------------------------------------------------------------------------------->>
-        // If any of the first four RC outputs are unused by drive, turret or steering, we can set them to generic RC outputs and let the user 
-        // control them directly for whatever purpose. They essentially "pass-through" whatever radio channel has been assigned to them. 
-        // In OP Config the user has the option of doing regular RC passthrough (good for servos, continuous rotation servos, or ESCs), or they 
-        // can select a Pan Servo passthrough. Which one they picked will influence what kind of object we need to create. The only way to know
-        // is to run through the list of the user's function triggers and see. And they may not have any at all, in which case we don't need
-        // to create anything. 
-
-        // It is also technically possible for the user to assign more than one trigger to the same RC pass-through. This would be bad news, so
-        // in this routine we make sure that no more than one trigger is assigned to an RC output.
-
-        // Only check if one of these is even available for use
-        if (RCOutput1_Available || RCOutput2_Available || RCOutput3_Available || RCOutput4_Available)
-        {   // Loop through every function-trigger pair
-            for (int i = 0; i <MAX_FUNCTION_TRIGGERS; i++)
-            {   // A valid function-trigger will have a function number and a TriggerID > 0
-                if (eeprom.ramcopy.SF_Trigger[i].specialFunction != SF_NULL_FUNCTION && eeprom.ramcopy.SF_Trigger[i].TriggerID > 0)
-                {
-                    switch (eeprom.ramcopy.SF_Trigger[i].specialFunction)
-                    {
-                        case SF_RC1_PASS:       // RC Output 1 passthrough
-                            if (RCOutput1_Available && !RCOutput1_Assigned) 
-                            {   //RC Output on LEFTTREAD
-                                RCOutput1 = new Servo_ESC (SERVONUM_LEFTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                RCOutput1->begin(); 
-                                RCOutput1_Assigned = true;
-                            }
-                            break;
-                        case SF_RC2_PASS:       // RC Output 2 passthrough
-                            if (RCOutput2_Available && !RCOutput2_Assigned) 
-                            {   //RC Output on RIGHTTREAD
-                                RCOutput2 = new Servo_ESC (SERVONUM_RIGHTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                RCOutput2->begin(); 
-                                RCOutput2_Assigned = true;
-                            }
-                            break;
-                        case SF_RC3_PASS:       // RC Output 3 passthrough
-                            if (RCOutput3_Available && !RCOutput3_Assigned) 
-                            {   //RC Output on TURRETROTATION
-                                RCOutput3 = new Servo_ESC (SERVONUM_TURRETROTATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                RCOutput3->begin(); 
-                                RCOutput3_Assigned = true;
-                            }
-                            break;
-                        case SF_RC4_PASS:       // RC Output 4 passthrough
-                            if (RCOutput4_Available && !RCOutput4_Assigned) 
-                            {   //RC Output on TURRETELEVATION
-                                RCOutput4 = new Servo_ESC (SERVONUM_TURRETELEVATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                RCOutput4->begin(); 
-                                RCOutput4_Assigned = true;
-                            }
-                            break;
-                        case SF_RC1_PASS_PAN:   // Pan Servo on RC Output 1
-                            if (RCOutput1_Available && !RCOutput1_Assigned) 
-                            {   // Servo_PAN on LEFTTTREAD
-                                ServoOutput1 = new Servo_PAN (SERVONUM_LEFTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                ServoOutput1->begin(); 
-                                RCOutput1_Assigned = true;
-                            }
-                            break;
-                        case SF_RC2_PASS_PAN:   // Pan Servo on RC Output 2
-                            if (RCOutput2_Available && !RCOutput2_Assigned) 
-                            {   // Servo_PAN on RIGHTTREAD
-                                ServoOutput2 = new Servo_PAN (SERVONUM_RIGHTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                ServoOutput2->begin(); 
-                                RCOutput2_Assigned = true;
-                            }
-                            break;
-                        case SF_RC3_PASS_PAN:   // Pan Servo on RC Output 3
-                            if (RCOutput3_Available && !RCOutput3_Assigned) 
-                            {   // Servo_PAN on TURRETROTATION
-                                ServoOutput3 = new Servo_PAN (SERVONUM_TURRETROTATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                ServoOutput3->begin(); 
-                                RCOutput3_Assigned = true;
-                            }
-                            break;
-                        case SF_RC4_PASS_PAN:   // Pan Servo on RC Output 4
-                            if (RCOutput4_Available && !RCOutput4_Assigned) 
-                            {   // Servo_PAN on TURRETELEVATION
-                                ServoOutput4 = new Servo_PAN (SERVONUM_TURRETELEVATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
-                                ServoOutput4->begin(); 
-                                RCOutput4_Assigned = true;
-                            }
-                            break;                                                        
-                    }
-                }
-            }
-        }
-        //DebugSerial->print(F("RCOutput 1 Available: ")); PrintLnTrueFalse(RCOutput1_Available);
-        //DebugSerial->print(F("RCOutput 2 Available: ")); PrintLnTrueFalse(RCOutput2_Available);
-        //DebugSerial->print(F("RCOutput 3 Available: ")); PrintLnTrueFalse(RCOutput3_Available);
-        //DebugSerial->print(F("RCOutput 4 Available: ")); PrintLnTrueFalse(RCOutput4_Available);
-
     // OPTIONAL ONBOARD MOTOR CONTROL
     // -------------------------------------------------------------------------------------------------------------------------------------->>
         // If either of the two onboard motor controllers (A & B) have not been assigned to any drive or turret function, we let the user
@@ -416,6 +316,167 @@ void InstantiateMotorObjects()
 }
 
 
+// OPTIONAL RC OUTPUTS
+// -------------------------------------------------------------------------------------------------------------------------------------->>
+void InstantiateOptionalServoOutputs()
+{
+    // Temp vars
+    boolean RCOutput1_Assigned = false;
+    boolean RCOutput2_Assigned = false;
+    boolean RCOutput3_Assigned = false;
+    boolean RCOutput4_Assigned = false;
+    boolean RCOutput6_Assigned = false;
+    boolean RCOutput7_Assigned = false;
+    boolean RCOutput8_Assigned = false;
+    
+    // If any of the first four RC outputs are unused by drive, turret or steering, we can set them to generic RC outputs .
+    // Also depending on the sound card the user selects, RC outputs 6, 7, 8 may also be available. 
+    // Freeing them from these tasks allows the user to control them directly for whatever purpose. They essentially "pass-through" whatever 
+    // radio channel has been assigned to them. 
+    // In OP Config the user has the option of doing regular RC passthrough (good for servos, continuous rotation servos, or ESCs), or they 
+    // can select a Pan Servo passthrough. Which one they picked will influence what kind of object we need to create. The only way to know
+    // is to run through the list of the user's function triggers and see. And they may not have any at all, in which case we don't need
+    // to create anything. 
+
+    // It is also technically possible for the user to assign more than one trigger to the same RC pass-through. This would be bad news, so
+    // in this routine we make sure that no more than one trigger is assigned to an RC output.
+
+    // Only check if one of these is even available for use
+
+    // This has ballooned into something ridiculous in terms of the coding. But I don't have time now to fancify and shorten it. 
+    if (RCOutput1_Available || RCOutput2_Available || RCOutput3_Available || RCOutput4_Available || RCOutput6_Available || RCOutput7_Available || RCOutput8_Available)
+    {   // Loop through every function-trigger pair
+        for (int i = 0; i <MAX_FUNCTION_TRIGGERS; i++)
+        {   // A valid function-trigger will have a function number and a TriggerID > 0
+            if (eeprom.ramcopy.SF_Trigger[i].specialFunction != SF_NULL_FUNCTION && eeprom.ramcopy.SF_Trigger[i].TriggerID > 0)
+            {
+                switch (eeprom.ramcopy.SF_Trigger[i].specialFunction)
+                {
+                    case SF_RC1_PASS:       // RC Output 1 passthrough
+                        if (RCOutput1_Available && !RCOutput1_Assigned) 
+                        {   //RC Output on LEFTTREAD
+                            RCOutput1 = new Servo_ESC (SERVONUM_LEFTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput1->begin(); 
+                            RCOutput1_Assigned = true;
+                        }
+                        break;
+                    case SF_RC2_PASS:       // RC Output 2 passthrough
+                        if (RCOutput2_Available && !RCOutput2_Assigned) 
+                        {   //RC Output on RIGHTTREAD
+                            RCOutput2 = new Servo_ESC (SERVONUM_RIGHTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput2->begin(); 
+                            RCOutput2_Assigned = true;
+                        }
+                        break;
+                    case SF_RC3_PASS:       // RC Output 3 passthrough
+                        if (RCOutput3_Available && !RCOutput3_Assigned) 
+                        {   //RC Output on TURRETROTATION
+                            RCOutput3 = new Servo_ESC (SERVONUM_TURRETROTATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput3->begin(); 
+                            RCOutput3_Assigned = true;
+                        }
+                        break;
+                    case SF_RC4_PASS:       // RC Output 4 passthrough
+                        if (RCOutput4_Available && !RCOutput4_Assigned) 
+                        {   //RC Output on TURRETELEVATION
+                            RCOutput4 = new Servo_ESC (SERVONUM_TURRETELEVATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput4->begin(); 
+                            RCOutput4_Assigned = true;
+                        }
+                        break;
+                    case SF_RC6_PASS:       // RC Output 6 passthrough
+                        if (RCOutput6_Available && !RCOutput6_Assigned) 
+                        {   //RC Output on TURRETELEVATION
+                            RCOutput6 = new Servo_ESC (SERVONUM_PROP3, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput6->begin(); 
+                            RCOutput6_Assigned = true;
+                        }
+                        break;
+                    case SF_RC7_PASS:       // RC Output 7 passthrough
+                        if (RCOutput7_Available && !RCOutput7_Assigned) 
+                        {   //RC Output on TURRETELEVATION
+                            RCOutput7 = new Servo_ESC (SERVONUM_PROP2, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput7->begin(); 
+                            RCOutput7_Assigned = true;
+                        }
+                        break;
+                    case SF_RC8_PASS:       // RC Output 8 passthrough
+                        if (RCOutput8_Available && !RCOutput8_Assigned) 
+                        {   //RC Output on TURRETELEVATION
+                            RCOutput8 = new Servo_ESC (SERVONUM_PROP1, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            RCOutput8->begin(); 
+                            RCOutput8_Assigned = true;
+                        }
+                        break;
+                                                
+                    case SF_RC1_PASS_PAN:   // Pan Servo on RC Output 1
+                        if (RCOutput1_Available && !RCOutput1_Assigned) 
+                        {   // Servo_PAN on LEFTTTREAD
+                            ServoOutput1 = new Servo_PAN (SERVONUM_LEFTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput1->begin(); 
+                            RCOutput1_Assigned = true;
+                        }
+                        break;
+                    case SF_RC2_PASS_PAN:   // Pan Servo on RC Output 2
+                        if (RCOutput2_Available && !RCOutput2_Assigned) 
+                        {   // Servo_PAN on RIGHTTREAD
+                            ServoOutput2 = new Servo_PAN (SERVONUM_RIGHTTREAD, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput2->begin(); 
+                            RCOutput2_Assigned = true;
+                        }
+                        break;
+                    case SF_RC3_PASS_PAN:   // Pan Servo on RC Output 3
+                        if (RCOutput3_Available && !RCOutput3_Assigned) 
+                        {   // Servo_PAN on TURRETROTATION
+                            ServoOutput3 = new Servo_PAN (SERVONUM_TURRETROTATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput3->begin(); 
+                            RCOutput3_Assigned = true;
+                        }
+                        break;
+                    case SF_RC4_PASS_PAN:   // Pan Servo on RC Output 4
+                        if (RCOutput4_Available && !RCOutput4_Assigned) 
+                        {   // Servo_PAN on TURRETELEVATION
+                            ServoOutput4 = new Servo_PAN (SERVONUM_TURRETELEVATION, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput4->begin(); 
+                            RCOutput4_Assigned = true;
+                        }
+                        break;                                                        
+                    case SF_RC6_PASS_PAN:   // Pan Servo on RC Output 6
+                        if (RCOutput6_Available && !RCOutput6_Assigned) 
+                        {   // Servo_PAN on TURRETELEVATION
+                            ServoOutput6 = new Servo_PAN (SERVONUM_PROP3, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput6->begin(); 
+                            RCOutput6_Assigned = true;
+                        }
+                        break;     
+                    case SF_RC7_PASS_PAN:   // Pan Servo on RC Output 7
+                        if (RCOutput7_Available && !RCOutput7_Assigned) 
+                        {   // Servo_PAN on TURRETELEVATION
+                            ServoOutput7 = new Servo_PAN (SERVONUM_PROP2, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput7->begin(); 
+                            RCOutput7_Assigned = true;
+                        }
+                        break;     
+                    case SF_RC8_PASS_PAN:   // Pan Servo on RC Output 8
+                        if (RCOutput8_Available && !RCOutput8_Assigned) 
+                        {   // Servo_PAN on TURRETELEVATION
+                            ServoOutput8 = new Servo_PAN (SERVONUM_PROP1, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, ANALOG_SPECFUNCTION_CENTER_VAL); 
+                            ServoOutput8->begin(); 
+                            RCOutput8_Assigned = true;
+                        }
+                        break;                                                     
+                }
+            }
+        }
+    }
+    //DebugSerial->print(F("RCOutput 1 Available: ")); PrintLnTrueFalse(RCOutput1_Available);
+    //DebugSerial->print(F("RCOutput 2 Available: ")); PrintLnTrueFalse(RCOutput2_Available);
+    //DebugSerial->print(F("RCOutput 3 Available: ")); PrintLnTrueFalse(RCOutput3_Available);
+    //DebugSerial->print(F("RCOutput 4 Available: ")); PrintLnTrueFalse(RCOutput4_Available);
+    //DebugSerial->print(F("RCOutput 6 Available: ")); PrintLnTrueFalse(RCOutput6_Available);
+    //DebugSerial->print(F("RCOutput 7 Available: ")); PrintLnTrueFalse(RCOutput7_Available);
+    //DebugSerial->print(F("RCOutput 8 Available: ")); PrintLnTrueFalse(RCOutput8_Available);
+}
 
 
 void SetupPins()
