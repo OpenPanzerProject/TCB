@@ -553,10 +553,10 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
         // This is just hard-coded for now. 
         // Combined these two statements result in an engine that takes ~1.2 seconds to return to idle from full speed
         if (LastThrottleSpeed > 50)                         
-        {   // Step of two and level (SkipNum) 2 means decelerate at a rate that would equal 1 second from full speed to full stop
+        {   // Step of two and level (SkipNum) 4 means decelerate at a rate that would equal 2 seconds from full speed to full stop
             // But this rate only appplies to throttle speeds above 50
             t_ThrottleRampStep = 2;
-            t_ThrottleSkipNum = 2;
+            t_ThrottleSkipNum = 4;
         }
         else
         {   // At throttle speeds below 50, we slow down a bit more slowly. From 50 to 0 would take ~1/2 second
@@ -567,11 +567,19 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
    
     // ACCELERATION
     // =============================================================================================================================================================>>
-    else if (ThrottleCMD >= LastThrottleSpeed) // Acceleration or staying the same
-    {   // For now we don't use ramping on acceleration, just set Throttle directly equal to command. If you step on the gas, the engine RPM responds immediately 
-        // (even though tank speed won't respond so quickly)
-        // Don't need to do anything to accomplish this, because ThrottleRampEnabled was already initialized to false at the beginning, 
-        // and t_ThrottleSpeed was initialized to ThrottleCMD
+    else if (ThrottleCMD > LastThrottleSpeed) // Acceleration 
+    {   // Here we do use a very small bit of ramping on acceleration. If you step on the gas, the engine RPM responds immediately (even though tank speed won't respond so quickly),
+        // and we want to keep that responsive feel. But some sound cards like the Taigen will sound odd if you jump straight to full speed so we do introduce a slight delay. 
+      
+        // Don't limit anything at a low level so we get a responsive throttle sound. But above that we do limit just a bit so it doesn't sound jerky. 
+        if (LastThrottleSpeed > 60)
+        {
+            ThrottleRampEnabled = true;
+            RampDir = 1;
+            t_ThrottleRampStep = 2;
+            t_ThrottleSkipNum = 3;
+        }
+        // else if throttle speed < 60 then there will be no ramping
     }
 
     // Don't let t_ThrottleRampStep get below 1
@@ -612,10 +620,18 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
     }   
     else
     {
-        // If we are decelerating, that means we are commanding less than where we are presently. 
-        // We don't let the throttle speed decrease to less than what we are commanding. 
-        // Obviously we don't let it be more than the maximum amount either, this is less likely. 
-        t_ThrottleSpeed = constrain(t_ThrottleSpeed, ThrottleCMD, MOTOR_MAX_FWDSPEED); // (we already turned ThrottleCMD into abs() at the start, so this works for forward or reverse deceleration)
+        if (RampDir == 1)          // ACCEL
+        {
+            // If we are accelerating, we are trying to reach ThrottleCMD. We don't want to accelerate PAST what we have commanded. 
+            t_ThrottleSpeed = constrain(t_ThrottleSpeed, 0, ThrottleCMD);    // (we already turned ThrottleCMD into abs() at the start, so this works for forward or reverse acceleration)
+        }
+        else if (RampDir == -1)    // DECEL
+        {
+            // If we are decelerating, that means we are commanding less than where we are presently. 
+            // We don't let the throttle speed decrease to less than what we are commanding. 
+            // Obviously we don't let it be more than the maximum amount either, this is less likely. 
+            t_ThrottleSpeed = constrain(t_ThrottleSpeed, ThrottleCMD, MOTOR_MAX_FWDSPEED); // (we already turned ThrottleCMD into abs() at the start, so this works for forward or reverse deceleration)
+        }
     }
 
     return t_ThrottleSpeed;
