@@ -2,6 +2,9 @@
  * Source:              openpanzer.org      
  * Authors:             Luke Middleton
  *
+ * NOTE:                OP_SoundCard does not have a corresponding .h (header) file, other than the header information
+ *                      in OP_Sound.h
+ *
  * LICENSE
  * ===============================================================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -22,24 +25,48 @@
 #include <OP_Sound.h>
 
 
-void OP_SoundCard::begin()
-{
-    // Initialize
+void OP_SoundCard::begin() 
+{ 
+    // Initialize to false, but they will ultimately get set to the user's preference
     _squeaksActive = false;
+    _headlightEnabled = false;
+    _turretEnabled = false;
+    _turretSoundActive = false;
+    _barrelEnabled = false;    
+    _barrelSoundActive = false;
+}
+
+void OP_SoundCard::command(byte command, byte value, byte modifier) const
+{
+    _port->write(OPSC_ADDRESS);
+    _port->write(command);
+    _port->write(value);
+    _port->write(modifier);
+    _port->write((OPSC_ADDRESS + command + value + modifier) & B01111111);
 }
 
 void OP_SoundCard::command(byte command, byte value) const
 {
-  _port->write(OPSC_ADDRESS);
-  _port->write(command);
-  _port->write(value);
-  _port->write((OPSC_ADDRESS + command + value) & B01111111);
+    this->command(command, value, 0); 
 }
 
 void OP_SoundCard::command(byte command) const
 {
-  this->command(command, 0);
+    this->command(command, 0, 0);
 }
 
-
+void OP_SoundCard::SendSqueakIntervals(unsigned int min, unsigned int max, uint8_t squeakNum) const
+{
+    uint8_t fmin;
+    uint8_t fmax;
+    // OP Config allows intervals from 500 to 10,000 mS (1/2 to 10 seconds) in 50 mS increments. 
+    min = constrain(min, 500, 10000);
+    max = constrain(max, 500, 10000);
+    
+    // The value we pass is in 50mS increments and will be some number from 0-190 (0=500, 190=10000)
+    fmin = (min - 500) / 50;    
+    fmax = (max - 500) / 50;
+    command(OPSC_CMD_SQUEAK_SET_MIN, fmin, squeakNum);  // Command, value, modifier
+    command(OPSC_CMD_SQUEAK_SET_MAX, fmax, squeakNum);    
+}
 

@@ -55,9 +55,15 @@ AreSqueaksActive	LITERAL2
 SetSqueak1_Interval	LITERAL2
 SetSqueak2_Interval	LITERAL2
 SetSqueak3_Interval	LITERAL2
+SetSqueak4_Interval	LITERAL2
+SetSqueak5_Interval	LITERAL2
+SetSqueak6_Interval	LITERAL2
 Squeak1_SetEnabled	LITERAL2
 Squeak2_SetEnabled	LITERAL2
 Squeak3_SetEnabled	LITERAL2
+Squeak4_SetEnabled	LITERAL2
+Squeak5_SetEnabled	LITERAL2
+Squeak6_SetEnabled	LITERAL2
 Beep	LITERAL2
 Beeps	LITERAL2
 

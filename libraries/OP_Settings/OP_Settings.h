@@ -16,7 +16,7 @@
 // OPEN PANZER TANK CONTROL BOARD (TCB) - FIRMWARE VERSION NUMBER
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is the firmware version that will be returned to the desktop application when it checks. It will be split into three, two-digit numbers
-    #define FIRMWARE_VERSION "00.90.23"     // version. Last update 01/19/2017
+    #define FIRMWARE_VERSION "00.90.24"     // version. Last update 01/30/2017
     
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -159,13 +159,31 @@
     // Timer 4 is used to generate PWM for the Aux Output (if used in analog mode) and the "Hit Notification LEDs" which are the LEDs typically installed 
     // in the IR apple. These LEDs are dimmed and faded in and out to create various effects. 
     
-    // This timer has been left at default Arduino settings, most likely phase correct PWM with top at 256 and prescaler at 64. This would mean, 
-    // ~490Hz PWM frequency which is really terrible for motor control, but fine for LEDs. We are free to change it without messing up anything. 
-    // It's a 16 bit timer so I should really just set it to the same frequency as Timer 5.
+    // We also use Timer 4's overflow interrupt to generate a stream of data that can control a Taigen sound card. 
     
+    // We set Timer 4 to Fast PWM 10-bit (WGM4 3:0 0111) with a prescaler of 8 (CS4 2:0 010). We leave COM4B and COM4C pins connected to PWM (COM 10)
+    // but disconnect PWM from COM4A pin (it can still be used as a digital I/O and it controls part of the direction for onboard motor driver A and is 
+    // unaffected by what we do here). 
+    
+    // PWM for the Aux output and Hit Notify LEDs will be 1.95kHz (basically 2kHz). That would be kind of noisy for motors but for switching LEDs is more than fast enough. 
+    // Timer 4 will tick (TCNT4 increment) once every 0.5 uS, or in other words, one uS = 2 ticks. 10-bit mode means TOP is equal to 1024, which means Timer 4 will overflow
+    // every (1024 ticks * 0.5uS per tick) = 512 uS or almost exactly 1/2 mS. This works very well because the data stream for the Taigen sound cards all involve
+    // pulses in increments of 1/2mS. 
+
+    // NOTE: Our first thought was to use an output compare (OCR4A) to create interrupts at specified times the way we do with generating servo pulses. The problem with this is 
+    // that unless you are in Normal or CTC mode, OCRnx doesn't update immediately, making it of little use for this purpose. But using Normal or CTC mode doesn't really leave us
+    // with a useful PWM signal which we want for the other two pins (OC4B and OC4C). So setting an overflow every increment of time and counting overflows works well. 
+    
+    // NOTE: Instead of 10-bit with a TOP of 1024 we could set top to a custom number using ICR4, for example we could set it to 1,000 so each rollover is precisely 1/2mS. 
+    // Nothing wrong with that, but actually the Taigen pulses tend to go a little long anyway, so 1024 seems to work just fine. 
+
+    // TCCR4A = 0x2B    // PWM disabled on OCR4A - Fast PWM 10 bit
+    // TCCR4B = 0x0A    // Fast PWM, 8  prescaler, TOP 1024 - frequency 2 KHz, tick every 0.5uS (2 ticks per uS)
+    // TIFR4 = 0x2F     // Clear all interrupt flags
+    // TIMSK4 = 0x00    // No interrupts enabled - later in OP_TaigenSound.cpp we will enable overflow interrupts by setting the TOIE4 bit in TIMSK4. 
     #define SetupTimer4() ({ \  
-        TCCR4A = 0xA9;       \
-        TCCR4B = 0x01;       \
+        TCCR4A = 0x2B;       \
+        TCCR4B = 0x0A;       \
         TIFR4 =  0x2F;       \
         TIMSK4 = 0x00;       \
         TCNT4 = 0;           \
