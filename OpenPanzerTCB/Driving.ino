@@ -102,8 +102,13 @@ void EngineOff()
         // Play the engine stop sound
             TankSound->StopEngine();
         // Stop the drive motor(s)
-            if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
-            else { RightTread->stop(); LeftTread->stop(); }  
+            switch (eeprom.ramcopy.DriveType)
+            {
+                case DT_TANK:       // Fallthrough >
+                case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
+                case DT_CAR:        { DriveMotor->stop();                        } break;
+                case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
+            }            
         // Clear the engine idle timer
             UpdateEngineIdleTimer();  
     }    
@@ -193,9 +198,14 @@ void SF_NT_Toggle(uint16_t ignoreMe)            { Driver.getNeutralTurnAllowed()
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void StopEverything()
 {   // We use this in the event of a radio failsafe event, or just as a quick way to stop all movement. 
-    // Stop drive motors
-    if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
-    else { RightTread->stop(); LeftTread->stop(); }
+    // Stop drive motor(s)
+    switch (eeprom.ramcopy.DriveType)
+    {
+        case DT_TANK:       // Fallthrough >
+        case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
+        case DT_CAR:        { DriveMotor->stop();                        } break;
+        case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
+    }    
     // We're not moving, so stop the squeaking
     TankSound->StopSqueaks();
     // TBS throttle speed = idle

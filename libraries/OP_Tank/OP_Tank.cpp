@@ -993,7 +993,7 @@ void OP_Tank::Damage(Motor* Right_orRear, Motor* Left_orSteering, Motor* elevati
 {
 int cut_Pct;
 
-    // If driveType = DT_CAR, then "Right_orRear" will be the rear axle, and "Left_OrSteering" will be the steering servo.
+    // If driveType = DT_CAR or DT_DKLM, then "Right_orRear" will be the rear axle/propulsion motor, and "Left_OrSteering" will be the steering servo/motor.
     // But if driveType = DT_TANK or DT_HALFTRACK, then "Right_orRear" will be the right tread, and "Left_OrSteering" will be the left tread. 
 
     // We can define multiple damage characteristics, aka "damage profiles" 
@@ -1039,7 +1039,7 @@ int cut_Pct;
             // Serial.print(F("Speed cut to "));
             // Serial.print(100-cut_Pct);
             // Serial.println(F("%"));
-            if (driveType != DT_CAR)
+            if (driveType == DT_TANK || driveType == DT_HALFTRACK)
             {   // Two independent treads, we cut/restore them both
                 if (cut_Pct > 0)
                 {
@@ -1053,11 +1053,12 @@ int cut_Pct;
                     Left_orSteering->restore_Speed();
                 }
             }
-            else
-            {   // A single rear axle
+            else if (driveType == DT_CAR || driveType == DT_DKLM)
+            {   // A single rear axle or drive motor
                 if (cut_Pct > 0) Right_orRear->cut_SpeedPct(cut_Pct);
                 else             Right_orRear->restore_Speed(); 
                 // In this case, we leave the steering servo alone because Tamiya has no damage setting specified for steering servos. 
+                // We also leave the steering motor alone in the case of DKLM gearbox. 
             }
             break;
     }

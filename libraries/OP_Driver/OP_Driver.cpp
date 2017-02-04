@@ -56,7 +56,7 @@ boolean             OP_Driver::NeutralTurnAllowed;
 const __FlashStringHelper *printDriveType(DRIVETYPE Type) 
 {
     if(Type>LAST_DT) Type=DT_UNKNOWN;
-    const __FlashStringHelper *Names[LAST_DT+1]={F("UNKNOWN"),F("Tank"),F("Halftrack"),F("Car")};
+    const __FlashStringHelper *Names[LAST_DT+1]={F("UNKNOWN"),F("Tank"),F("Halftrack"),F("Car"),F("Tank (DKLM type)")};
     return Names[Type];
 };
 

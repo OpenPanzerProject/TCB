@@ -102,7 +102,7 @@
         Motor * DriveMotor;
         Motor * SteeringServo;
     // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
-    // we have a "SteeringMotor" which will be the secondary output to a dual-motor serial controller (if using hobby ESCs, connect the steering motor to the SteeringServo output instead)
+    // we have a "SteeringMotor" object which will control the steering
         Motor * SteeringMotor;
     // We always have turret rotation & elevation motors
         Motor * TurretRotation;
@@ -481,6 +481,7 @@ void loop()
     static int ThrottleCommand_Previous = 0;                          // Value of throttle command from last time through loop
     static int DriveCommand = 0;                                      // Drive command is the speed to the wheels through the transmission. Not the same as throttle. 
     static int TurnCommand = 0;                                       // Turn command
+    static int TurnCommand_Previous = 0;                              // Value of turn command last through loop
     static int DriveSpeed = 0;                                        // Differs from Command which is what we are being told by the Tx stick - DriveSpeed is what is being told the motors by software, after modifications to command. 
     static int DriveSpeed_Previous = 0;                               // Previous value of DriveSpeed
     static int ThrottleSpeed = 0;                                     // This will be the RPM of the engine, which is not the same as the drive speed
@@ -1146,8 +1147,13 @@ if (Startup)
                 DriveFlag = false;                               // Disable driving for TimeToShift_MS
                 TransitionStart = millis();                      // Start shift timer
                 // Kill the motor(s)
-                if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
-                else { RightTread->stop(); LeftTread->stop(); }
+                switch (eeprom.ramcopy.DriveType)
+                {
+                    case DT_TANK:       // Fallthrough >
+                    case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     }  break;
+                    case DT_CAR:        { DriveMotor->stop();                        }  break;
+                    case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); }  break;
+                }
             }
             
             // We're not moving, so stop the squeaking
@@ -1161,31 +1167,48 @@ if (Startup)
         {
             // We are moving 
 
-            // In this case we have independent tread speeds 
-            if (eeprom.ramcopy.DriveType != DT_CAR)
+            switch (eeprom.ramcopy.DriveType)
             {
-                // Now we mix the throttle and turn outputs to arrive at individual motor commands. 
-                // RightSpeed and LeftSpeed are passed by reference and updated by the function
-                Driver.MixSteering(DriveSpeed, TurnSpeed, &RightSpeed, &LeftSpeed);  
+                case DT_TANK:       
+                case DT_HALFTRACK:
+                    // In this case we have independent tread speeds 
+                    // Now we mix the throttle and turn outputs to arrive at individual motor commands. 
+                    // RightSpeed and LeftSpeed are passed by reference and updated by the function
+                    Driver.MixSteering(DriveSpeed, TurnSpeed, &RightSpeed, &LeftSpeed);  
+    
+                    //Finally! We send the motor commands out to the motors, but only if something has changed since last time. 
+                    if ((RightSpeed_Previous != RightSpeed) || (LeftSpeed_Previous != LeftSpeed))
+                    {
+                        RightTread->setSpeed(RightSpeed);
+                        LeftTread->setSpeed(LeftSpeed);
+                        RightSpeed_Previous = RightSpeed;    // Save these for next time
+                        LeftSpeed_Previous = LeftSpeed;
+                    }
+                    // In the case of halftracks with steering servos, we set the servo a bit later, outside of this code block because we want steering control even when the engine is not running
+                    break;
 
-                //Finally! We send the motor commands out to the motors, but only if something has changed since last time. 
-                if ((RightSpeed_Previous != RightSpeed) || (LeftSpeed_Previous != LeftSpeed))
-                {
-                    RightTread->setSpeed(RightSpeed);
-                    LeftTread->setSpeed(LeftSpeed);
-                    RightSpeed_Previous = RightSpeed;    // Save these for next time
-                    LeftSpeed_Previous = LeftSpeed;
-                }
-            }
-            else    // DriveType = Car (single rear axle speed)
-            {
-                // In this case, there is only a single rear axle speed, and no such thing as neutral turns. 
-                // Send the signal if the DriveSpeed has changed
-                if (DriveSpeed_Previous != DriveSpeed)
-                {
-                    DriveMotor->setSpeed(DriveSpeed);
-                    // We set the front wheel steering a bit later, outside of this code block because we want steering control even when the engine is not running
-                }
+                case DT_CAR:
+                    // In this case, there is only a single rear axle speed, and no such thing as neutral turns. 
+                    // Send the signal if the DriveSpeed has changed
+                    if (DriveSpeed_Previous != DriveSpeed)
+                    {
+                        DriveMotor->setSpeed(DriveSpeed);
+                    }
+                    // We set the front wheel steering servo a bit later, outside of this code block because we want servo steering control even when the engine is not running
+                    break;
+
+                case DT_DKLM:
+                    // In this case the gearbox physically "mixes" turning, we just need to send it a drive speed for the single propulsion motor
+                    if (DriveSpeed_Previous != DriveSpeed)
+                    {
+                        DriveMotor->setSpeed(DriveSpeed);
+                    }
+                    // And a steering command for the steering motor
+                    if (TurnCommand_Previous != TurnCommand)
+                    {
+                        SteeringMotor->setSpeed(TurnCommand);   // We send TurnCommand rather than TurnSpeed because we don't want any scaling effects applied in this case. TurnCommand is just equal to the stick input. 
+                    }
+                    break;                    
             }
 
             // Other checks to do when we're moving: 
@@ -1212,8 +1235,13 @@ if (Startup)
             TurnSpeed = 0;
             RightSpeed = 0;
             LeftSpeed = 0;
-            if (eeprom.ramcopy.DriveType == DT_CAR) {DriveMotor->stop(); }
-            else { RightTread->stop(); LeftTread->stop(); }
+            switch (eeprom.ramcopy.DriveType)
+            {
+                case DT_TANK:       // Fallthrough >
+                case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
+                case DT_CAR:        { DriveMotor->stop();                        } break;
+                case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
+            }
             DriveModeActual = STOP;
             Braking = false;
             BrakeLightsOff();      // Don't leave the brake lights on when the engine stops
@@ -1223,24 +1251,17 @@ if (Startup)
         }
     }
 
-    // FRONT WHEEL STEERING
+    // FRONT WHEEL SERVO STEERING 
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-    // If this is a car or halftrack, we always allow front wheel steering (servo movement) regardless of whether the engine is running or not, 
+    // If this is a car or halftrack, we always allow front wheel steering via servo movement regardless of whether the engine is running or not, 
     // or even whether the tank is destroyed or not (but not when we are in LVC mode or the battery is unplugged)
-    if (eeprom.ramcopy.DriveType != DT_TANK && HavePower)
+    // The servo command is just passed through directly from the radio. 
+    if (HavePower && (eeprom.ramcopy.DriveType == DT_HALFTRACK || eeprom.ramcopy.DriveType == DT_CAR))
     {
         // The servo object knows that "setSpeed" actually means "set servo position." 
         SteeringServo->setSpeed(Radio.Sticks.Turn.command);   
-        
-        // There are a few odd gearboxes like the very early Tamiyas and the DKLM RC "Propulsion Dynamics" gearbox that outwardly appear like the standard dual-drive boxes with two motors, 
-        // but instead of one motor for each tread, there is actually one motor for drive and a second motor for steering. For compatibility with these units the user should (somewhat confusingly)
-        // set the drive type to Car and then select a serial-motor controller. We will pipe the steering signal out to the second motor output of the dual motor controllers.
-        // Alternatively the user can set the drive type to Car and use hobby ESCs on the correct servo outputs.
-        if (eeprom.ramcopy.DriveMotors == OP_SCOUT || eeprom.ramcopy.DriveMotors == SABERTOOTH || eeprom.ramcopy.DriveMotors || POLOLU)
-        {
-            SteeringMotor->setSpeed(Radio.Sticks.Turn.command);     
-        }
     }
+
 
     // RUN SPECIAL FUNCTIONS - But only if tank hasn't been destroyed, and if the battery voltage level is sufficient
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -1358,17 +1379,22 @@ if (Startup)
         // Now apply "damage", it doesn't matter if we were "damaged" or "repaired". The Damage function will take into account
         // the current amount of damage. If we were repaired, the amount of damage will be less than before, so the Damage function will 
         // calculate a new, lesser damage. Of course if we were hit by cannon or machine gun fire, then Damage will calculate a new, more severe damage. 
-        if (eeprom.ramcopy.DriveType != DT_CAR)
+        if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK)
         {
             // In this case, we have two treads. Either can be damaged. 
             // If this is a halftrack there is also a steering servo, which for now we don't bother damaging. 
             Tank.Damage(RightTread, LeftTread, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
         }
-        else
+        else if (eeprom.ramcopy.DriveType == DT_CAR)
         {
             // In this case, there is a single rear axle and a steering servo. We allow both to be damaged.
             Tank.Damage(DriveMotor, SteeringServo, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
         }
+        else if (eeprom.ramcopy.DriveType == DT_DKLM)
+        {
+            // In this case, there is a single propulsion motor as well as a separate steering motor. We allow both to be damaged.
+            Tank.Damage(DriveMotor, SteeringMotor, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
+        }        
         // Force treads to update
         RightSpeed_Previous = 0;
         LeftSpeed_Previous = 0;
@@ -1410,15 +1436,17 @@ if (Startup)
             Alive = true;
         // While battling, the motors had their speed range cut to simulate damage. Now restore to full range - this doesn't actually set a speed, it just restores the speed *range* 
         // The actual motors will differ depending on the vehicle type. 
-            if (eeprom.ramcopy.DriveType != DT_CAR)
+            if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK)
             {
                 RightTread->restore_Speed();
                 LeftTread->restore_Speed();
+                if (eeprom.ramcopy.DriveType == DT_HALFTRACK) SteeringServo->restore_Speed();
             }
-            else
+            else // Car or DKLM
             {
                 DriveMotor->restore_Speed();
-                SteeringServo->restore_Speed();
+                if (eeprom.ramcopy.DriveType == DT_CAR)  SteeringServo->restore_Speed();
+                if (eeprom.ramcopy.DriveType == DT_DKLM) SteeringMotor->restore_Speed();
             }
             TurretRotation->restore_Speed();
             TurretElevation->restore_Speed();
@@ -1516,7 +1544,7 @@ if (Startup)
 
     ThrottleCommand_Previous = ThrottleCommand;
     ThrottleSpeed_Previous = ThrottleSpeed;
-    
+    TurnCommand_Previous = TurnCommand;
 }
 
 

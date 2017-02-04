@@ -2,7 +2,7 @@
 void InstantiateSoundObject(void)
 {
     // Sanity check - make sure DriveType is valid
-    if (eeprom.ramcopy.SoundDevice < SD_FIRST_SD || eeprom.ramcopy.DriveType > SD_LAST_SD)
+    if (eeprom.ramcopy.SoundDevice < SD_FIRST_SD || eeprom.ramcopy.SoundDevice > SD_LAST_SD)
     {   // Default to TBS Mini if we have some invalid value, and update EEPROM too
         eeprom.ramcopy.SoundDevice = SD_BENEDINI_TBSMINI;
         EEPROM.updateInt(offsetof(_eeprom_data, SoundDevice), SD_BENEDINI_TBSMINI);

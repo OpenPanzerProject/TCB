@@ -22,47 +22,76 @@ void InstantiateMotorObjects()
         EEPROM.updateInt(offsetof(_eeprom_data, DriveType), DT_TANK);
     }
    
-    if (eeprom.ramcopy.DriveType == DT_CAR)
+    if (eeprom.ramcopy.DriveType == DT_CAR || eeprom.ramcopy.DriveType == DT_DKLM)
     {   
         switch (eeprom.ramcopy.DriveMotors)
         {
             case OP_SCOUT:
-                // For a single rear drive motor, connect it to M1
+                // For a single rear drive motor (or a single propulsion motor), connect it to M1
                 DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud);    
+                DriveMotor->begin();
                 
                 // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
                 // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
-                SteeringMotor = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud);    
+                SteeringMotor = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud);
+                SteeringMotor->begin();    
                 break;
                 
             case SABERTOOTH:
-                // For a single rear drive motor, connect it to M1
+                // For a single rear drive motor (or a single propulsion motor), connect it to M1
                 DriveMotor = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
+                DriveMotor->begin();
                 
                 // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
                 // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
                 SteeringMotor = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
+                SteeringMotor->begin();
                 break;
     
             case POLOLU:
-                // For a single rear drive motor, connect it to M0
+                // For a single rear drive motor (or a single propulsion motor), connect it to M0
                 DriveMotor = new Pololu_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
+                DriveMotor->begin();
 
                 // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
                 // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
                 SteeringMotor = new Pololu_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Pololu_DRIVE_ID,&MotorSerial);
+                SteeringMotor->begin();
                 break;
     
             case ONBOARD:
-                // For a single rear drive motor, connect it to  MOTOR A
+                // For a single rear drive motor (or a single propulsion motor), connect it to  MOTOR A
                 DriveMotor = new Onboard_ESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                DriveMotor->begin();                
                 MotorA_Available = false;
+
+                if (eeprom.ramcopy.DriveType == DT_DKLM)
+                {
+                    // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
+                    // we have a "SteeringMotor" which will be MOTOR B. Technically one should not be using this option for those gearboxes because they will exceed the current draw limits of the 
+                    // onboard driver, but perhaps some day this same code will be used on different hardware. 
+                    SteeringMotor = new Onboard_ESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    SteeringMotor->begin();
+                    MotorB_Available = false;       // This becomes unavailable for general purpose controller
+                }
+                // else - if car, we leave MotorB available as a general purpose controller. 
                 break;
                 
             case SERVO_ESC:
                 // For a single rear drive motor, connect it to the "Left" servo port (Servo 1)
                 DriveMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                DriveMotor->begin();                    
                 RCOutput1_Available = false;
+
+                if (eeprom.ramcopy.DriveType == DT_DKLM)
+                {
+                    // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
+                    // we have a "SteeringMotor" which will be RC Output 2.
+                    SteeringMotor = new Servo_ESC (SERVONUM_RIGHTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    SteeringMotor->begin();
+                    RCOutput2_Available = false;    // This slot becomes unavailable for general purpose servo
+                }
+                // else - if car or halftrack we create a steering servo output, see below
                 break;
     
             default:
@@ -71,13 +100,13 @@ void InstantiateMotorObjects()
                 eeprom.ramcopy.DriveMotors = SABERTOOTH;
                 EEPROM.updateInt(offsetof(_eeprom_data, DriveMotors), SABERTOOTH);
                 DriveMotor = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
+                DriveMotor->begin();
                 SteeringMotor = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_DRIVE_Address,&MotorSerial);
+                SteeringMotor->begin();
         }
-        // Now initialize the motor
-        DriveMotor->begin();
     }
     else
-    {   // The user wants independent tread speeds. 
+    {   // The user wants independent tread speeds, either tank or halftrack
         switch (eeprom.ramcopy.DriveMotors)
         {
             case OP_SCOUT:
@@ -139,8 +168,8 @@ void InstantiateMotorObjects()
 
     // STEERING SERVO
     // -------------------------------------------------------------------------------------------------------------------------------------->>
-    if (eeprom.ramcopy.DriveType != DT_TANK)
-    {   // If we are using a steering servo, it gets assigned to the Right tread servo port. Obviously the Right tread servo port can no longer
+    if (eeprom.ramcopy.DriveType == DT_HALFTRACK || eeprom.ramcopy.DriveType == DT_CAR)
+    {   // Cars and halftrack requre a steering servo, which gets assigned to the Right tread servo port. Obviously the Right tread servo port can no longer
         // be used for the right tread. If a single rear drive axle is used, the drive ESC can be plugged into the Left tread servo port. Otherwise
         // if independent tread speeds are still desired in addition to the steering servo (halftracks with independent tread control), 
         // the user will have to use a serial dual motor controller or the onboard motor controllers. 

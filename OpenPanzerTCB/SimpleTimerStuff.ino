@@ -18,8 +18,13 @@ void UpdateSimpleTimers()
     // Now we also update the four motor objects. The motor update() routines will only do something if the motor type is a serial controller. 
     // We can use this to force serial commands be sent at set intervals even if the command hasn't changed; this keeps us from tripping the serial 
     // watchdog that for example the Scout ESC implements. 
-    if (eeprom.ramcopy.DriveType == DT_CAR) { DriveMotor->update(); }
-    else { RightTread->update(); LeftTread->update(); }
+    switch (eeprom.ramcopy.DriveType)
+    {
+        case DT_TANK:       // Fallthrough >
+        case DT_HALFTRACK:  { RightTread->update(); LeftTread->update();     } break;
+        case DT_CAR:        { DriveMotor->update();                          } break;
+        case DT_DKLM:       { DriveMotor->update(); SteeringMotor->update(); } break;
+    }    
     TurretRotation->update();
     TurretElevation->update();
 
