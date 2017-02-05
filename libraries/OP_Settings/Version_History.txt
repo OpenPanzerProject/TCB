@@ -1,3 +1,8 @@
+00.91.00        02/04/2017 - IMPORTANT NOTE: This release requires OP Config 00.91.00
+                           - Added new drive type specifically for cluch-style gearboxes such as the DKLM RC PDSGB.
+                           - Added functionality for OP Config to check what minimum version of OP Config the TCB expects, and what minimum version of TCB firmware OP Config expects. 
+                             If either the TCB or OP Config is found to be older than the other is expecting, we will warn the user on TCB connection and remind them to update
+                             as appropriate. 
 00.90.24        01/30/2017 - IMPORTANT NOTE: This release requires OP Config 00.90.24
                            - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. It is advised 
                              to save an OPZ file of your settings before re-flashing.

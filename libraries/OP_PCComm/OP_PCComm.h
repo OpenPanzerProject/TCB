@@ -142,6 +142,7 @@
 #define PCCMD_READ_EEPROM       126     // PC wants us to read EEPROM and return value
 #define PCCMD_READ_VERSION      128     // PC wants to know what firmware version we're running
 #define PCCMD_STAY_AWAKE        129     // PC is tellings us to stay on the line
+#define PCCMD_MINOPC_VERSION    130     // PC requests the minimum version of OP Config the current version of TCB firmware requires
 #define PCCMD_DISCONNECT        31      // PC tells us to disconnect
 
 // "Commands" returned by device
@@ -225,6 +226,7 @@ class OP_PCComm
         static void GivePC_Value_byID(uint16_t ID);                 // Sends an eeprom value by eeprom variable ID
         static void GivePC_Int(uint16_t returnID, int32_t val);     // Sends an arbitrary value up to int32
         static void GivePC_FirmwareVersion(void);
+        static void GivePC_MinOPCVersion(void); 
         static void sendNullValueSentence(uint8_t command, boolean setValueFlag = false);
         static void prefixToByteArray(SentencePrefix s, char *prefixOut, uint8_t prefixBUFF, uint8_t &returnStrLen);
 

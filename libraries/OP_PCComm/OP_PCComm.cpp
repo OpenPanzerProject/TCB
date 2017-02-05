@@ -593,6 +593,13 @@ OP_PololuQik * Qik;
             }
             break;
 
+        case PCCMD_MINOPC_VERSION:          // Computer wants us to tell it what minimum version of OP Config this version of TCB firmware expects
+            if (SentenceIN.ID == SentenceIN.Command)    // On commands with no value ID, the command should be repeated in the ID slot
+            {
+                GivePC_MinOPCVersion();
+            }
+            break;
+
         case PCCMD_STAY_AWAKE:          // Computer has nothing for us to do, but doesn't want us to disconnect yet
             if (SentenceIN.ID == SentenceIN.Command)    // On commands with no value ID, the command should be repeated in the ID slot
             {
@@ -698,6 +705,46 @@ void OP_PCComm::GivePC_FirmwareVersion(void)
     prefixToByteArray(s, sentenceOut, SENTENCE_BUFF, strLen);
 
     String str = FIRMWARE_VERSION;          // Now convert firmware version string to char array
+    str += DELIMITER;                       // add final delimiter
+    strLen += str.length();                 // Add to the string length
+    fValue[0] = '\0';                       // Convert the string to a char array in fValue
+    str.toCharArray(fValue, VALUE_BUFF);    
+    strcat(sentenceOut, fValue);            // Concatenate the arrays
+    sentenceOut[strLen] = '\0';             // Mark the end of the array
+
+    _serial->print(sentenceOut);            // Now print command | ID | 0 |
+    _serial->print(calcrc(sentenceOut, strLen));    // Calculate the CRC for all the above and print that
+    _serial->print(NEWLINE);                // End sentence
+    _serial->flush();   
+    
+}
+
+// Tell the PC the minimum version of OP Config we expect
+void OP_PCComm::GivePC_MinOPCVersion(void)
+{
+    // Send the minimum OP Config version number. This is defined in OP_Settings.h
+
+    // This routine is a bit unusual since in all other cases we are sending a value of 0, 
+    // or else some numerical value. But in this case we are sending a string value. 
+    // Of course everything gets converted into the equivalent of a string as it gets sent out,
+    // but we have to handle this one a bit different to correctly determine the CRC
+    
+    char sentenceOut[SENTENCE_BUFF];        // buffer for sentence
+    char fValue[VALUE_BUFF];                // smaller buffer for firmware version string
+    uint8_t strLen;                         // total string length
+
+    // The firmware version does not have an ID number like our other values in EEPROM
+    // For the ID we instead use the CMD that was given us requesting the firmware version
+    // This is unusual but lets the computer identify this as a firmware value and not
+    // some eeprom value. 
+    SentencePrefix s;
+        s.Command = DVCMD_RETURN_VALUE;
+        s.ID = PCCMD_MINOPC_VERSION;
+    
+    // Now convert the command | ID | to a byte array
+    prefixToByteArray(s, sentenceOut, SENTENCE_BUFF, strLen);
+
+    String str = MIN_OPCONFIG_VERSION;      // Now convert minimum OP Cofig version string to char array
     str += DELIMITER;                       // add final delimiter
     strLen += str.length();                 // Add to the string length
     fValue[0] = '\0';                       // Convert the string to a char array in fValue
