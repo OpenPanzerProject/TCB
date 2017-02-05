@@ -1,4 +1,4 @@
-00.91.00        02/04/2017 - IMPORTANT NOTE: This release requires OP Config 00.91.00
+0.91.00         02/04/2017 - IMPORTANT NOTE: This release requires OP Config 0.91.00
                            - Added new drive type specifically for cluch-style gearboxes such as the DKLM RC PDSGB.
                            - Added functionality for OP Config to check what minimum version of OP Config the TCB expects, and what minimum version of TCB firmware OP Config expects. 
                              If either the TCB or OP Config is found to be older than the other is expecting, we will warn the user on TCB connection and remind them to update
