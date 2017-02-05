@@ -123,15 +123,15 @@ void DumpSysInfo()
     DumpMotorInfo();
         PerLoopUpdates();
         DebugSerial->flush();    
-    DumpBattleInfo();
-        PerLoopUpdates();
-        DebugSerial->flush();    
     DumpDriveSettings();
         PerLoopUpdates();
         DebugSerial->flush();    
     DumpTurretInfo();
         PerLoopUpdates();
         DebugSerial->flush();    
+    DumpBattleInfo();
+        PerLoopUpdates();
+        DebugSerial->flush();
     DumpSoundInfo();
         PerLoopUpdates();
         DebugSerial->flush();        
@@ -252,6 +252,7 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
     PrintDebugLine();
     DebugSerial->println(F("DRIVE SETTINGS"));
     PrintDebugLine();
+    DebugSerial->print(F("Vehicle Type:           ")); DebugSerial->println(printDriveType(eeprom.ramcopy.DriveType));
     DebugSerial->print(F("Active Driving Profile: ")); DebugSerial->println(DrivingProfile);
     DebugSerial->print(F("Accel Ramp Enabled:     ")); PrintYesNo(AccelRampEnabled); 
     if (AccelRampEnabled) 
@@ -323,10 +324,17 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
     DebugSerial->print(F("Shift time:             ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TimeToShift_mS),1); DebugSerial->println(F(" sec"));
     DebugSerial->print(F("Engine pause time:      ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.EnginePauseTime_mS),1); DebugSerial->println(F(" sec"));
     DebugSerial->print(F("Transmission delay:     ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TransmissionDelay_mS),1); DebugSerial->println(F(" sec"));
-    DebugSerial->print(F("Neutral turn allowed:   ")); PrintYesNo(eeprom.ramcopy.NeutralTurnAllowed);
-    if (eeprom.ramcopy.NeutralTurnAllowed) DebugSerial->print(F(" - ")); DebugSerial->print(eeprom.ramcopy.NeutralTurnPct); DebugSerial->print(F("%"));
-    DebugSerial->println();
-    DebugSerial->print(F("Turn mode:              ")); DebugSerial->println(Driver.getTurnMode());  
+    DebugSerial->print(F("Neutral turn allowed:   "));  // Neutral turns only make sense with tanks
+    if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_DKLM) 
+    {   
+        PrintYesNo(eeprom.ramcopy.NeutralTurnAllowed);
+        if (eeprom.ramcopy.NeutralTurnAllowed) { DebugSerial->print(F(" - ")); DebugSerial->print(eeprom.ramcopy.NeutralTurnPct); DebugSerial->print(F("%")); }
+    }
+    else DebugSerial->print(F("N/A for vehicle type"));
+    DebugSerial->println();        
+    DebugSerial->print(F("Turn mode:              "));  // Turn modes only apply to conventional tank drives (not clutch type) and halftracks
+    if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK) DebugSerial->println(Driver.getTurnMode());
+    else DebugSerial->println(F("N/A for vehicle type"));
 }
 
 void DumpTurretInfo()

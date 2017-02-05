@@ -1016,7 +1016,7 @@ if (Startup)
         // TURN SCALING
         // ---------------------------------------------------------------------------------------------------------------------------------------------->        
         // Neutral Turn
-        if (eeprom.ramcopy.DriveType == DT_TANK && DriveModeActual == NEUTRALTURN) 
+        if (eeprom.ramcopy.DriveType == DT_TANK && DriveModeActual == NEUTRALTURN)
         {   // Neutral Turn - if we are in a neutral turn (only for tanks), scale the turn command to the max neutral turn speed allowed. 
             TurnSpeed = Driver.ScaleTurnCommand(TurnCommand, NeutralTurn_Max); 
 
@@ -1166,7 +1166,6 @@ if (Startup)
         else
         {
             // We are moving 
-
             switch (eeprom.ramcopy.DriveType)
             {
                 case DT_TANK:       
