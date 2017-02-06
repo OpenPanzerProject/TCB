@@ -4,7 +4,7 @@ This folder contains the custom bootloader used on the TCB - both a precompiled 
 
 ## Do I Need to Do Anything With This? 
 
-Probably not, the bootloader should already come installed on your TCB from the factory. But if you are a developer, are curious, or for some reason need to re-write the bootloader on your device, read one. 
+Probably not, the bootloader should already come installed on your TCB from the factory. But if you are a developer, are curious, or for some reason need to re-write the bootloader on your device, read on. 
 
 ## Bootloader Details
 
