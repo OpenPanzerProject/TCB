@@ -13,7 +13,7 @@
 If you are not a developer, you probably don't need to worry about anything on this site. Instead go to the [OpenPanzer Wiki](http://www.openpanzer.org/wiki), learn how to get your own TCB board, [download the OP Config Windows desktop program](http://www.openpanzer.org/downloads), and start tanking! 
 
 ## Developers
-**NOTE:** For now please compile only with Arduino IDE 1.6.9 or prior. We have discovered issues related to later versions that remain unresolved, see [here for updates](http://forum.arduino.cc/index.php?topic=453836.0).
+**NOTE:** For now please compile only with [Arduino IDE 1.6.9 or prior](https://www.arduino.cc/en/Main/OldSoftwareReleases#previous). We have discovered issues related to later versions that remain unresolved, see [here for updates](http://forum.arduino.cc/index.php?topic=453836.0).
 
 The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. If you want to modify the source code you should either clone the TCB repository if you are familiar with Git, or simply click the **Download ZIP** button at the top right of this page. Extract the ZIP file to your computer. Inside the ZIP file enter the `TCB-master` folder and:
   * Copy the **libraries** and **OpenPanzerTCB** folders to your Arduino Sketches directory. You may already have a libraries folder in your sketches directory - if so, that's fine, just overwrite it (this will simply add the new libraries). 
