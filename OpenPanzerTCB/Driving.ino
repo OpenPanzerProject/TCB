@@ -104,10 +104,11 @@ void EngineOff()
         // Stop the drive motor(s)
             switch (eeprom.ramcopy.DriveType)
             {
-                case DT_TANK:       // Fallthrough >
+                case DT_TANK:       { RightTread->stop(); LeftTread->stop();     } break;
                 case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
                 case DT_CAR:        { DriveMotor->stop();                        } break;
                 case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
+                default:                                                           break;
             }            
         // Clear the engine idle timer
             UpdateEngineIdleTimer();  
@@ -201,10 +202,11 @@ void StopEverything()
     // Stop drive motor(s)
     switch (eeprom.ramcopy.DriveType)
     {
-        case DT_TANK:       // Fallthrough >
+        case DT_TANK:       { RightTread->stop(); LeftTread->stop();     } break;
         case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
         case DT_CAR:        { DriveMotor->stop();                        } break;
         case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
+        default:                                                           break;
     }    
     // We're not moving, so stop the squeaking
     TankSound->StopSqueaks();

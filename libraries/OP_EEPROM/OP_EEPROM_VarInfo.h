@@ -7,7 +7,7 @@
 //=======================================================================================================================================>>
 // You must make sure this number equals the number of variables defined in the __eeprom_data struct (including the unused FirstVar)
 // 
-    #define NUM_STORED_VARS         302
+    #define NUM_STORED_VARS         303
 
 // THIS NUMBER CAN BE CALCULATED BY THE EXCEL REFERENCE SHEET - AS CAN THE ENTIRE PROGMEM STATEMENT BELOW
 // Don't bother trying to do it by hand!
@@ -349,8 +349,9 @@ const _storage_var_info STORAGEVARS[NUM_STORED_VARS] PROGMEM_FAR = {
     {3418, 435, varUINT8},        // MGLightBlink_mS
     {3419, 436, varBOOL},        // FlashLightsWhenSignalLost
     {3420, 437, varBOOL},        // HiFlashWithCannon
-    {9011, 438, varBOOL},        // PrintDebug
-    {9999, 439, varUINT32}        // InitStamp
+    {3421, 438, varBOOL},        // AuxFlashWithCannon
+    {9011, 439, varBOOL},        // PrintDebug
+    {9999, 440, varUINT32}        // InitStamp
 };
 
 

@@ -48,7 +48,7 @@
 // and the sketch will exhibit unstable behavior!
 // 
 
-    #define EEPROM_INIT             0xAA46          // Modified with 00.90.24 on 1/30/2017
+    #define EEPROM_INIT             0xF973          // Modified with 00.91.01 on 2/7/2017
 //
 //
 //=======================================================================================================================================>>

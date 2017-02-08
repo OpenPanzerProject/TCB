@@ -20,11 +20,13 @@ void UpdateSimpleTimers()
     // watchdog that for example the Scout ESC implements. 
     switch (eeprom.ramcopy.DriveType)
     {
-        case DT_TANK:       // Fallthrough >
+        case DT_TANK:       { RightTread->update(); LeftTread->update();     } break;
         case DT_HALFTRACK:  { RightTread->update(); LeftTread->update();     } break;
         case DT_CAR:        { DriveMotor->update();                          } break;
         case DT_DKLM:       { DriveMotor->update(); SteeringMotor->update(); } break;
+        default:                                                               break;
     }    
+
     TurretRotation->update();
     TurretElevation->update();
 

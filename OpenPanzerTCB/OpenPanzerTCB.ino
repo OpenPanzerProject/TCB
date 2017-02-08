@@ -2,7 +2,7 @@
  * Source:          openpanzer.org              
  * Authors:         Luke Middleton
  * 
- * Copyright 2016 Open Panzer
+ * Copyright 2017 Open Panzer
  *   
  * For more information, see the Open Panzer Wiki:
  * http://openpanzer.org/wiki/
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */ 
- 
+
 #include "OP_Settings.h"
 #include "OP_FunctionsTriggers.h"
 #include "OP_IO.h"
@@ -291,6 +291,8 @@ void setup()
                    eeprom.ramcopy.ServoRecoilWithCannon,
                    eeprom.ramcopy.RecoilDelay, 
                    eeprom.ramcopy.HiFlashWithCannon,
+                   eeprom.ramcopy.AuxFlashWithCannon,
+                   eeprom.ramcopy.AuxLightFlashTime_mS,
                    eeprom.ramcopy.MGLightBlink_mS,
                    RecoilServo, 
                    TankSound,
@@ -1149,10 +1151,11 @@ if (Startup)
                 // Kill the motor(s)
                 switch (eeprom.ramcopy.DriveType)
                 {
-                    case DT_TANK:       // Fallthrough >
+                    case DT_TANK:       { RightTread->stop(); LeftTread->stop();     }  break;
                     case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     }  break;
                     case DT_CAR:        { DriveMotor->stop();                        }  break;
                     case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); }  break;
+                    default:                                                            break;
                 }
             }
             
@@ -1236,10 +1239,11 @@ if (Startup)
             LeftSpeed = 0;
             switch (eeprom.ramcopy.DriveType)
             {
-                case DT_TANK:       // Fallthrough >
+                case DT_TANK:       { RightTread->stop(); LeftTread->stop();     } break;
                 case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
                 case DT_CAR:        { DriveMotor->stop();                        } break;
                 case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
+                default:                                                           break;
             }
             DriveModeActual = STOP;
             Braking = false;

@@ -1,3 +1,9 @@
+0.91.01         02/07/2017 - Added ability to automatically flash the Aux Light output when cannon is fired. Flash will last for user specified time and will be triggered
+                             at the correct location in the cannon fire sequence, accounting for any delays the user may have specified under the mechanical recoil option.
+                             This option will hopefully be useful for people using an ordinary LED for muzzle flash instead of the high-intensity flash units. The Aux Light
+                             could already be flashed with cannon before but it required the user to assign their cannon trigger to the Aux Flash function, not a big deal 
+                             but this eliminates that step. 
+                             - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
 0.91.00         02/04/2017 - IMPORTANT NOTE: This release requires OP Config 0.91.00
                            - Added new drive type specifically for cluch-style gearboxes such as the DKLM RC PDSGB.
                            - Added functionality for OP Config to check what minimum version of OP Config the TCB expects, and what minimum version of TCB firmware OP Config expects. 

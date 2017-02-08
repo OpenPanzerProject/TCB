@@ -33,6 +33,8 @@ boolean         OP_Tank::_Airsoft;
 boolean         OP_Tank::_RecoilServoWithCannon;
 int             OP_Tank::_RecoilDelay = 0;      
 boolean         OP_Tank::_HiFlashWithCannon;
+boolean         OP_Tank::_AuxFlashWithCannon;
+uint16_t        OP_Tank::_AuxFlashTime_mS;
 int             OP_Tank::MechRecoilTimeoutTimerID;
 boolean         OP_Tank::isInvulnerable;            
 boolean         OP_Tank::isDestroyed;           
@@ -94,7 +96,7 @@ OP_Tank::OP_Tank()
 }
 
 
-void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, uint8_t mgint, Servo_RECOIL * sr, OP_Sound * os, OP_SimpleTimer * t)
+void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, boolean afwc, uint16_t aftms, uint8_t mgint, Servo_RECOIL * sr, OP_Sound * os, OP_SimpleTimer * t)
 {
     // Save settings
     
@@ -118,6 +120,8 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     _RecoilDelay = mrd; 
     _MGLightBlink_mS = mgint;
     _HiFlashWithCannon = hfwc;
+    _AuxFlashWithCannon = afwc;
+    _AuxFlashTime_mS = aftms;
     
     // Pointers to objects
     _RecoilServo = sr;
@@ -371,8 +375,8 @@ void OP_Tank::Fire_Part2(void)
     // Play cannon fire sound
     Cannon_Sound();
     
-    // If tied to the Fire Cannon function, flash the high intensity flash unit
-    if (_HiFlashWithCannon) { Cannon_Flash(); }
+    // This will flash the high-intensity flash unit and/or the aux light output, if either are set to do so. 
+    Cannon_Flash();
     
     // If Airsoft we already sent IR before this. If mech-recoil, or if no mechanical barrel is specified, we send the IR now.
     if (!_Airsoft || !_MechBarrelWithCannon) { Cannon_SendIR(); }
@@ -385,7 +389,8 @@ void OP_Tank::Fire_Part2(void)
 }
 void OP_Tank::Cannon_Flash(void)
 {
-    TriggerMuzzleFlash();               // High intensity flash unit
+    if (_HiFlashWithCannon)  { TriggerMuzzleFlash(); }              // High intensity flash unit
+    if (_AuxFlashWithCannon) { TriggerAuxFlash();    }              // Aux light output
 }
 void OP_Tank::Cannon_Sound(void)
 {
@@ -679,7 +684,6 @@ void OP_Tank::INT6_RECOIL_ISR()
 
 
 
-
 //------------------------------------------------------------------------------------------------------------------------>>
 // MUZZLE FLASH
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -694,7 +698,17 @@ void OP_Tank::ClearMuzzleFlash(void)
     // Muzzle flash is over. Remember, for PNP HIGH = off
     digitalWrite(pin_MuzzleFlash, HIGH);
 }
-
+void OP_Tank::TriggerAuxFlash(void)
+{
+    // This is an N-Channel MOSFET, so logic HIGH = ON, LOW = OFF
+    digitalWrite(pin_AuxOutput, HIGH);    
+    TankTimer->setTimeout(_AuxFlashTime_mS, ClearAuxFlash);
+}
+void OP_Tank::ClearAuxFlash(void)
+{
+    // Aux flash is over. Turn off light.
+    digitalWrite(pin_AuxOutput, LOW);   
+}
 
 
 

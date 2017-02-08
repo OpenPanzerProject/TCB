@@ -168,6 +168,7 @@ struct _eeprom_data {
     uint8_t  MGLightBlink_mS;                  // Some number between 0-255. The Machine Gun blinks on/off at the same rate (on period is not different from off period).
     boolean  FlashLightsWhenSignalLost;        // If radio signal lost, flash all lights. 
     boolean  HiFlashWithCannon;                // If true, the high-intensity flash unit will automatically be triggered with cannon fire. If False, user can still trigger it manually.
+    boolean  AuxFlashWithCannon;               // If true, the aux light output will automatically be flashed with cannon fire. If False, it is controlled by user through function triggers
             
 // Program setting
     boolean PrintDebug;                        // If true, TCB will print debugging messages out the DebugSerial serial port
