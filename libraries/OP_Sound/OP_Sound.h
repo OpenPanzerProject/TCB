@@ -98,6 +98,8 @@ class OP_Sound {
     virtual void Beeps(uint8_t) =0;                     // Beep number of times in a row
     // Volume
     virtual void SetVolume(uint8_t) =0;                 // Set the volume from off (0) to full on (100)
+    virtual void IncreaseVolume(void) =0;               // Bump up the volume by some step
+    virtual void DecreaseVolume(void) =0;               // Bump down the volume by some step
 
 };
 
@@ -134,9 +136,9 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void Turret(void)                                           { OP_TBS::Turret();                    }
     void StopTurret(void)                                       { OP_TBS::StopTurret();                }
     void TurretSound_SetEnabled(boolean b)                      { OP_TBS::TurretSound_SetEnabled(b);   }
-    void Barrel(void)                                           { return;                              } // TBS doesn't have barrel sound for now
-    void StopBarrel(void)                                       { return;                              } // TBS doesn't have barrel sound for now
-    void BarrelSound_SetEnabled(boolean)                        { return;                              } // TBS doesn't have barrel sound for now
+    void Barrel(void)                                           { OP_TBS::Barrel();                    }
+    void StopBarrel(void)                                       { OP_TBS::StopBarrel();                }
+    void BarrelSound_SetEnabled(boolean b)                      { OP_TBS::BarrelSound_SetEnabled(b);   }
   // Headlight
     void HeadlightSound(void)                                   { OP_TBS::HeadlightSound();            }
     void HeadlightSound_SetEnabled(boolean b)                   { OP_TBS::HeadlightSound_SetEnabled(b);}
@@ -147,9 +149,9 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void UserSound2(void)                                       { OP_TBS::UserSound2();                }
     void UserSound2_Repeat(void)                                { OP_TBS::UserSound2_Repeat();         }
     void UserSound2_Stop(void)                                  { OP_TBS::UserSound2_Stop();           }
-    void UserSound3(void)                                       { return;                              } // TBS doesn't have user sound 3 for now
-    void UserSound3_Repeat(void)                                { return;                              } // TBS doesn't have user sound 3 for now
-    void UserSound3_Stop(void)                                  { return;                              } // TBS doesn't have user sound 3 for now
+    void UserSound3(void)                                       { OP_TBS::UserSound3();                }
+    void UserSound3_Repeat(void)                                { OP_TBS::UserSound3_Repeat();         }
+    void UserSound3_Stop(void)                                  { OP_TBS::UserSound3_Stop();           }
     void UserSound4(void)                                       { return;                              } // TBS doesn't have user sound 4 for now
     void UserSound4_Repeat(void)                                { return;                              } // TBS doesn't have user sound 4 for now
     void UserSound4_Stop(void)                                  { return;                              } // TBS doesn't have user sound 4 for now
@@ -173,7 +175,9 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void Beep(void)                                             { return; }  // All TBS beeping stuff was removed to make space for another sound
     void Beeps(uint8_t)                                         { return; }  // It may be added back later if the TBS gets an update for use with the TCB
   // Volume
-    void SetVolume(uint8_t)                                     { return; }  // It is possible to adjust TBS volume remotely but not through this function, see the wiki for instructions
+    void SetVolume(uint8_t)                                     { return; }  // It is possible to adjust TBS volume remotely but not through this function
+    void IncreaseVolume(void)                                   { OP_TBS::IncreaseVolume();            }
+    void DecreaseVolume(void)                                   { OP_TBS::DecreaseVolume();            }
     // These are other functions used internally to the TBS class. If beeps get re-enabled you would probably map the above two to these two. 
     // void ForceBeep(void);                                    // Blocking call to beep
     // void ForceBeeps(int);                                    // Beep number of times in a row (blocks code)
@@ -303,6 +307,8 @@ class OP_SoundCard: public OP_Sound {
     void Beeps(uint8_t x)                                       { command(OPSC_CMD_BEEP_X, x);                              }
   // Volume         
     void SetVolume(uint8_t v)                                   { command(OPSC_CMD_SET_VOLUME, v);                          }   // Expects a value from 0-100 
+    void IncreaseVolume(void)                                   { return;                                                   }   // Use SetVolume instead
+    void DecreaseVolume(void)                                   { return;                                                   }   // Use SetVolume instead
 
   // Functions specific to the OP_SoundCard sub-class
     inline HardwareSerial* port() const                         { return _port;                                             }   // Return the serial port.
@@ -451,6 +457,8 @@ class OP_TaigenSound: public OP_Sound {
     void Beeps(uint8_t x)                                       { return;               }
   // Volume                                                                             
     void SetVolume(uint8_t v)                                   { return;               }
+    void IncreaseVolume(void)                                   { return;               } 
+    void DecreaseVolume(void)                                   { return;               }     
 
 
   public: 

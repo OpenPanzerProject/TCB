@@ -85,7 +85,8 @@ OP_TBS::OP_TBS(OP_SimpleTimer * t)
     
     // Initialize these as well, but again, they will in the end be set by the user's preference
     HeadlightSound_Enabled = true;
-    TurretSound_Enabled = false;
+    TurretSound_Enabled = true;
+    BarrelSound_Enabled = true;
 }
 
 
@@ -213,7 +214,7 @@ void OP_TBS::Beep(void)
 */
 
 //------------------------------------------------------------------------------------------------------------------------>>
-// PROP 3 - Twelve sounds in the 1st Coder column of TBS Flash. 
+// PROP 3 - Sixteen sounds in the 1st Coder column of TBS Flash (v3.0.1 and later) 
 //------------------------------------------------------------------------------------------------------------------------>>
 // Prop 3 - can only play one sound at a time. If a sound is playing and a second sound begins before the first is finished, 
 // the first will stop. This can occasionally cause odd behavior. For example, assume you have a cannon fire sound that lasts 
@@ -304,7 +305,7 @@ void OP_TBS::StopMachineGun(void)
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
-// TURRET TRAVERSE (Azimuth)
+// TURRET TRAVERSE
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::TurretSound_SetEnabled(boolean enabled)
 {
@@ -319,6 +320,24 @@ void OP_TBS::Turret(void)
 void OP_TBS::StopTurret(void)
 {
     if (TurretSound_Enabled) StopSpecialSounds();
+}
+
+//------------------------------------------------------------------------------------------------------------------------>>
+// BARREL ELEVATION 
+//------------------------------------------------------------------------------------------------------------------------>>
+void OP_TBS::BarrelSound_SetEnabled(boolean enabled)
+{
+    BarrelSound_Enabled = enabled;
+}
+
+void OP_TBS::Barrel(void)
+{
+    if (BarrelSound_Enabled) TriggerSpecialSound(SOUND_BARREL);
+}
+
+void OP_TBS::StopBarrel(void)
+{
+    if (BarrelSound_Enabled) StopSpecialSounds();
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -390,6 +409,36 @@ void OP_TBS::UserSound2_Stop(void)
 {
     StopSpecialSounds();                    
 }                                           
+
+
+//------------------------------------------------------------------------------------------------------------------------>>
+// USER SOUND #3
+//------------------------------------------------------------------------------------------------------------------------>>
+void OP_TBS::UserSound3(void)
+{
+    TriggerSpecialSound(SOUND_USER_3);
+}
+void OP_TBS::UserSound3_Repeat(void)
+{
+    TriggerSpecialSound(SOUND_USER_3, false);   // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+}                                               // until explicitly turned off, or until interrupted by another sound with a higher priority. 
+void OP_TBS::UserSound3_Stop(void)
+{
+    StopSpecialSounds();                    
+}     
+
+
+//------------------------------------------------------------------------------------------------------------------------>>
+// VOLUME
+//------------------------------------------------------------------------------------------------------------------------>>
+void OP_TBS::IncreaseVolume(void)
+{
+    TriggerSpecialSound(SOUND_VOLUME_UP);
+}
+void OP_TBS::DecreaseVolume(void)
+{
+    TriggerSpecialSound(SOUND_VOLUME_DN);
+}
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -538,67 +587,4 @@ void OP_TBS::Squeak3_Pause(void)
 
 
 
-//------------------------------------------------------------------------------------------------------------------------>>
-// TEACH TBS UNIT FOR ENCODER CONTROL
-//------------------------------------------------------------------------------------------------------------------------>>
-void OP_TBS::TeachEncoder(void)
-{
-    char buffer[30];    // This needs to be large enough to hold any string from our sound_descr_table (see OP_TBS.h)
-    uint32_t soundNameTableAddress = pgm_get_far_address(_sound_descr_table_);  // This is the starting address of our sound names table in far progmem. 
-
-    // Before you run this routine, the TBS Mini needs to be placed in the TEACH mode by pushing the button on the sound unit.
-    // This is handled in the sketch, as well as some other preliminary steps
-        
-    Serial.println("Start - Teaching:");
-    // Whenever they pressed the TBS button, the neutral positions were already recorded    
-    Serial.println(F("...Neutral"));
-    delay(1000);
-    
-    // Move throttle to just moving    
-    TBSProp->writeMicroseconds(PROP1, PROP1_JUST_MOVING);
-    Serial.println(F("...Just moving"));
-    PulseDelayProp3(1); // Doesn't matter what signal we send here
-    delay(1000);
-    
-    // Now move throttle to full speed
-    TBSProp->writeMicroseconds(PROP1, PROP1_FULL_SPEED);
-    Serial.println(F("...Full speed"));
-    PulseDelayProp3(1); // Doesn't matter what signal we send here
-    delay(1000);
-    // Probably doesn't matter, but let's put throttle back to idle
-    TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);    
-
-
-    // From here on out, we will be teaching the 12 positions. According to the TBS instructions, 
-    // we go to position 1, "push the encoder button" which means briefly send the PWM value associated
-    // with position 1 to Prop3, then return Prop3 back to the default state of center (1500). Then
-    // wait two seconds, and repeat for all 12 "encoder" positions
-    for (int i=1; i<=12; i++)
-    {
-        // Example:
-        // ...Sound 1: Cannon Fire
-        Serial.print(F("...Sound ")); Serial.print(i); Serial.print(F(": "));
-        // Using the string table in FAR program memory requires the use of a special function to retrieve the data.
-        strcpy_PFAR(buffer, soundNameTableAddress, i*SOUNDNAME_CHARS);
-        Serial.println(buffer);
-        // Now send the signal for this sound number briefly, then wait two seconds before sending the next one (according to TBS teaching specs)
-        PulseDelayProp3(i);
-    }
-
-}
-
-void OP_TBS::PulseDelayProp3(int whatSound)
-{
-    // This is hardcoded with delays. We don't use it in normal practice, just for teaching the TBS. 
-    TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(whatSound));
-    // Wait a short bit for the TBS to read the signal, and blink the green LED while we're waiting
-    digitalWrite(pin_GreenLED, HIGH);
-    delay(100);
-    digitalWrite(pin_GreenLED, LOW);
-    delay(300);
-    // Now put the signal back to off
-    TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));
-    // Wait 2 seconds
-    delay(2000);
-}
 

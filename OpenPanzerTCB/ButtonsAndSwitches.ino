@@ -34,7 +34,7 @@ uint8_t GetMenuNumber(void)
 {
     if (DipSwitchOn(3) && DipSwitchOn(4))           return 1;       // Barrel elevation pan servo setup
     else if (DipSwitchOn(3) && DipSwitchOff(4))     return 2;       // Future use/testing
-    else if (DipSwitchOff(3) && DipSwitchOn(4))     return 3;       // Teach TBS
+    else if (DipSwitchOff(3) && DipSwitchOn(4))     return 3;       // Future use/testing
     else if (DipSwitchOff(3) && DipSwitchOff(4))    return 4;       // Recoil servo setup
 }
 

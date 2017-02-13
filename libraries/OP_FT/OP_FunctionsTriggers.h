@@ -37,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 98;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 100;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -138,7 +138,9 @@ enum _special_function : byte {
     SF_RC8_PASS         = 94,       // 94   -- analog function
     SF_RC6_PASS_PAN     = 95,       // 95   -- analog function (Pan servo passthrough signal)
     SF_RC7_PASS_PAN     = 96,       // 96   -- analog function
-    SF_RC8_PASS_PAN     = 97        // 97   -- analog function    
+    SF_RC8_PASS_PAN     = 97,       // 97   -- analog function    
+    SF_INCR_VOLUME      = 98,       // 98
+    SF_DECR_VOLUME      = 99        // 99
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -155,7 +157,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  0,0,0,1,1,1,0,1,1,1,   // 60-69    60-62,66 analog
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
- 1,1,0,0,0,0,0,0        // 90-97    92-97 analog    
+ 1,1,0,0,0,0,0,0,1,1    // 90-99    92-97 analog    
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -266,7 +268,9 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "RC Output 8 - Pass-through",                // 94
     "RC Output 6 - Pan Servo",                   // 95   
     "RC Output 7 - Pan Servo",                   // 96
-    "RC Output 8 - Pan Servo"                    // 97   
+    "RC Output 8 - Pan Servo",                   // 97   
+    "Increase Volume",                           // 98
+    "Decrease Volme"                             // 99
 };
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>

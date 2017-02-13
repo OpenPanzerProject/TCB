@@ -51,7 +51,6 @@ AreSqueaksActive	LITERAL2
 SetSqueak1_Interval	LITERAL2
 SetSqueak2_Interval	LITERAL2
 SetSqueak3_Interval	LITERAL2
-TeachEncoder	LITERAL2
 
 
 #-------------------------------------------------------------

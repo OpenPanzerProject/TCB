@@ -629,6 +629,7 @@ if (Startup)
                     switch (GetMenuNumber())
                     {
                         case 1: 
+                            // Barrel elevation servo setup
                             if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
                             { SetupServo(SERVONUM_TURRETELEVATION); }
                             else
@@ -641,9 +642,12 @@ if (Startup)
                         case 2: 
                             // Reserved for future use
                             break;        
-                        case 3: TBS_Setup();    
+                        case 3: 
+                            // Reserved for future use
                             break;
-                        case 4: SetupServo(SERVONUM_RECOIL); 
+                        case 4: 
+                            // Recoil servo setup
+                            SetupServo(SERVONUM_RECOIL); 
                             break;
                     }
                     // All the menus above wait for the button to be released before exiting, so we can go straight from here to BUTTON_WAIT

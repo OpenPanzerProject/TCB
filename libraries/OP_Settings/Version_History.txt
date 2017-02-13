@@ -1,3 +1,5 @@
+0.91.02         02/12/2017 - Updated TBS library for compatibility with the new version of Benedini's TBS Flash (probably v3.x). This adds 4 more sounds, we use one for barrel elevation, 
+                             one for a user sound (for a total of 3), and two as dedicated volume increase/decrease functions. 
 0.91.01         02/07/2017 - Added ability to automatically flash the Aux Light output when cannon is fired. Flash will last for user specified time and will be triggered
                              at the correct location in the cannon fire sequence, accounting for any delays the user may have specified under the mechanical recoil option.
                              This option will hopefully be useful for people using an ordinary LED for muzzle flash instead of the high-intensity flash units. The Aux Light
