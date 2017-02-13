@@ -47,8 +47,8 @@
 #include "OP_Radio.h"
 #include "OP_Tank.h"
 #include "OP_PCComm.h"
-#include "OP_BNO055.h"
-#include "OP_I2C.h"
+#include "OP_BNO055.h"        // Not used currently
+#include "OP_I2C.h"           // Not used currently
 
 
 // GLOBAL VARIABLES
@@ -150,7 +150,7 @@
     boolean Nudge = false;                        // We can nudge the motors when first moving from a stop, for a crisper response. When the Nudge flag is true, the nudge effect will be active. 
 
 // INERTIAL MEASUREMENT UNIT (IMU)
-    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board)
+    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board) - NOT USED FOR NOW
     boolean UseIMU = false;
     boolean IMU_Present = false;
     boolean IMU_ReadyToSample = true;

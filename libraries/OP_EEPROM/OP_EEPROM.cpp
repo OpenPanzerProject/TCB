@@ -162,7 +162,7 @@ boolean OP_EEPROM::readSerialEEPROM_byID(uint16_t ID, char *chrArray, uint8_t bu
                 return false;
         }
     }
-    
+
     return 1;
 
 }
