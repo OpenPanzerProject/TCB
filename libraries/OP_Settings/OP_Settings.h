@@ -411,8 +411,8 @@
         #define pin_HitNotifyLEDs        7        // Output   - Hit notification LEDs if using the Tamiya apple. PWM capable (ATmega H4)
         //Machine Gun light output - slightly different. This is on Atmega pin 4, but it does not have an Arduino pin number! 
         // Therefore we have to manipulate the port directly, we can't use pinMode() or digitalWrite() functions
-        #define MG_PORT                  PORTE    // Port H
-        #define MG_DDR                   DDRE     // Data direction register for Port H 
+        #define MG_PORT                  PORTE    // Port E
+        #define MG_DDR                   DDRE     // Data direction register for Port E 
         #define MG_PORTPIN               PE2      // The specific port pin for the machine gun LED (ATmega E2)
 
         
