@@ -81,10 +81,13 @@ void IncreaseVolume(void)
 {
     TankSound->IncreaseVolume();
 }
-
 void DecreaseVolume(void)
 {
-    TankSound->IncreaseVolume();
+    TankSound->DecreaseVolume();
+}
+void StopVolume(void)
+{
+    TankSound->StopVolume();
 }
 
 void TriggerUserSound1()
@@ -155,4 +158,44 @@ void PrintUserSound()
 {
     DebugSerial->print(F("User Sound "));
 }
+
+// This routine is only needed for testing during development of compatibility with Benedini TBS Flash v3. We will remove it when no longer needed //
+/*
+void TBSTest(void)
+{
+OP_TBS * TBS;        
+TBS = new OP_TBS (&timer);        
+
+    // Ok, before we run this test, stop everything.      
+    StopEverything();     
+
+    // Turn the Red LED on for the duration of setup      
+    GreenLedOff();        
+    RedLedOn();       
+
+    //        
+    DebugSerial->println();       
+    PrintDebugLine();     
+    DebugSerial->println(F("Start TBS Prop3 Test"));       
+    PrintDebugLine();     
+    delay(2000);
+
+    // Initialize TBS outputs     
+    TBS->InitializeOutputs();  // Set all outputs to defaults    
+
+    // Run the test
+    TBS->testProp3();
+
+    // Ok, we're done        
+    PrintDebugLine();     
+    DebugSerial->println(F("End TBS Prop3 Test"));     
+    PrintDebugLine();     
+    DebugSerial->println();           
+
+    // Blink the Green LED 3 times quickly, then turn all leds off.       
+    GreenBlinkFast(3);        
+    RedLedOff();    
+}
+*/
+
 

@@ -7,6 +7,9 @@
  *
  * Connect three servo cables from Prop1, Prop2 and Prop3 on the Open Panzer TCB board to Prop1, Prop2 and Prop3 on the Mini. 
  *   
+ * NOTE: This will only work with Benedini TBS Flash v3 or later! Benedini released this version in spring of 2017. If you installed
+ * TBS Flash before that, please update to the latest version. 
+ *   
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -433,11 +436,15 @@ void OP_TBS::UserSound3_Stop(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::IncreaseVolume(void)
 {
-    TriggerSpecialSound(SOUND_VOLUME_UP);
-}
+    TriggerSpecialSound(SOUND_VOLUME_UP, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+}                                                   // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 void OP_TBS::DecreaseVolume(void)
 {
-    TriggerSpecialSound(SOUND_VOLUME_DN);
+    TriggerSpecialSound(SOUND_VOLUME_DN, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+}                                                   // until explicitly turned off, or until interrupted by another sound with a higher priority. 
+void OP_TBS::StopVolume(void)
+{
+    StopSpecialSounds();
 }
 
 
@@ -587,4 +594,33 @@ void OP_TBS::Squeak3_Pause(void)
 
 
 
+//------------------------------------------------------------------------------------------------------------------------>>
+// TEST ALL PROP 3 POSITIONS
+//------------------------------------------------------------------------------------------------------------------------>>
+/*
+void OP_TBS::testProp3(void)
+{
+    char buffer[30];    // This needs to be large enough to hold any string from our sound_descr_table (see OP_TBS.h)
+    uint32_t soundNameTableAddress = pgm_get_far_address(_sound_descr_table_);  // This is the starting address of our sound names table in far progmem. 
+
+    for (int i=1; i<PROP3_NUM_SOUNDS; i++)
+    {
+        // Example:
+        // ...Sound 1: Cannon Fire
+        Serial.print(F("...Sound ")); Serial.print(i); Serial.print(F(": "));
+        // Using the string table in FAR program memory requires the use of a special function to retrieve the data.
+        strcpy_PFAR(buffer, soundNameTableAddress, i*SOUNDNAME_CHARS);
+        Serial.println(buffer);
+        // Now send the signal for this sound number briefly, then wait two seconds before sending the next one (according to TBS teaching specs)
+
+        // This is hardcoded with delays. We don't use it in normal practice, just for testing
+        TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(i));
+        delay(2000);
+        TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));
+
+        // Wait
+        delay(1000);
+    }
+}
+*/
 

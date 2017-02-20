@@ -124,6 +124,7 @@ void LoadFunctionTriggers()
                 case SF_SMOKER_TOGGLE:              SF_Callback[i] = &SF_Smoker_Toggle;                             break;
                 case SF_INCR_VOLUME:                SF_Callback[i] = &SF_IncreaseVolume;                            break;
                 case SF_DECR_VOLUME:                SF_Callback[i] = &SF_DecreaseVolume;                            break;
+                case SF_STOP_VOLUME:                SF_Callback[i] = &SF_StopVolume;                                break;
             }
         }
     }
@@ -422,6 +423,7 @@ void SF_Smoker_Disable(uint16_t ignoreMe)       { DisableSmoker();          }
 void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }
 void SF_IncreaseVolume(uint16_t ignoreMe)       { IncreaseVolume();         }
 void SF_DecreaseVolume(uint16_t ignoreMe)       { DecreaseVolume();         }
+void SF_StopVolume(uint16_t ignoreMe)           { StopVolume();             }
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>

@@ -98,8 +98,9 @@ class OP_Sound {
     virtual void Beeps(uint8_t) =0;                     // Beep number of times in a row
     // Volume
     virtual void SetVolume(uint8_t) =0;                 // Set the volume from off (0) to full on (100)
-    virtual void IncreaseVolume(void) =0;               // Bump up the volume by some step
-    virtual void DecreaseVolume(void) =0;               // Bump down the volume by some step
+    virtual void IncreaseVolume(void) =0;               // Start increasing the volume (will keep increasing until stop is called or volume reaches max)
+    virtual void DecreaseVolume(void) =0;               // Start decreasing the volume (will keep decreasing until stop is called or volume reaches min)
+    virtual void StopVolume(void) =0;                   // Stop changing volume
 
 };
 
@@ -178,6 +179,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void SetVolume(uint8_t)                                     { return; }  // It is possible to adjust TBS volume remotely but not through this function
     void IncreaseVolume(void)                                   { OP_TBS::IncreaseVolume();            }
     void DecreaseVolume(void)                                   { OP_TBS::DecreaseVolume();            }
+    void StopVolume(void)                                       { OP_TBS::StopVolume();                }
     // These are other functions used internally to the TBS class. If beeps get re-enabled you would probably map the above two to these two. 
     // void ForceBeep(void);                                    // Blocking call to beep
     // void ForceBeeps(int);                                    // Beep number of times in a row (blocks code)
@@ -309,6 +311,7 @@ class OP_SoundCard: public OP_Sound {
     void SetVolume(uint8_t v)                                   { command(OPSC_CMD_SET_VOLUME, v);                          }   // Expects a value from 0-100 
     void IncreaseVolume(void)                                   { return;                                                   }   // Use SetVolume instead
     void DecreaseVolume(void)                                   { return;                                                   }   // Use SetVolume instead
+    void StopVolume(void)                                       { return;                                                   }   // Use SetVolume instead
 
   // Functions specific to the OP_SoundCard sub-class
     inline HardwareSerial* port() const                         { return _port;                                             }   // Return the serial port.
@@ -459,6 +462,7 @@ class OP_TaigenSound: public OP_Sound {
     void SetVolume(uint8_t v)                                   { return;               }
     void IncreaseVolume(void)                                   { return;               } 
     void DecreaseVolume(void)                                   { return;               }     
+    void StopVolume(void)                                       { return;               }
 
 
   public: 

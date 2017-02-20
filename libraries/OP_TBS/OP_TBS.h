@@ -7,6 +7,9 @@
  *
  * Connect three servo cables from Prop1, Prop2 and Prop3 on the Open Panzer TCB board to Prop1, Prop2 and Prop3 on the Mini. 
  *   
+ * NOTE: This will only work with Benedini TBS Flash v3 or later! Benedini released this version in spring of 2017. If you installed
+ * TBS Flash before that, please update to the latest version. 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -38,7 +41,7 @@
 
 // Prop1 - Throttle speed
 #define PROP1_IDLE          1500                // Idle throttle
-#define PROP1_JUST_MOVING   1550                // What throttle value do we change from idle to moving sound (above 1500 which is center) 
+#define PROP1_JUST_MOVING   1550                // What throttle value do we change from idle to moving sound (above 1500 which is center). No longer used since TBS Flash v3.0 and later. 
 #define PROP1_FULL_SPEED    2000                // Full speed
 
 // Prop2 - 2 sounds in direct control mode, you must emulate a 3-position switch
@@ -68,7 +71,7 @@
 #define SOUND_VOLUME_DN      16         // Sound 16: Decrease volume
 #define PROP3_NUM_SOUNDS     17         // How many sounds are there in total in the Prop3 register, including the SOUND_OFF "sound"
 // The Prop3 numbers above refer to positions in the array below.
-// The array holds the actual PWM values for each of the 12 sound slots, plus one more for SOUND_OFF (1500) (so 13 total)
+// The array holds the actual PWM values for each of the sound slots, plus one more for SOUND_OFF (1500)
 // Each sound also has a priority number associated with it. If a sound is playing, and second sound is triggered, the second
 // sound will only interrupt the first one if it has a higher priority. However, note that most sounds will be considered over 
 // after TBS_SIGNAL_mS long (see the define below, very short), even though the actual sound may play longer than that. So it is 
@@ -81,24 +84,31 @@ typedef struct {
     int16_t Pulse;
     uint8_t Priority;
 } Prop3Settings;
+
+// Benedini uses an odd spread of pulses from 800uS to 2280uS. This means an even center is not 1500 but rather 1540, although in the case
+// of Prop 3 it doesn't really matter. What does matter is that we spread out each position as much as possible to take full advantage of the 
+// range. However recall the OP Servo class won't generate signals greater than 2250 uS (but we keep it here to 2200). 
+// We spread out each step by approximately 80uS with the exception of the two steps around center which we extend to approximately 100 uS. 
+// Values were tweaked to correspond as closely to whole integers from 0-255 as possible (since that is actually how the TBS Mini reads the pulses
+// apparently). The small tweaks are probably unnecessary and irrelevant once you account for all the variability in creating and reading PWM signals. 
 const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
-{1500, 0},  // Sound 0:  Prop3 default (off - no sound)
-{1000, 1},  // Sound 1:  Turret rotation
-{1062, 1},  // Sound 2:  Barrel elevation
-{1124, 1},  // Sound 3:  Cannon fire
-{1186, 2},  // Sound 4:  Machine gun fire - higher priority because it needs to repeat
-{1248, 1},  // Sound 5:  Received cannon hit - damage
-{1310, 1},  // Sound 6:  Received machine gun hit - damage
-{1372, 1},  // Sound 7:  Received hit - vehicle destroyed
-{1434, 1},  // Sound 8:  Headlights on/off
-{1566, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG
-{1628, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG
-{1690, 3},  // Sound 11: Custom User Sound 3 - even higher priority than MG
-{1752, 1},  // Sound 12: Squeak 1 (frequent)
-{1814, 1},  // Sound 13: Squeak 2 (medium frequency)
-{1876, 1},  // Sound 14: Squeak 3 (less frequent)
-{1938, 5},  // Sound 15: Increase volume - highest priority since it shouldn't actually affect other sounds
-{2000, 5}   // Sound 16: Decrease volume - highest priority since it shouldn't actually affect other sounds
+{1531, 0},  // Sound 0:  Prop3 default (off - no sound) - this is the odd Benedini center value
+{864, 1},  // Sound 1:  Turret rotation
+{945, 1},  // Sound 2:  Barrel elevation
+{1026, 1},  // Sound 3:  Cannon fire
+{1108, 2},  // Sound 4:  Machine gun fire - higher priority because it needs to repeat
+{1189, 1},  // Sound 5:  Received cannon hit - damage
+{1270, 1},  // Sound 6:  Received machine gun hit - damage
+{1351, 1},  // Sound 7:  Received hit - vehicle destroyed
+{1433, 1},  // Sound 8:  Headlights on/off
+{1630, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG
+{1711, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG
+{1793, 3},  // Sound 11: Custom User Sound 3 - even higher priority than MG
+{1874, 1},  // Sound 12: Squeak 1 (frequent)
+{1955, 1},  // Sound 13: Squeak 2 (medium frequency)
+{2036, 1},  // Sound 14: Squeak 3 (less frequent)
+{2117, 5},  // Sound 15: Increase volume - highest priority since it shouldn't actually affect other sounds
+{2199, 5}   // Sound 16: Decrease volume - highest priority since it shouldn't actually affect other sounds
 };
 // We can't refer directly to array elements and struct members when using far addresses. For some reason, even using s*sizeof(Prop3) instead of (s*3) doesn't work. 
 #define Prop3SoundPulse(s)      pgm_read_word_far(pgm_get_far_address(Prop3) + (s*3))       // Get address of Prop3 array, then skip ahead to the s-th element, since each struct is 3 bytes wide
@@ -111,14 +121,15 @@ const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 #define SQUEAK_DELAY_mS       3000      // We don't start squeaking until this amount of time has passed after we first start moving
                                         // I suppose this should probably be stuck in EEPROM and let the user adjust it... 
 
-// Let's create descriptions of these 12 sounds so we can print them out during the teaching routine. These must match
-// the order they were defined in (see above). If SOUNDNAME_CHARS is 31, that means you have 30 (not 31) chars for the name.
+// Let's create descriptions of these sounds so we can print them out during the teaching routine (EDIT: teaching routine is no longer required
+// since TBS Flash v3.0 but these have still be useful in testing. For production we comment them out). 
+// These must match the order they were defined in (see above). If SOUNDNAME_CHARS is 31, that means you have 30 (not 31) chars for the name.
 // You must leave one char for the null terminator. 
 // As with the function names in OP_FunctionsTriggers.h, this construct is wasteful of program space since we are reserving 31 chars
 // per name whether we need that many or not. It is harder to address these elements as well, but the tradeoff is that we get to 
 // keep these in FAR progmem (see OP_Settings.h for the exact location where), rather than in near which causes all sorts of problems, 
-// AND we didn't have to make custom modifications to the linker script. We don't have many entries right now but we expect many
-// more in the future. 
+// AND we didn't have to make custom modifications to the linker script.
+/*
 #define SOUNDNAME_CHARS  31
 const char _sound_descr_table_[PROP3_NUM_SOUNDS][SOUNDNAME_CHARS] PROGMEM_FAR = 
 {   "Sound Off",                                // 0
@@ -139,7 +150,7 @@ const char _sound_descr_table_[PROP3_NUM_SOUNDS][SOUNDNAME_CHARS] PROGMEM_FAR =
     "Increase volume",                          // 15
     "Decrease volume"                           // 16
 };
-
+*/
 
 class OP_TBS
 {
@@ -186,6 +197,7 @@ public:
     void UserSound3_Stop(void);                             // Stop user sound 3
     void IncreaseVolume(void);                              // Increase volume
     void DecreaseVolume(void);                              // Decrease volume
+    void StopVolume(void);                                  // Stop changing volume
                 
     // Set enabled status of certain sounds         
     void Squeak1_SetEnabled(boolean);                       // Enabled or disable Squeak1 
@@ -201,6 +213,8 @@ public:
     void SetSqueak1_Interval(unsigned int, unsigned int);
     void SetSqueak2_Interval(unsigned int, unsigned int);
     void SetSqueak3_Interval(unsigned int, unsigned int);
+    
+//    void testProp3(void);                                   // Used for testing
 
  private:   
     static OP_Servos  * TBSProp;

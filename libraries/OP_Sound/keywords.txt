@@ -37,6 +37,9 @@ BarrelSound_SetEnabled  LITERAL2
 HeadlightSound	LITERAL2
 HeadlightSound_SetEnabled	LITERAL2
 SetVolume   LITERAL2
+IncreaseVolume  LITERAL2
+DecreaseVolume  LITERAL2
+StopVolume  LITERAL2
 UserSound1	LITERAL2
 UserSound1_Repeat	LITERAL2
 UserSound1_Stop	LITERAL2
