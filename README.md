@@ -10,7 +10,7 @@
   * To discuss the project, feel free to join the [Open Panzer Community](http://openpanzer.org/forum/index.php?action=forum).
 
 ## General Users
-If you are not a developer, you probably don't need to worry about anything on this site. Instead go to the [OpenPanzer Wiki](http://www.openpanzer.org/wiki), learn how to get your own TCB board, [download the OP Config Windows desktop program](http://www.openpanzer.org/downloads), and start tanking! 
+If you are not a developer, you probably don't need to worry about anything on this site. Instead [get your own TCB board](http://openpanzer.org/buy), [download the OP Config Windows desktop program](http://www.openpanzer.org/downloads), check out the [OpenPanzer Wiki](http://www.openpanzer.org/wiki) for instructions, and have fun tanking! 
 
 ## Developers
 The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. If you want to modify the source code you can either A) clone the TCB repository if you are familiar with Git, or B) click the green **Clone or download** button at the top of this page, then select **Download ZIP**. 
