@@ -6,7 +6,7 @@
 
 ## Resources
   * For the TCB hardware files and bill of materials, see the [Open Panzer Downloads page](http://openpanzer.org/downloads).
-  * For more information on the Open Panzer project, see the [OpenPanzer Wiki](http://www.openpanzer.org/wiki).
+  * For more information on the Open Panzer project, see the [OpenPanzer Wiki](http://wiki.openpanzer.org).
   * To discuss the project, feel free to join the [Open Panzer Community](http://openpanzer.org/forum/index.php?action=forum).
 
 ## General Users
