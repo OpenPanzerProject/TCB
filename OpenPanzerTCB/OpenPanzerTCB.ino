@@ -5,7 +5,7 @@
  * Copyright 2017 Open Panzer
  *   
  * For more information, see the Open Panzer Wiki:
- * http://openpanzer.org/wiki/
+ * http://wiki.openpanzer.org
  * 
  * TCB GitHub Repository:
  * https://github.com/OpenPanzerProject/TCB
@@ -24,29 +24,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "OP_Settings.h"
-#include "OP_FunctionsTriggers.h"
-#include "OP_IO.h"
-#include "OP_PPMDecode.h"
-#include "OP_SBusDecode.h"
-#include "OP_iBusDecode.h"
-#include "OP_Motors.h"
-#include "OP_Servo.h"
-#include "OP_Sabertooth.h"
-#include "OP_PololuQik.h"
-#include "OP_Scout.h"
-#include "OP_SimpleTimer.h"
-#include "OP_Driver.h"
-#include "OP_IRLib.h"
-#include "OP_IRLibMatch.h"
-#include "OP_Sound.h"
-#include "OP_TBS.h"
-#include "OP_Button.h"
-#include "OP_EEPROM.h"
 #include "EEPROMex.h"
-#include "OP_Radio.h"
-#include "OP_Tank.h"
-#include "OP_PCComm.h"
+#include "src/OP_Settings/OP_Settings.h"
+#include "src/OP_FT/OP_FunctionsTriggers.h"
+#include "src/OP_IO/OP_IO.h"
+#include "src/OP_PPMDecode/OP_PPMDecode.h"
+#include "src/OP_SBusDecode/OP_SBusDecode.h"
+#include "src/OP_IBusDecode/OP_iBusDecode.h"
+#include "src/OP_Motors/OP_Motors.h"
+#include "src/OP_Servo/OP_Servo.h"
+#include "src/OP_Sabertooth/OP_Sabertooth.h"
+#include "src/OP_PololuQik/OP_PololuQik.h"
+#include "src/OP_Scout/OP_Scout.h"
+#include "src/OP_SimpleTimer/OP_SimpleTimer.h"
+#include "src/OP_Driver/OP_Driver.h"
+#include "src/OP_IRLib/OP_IRLib.h"
+#include "src/OP_IRLib/OP_IRLibMatch.h"
+#include "src/OP_Sound/OP_Sound.h"
+#include "src/OP_TBS/OP_TBS.h"
+#include "src/OP_Button/OP_Button.h"
+#include "src/OP_EEPROM/OP_EEPROM.h"
+#include "src/OP_Radio/OP_Radio.h"
+#include "src/OP_Tank/OP_Tank.h"
+#include "src/OP_PCComm/OP_PCComm.h"
 
 
 // GLOBAL VARIABLES
