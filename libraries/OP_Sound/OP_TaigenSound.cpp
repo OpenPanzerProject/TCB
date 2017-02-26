@@ -21,7 +21,7 @@
  *
  */ 
 
-#include <OP_Sound.h>
+#include "OP_Sound.h"
 
 
 volatile uint16_t OP_TaigenSound::command; 

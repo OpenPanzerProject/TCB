@@ -25,7 +25,7 @@
  *
  */ 
 
-#include <OP_TBS.h>
+#include "OP_TBS.h"
  
 // Static variables must be initialized outside the class 
 OP_SimpleTimer * OP_TBS::TBSTimer;

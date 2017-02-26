@@ -18,7 +18,7 @@
  */ 
  
 
-#include <OP_Motors.h>
+#include "OP_Motors.h"
 
 
 // Return a character string of the name of the weight class, used for printing

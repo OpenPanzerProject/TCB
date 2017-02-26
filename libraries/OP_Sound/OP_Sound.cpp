@@ -18,7 +18,7 @@
  */ 
  
 
-#include <OP_Sound.h>
+#include "OP_Sound.h"
 
 // Little function to help us print out actual sound device names, rather than numbers. 
 // To use, call something like this:  Serial.print(printSoundDevice(SOUND_DEVICE))

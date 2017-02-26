@@ -22,7 +22,7 @@
  *
  */ 
 
-#include <OP_Sound.h>
+#include "OP_Sound.h"
 
 
 void OP_SoundCard::begin() 

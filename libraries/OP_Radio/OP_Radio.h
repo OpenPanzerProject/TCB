@@ -1,4 +1,4 @@
-/* OP_Radio.h       Open Panzer Radio - radio class for converting PPM pulse widths into more useful (and abstract) channel objects. 
+/* OP_Radio.h       Open Panzer Radio - radio class for converting inputs (from various radio types) into more useful channel objects. 
  * Source:          openpanzer.org              
  * Authors:         Luke Middleton
  *   

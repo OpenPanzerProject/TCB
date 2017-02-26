@@ -17,7 +17,7 @@
  *
  */ 
 
-#include <OP_PCComm.h>
+#include "OP_PCComm.h"
 
 
 // Static variables must be declared outside the class

@@ -18,7 +18,7 @@
  */  
 
 
-#include <OP_Tank.h>
+#include "OP_Tank.h"
 
 // Static variables must be declared outside the class
 battle_settings OP_Tank::BattleSettings;
