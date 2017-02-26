@@ -89,9 +89,13 @@ void SBusDecode::begin()
     SBUS_UCSRB = 0x90;                  // Rx interrupt enabled, Rx enabled, TX disabled, only 8 bits
 
     // Timer 1 
-    // SBusDecode uses Timer 1 Compare C interrupt. Timer 1 is setup in the main sketch, using a macro defined in OP_Settings.h
-    // But we do need to enable the Output Compare C interrupt by setting the bit in the Timer 1 Interrupt MaSK register.
-    TIMSK1 |= (1 << OCIE1C);        
+    // SBusDecode uses Timer 1 Compare C (OCR1C). Timer 1 is setup in the main sketch, using a macro defined in OP_Settings.h
+    // We can set OCR1C to some time in the future, and the OCF1C flag (Output Compare match flag) of the TIFR1 (Timer 1 Interrupt Flag Register)
+    // will get set when that time is reached. We can use this flag to determine if the timing of our incoming pulse stream is correct. 
+    // Note: you could also set an interrupt to occur when this flag is set, which is a frequent application, but we do not need it here! 
+    // NOTE: Even worse, if you enable the output compare interrupt but do not specify an ISR, the IDE will NOT warn you about it, but will go off
+    // and choose an ISR maybe defined somewhere else in some unrelated library or who knows, and you will get all kinds of random and inexplicable behavior!
+    // Don't ask us how many countless hours we spent trying to troubleshoot this one! 
 
     // Other initializations
     State = NOT_SYNCHED_state;                          // Decoder not yet synched
