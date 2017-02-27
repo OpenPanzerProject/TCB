@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "EEPROMex.h"
 #include "src/OP_Settings/OP_Settings.h"
 #include "src/OP_FT/OP_FunctionsTriggers.h"
 #include "src/OP_IO/OP_IO.h"
@@ -47,6 +46,10 @@
 #include "src/OP_Radio/OP_Radio.h"
 #include "src/OP_Tank/OP_Tank.h"
 #include "src/OP_PCComm/OP_PCComm.h"
+// It would be nice to just have the user install the EEPROMex library through Arduino library manager, 
+// but we actually need to make a change to the default settings, so we include a copy in our own src folder.
+// You must comment-out the "#define _EEPROMEX_DEBUG" line in EEPROMex.cpp
+#include "src/EEPROMex/EEPROMex.h"   
 
 
 // GLOBAL VARIABLES
@@ -594,8 +597,8 @@ if (Startup)
         Startup = false;    
 
     // Turn off the Red LED to let the user know startup is complete
-    RedLedOff();
-//    GreenBlinkFast(1);  // Blink the green LED once - this means we are ready for business. 
+        RedLedOff();
+
 } 
 // End of Startup loop - it won't be run again
 
@@ -642,6 +645,8 @@ if (Startup)
                             break;        
                         case 3: 
                             // Reserved for future use
+                            // ACTUALLY, we are reverting back to TBS Setup for the time being since Benedini is taking longer than expected to release Flash v3
+                            TBS_Setup();
                             break;
                         case 4: 
                             // Recoil servo setup
