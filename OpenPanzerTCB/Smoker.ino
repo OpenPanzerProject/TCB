@@ -100,8 +100,8 @@ void Smoker_SetDestroyedSpeed()
     }
 }
 
-// This function is called if the user wants to control the smoker output manually. Any motor could be attached to the output and run 
-// in a single direction at variable speed with an analog input. 
+// These functions are called if the user wants to control the smoker output manually. Any motor could be attached to the output and run 
+// in a single direction at variable speed with an analog input (or dim a high-current light)
 void Smoker_ManualControl(uint16_t level)
 {
     // This should be prevented from other sanity checking, but just in case, don't allow this function to do anything
@@ -113,3 +113,18 @@ void Smoker_ManualControl(uint16_t level)
     }
 }
 
+void Smoker_ManualOn()
+{
+    if (eeprom.ramcopy.SmokerControlAuto == false)
+    {   
+        Smoker->setSpeed(MOTOR_MAX_FWDSPEED);
+    }
+}
+
+void Smoker_ManualOff()
+{
+    if (eeprom.ramcopy.SmokerControlAuto == false)
+    {   
+        Smoker->setSpeed(0);
+    }
+}

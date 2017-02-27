@@ -83,7 +83,9 @@ void LoadFunctionTriggers()
                 case SF_TURNMODE_1:                 SF_Callback[i] = &SF_TurnMode1;                                 break;                    
                 case SF_TURNMODE_2:                 SF_Callback[i] = &SF_TurnMode2;                                 break;                    
                 case SF_TURNMODE_3:                 SF_Callback[i] = &SF_TurnMode3;                                 break;                    
-                case SF_SMOKER:                     SF_Callback[i] = &Smoker_ManualControl;                         break; // Analog function
+                case SF_SMOKER:                     SF_Callback[i] = &Smoker_ManualControl;                         break; // Analog function for controlling speed of smoker output (could be a motor or light or whatever)
+                case SF_SMOKER_ON:                  SF_Callback[i] = &SF_Smoker_ManualOn;                           break; 
+                case SF_SMOKER_OFF:                 SF_Callback[i] = &SF_Smoker_ManualOff;                          break;
                 case SF_MOTOR_A:                    SF_Callback[i] = &MotorA_ManualControl;                         break; // Analog function
                 case SF_MOTOR_B:                    SF_Callback[i] = &MotorB_ManualControl;                         break; // Analog function
                 case SF_RC1_PASS:                   SF_Callback[i] = &RC_Passthrough_1;                             break; // Analog function
@@ -421,6 +423,8 @@ void SF_DriveProfile_Toggle(uint16_t ignoreMe)  { ToggleDrivingProfile();   }
 void SF_Smoker_Enable(uint16_t ignoreMe)        { EnableSmoker();           }
 void SF_Smoker_Disable(uint16_t ignoreMe)       { DisableSmoker();          }
 void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }
+void SF_Smoker_ManualOn(uint16_t ignoreMe)      { Smoker_ManualOn();        }
+void SF_Smoker_ManualOff(uint16_t ignoreMe)     { Smoker_ManualOff();       }
 void SF_IncreaseVolume(uint16_t ignoreMe)       { IncreaseVolume();         }
 void SF_DecreaseVolume(uint16_t ignoreMe)       { DecreaseVolume();         }
 void SF_StopVolume(uint16_t ignoreMe)           { StopVolume();             }

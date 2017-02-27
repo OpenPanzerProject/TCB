@@ -37,7 +37,7 @@
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
 
-const byte COUNT_SPECFUNCTIONS  = 101;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 103;   // Count of special functions. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -93,7 +93,7 @@ enum _special_function : byte {
     SF_TURNMODE_1       = 49,       // 49
     SF_TURNMODE_2       = 50,       // 50
     SF_TURNMODE_3       = 51,       // 51
-    SF_SMOKER           = 52,       // 52   -- analog function
+    SF_SMOKER           = 52,       // 52   -- analog function, sets the speed of the smoker manually -- see also 101-102 for on/off digital functions
     SF_MOTOR_A          = 53,       // 53   -- analog function
     SF_MOTOR_B          = 54,       // 54   -- analog function
     SF_RC1_PASS         = 55,       // 55   -- analog function ("PASS" for pass-through) -- see also 92-97 for pass-throughs 6-8
@@ -141,7 +141,9 @@ enum _special_function : byte {
     SF_RC8_PASS_PAN     = 97,       // 97   -- analog function    
     SF_INCR_VOLUME      = 98,       // 98
     SF_DECR_VOLUME      = 99,       // 99
-    SF_STOP_VOLUME      = 100       // 100
+    SF_STOP_VOLUME      = 100,      // 100
+    SF_SMOKER_ON        = 101,      // 101  -- see also 52 for analog manual control of smoker output
+    SF_SMOKER_OFF       = 102       // 102
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -159,7 +161,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
- 1                      // 100      
+ 1,1,1                  // 100-102      
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -225,7 +227,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Set Turn Mode = 1",                         // 49
     "Set Turn Mode = 2",                         // 50
     "Set Turn Mode = 3",                         // 51
-    "Smoker - Manual Control",                   // 52
+    "Smoker - Manual Control",                   // 52   -- see also 101-102 for digital on/off manual control of the smoker output
     "Motor A - Manual Control",                  // 53
     "Motor B - Manual Control",                  // 54
     "RC Output 1 - Pass-through",                // 55   -- see also 92-97 for pass-throughs 6-8
@@ -273,7 +275,9 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "RC Output 8 - Pan Servo",                   // 97   
     "Start Increasing Volume",                   // 98
     "Start Decreasing Volume",                   // 99
-    "Stop Changing Volume"                       // 100
+    "Stop Changing Volume",                      // 100
+    "Smoker - Manual On",                        // 101  -- see also 52 for analag manual control of the smoker output speed
+    "Smoker - Manual Off"                        // 102
 };
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
