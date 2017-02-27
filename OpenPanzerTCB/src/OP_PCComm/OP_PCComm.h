@@ -119,7 +119,7 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "EEPROMex.h"
+#include "../EEPROMex/EEPROMex.h"
 #include "../OP_EEPROM/OP_EEPROM.h"
 #include "../OP_Radio/OP_Radio.h"
 #include "../OP_Settings/OP_Settings.h"

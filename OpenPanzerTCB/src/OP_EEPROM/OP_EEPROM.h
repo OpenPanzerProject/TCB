@@ -33,7 +33,7 @@
 #include "../OP_Motors/OP_Motors.h"
 #include "../OP_Driver/OP_Driver.h"
 #include "../OP_Settings/OP_Settings.h"
-#include "EEPROMex.h"   // We use the extended version, not Arduino's built-in EEPROM library. 
+#include "../EEPROMex/EEPROMex.h"   // We use the extended version, not Arduino's built-in EEPROM library. 
 // This one is important. It has the definition of our eeprom struct
 #include "OP_EEPROM_Struct.h"
 
