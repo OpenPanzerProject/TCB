@@ -6,21 +6,19 @@
                              function was already present). 
 0.91.02         02/12/2017 - Updated TBS library for compatibility with the new version of Benedini's TBS Flash (probably v3.x). This adds 4 more sounds, we use one for barrel elevation, 
                              one for a user sound (for a total of 3), and two as dedicated volume increase/decrease functions. 
-0.91.01         02/07/2017 - Added ability to automatically flash the Aux Light output when cannon is fired. Flash will last for user specified time and will be triggered
+0.91.01         02/07/2017 - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                             It is advised to save an OPZ file of your settings before re-flashing.                           
+                           - Added ability to automatically flash the Aux Light output when cannon is fired. Flash will last for user specified time and will be triggered
                              at the correct location in the cannon fire sequence, accounting for any delays the user may have specified under the mechanical recoil option.
                              This option will hopefully be useful for people using an ordinary LED for muzzle flash instead of the high-intensity flash units. The Aux Light
                              could already be flashed with cannon before but it required the user to assign their cannon trigger to the Aux Flash function, not a big deal 
                              but this eliminates that step. 
-                             - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
-0.91.00         02/04/2017 - IMPORTANT NOTE: This release requires OP Config 0.91.00
-                           - Added new drive type specifically for cluch-style gearboxes such as the DKLM RC PDSGB.
+0.91.00         02/04/2017 - Added new drive type specifically for cluch-style gearboxes such as the DKLM RC PDSGB.
                            - Added functionality for OP Config to check what minimum version of OP Config the TCB expects, and what minimum version of TCB firmware OP Config expects. 
                              If either the TCB or OP Config is found to be older than the other is expecting, we will warn the user on TCB connection and remind them to update
                              as appropriate. 
-00.90.24        01/30/2017 - IMPORTANT NOTE: This release requires OP Config 00.90.24
-                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. It is advised 
-                             to save an OPZ file of your settings before re-flashing.
-                           - Corrected a bug introduced with 90.23. ResetBattle() is passed as a void function pointer in the SimpleTimer class, but adding a parameter to the 
+00.90.24        01/30/2017 - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. 
+                             It is advised to save an OPZ file of your settings before re-flashing.- Corrected a bug introduced with 90.23. ResetBattle() is passed as a void function pointer in the SimpleTimer class, but adding a parameter to the 
                              function causes erratic behavior. This was difficult to troubleshoot because newer versions of the Arduino IDE failed to throw an error, however 1.6.8
                              did. We still removed the invulnerability period on first boot but we have corrected the error by simply using a second function instead of adding a parameter
                              to the original.
@@ -33,8 +31,7 @@
                            - Removed the invulnerability period when TCB first boots. This causes endless confusion when you attempt to test IR reception and for the first 
                              10-15 seconds after applying power (depending on weight class) the tank is invulnerable. Invulnerability is really intended to apply only after 
                              the tank has been destroyed and is in the process of regenerating; we don't need it at boot. 
-00.90.22        01/11/2017 - IMPORTANT NOTE: This release requires OP Config 00.90.22
-                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. It is advised 
+00.90.22        01/11/2017 - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed. It is advised 
                              to save an OPZ file of your settings before re-flashing. 
                            - Fixed bug with radio detect routine when being run from within OP_PCComm (sketches timer was not being updated)
                            - Adjusted timing of radio detection to make it feasible to test for all three protocols within the 1 second alloted by OP Config
@@ -55,7 +52,7 @@
 00.90.20        12/15/2016 - Add a Null_Motor drive type, which can be used when the user chooses to detach the turret stick controls 
                              from actually controlling the turret. 
 00.90.19        12/05/2016 - A million things I didn't bother recording during development.
-00.90.16	    4/12/2016  - Fixed debug LED behavior on braking. PCComm class can now try to initialize the radio after communication with 
+00.90.16        04/12/2016 - Fixed debug LED behavior on braking. PCComm class can now try to initialize the radio after communication with 
                              PC has started, in the event the user forgets to turn their radio on until after, or communcation begins before
                              the sketch has a chance to set it up. Fixed machine gun LED pin number, was incorrect for current board. 
 00.90.15        4/02/2016  - Added FlySky iBus support, up to 14 channels. Required board change to Rev 0.19. 
