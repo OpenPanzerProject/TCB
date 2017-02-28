@@ -18,7 +18,7 @@ The processor used on the TCB is an ATmega 2560 and the firmware can be compiled
 ### 1. Get the Code
 
 #### Fork the Repo 
-If you would like to contribute your changes back to the project (we hope you will!), you need to "fork" this repo and use Git to submit pull requests. A GitHub tutorial is beyond the scope of this introduction but SparkFun has a good one you can read here: [Using GiHub](https://learn.sparkfun.com/tutorials/using-github). 
+If you would like to contribute your changes back to the project, you need to "fork" this repo and use Git to submit pull requests. A GitHub tutorial is beyond the scope of this introduction but SparkFun has a good one you can read here: [Using GiHub](https://learn.sparkfun.com/tutorials/using-github). 
 
 #### Just Download It
 If you just want to make changes for yourself but don't care to contribute them back to the project, you can simply click the green **Clone or download** button at the top of this page, then select **Download ZIP**. 
