@@ -6,7 +6,7 @@
 void UserFunction1(void)
 {
     // Do something here
-
+    // THIS IS A TEST FROM BJIORKEN
     if (DEBUG) DebugSerial->println(F("User Function 1")); 
 }
 
