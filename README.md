@@ -23,7 +23,6 @@ If you would like to contribute your changes back to the project (we hope you wi
 #### Just Download It
 If you just want to make changes for yourself but don't care to contribute them back to the project, you can simply click the green **Clone or download** button at the top of this page, then select **Download ZIP**. 
 ![Download ZIP](http://openpanzer.org/images/github/CloneOrDownloadTCB.png "Download ZIP") 
-Unzip the file on your computer. Inside the ZIP file enter the `TCB-master` folder and:
 
 #### Either Way
 Whether you fork or download, either way you need to locate the **`OpenPanzerTCB`** folder in your Arduino Sketchbook directory. If you don't know where this is you can view its location in the Arduino IDE by going to **File > Preferences > Sketchbook Location**. 
