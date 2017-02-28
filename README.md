@@ -34,10 +34,10 @@ Now you have the source code, we also need to install the board definition files
 Adding our board to the IDE is a simple process. 
   * Open the Arduino IDE and go to **File > Preferences** (or if using OS X, go to Arduino > Preferences). A window will appear like the one shown below: 
 ![Add JSON to Preferences](http://openpanzer.org/images/github/boards/Preferences_JSON.png "Add JSON to Preferences")
-  * Paste the following URL to the 'Additional Boards Manager URLs' input field: 
+  * Paste the following URL into the 'Additional Boards Manager URLs' input field: 
 `https://openpanzerproject.github.io/OpenPanzerBoards/package_openpanzer_index.json`
   * If there are already other entries in that field just add the link at the end separated from the others with a comma. 
-  * Next close the Preferences window, then go to the **Tools** menu and select **Board > Boards Manager**. Once the Board Manager opens, click on the category drop down menu on the top left hand side of the window and select **Contributed** - or, just type "Open Panzer" into the search bar. When you find the Open Panzer Boards option, click on the **Install** button and wait for the process to complete. 
+  * Next close the Preferences window, then go to the **Tools** menu and select **Board > Boards Manager**. Once the Board Manager opens, click on the category drop down menu on the top left hand side of the window and select **Contributed** - or, just type "Open Panzer" into the search bar. When you find the Open Panzer Boards option, click on the **Install** button and wait for the process to complete. If there are multiple versions listed, install the newest one. 
   ![Boards Manager](http://openpanzer.org/images/github/boards/BoardsManager.png "Boards Manager")
   * Finally, **quit and reopen the Arduino IDE** to ensure the new board packages are properly installed. You should now be able to select the new board listed in the **Tools->Board** menu.
   ![TCB Board shown in List](http://openpanzer.org/images/github/boards/BoardList.png "TCB Board shown in List")
