@@ -13,13 +13,26 @@
 If you are not a developer, you probably don't need to worry about anything on this site. Instead [get your own TCB board](http://openpanzer.org/buy), [download the OP Config Windows desktop program](http://www.openpanzer.org/downloads), check out the [OpenPanzer Wiki](http://wiki.openpanzer.org) for instructions, and have fun tanking! 
 
 ## Developers
-The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. If you want to modify the source code you can either A) clone the TCB repository if you are familiar with Git, or B) click the green **Clone or download** button at the top of this page, then select **Download ZIP**. 
+The processor used on the TCB is an ATmega 2560 and the firmware can be compiled in the Arduino IDE. To compile yourself you first have to obtain the code, and you also have to set up the IDE for our board. 
 
-![Download ZIP](http://openpanzer.org/images/github/CloneOrDownloadTCB.png "Download ZIP")
+### 1. Get the Code
 
+#### Fork the Repo 
+If you would like to contribute your changes back to the project (we hope you will!), you need to "fork" this repo and use Git to submit pull requests. A GitHub tutorial is beyond the scope of this introduction but SparkFun has a good one you can read here: [Using GiHub](https://learn.sparkfun.com/tutorials/using-github). 
+
+#### Just Download It
+If you just want to make changes for yourself but don't care to contribute them back to the project, you can simply click the green **Clone or download** button at the top of this page, then select **Download ZIP**. 
+![Download ZIP](http://openpanzer.org/images/github/CloneOrDownloadTCB.png "Download ZIP") 
 Unzip the file on your computer. Inside the ZIP file enter the `TCB-master` folder and:
-  * Copy the **`libraries`** and **`OpenPanzerTCB`** folders to your Arduino Sketchbook directory. If you don't know your sketchbook folder you can view its location in the Arduino IDE by going to **File > Preferences > Sketchbook Location**. You may already have a `libraries` folder in your sketchbook directory - if so, that's fine, just overwrite it (this will simply add the new libraries). 
-  * That gets you the source code, but we also need to install the board definition files in the Arduino IDE. This is a simple process. Open the Arduino IDE and go to **File > Preferences** (or if using OS X, go to Arduino > Preferences). A window will appear like the one shown below: 
+
+#### Either Way
+Whether you fork or download, either way you need to locate the **`OpenPanzerTCB`** folder in your Arduino Sketchbook directory. If you don't know where this is you can view its location in the Arduino IDE by going to **File > Preferences > Sketchbook Location**. 
+  
+### 2. Setup the IDE
+Now you have the source code, we also need to install the board definition files in the Arduino IDE. It's probably best to use the [latest Arduino IDE](https://www.arduino.cc/en/main/software) but any from 1.6.4 theoretically should work. 
+
+Adding our board to the IDE is a simple process. 
+  * Open the Arduino IDE and go to **File > Preferences** (or if using OS X, go to Arduino > Preferences). A window will appear like the one shown below: 
 ![Add JSON to Preferences](http://openpanzer.org/images/github/boards/Preferences_JSON.png "Add JSON to Preferences")
   * Paste the following URL to the 'Additional Boards Manager URLs' input field: 
 `https://openpanzerproject.github.io/OpenPanzerBoards/package_openpanzer_index.json`
