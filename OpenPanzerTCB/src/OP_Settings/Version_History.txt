@@ -1,3 +1,6 @@
+0.92.02         03/03/2017 - Added additional trigger sources - speed-based (vehicle goes above or falls below some user defined speed percentage) and ad-hoc triggers 
+                             (presently the only one is "brakes applied" but we can add up to 16 in the future). These triggers departs from the traditional "input" and represent 
+                             instead "events" from which the user may want other events to be triggered. 
 0.92.01         02/26/2017 - Fixed bug caused by enabling Timer 1 Output Compare C interrupt but not having an ISR defined. These interrupts were enabled in both OP_SBusDecode.cpp
                              and OP_iBusDecode.cpp, but in fact neither were needed. 
                            - Moved all libraries to src subfolder of sketch folder. This will make it much more easier for developers to fork the project. 
