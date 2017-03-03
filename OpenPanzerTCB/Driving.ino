@@ -102,14 +102,7 @@ void EngineOff()
         // Play the engine stop sound
             TankSound->StopEngine();
         // Stop the drive motor(s)
-            switch (eeprom.ramcopy.DriveType)
-            {
-                case DT_TANK:       { RightTread->stop(); LeftTread->stop();     } break;
-                case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
-                case DT_CAR:        { DriveMotor->stop();                        } break;
-                case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
-                default:                                                           break;
-            }            
+            StopDriveMotors();
         // Clear the engine idle timer
             UpdateEngineIdleTimer();  
     }    
@@ -197,17 +190,22 @@ void SF_NT_Toggle(uint16_t ignoreMe)            { Driver.getNeutralTurnAllowed()
 
 // OTHER DRIVING FUNCTIONS
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
+void StopDriveMotors()
+{
+    switch (eeprom.ramcopy.DriveType)
+    {
+        case DT_TANK:       { RightTread->stop(); LeftTread->stop();     }  break;
+        case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     }  break;
+        case DT_CAR:        { DriveMotor->stop();                        }  break;
+        case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); }  break;
+        default:                                                            break;
+    }
+}
+
 void StopEverything()
 {   // We use this in the event of a radio failsafe event, or just as a quick way to stop all movement. 
     // Stop drive motor(s)
-    switch (eeprom.ramcopy.DriveType)
-    {
-        case DT_TANK:       { RightTread->stop(); LeftTread->stop();     } break;
-        case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
-        case DT_CAR:        { DriveMotor->stop();                        } break;
-        case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
-        default:                                                           break;
-    }    
+    StopDriveMotors();
     // We're not moving, so stop the squeaking
     TankSound->StopSqueaks();
     // TBS throttle speed = idle
@@ -222,6 +220,7 @@ void StopEverything()
     // Stop smoker
     StopSmoker();
 }
+
 
 
 
