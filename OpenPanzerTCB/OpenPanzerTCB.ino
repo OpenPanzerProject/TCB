@@ -74,6 +74,7 @@
 // SPECIAL FUNCTIONS AND TRIGGERS
     void_FunctionPointer_uint16 SF_Callback[MAX_FUNCTION_TRIGGERS];  // An array of function pointers that we will tie to our special function triggers. 
     uint8_t triggerCount = 0;                    // How many triggers defined. Will be determined at run time. 
+    uint16_t AdHocTriggers = 0x0000;             // We use individual bits of a 2-byte number to flag up to 16 different ad-hoc triggers. Initialize all to zero.
 
 // I/O PINS
     external_io IO_Pin[NUM_IO_PORTS];            // Information about the general purpose I/O pins
@@ -487,6 +488,8 @@ void loop()
     static int TurnCommand_Previous = 0;                              // Value of turn command last through loop
     static int DriveSpeed = 0;                                        // Differs from Command which is what we are being told by the Tx stick - DriveSpeed is what is being told the motors by software, after modifications to command. 
     static int DriveSpeed_Previous = 0;                               // Previous value of DriveSpeed
+    static uint8_t DriveSpeedPct = 0;
+    static uint8_t DriveSpeedPct_Previous = 0;
     static int ThrottleSpeed = 0;                                     // This will be the RPM of the engine, which is not the same as the drive speed
     static int ThrottleSpeed_Previous = 0;                            // 
     static int RightSpeed = 0;                                        // We also have variables for the speed split between the two tracks
@@ -895,6 +898,8 @@ if (Startup)
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
     if (TankEngine.Running() && HavePower)
     {
+        if (WasRunning == false) { WasRunning = true; }     // Means, we just started the engine running
+        
         // GET DRIVE MODE - COMMANDED & ACTUAL
         // ---------------------------------------------------------------------------------------------------------------------------------------------->
         // This runs faster than the radio updates - so skip it entirely if nothing new has come in
@@ -903,8 +908,6 @@ if (Startup)
             // We set Throttle (engine speed) and Drive (wheel speed) equal to begin with, but they will diverge as we proceed. 
             DriveCommand = ThrottleCommand = Radio.Sticks.Throttle.command;
             TurnCommand = Radio.Sticks.Turn.command;
-
-            if (WasRunning == false) {WasRunning = true;}    // Means, we just started the engine running
             
             // Get drive mode command
             if (!TankTransmission.Engaged())
@@ -1112,6 +1115,15 @@ if (Startup)
             TurnSpeed = Driver.GetDriveSpeed(TurnSpeed, TurnSpeed_Previous, DriveModeActual, Braking);
         }
 
+        // Calculate an absolute percentage of movement (0-100). We will use this for vehicle speed triggers
+        if (DriveSpeed_Previous != DriveSpeed)
+        {
+            if (DriveModeActual == FORWARD)         DriveSpeedPct = map(DriveSpeed, 0, ForwardSpeed_Max, 0, 100);
+            else if (DriveModeActual == REVERSE)    DriveSpeedPct = abs(map(DriveSpeed, 0, ReverseSpeed_Max, 0, -100));
+            else DriveSpeedPct = 0; // Ignore for stop or neutral turns
+        }
+           
+
         // GET AND SET THROTTLE SPEED
         // ---------------------------------------------------------------------------------------------------------------------------------------------->
         // Now we also calculate the throttle (engine speed). This is not the same as the DriveSpeed! Throttle speed can be different from drive speed for various effects. 
@@ -1155,15 +1167,7 @@ if (Startup)
                 DriveMode_LastDirection = DriveMode_Previous;    // We will use this to allow starts in the same direction without waiting for shift timer
                 DriveFlag = false;                               // Disable driving for TimeToShift_MS
                 TransitionStart = millis();                      // Start shift timer
-                // Kill the motor(s)
-                switch (eeprom.ramcopy.DriveType)
-                {
-                    case DT_TANK:       { RightTread->stop(); LeftTread->stop();     }  break;
-                    case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     }  break;
-                    case DT_CAR:        { DriveMotor->stop();                        }  break;
-                    case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); }  break;
-                    default:                                                            break;
-                }
+                StopDriveMotors();                               // Kill the motor(s)
             }
             
             // We're not moving, so stop the squeaking
@@ -1244,14 +1248,7 @@ if (Startup)
             TurnSpeed = 0;
             RightSpeed = 0;
             LeftSpeed = 0;
-            switch (eeprom.ramcopy.DriveType)
-            {
-                case DT_TANK:       { RightTread->stop(); LeftTread->stop();     } break;
-                case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     } break;
-                case DT_CAR:        { DriveMotor->stop();                        } break;
-                case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); } break;
-                default:                                                           break;
-            }
+            StopDriveMotors();
             DriveModeActual = STOP;
             Braking = false;
             BrakeLightsOff();      // Don't leave the brake lights on when the engine stops
@@ -1321,6 +1318,37 @@ if (Startup)
                         SF_Callback[t](IO_Pin[io].inputValue);
                     }
             }
+
+            // We also have triggers based on vehicle speed. Only bother checking if the speed has changed
+            if (DriveSpeedPct != DriveSpeedPct_Previous)
+            {
+                // Check for triggers based on vehicle speed rising above a given percent
+                if ((eeprom.ramcopy.SF_Trigger[t].TriggerID >= trigger_id_speed_increase) && (eeprom.ramcopy.SF_Trigger[t].TriggerID < trigger_id_speed_increase + trigger_id_speed_range))
+                {   
+                    uint8_t triggerSpeed = eeprom.ramcopy.SF_Trigger[t].TriggerID - trigger_id_speed_increase;  // The remainder is the percent we want to check against
+                    if ((DriveSpeedPct_Previous <= triggerSpeed) && (DriveSpeedPct > triggerSpeed)) SF_Callback[t](0);
+                }
+    
+                // Check for triggers based on vehicle speed falling below a given percent
+                if ((eeprom.ramcopy.SF_Trigger[t].TriggerID >= trigger_id_speed_decrease) && (eeprom.ramcopy.SF_Trigger[t].TriggerID < trigger_id_speed_decrease + trigger_id_speed_range))
+                {   
+                    uint8_t triggerSpeed = eeprom.ramcopy.SF_Trigger[t].TriggerID - trigger_id_speed_decrease;  // The remainder is the percent we want to check against
+                    if ((DriveSpeedPct < triggerSpeed) && (DriveSpeedPct_Previous >= triggerSpeed)) SF_Callback[t](0);
+                }
+            }
+
+            // Ad-hoc triggers. As compared to other triggers which are in essence inputs, these are internal events which advanced users may want to use to trigger further events.
+            // AdHocTriggers is a 2-byte integer. We use each bit (there are 16) as a flag, for a total of 16 ad-hoc triggers. We shift through each bit and check if it is 1, if 
+            // so we call the associated function if one is related to it - we can tell because the Trigger ID will be equal to (trigger_id_adhoc_start + ad-hoc number). 
+            if (AdHocTriggers > 0)
+            {
+                uint16_t adhct = AdHocTriggers;     // Copy because we don't want to shift-out AdHocTriggers itself, since we will be looping through this "t" times
+                for (uint8_t d=0; d<COUNT_ADHOC_TRIGGERS; d++)
+                {   // & 0x0001 masks the right-most bit
+                    if ((adhct & 0x0001) && (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_adhoc_start + d)) { SF_Callback[t](0); }
+                    adhct >>= 1;    // Shift to the next bit (flag)
+                }
+            }
         }
         
         // Finally, sort of a one-off trigger: the user has the option of starting the engine with the throttle channel
@@ -1329,6 +1357,8 @@ if (Startup)
             EngineOn();
         }
     }
+    // Having processed all ad-hoc triggers, we now reset all 16 flags so they don't trip again unless they are explicitly set once more
+    AdHocTriggers = 0; 
 
 
     // BATTLE 
@@ -1543,12 +1573,19 @@ if (Startup)
     
 
 // ====================================================================================================================================================>
+//  SOME AD-HOC TRIGGERS RELATED TO MOVEMENT
+// ====================================================================================================================================================> 
+        if (Braking && !Braking_Previous) { bitSet(AdHocTriggers, ADHOCT_BIT_BRAKES_APPLIED);  }
+
+
+// ====================================================================================================================================================>
 //  SAVE COMMANDS FOR NEXT ITERATION
 // ====================================================================================================================================================>    
     // Set previous variables to current
     DriveModeCommand_Previous = DriveModeCommand;
     DriveMode_Previous = DriveModeActual;
     DriveSpeed_Previous = DriveSpeed;
+    DriveSpeedPct_Previous = DriveSpeedPct;
     TurnSpeed_Previous = TurnSpeed;
     Braking_Previous = Braking;
 

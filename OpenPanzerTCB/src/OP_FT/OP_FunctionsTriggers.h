@@ -25,19 +25,20 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // SPECIAL FUNCTIONS
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// Special functions are actions the user may want to control. Functions are initiated by triggers. You can assign multiple functions to a single trigger, or 
+// multiple triggers to a single function. There are two basic types of functions, which we call "digital" and "analog." These terms are not meant to be taken in a
+// strict technical sense. Digital functions are discrete actions like turn a light on or off or fire the cannon or play a sound. Analog functions typically adjust
+// something along a scale, examples are "set the speed of motor output A" or "set the volume". Digital functions can be assigned to "digital" (discrete) triggers, 
+// typically switches on your transmitter. Analog functions need to be assigned to analog triggers such as a knob or lever on your transmitter (or even a potentiometer
+// attached to one of the general purpose inputs). 
 
-#define trigger_id_multiplier_auxchannel    1000        // Aux channel trigger ID is defined as:
-                                                        // (multiplier * channel number) + (number of switch positions * switch_pos_multiplier) + switch position (1-5)
-#define trigger_id_multiplier_ports         100         // External ports input trigger ID is defined as:
-                                                        // (multipler * port number) + 0/1 (off/on)
-#define switch_pos_multiplier               10          // Move the number of switch positions to the tens slot (the actual position will be in the ones slot)      
-
-#define ANALOG_SPECFUNCTION_MAX_VAL         1023
-#define ANALOG_SPECFUNCTION_CENTER_VAL      511
+#define ANALOG_SPECFUNCTION_MAX_VAL         1023    // Analog functions all take the same range of values from 0-1023. If an analog input (trigger) has a different 
+#define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-
 const byte COUNT_SPECFUNCTIONS  = 103;   // Count of special functions. 
+
+// Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
 // This also means we can't have more than 256 special functions
 enum _special_function : byte {
@@ -166,6 +167,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
 
+// Friendly names for each function, stored in PROGMEM. Used for printint out the serial port. 
 // The FUNCNAME_CHARS set to 41 means each string must be 40 chars or less (the compiler will "helpfully" null-terminate each string, which adds one extra byte). 
 // The approach shown here is a very wasteful way of storing strings since many of our strings are much less than 40 characters long, but it is the only way I have found
 // to store them in FAR program memory and still be able to access them using a reasonable array index, WHILE not needing to make custom modifications to the 
@@ -280,17 +282,56 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Smoker - Manual Off"                        // 102
 };
 
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// FUNCTION TRIGGERS
+// TRIGGERS
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
-#define MAX_FUNCTION_TRIGGERS 40            // Maximum number of triggers we can save
-// An array of MAX_FUNCTION_TRIGGERS of this struct will be saved in EEPROM: 
-typedef struct _functionTrigger {
-    uint16_t TriggerID;                     // Each trigger has an ID
-    _special_function specialFunction;      // The trigger will be linked to a special function in the sketch
+// As discussed above, triggers are the things which are assigned to functions and which cause the function to occur. As with functions there are two basic types of
+// triggers, digital and analog. But there are further types beyond that, which represent essentially the source of the trigger (radio turret stick, general purpose 
+// input pins, radio aux channels, or other esoteric sources). Each trigger has a unique Trigger ID. The Trigger ID is a number which identifies the trigger but which
+// may also contain other information embedded into the number. For example, Trigger ID 6035 identifies radio aux channel #6 (6000), the fact that this channel represents a 
+// 3-position switch (30) and that this trigger occurs when the switch is in position 3 (5 - yes, 5). 
+
+// Trigger ID Ranges    Effective Range
+// 0 - 99               0 - 36              Turret stick positions
+// 100 - 999            100 - 202           General purpose I/O ports A & B (when set to inputs)
+// 1000 - 18999         10021 - 12055       Aux radio channels 1-12
+// 19000 - 19999        19001 - 19016       Ad-hoc triggers 1-16 (these are events rather than inputs)
+// 20000 - 20999        20000 - 20090       Speed increase triggers (when speed rises above a certain level)
+// 21000 - 21999        21001 - 21100       Speed decrease triggers (when speed falls below a certain level)
+// 22000 - 65535                            Unallocated
+
+// Some range definitions
+#define trigger_id_multiplier_ports         100         // External ports input trigger ID is defined as: (multipler_ports * port number) + 0/1 (off/on)
+
+#define trigger_id_multiplier_auxchannel    1000        // Aux channel trigger ID is defined as:
+                                                        // (multiplier_auxchannel * channel number) + (number of switch positions * switch_pos_multiplier) + switch position (1-5)
+#define switch_pos_multiplier               10          // Move the number of switch positions to the tens slot (the actual position will be in the ones slot)  
+
+#define trigger_id_adhoc_start              19000       // Trigger IDs for ad-hoc events. Range FROM trigger_id_adhoc_start TO (trigger_id_adhoc_start + trigger_id_adhoc_range - 1)
+#define trigger_id_adhoc_range              1000
+
+#define trigger_id_speed_increase           20000       // Trigger IDs for speed rising above  a set level. Range FROM trigger_id_speed_increase TO (trigger_id_speed_increase + trigger_id_speed_range - 1)
+#define trigger_id_speed_decrease           21000       // Trigger IDs for speed falling below a set level. Range FROM trigger_id_speed_decrease TO (trigger_id_speed_decrease + trigger_id_speed_range - 1)
+#define trigger_id_speed_range              1000        
+
+
+// Function/Trigger Pair Definition
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+#define MAX_FUNCTION_TRIGGERS 40            // Maximum number of function/trigger pairs we can save
+
+// An array of this struct will be saved in EEPROM and a copy in RAM. 
+// These define function/trigger pairs: 
+typedef struct _functionTrigger 
+{
+    uint16_t TriggerID;                     // Each _functionTrigger has a Trigger ID
+    _special_function specialFunction;      // Each _functionTrigger has a function that will be executed when some input state matches the Trigger ID
 };
 
-// Trigger sources:
+
+// Trigger Sources
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// Trigger sources: these are not needed in TCB firmware but are used by OP Config, we keep a copy here for the fun of it. 
 enum _trigger_source : byte {
     TS_NULL_TRIGGER = 0,   // no trigger
     TS_TURRET_STICK = 1,   // Turret stick
@@ -307,23 +348,42 @@ enum _trigger_source : byte {
     TS_AUX11,              // Aux channel 11
     TS_AUX12,              // Aux channel 12
     TS_INPUT_A,            // External input A (if set to input)
-    TS_INPUT_B             // External input B (if set to input)
+    TS_INPUT_B,            // External input B (if set to input)
+    TS_SPEED_INCR,         // Vehicle speed increases beyond a set point
+    TS_SPEED_DECR,         // Vehicle speed decreased below  a set point
+    TS_ADHC_BRAKES         // Ad-hoc - brakes applied
 };
 
-// Triggers for special functions can be set by the user. The TriggerID lets the program know what event should
-// trigger the special function. Presently TriggerIDs can be turret stick special positions, aux channel inputs, or digital I/O ports (when set to input). 
 
-// In the case of turret stick special positions, the possible TriggerID values are: 
+// Turret Stick Triggers
+//------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// The turret stick can occupy one of 9 positions, each of which can serve as a trigger. 
+// You can see OP_RadioDefines.h for more on the turret stick special positions math. 
+// The possible TriggerID values are: 
     // Top left      = 36    (32+4)
     // Top center    = 34    (32+2)
     // Top right     = 33    (32+1)
     // Middle left   = 20    (16+4)
-    // Middle center = 18    (16+2)    - this is stick untouched
+    // Middle center = 18    (16+2)    - this is stick untouched, assuming your radio self-centers the stick
     // Middle right  = 17    (16+1)
     // Bottom left   = 12    (8+4)
     // Bottom center = 10    (8+2)
     // Bottom right  = 9     (8+1)
 
+
+// General Purpose Input Pins A & B (I/O ports when set to input)
+//------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// Trigger IDs can also be digital I/O ports (when set to input). The TriggerID in that case will be: 
+//   (PortNumber * trigger_id_multiplier_ports) + Input Switch Position
+//   These are always considered 2 position switches so we don't need to include information about the number of positions
+//   For example, the trigger ID for Port B (A = 1, B = 2) in the On position would be: 201
+//   The trigger ID for Port A in the Off position would be 100. 
+// In the case of analog inputs the Trigger ID is simply (PortNumber * trigger_id_multiplier_ports) and the current position (value) of the input 
+// is taken directly from an analog read instruction on the pin rather than being embedded in the Trigger ID itself. 
+
+
+// Radio Aux Channels
+//------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // Trigger IDs can also be digital aux channel inputs. The TriggerID in that case will be: 
 //   (AuxChannelNumber * trigger_id_multiplier_auxchannel) + (NumberOfSwitchPositions * switch_pos_multiplier) + Switch Position    
 //   So for example, if you wanted to trigger a function when the Aux Channel 3 switch is in position 2 of a 2-position switch, 
@@ -331,19 +391,68 @@ enum _trigger_source : byte {
 //   Does that make sense? Remember that positions are always 1-5. If you have a two-position switch, position 1 = 1 and position 2 = 5.
 //   If you have a three position switch, position 1 = 1, position 2 = 3, position 3 = 5. 
 //   If you have a five-position switch, each position equals its own number (1-5)
-
-// Trigger IDs can also be digital I/O ports (when set to input). The TriggerID in that case will be: 
-//   (PortNumber * trigger_id_multiplier_ports) + Input Switch Position
-//   These are always considered 2 position switches so we don't need to include information about the number of positions
-//   For example, the trigger ID for Port B (A = 1, B = 2) in the On position would be: 201
-//   The trigger ID for Port A in the Off position would be 100. 
-
-// Trigger IDs can also be *analog*, in which case they won't have any switch position information and the analog value will be taken
-// from somewhwere besides the Trigger ID itself. 
+// In the case of analog aux channels the Trigger ID is simply (AuxChannelNumber * trigger_id_multiplier_auxchannel) and the current position (value) of the channel
+// is taken from the channel reading itself, not the Trigger ID. 
 
 
+// Speed Increase and Decrease Triggers
+//------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// Speed increase trigger IDs are defined as: 
+//   trigger_id_speed_increase + speed level pct (number from 0-99)
+//   When the vehicle speed changes from a number equal to or less than the set level percent, to a number higher than the set level percent, then the trigger occurs.
+//   The set level is from 0-99 because you can not rise any higher than above 99 percent.
+// Speed decrease trigger IDs are defined as: 
+//   trigger_id_speed_decrease + speed level pct (number from 1-100)
+//   When the vehicle speed changes from a number greater than or equal to the set level percent, to a number lower than the set level percent, then the trigger occurs.
+//   The set level is from 1 to 100 because you can not fall any lower than below 1 percent. 
+
+
+// Ad-Hoc Function Triggers
+//------------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// Ad-Hoc triggers are unlike other triggers in that they are not external inputs (radio channels, literal pin inputs, etc)
+// Instead ad-hoc triggers are typically events that occur within the program, to which we may want to assign some other function/event. 
+// Keep in mind, it doesn't make sense to create an ad-hoc trigger for most events. Consider the creation of an ad-hoc trigger to occur when the cannon 
+// is fired. This could easily be done, and yes, cannon fire is an event that we might want other events to occur at the same time as. But - for the cannon 
+// fire event to occur, you already have to assign a trigger to it (for example, a switch on your transmitter). If you want other things to happen at the 
+// same time, just assign those other events to the same trigger! A trigger can control multiple events, so that is no problem. That would be the most 
+// direct way and no need for us to create additional complexity here. 
+// But in time, who knows, we may think of new events that we want for triggers, so it's good to have a process to implement them. 
+
+// Count of active Ad-Hoc triggers
+#define COUNT_ADHOC_TRIGGERS            1           // This number can not get higher than 16 unless you want to change some methods in the sketch
+
+// Ad-Hoc trigger Flag Masks
+// We don't anticipate needing many ad hoc trigger events. In the Sketch we will use a single 2-byte integer for 16 flags. The sketch sets the appropriate bit when an event occurs, 
+// the flag causes execution of any function with the corresponding trigger ID defined below, and finally the flag bit is cleared after execution for the next round. 
+#define ADHOCT_BIT_BRAKES_APPLIED       0           // Brakes just applied
+//#define ADHOCT_BIT_ etc...
+
+// Ad-Hoc trigger Triggger IDs 
+// The trigger IDs must start at trigger_id_adhoc_start and go up from there, but not exceed (trigger_id_adhoc_start + trigger_id_adhoc_range - 1)
+// In practice they shouldn't even go above 19015 because we only have 16 flags implemented in the sketch.
+#define ADHOC_TRIGGER_BRAKES_APPLIED    trigger_id_adhoc_start + ADHOCT_BIT_BRAKES_APPLIED      // Ad-Hoc Trigger ID  1 - brakes just applied
+//                                      19001                                                   // Ad-Hoc Trigger ID  2
+//                                      19002                                                   // Ad-Hoc Trigger ID  3
+//                                      19003                                                   // Ad-Hoc Trigger ID  4
+//                                      19004                                                   // Ad-Hoc Trigger ID  5
+//                                      19005                                                   // Ad-Hoc Trigger ID  6
+//                                      19006                                                   // Ad-Hoc Trigger ID  7
+//                                      19007                                                   // Ad-Hoc Trigger ID  8
+//                                      19008                                                   // Ad-Hoc Trigger ID  9
+//                                      19009                                                   // Ad-Hoc Trigger ID 10
+//                                      19010                                                   // Ad-Hoc Trigger ID 11
+//                                      19011                                                   // Ad-Hoc Trigger ID 12
+//                                      19012                                                   // Ad-Hoc Trigger ID 13
+//                                      19013                                                   // Ad-Hoc Trigger ID 14
+//                                      19014                                                   // Ad-Hoc Trigger ID 15
+//                                      19015                                                   // Ad-Hoc Trigger ID 16
+
+
+
+// Function Pointers
+//------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // At the top of the sketch we will also create an array of MAX_FUNCTION_TRIGGERS function pointers. 
-// Whenever a _functionTrigger.TriggerID matches some external trigger condition, the function
+// Whenever a _functionTrigger.TriggerID matches some trigger condition, the function
 // in that array matching the same position as the TriggerID in the _functionTrigger array will get called. 
 // Yes, we could put this function pointer in the _functionTrigger struct directly, but we want to save
 // an array of the _functionTrigger struct in EEPROM. This would take up more room and isn't needed in EEPROM.

@@ -9,7 +9,6 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 void LoadFunctionTriggers()
 {
-
     // Here we setup the special functions list. The user can create up to MAX_FUNCTION_TRIGGERS (40 for now) pairs of Triggers-to-Functions.
     // Here we save the callback function address for each trigger. 
     for (int i = 0; i <MAX_FUNCTION_TRIGGERS; i++)
@@ -193,7 +192,7 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
         }
     }
     // Aux RC Channel Trigger
-    else if (TriggerID >= trigger_id_multiplier_auxchannel)
+    else if (TriggerID >= trigger_id_multiplier_auxchannel && TriggerID < trigger_id_adhoc_start)
     {
         int channelNum = TriggerID / trigger_id_multiplier_auxchannel;
         DebugSerial->print(F("Aux Channel "));
@@ -238,6 +237,32 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
             DebugSerial->print(F("Variable"));
             PrintSpaces(PadLength - 25);
         }
+    }
+    // Ad-Hoc Triggers
+    else if (TriggerID >= trigger_id_adhoc_start && TriggerID < (trigger_id_adhoc_start + trigger_id_adhoc_range))
+    {   // The only way to do these is hand-code them, that is why they are called "ad-hoc"
+        switch (TriggerID)
+        {   // The line should equal 29 characters
+            case ADHOC_TRIGGER_BRAKES_APPLIED:  DebugSerial->print(F("Brakes Applied")); PrintSpaces(15); break;
+        }        
+    }
+    // Vehicle speed triggers - increasing speed
+    else if (TriggerID >= trigger_id_speed_increase && TriggerID < (trigger_id_speed_increase + trigger_id_speed_range))        
+    {
+        uint8_t triggerSpeed = TriggerID - trigger_id_speed_increase;  // The remainder is the percent we want to check against
+        DebugSerial->print(F("Speed increases above "));
+        if (triggerSpeed < 10) PrintSpace(); 
+        PrintPct(triggerSpeed); 
+        PrintSpaces(4);
+    }
+    // Vehicle speed triggers - decreasing speed
+    else if (TriggerID >= trigger_id_speed_decrease && TriggerID < (trigger_id_speed_decrease + trigger_id_speed_range))        
+    {
+        uint8_t triggerSpeed = TriggerID - trigger_id_speed_decrease;  // The remainder is the percent we want to check against
+        DebugSerial->print(F("Speed decreases below "));
+        if (triggerSpeed < 10) PrintSpace(); 
+        PrintPct(triggerSpeed); 
+        PrintSpaces(4);
     }
 }
 
