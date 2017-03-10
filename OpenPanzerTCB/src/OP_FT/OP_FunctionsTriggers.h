@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 103;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 109;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -77,7 +77,7 @@ enum _special_function : byte {
     SF_AUXOUT_TOGGLEBLINK = 32,     // 32
     SF_AUXOUT_REVOLVE   = 33,       // 33
     SF_AUXOUT_TOGGLEREVOLVE = 34,   // 34
-    SF_USER_SOUND1_ONCE = 35,       // 35   -- see also 86-91 for user sounds 3 & 4
+    SF_USER_SOUND1_ONCE = 35,       // 35   -- see also 86-91 for user sounds 3 & 4 and 103-108 for user sounds 5 & 6
     SF_USER_SOUND1_RPT  = 36,       // 36
     SF_USER_SOUND1_OFF  = 37,       // 37
     SF_USER_SOUND2_ONCE = 38,       // 38
@@ -128,7 +128,7 @@ enum _special_function : byte {
     SF_SMOKER_DISABLE   = 83,       // 83
     SF_SMOKER_TOGGLE    = 84,       // 84
     SF_SET_VOLUME       = 85,       // 85
-    SF_USER_SOUND3_ONCE = 86,       // 86   -- see also 35-40 for user sounds 1 & 2
+    SF_USER_SOUND3_ONCE = 86,       // 86   -- see also 35-40 for user sounds 1 & 2 and 103-108 for user sounds 5 & 6
     SF_USER_SOUND3_RPT  = 87,       // 87
     SF_USER_SOUND3_OFF  = 88,       // 88
     SF_USER_SOUND4_ONCE = 89,       // 89
@@ -144,7 +144,13 @@ enum _special_function : byte {
     SF_DECR_VOLUME      = 99,       // 99
     SF_STOP_VOLUME      = 100,      // 100
     SF_SMOKER_ON        = 101,      // 101  -- see also 52 for analog manual control of smoker output
-    SF_SMOKER_OFF       = 102       // 102
+    SF_SMOKER_OFF       = 102,      // 102
+    SF_USER_SOUND5_ONCE = 103,      // 103  -- see also 35-40 for user sounds 1 & 2 and 86-91 for user sounds 3 & 4
+    SF_USER_SOUND5_RPT  = 104,      // 104
+    SF_USER_SOUND5_OFF  = 105,      // 105
+    SF_USER_SOUND6_ONCE = 106,      // 106
+    SF_USER_SOUND6_RPT  = 107,      // 107
+    SF_USER_SOUND6_OFF  = 108       // 108    
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -162,7 +168,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
- 1,1,1                  // 100-102      
+ 1,1,1,1,1,1,1,1,1      // 100-108  
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -212,7 +218,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Aux Output - Toggle Blink",                 // 32
     "Aux Output - Revolving Light",              // 33 
     "Aux Output - Toggle Revolving Light",       // 34
-    "User Sound 1 - Play Once",                  // 35   -- see also 86-91 for user sounds 3 & 4
+    "User Sound 1 - Play Once",                  // 35   -- see also 86-91 for user sounds 3 & 4 and 103-108 for user sounds 5 & 6
     "User Sound 1 - Repeat",                     // 36
     "User Sound 1 - Stop",                       // 37
     "User Sound 2 - Play Once",                  // 38
@@ -263,7 +269,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Smoker - Disable",                          // 83
     "Smoker - Toggle",                           // 84
     "Sound Card - Set Volume",                   // 85
-    "User Sound 3 - Play Once",                  // 86   -- see also 35-40 for user sounds 1 & 2
+    "User Sound 3 - Play Once",                  // 86   -- see also 35-40 for user sounds 1 & 2 and 103-108 for user sounds 5 & 6
     "User Sound 3 - Repeat",                     // 87
     "User Sound 3 - Stop",                       // 88
     "User Sound 4 - Play Once",                  // 89
@@ -279,7 +285,13 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Start Decreasing Volume",                   // 99
     "Stop Changing Volume",                      // 100
     "Smoker - Manual On",                        // 101  -- see also 52 for analag manual control of the smoker output speed
-    "Smoker - Manual Off"                        // 102
+    "Smoker - Manual Off",                       // 102
+    "User Sound 5 - Play Once",                  // 103  -- see also 35-40 for user sounds 1 & 2 and 86-91 for user sounds 3 & 4
+    "User Sound 5 - Repeat",                     // 104
+    "User Sound 5 - Stop",                       // 105
+    "User Sound 6 - Play Once",                  // 106
+    "User Sound 6 - Repeat",                     // 107
+    "User Sound 6 - Stop"                        // 108    
 };
 
 

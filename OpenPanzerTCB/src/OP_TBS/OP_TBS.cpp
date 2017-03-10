@@ -386,58 +386,38 @@ void OP_TBS::HeadlightSound(void)
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>
-// USER SOUND #1
+// USER SOUNDS
 //------------------------------------------------------------------------------------------------------------------------>>
-void OP_TBS::UserSound1(void)
+void OP_TBS::UserSound_Play(uint8_t s)
 {
-    TriggerSpecialSound(SOUND_USER_1);
+    switch (s)
+    {
+        case 1: TriggerSpecialSound(SOUND_USER_1); break;
+        case 2: TriggerSpecialSound(SOUND_USER_2); break;
+// ONLY 2 USER SOUNDS IN FLASH v1
+//        case 3: TriggerSpecialSound(SOUND_USER_3); break;
+//        case 4: TriggerSpecialSound(SOUND_USER_4); break;
+//        case 5: TriggerSpecialSound(SOUND_USER_5); break;
+//        case 6: TriggerSpecialSound(SOUND_USER_6); break;
+    }
 }
-void OP_TBS::UserSound1_Repeat(void)
+void OP_TBS::UserSound_Repeat(uint8_t s)
 {
-    TriggerSpecialSound(SOUND_USER_1, false);   // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
-}                                               // until explicitly turned off, or until interrupted by another sound with a higher priority. 
-void OP_TBS::UserSound1_Stop(void)
+    switch (s)
+    {
+        case 1: TriggerSpecialSound(SOUND_USER_1, false); break;    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+        case 2: TriggerSpecialSound(SOUND_USER_2, false); break;    // until explicitly turned off, or until interrupted by another sound with a higher priority. 
+// ONLY 2 USER SOUNDS IN FLASH v1
+//        case 3: TriggerSpecialSound(SOUND_USER_3, false); break;
+//        case 4: TriggerSpecialSound(SOUND_USER_4, false); break;
+//        case 5: TriggerSpecialSound(SOUND_USER_5, false); break;
+//        case 6: TriggerSpecialSound(SOUND_USER_6, false); break;        
+    }
+}
+void OP_TBS::UserSound_Stop(uint8_t)
 {
     StopSpecialSounds();                    
 }                                           
-
-
-//------------------------------------------------------------------------------------------------------------------------>>
-// USER SOUND #2
-//------------------------------------------------------------------------------------------------------------------------>>
-void OP_TBS::UserSound2(void)
-{
-    TriggerSpecialSound(SOUND_USER_2);
-}
-void OP_TBS::UserSound2_Repeat(void)
-{
-    TriggerSpecialSound(SOUND_USER_2, false);   // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
-}                                               // until explicitly turned off, or until interrupted by another sound with a higher priority. 
-void OP_TBS::UserSound2_Stop(void)
-{
-    StopSpecialSounds();                    
-}                                           
-
-
-//------------------------------------------------------------------------------------------------------------------------>>
-// USER SOUND #3
-//------------------------------------------------------------------------------------------------------------------------>>
-void OP_TBS::UserSound3(void)
-{
-    // NO USER SOUND 3 IN FLASH v1
-    //TriggerSpecialSound(SOUND_USER_3);
-}
-void OP_TBS::UserSound3_Repeat(void)
-{
-    // NO USER SOUND 3 IN FLASH v1
-    //TriggerSpecialSound(SOUND_USER_3, false);   // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
-}                                               // until explicitly turned off, or until interrupted by another sound with a higher priority. 
-void OP_TBS::UserSound3_Stop(void)
-{
-    // NO USER SOUND 3 IN FLASH v1
-    //StopSpecialSounds();                    
-}     
-
 
 //------------------------------------------------------------------------------------------------------------------------>>
 // VOLUME
@@ -489,19 +469,36 @@ boolean OP_TBS::AreSqueaksActive(void)
     return AllSqueaks_Active;
 }
 
-
-
-void OP_TBS::SetSqueak1_Interval(unsigned int min, unsigned int max)
+void OP_TBS::SetSqueak_Interval(uint8_t s, unsigned int min, unsigned int max)
 {
-    SQUEAK1_MIN_mS = min;
-    SQUEAK1_MAX_mS = max;
+    switch (s)
+    {
+        case 1: 
+            SQUEAK1_MIN_mS = min;
+            SQUEAK1_MAX_mS = max;            
+            break;
+        case 2: 
+            SQUEAK2_MIN_mS = min;
+            SQUEAK2_MAX_mS = max;            
+            break;
+        case 3: 
+            SQUEAK3_MIN_mS = min;
+            SQUEAK3_MAX_mS = max;            
+            break;
+    }
 }
-void OP_TBS::Squeak1_SetEnabled(boolean enabled)
+void OP_TBS::Squeak_SetEnabled(uint8_t s, boolean enabled)
 {   // This is for enabling the squeak or not, which is a user setting. It is not the same thing
     // as active/inactive (that determines if the squeak is squeaking or just waiting to squeak).
     // If a squeak is disabled, the sound won't play. 
-    Squeak1_Enabled = enabled;
+    switch (s)
+    {
+        case 1: Squeak1_Enabled = enabled; break;
+        case 2: Squeak2_Enabled = enabled; break;
+        case 3: Squeak3_Enabled = enabled; break;
+    }
 }
+
 void OP_TBS::Squeak1(void)
 {
     if (Squeak1_Active)
@@ -528,18 +525,6 @@ void OP_TBS::Squeak1_Pause(void)
 }
 
 
-
-void OP_TBS::SetSqueak2_Interval(unsigned int min, unsigned int max)
-{   
-    SQUEAK2_MIN_mS = min;
-    SQUEAK2_MAX_mS = max;
-}
-void OP_TBS::Squeak2_SetEnabled(boolean enabled)
-{   // This is for enabling the squeak or not, which is a user setting. It is not the same thing
-    // as active/inactive (that determines if the squeak is squeaking or just waiting to squeak).
-    // If a squeak is disabled, the sound won't play. 
-    Squeak2_Enabled = enabled;
-}
 void OP_TBS::Squeak2(void)
 {   
     if (Squeak2_Active)
@@ -566,18 +551,6 @@ void OP_TBS::Squeak2_Pause(void)
 }
 
 
-
-void OP_TBS::SetSqueak3_Interval(unsigned int min, unsigned int max)
-{
-    SQUEAK3_MIN_mS = min;
-    SQUEAK3_MAX_mS = max;
-}
-void OP_TBS::Squeak3_SetEnabled(boolean enabled)
-{   // This is for enabling the squeak or not, which is a user setting. It is not the same thing
-    // as active/inactive (that determines if the squeak is squeaking or just waiting to squeak).
-    // If a squeak is disabled, the sound won't play. 
-    Squeak3_Enabled = enabled;
-}
 void OP_TBS::Squeak3(void)
 {
     if (Squeak3_Active)

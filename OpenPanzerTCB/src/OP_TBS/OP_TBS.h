@@ -173,33 +173,24 @@ public:
     void CannonHit(void);                                   // Play cannon hit sound
     void Destroyed(void);                                   // Play tank destroyed sound
     void HeadlightSound(void);                              // Play the headlight on/off sound
-    void UserSound1(void);                                  // Play user sound 1 once
-    void UserSound1_Repeat(void);                           // Repeat user sound 1
-    void UserSound1_Stop(void);                             // Stop user sound 1
-    void UserSound2(void);                                  // Play user sound 2 once
-    void UserSound2_Repeat(void);                           // Repeat user sound 2
-    void UserSound2_Stop(void);                             // Stop user sound 2
-    void UserSound3(void);                                  // Play user sound 3 once
-    void UserSound3_Repeat(void);                           // Repeat user sound 3
-    void UserSound3_Stop(void);                             // Stop user sound 3
+    void UserSound_Play(uint8_t);                           // Play user sound x once
+    void UserSound_Repeat(uint8_t);                         // Repeat user sound x
+    void UserSound_Stop(uint8_t);                           // Stop user sound x
     void IncreaseVolume(void);                              // Increase volume
     void DecreaseVolume(void);                              // Decrease volume
     void StopVolume(void);                                  // Stop changing volume
                 
     // Set enabled status of certain sounds         
-    void Squeak1_SetEnabled(boolean);                       // Enabled or disable Squeak1 
-    void Squeak2_SetEnabled(boolean);                       // Enabled or disable Squeak2
-    void Squeak3_SetEnabled(boolean);                       // Enabled or disable Squeak3 
     void HeadlightSound_SetEnabled(boolean);                // Headlight sound enabled or not
     void TurretSound_SetEnabled(boolean);                   // Turret sound enabled or not
     void BarrelSound_SetEnabled(boolean);                   // Barrel sound enabled or not
-                
+
+    // Squeak functions
+    void SetSqueak_Interval(uint8_t, unsigned int, unsigned int); // Set squeak interval for squeak x
+    void Squeak_SetEnabled(uint8_t, boolean);               // Enabled or disable Squeak x
     static void StartSqueaks(void);                         // Starts all squeaks
     void StopSqueaks(void);                                 // Stops all squeaks
     boolean AreSqueaksActive(void);                         // Returns true or false if sqeaks are active
-    void SetSqueak1_Interval(unsigned int, unsigned int);
-    void SetSqueak2_Interval(unsigned int, unsigned int);
-    void SetSqueak3_Interval(unsigned int, unsigned int);
     
     // Utilities
     void TeachEncoder(void);

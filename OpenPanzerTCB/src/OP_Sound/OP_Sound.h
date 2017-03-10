@@ -65,34 +65,15 @@ class OP_Sound {
     virtual void HeadlightSound(void) =0;               // Play the headlight on/off sound
     virtual void HeadlightSound_SetEnabled(boolean) =0; // Headlight sound enabled or not
     // User sounds
-    virtual void UserSound1(void) =0;                   // Play user sound 1 once
-    virtual void UserSound1_Repeat(void) =0;            // Repeat user sound 1
-    virtual void UserSound1_Stop(void) =0;              // Stop user sound 1
-    virtual void UserSound2(void) =0;                   // Play user sound 2 once
-    virtual void UserSound2_Repeat(void) =0;            // Repeat user sound 2
-    virtual void UserSound2_Stop(void) =0;              // Stop user sound 2
-    virtual void UserSound3(void) =0;                   // Play user sound 3 once
-    virtual void UserSound3_Repeat(void) =0;            // Repeat user sound 3
-    virtual void UserSound3_Stop(void) =0;              // Stop user sound 3
-    virtual void UserSound4(void) =0;                   // Play user sound 4 once
-    virtual void UserSound4_Repeat(void) =0;            // Repeat user sound 4
-    virtual void UserSound4_Stop(void) =0;              // Stop user sound 4    
+    virtual void UserSound_Play(uint8_t) = 0;           // Play user sound x once
+    virtual void UserSound_Repeat(uint8_t) =0;          // Repeat user sound x
+    virtual void UserSound_Stop(uint8_t) =0;            // Stop user sound x
     // Squeaks  
     virtual void StartSqueaks(void) =0;                 // Starts all squeaks
     virtual void StopSqueaks(void) =0;                  // Stops all squeaks
     virtual boolean AreSqueaksActive(void) =0;          // Returns true or false if sqeaks are active
-    virtual void SetSqueak1_Interval(unsigned int, unsigned int) =0;
-    virtual void SetSqueak2_Interval(unsigned int, unsigned int) =0;
-    virtual void SetSqueak3_Interval(unsigned int, unsigned int) =0;
-    virtual void SetSqueak4_Interval(unsigned int, unsigned int) =0;
-    virtual void SetSqueak5_Interval(unsigned int, unsigned int) =0;
-    virtual void SetSqueak6_Interval(unsigned int, unsigned int) =0;    
-    virtual void Squeak1_SetEnabled(boolean) =0;        // Enabled or disable Squeak1 
-    virtual void Squeak2_SetEnabled(boolean) =0;        // Enabled or disable Squeak2
-    virtual void Squeak3_SetEnabled(boolean) =0;        // Enabled or disable Squeak3 
-    virtual void Squeak4_SetEnabled(boolean) =0;        // Enabled or disable Squeak4 
-    virtual void Squeak5_SetEnabled(boolean) =0;        // Enabled or disable Squeak5
-    virtual void Squeak6_SetEnabled(boolean) =0;        // Enabled or disable Squeak6    
+    virtual void SetSqueak_Interval(uint8_t, unsigned int, unsigned int) =0;    // squeak num, min interval, max interval
+    virtual void Squeak_SetEnabled(uint8_t, boolean) =0;// Enabled or disable Squeak x
     // Beeps
     virtual void Beep(void) =0;                         // Beep once
     virtual void Beeps(uint8_t) =0;                     // Beep number of times in a row
@@ -144,34 +125,15 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void HeadlightSound(void)                                   { OP_TBS::HeadlightSound();            }
     void HeadlightSound_SetEnabled(boolean b)                   { OP_TBS::HeadlightSound_SetEnabled(b);}
   // User Sounds
-    void UserSound1(void)                                       { OP_TBS::UserSound1();                }
-    void UserSound1_Repeat(void)                                { OP_TBS::UserSound1_Repeat();         }
-    void UserSound1_Stop(void)                                  { OP_TBS::UserSound1_Stop();           }
-    void UserSound2(void)                                       { OP_TBS::UserSound2();                }
-    void UserSound2_Repeat(void)                                { OP_TBS::UserSound2_Repeat();         }
-    void UserSound2_Stop(void)                                  { OP_TBS::UserSound2_Stop();           }
-    void UserSound3(void)                                       { OP_TBS::UserSound3();                }
-    void UserSound3_Repeat(void)                                { OP_TBS::UserSound3_Repeat();         }
-    void UserSound3_Stop(void)                                  { OP_TBS::UserSound3_Stop();           }
-    void UserSound4(void)                                       { return;                              } // TBS doesn't have user sound 4 for now
-    void UserSound4_Repeat(void)                                { return;                              } // TBS doesn't have user sound 4 for now
-    void UserSound4_Stop(void)                                  { return;                              } // TBS doesn't have user sound 4 for now
+    void UserSound_Play(uint8_t s)                              { OP_TBS::UserSound_Play(s);           }
+    void UserSound_Repeat(uint8_t s)                            { OP_TBS::UserSound_Repeat(s);         }
+    void UserSound_Stop(uint8_t s)                              { OP_TBS::UserSound_Stop(s);           }
   // Squeaks
     void StartSqueaks(void)                                     { OP_TBS::StartSqueaks();              }
     void StopSqueaks(void)                                      { OP_TBS::StopSqueaks();               }
     boolean AreSqueaksActive(void)                              { OP_TBS::AreSqueaksActive();          }
-    void SetSqueak1_Interval(unsigned int a, unsigned int b)    { OP_TBS::SetSqueak1_Interval(a,b);    }
-    void SetSqueak2_Interval(unsigned int a, unsigned int b)    { OP_TBS::SetSqueak2_Interval(a,b);    }
-    void SetSqueak3_Interval(unsigned int a, unsigned int b)    { OP_TBS::SetSqueak3_Interval(a,b);    }
-    void SetSqueak4_Interval(unsigned int, unsigned int)        { return;                              } // TBS doesn't have squeak 4 for now
-    void SetSqueak5_Interval(unsigned int, unsigned int)        { return;                              } // TBS doesn't have squeak 5 for now
-    void SetSqueak6_Interval(unsigned int, unsigned int)        { return;                              } // TBS doesn't have squeak 6 for now
-    void Squeak1_SetEnabled(boolean b)                          { OP_TBS::Squeak1_SetEnabled(b);       }
-    void Squeak2_SetEnabled(boolean b)                          { OP_TBS::Squeak2_SetEnabled(b);       }
-    void Squeak3_SetEnabled(boolean b)                          { OP_TBS::Squeak3_SetEnabled(b);       }
-    void Squeak4_SetEnabled(boolean)                            { return;                              } // TBS doesn't have squeak 4 for now
-    void Squeak5_SetEnabled(boolean)                            { return;                              } // TBS doesn't have squeak 5 for now
-    void Squeak6_SetEnabled(boolean)                            { return;                              } // TBS doesn't have squeak 6 for now
+    void SetSqueak_Interval(uint8_t s, unsigned int a, unsigned int b) { OP_TBS::SetSqueak_Interval(s,a,b); }
+    void Squeak_SetEnabled(uint8_t s, boolean b)                { OP_TBS::Squeak_SetEnabled(s,b);      }
   // Beeps
     void Beep(void)                                             { return; }  // All TBS beeping stuff was removed to make space for another sound
     void Beeps(uint8_t)                                         { return; }  // It may be added back later if the TBS gets an update for use with the TCB
@@ -276,34 +238,15 @@ class OP_SoundCard: public OP_Sound {
     void HeadlightSound(void)                                   { if (_headlightEnabled) command(OPSC_CMD_HEADLIGHT);       }
     void HeadlightSound_SetEnabled(boolean e)                   { _headlightEnabled = e;                                    }
   // User sounds                                  
-    void UserSound1(void)                                       { command(OPSC_CMD_USER_SOUND_PLAY, 0, 1);                  }
-    void UserSound1_Repeat(void)                                { command(OPSC_CMD_USER_SOUND_REPEAT, 0, 1);                }
-    void UserSound1_Stop(void)                                  { command(OPSC_CMD_USER_SOUND_STOP, 0, 1);                  }
-    void UserSound2(void)                                       { command(OPSC_CMD_USER_SOUND_PLAY, 0, 2);                  }
-    void UserSound2_Repeat(void)                                { command(OPSC_CMD_USER_SOUND_REPEAT, 0, 2);                }
-    void UserSound2_Stop(void)                                  { command(OPSC_CMD_USER_SOUND_STOP, 0, 2);                  }
-    void UserSound3(void)                                       { command(OPSC_CMD_USER_SOUND_PLAY, 0, 3);                  }
-    void UserSound3_Repeat(void)                                { command(OPSC_CMD_USER_SOUND_REPEAT, 0, 3);                }
-    void UserSound3_Stop(void)                                  { command(OPSC_CMD_USER_SOUND_STOP, 0, 3);                  }
-    void UserSound4(void)                                       { command(OPSC_CMD_USER_SOUND_PLAY, 0, 4);                  }
-    void UserSound4_Repeat(void)                                { command(OPSC_CMD_USER_SOUND_REPEAT, 0, 4);                }
-    void UserSound4_Stop(void)                                  { command(OPSC_CMD_USER_SOUND_STOP, 0, 4);                  }
+    void UserSound_Play(uint8_t s)                              { command(OPSC_CMD_USER_SOUND_PLAY, 0, s);                  }
+    void UserSound_Repeat(uint8_t s)                            { command(OPSC_CMD_USER_SOUND_REPEAT, 0, s);                }
+    void UserSound_Stop(uint8_t s)                              { command(OPSC_CMD_USER_SOUND_STOP, 0, s);                  }
   // Squeaks                
     void StartSqueaks(void)                                     { if (_squeaksActive == false) { command(OPSC_CMD_SQUEAKS_START); _squeaksActive = true; } } 
     void StopSqueaks(void)                                      { if (_squeaksActive == true)  { command(OPSC_CMD_SQUEAKS_STOP);  _squeaksActive = false;} }
     boolean AreSqueaksActive(void)                              { return _squeaksActive;                                    }
-    void SetSqueak1_Interval(unsigned int i, unsigned int a)    { SendSqueakIntervals(i, a, 1);                             }
-    void SetSqueak2_Interval(unsigned int i, unsigned int a)    { SendSqueakIntervals(i, a, 2);                             }
-    void SetSqueak3_Interval(unsigned int i, unsigned int a)    { SendSqueakIntervals(i, a, 3);                             }
-    void SetSqueak4_Interval(unsigned int i, unsigned int a)    { SendSqueakIntervals(i, a, 4);                             }
-    void SetSqueak5_Interval(unsigned int i, unsigned int a)    { SendSqueakIntervals(i, a, 5);                             }
-    void SetSqueak6_Interval(unsigned int i, unsigned int a)    { SendSqueakIntervals(i, a, 6);                             }
-    void Squeak1_SetEnabled(boolean e)                          { command(OPSC_CMD_SQUEAK_ENABLE, e, 1);                    }
-    void Squeak2_SetEnabled(boolean e)                          { command(OPSC_CMD_SQUEAK_ENABLE, e, 2);                    }
-    void Squeak3_SetEnabled(boolean e)                          { command(OPSC_CMD_SQUEAK_ENABLE, e, 3);                    }
-    void Squeak4_SetEnabled(boolean e)                          { command(OPSC_CMD_SQUEAK_ENABLE, e, 4);                    }
-    void Squeak5_SetEnabled(boolean e)                          { command(OPSC_CMD_SQUEAK_ENABLE, e, 5);                    }
-    void Squeak6_SetEnabled(boolean e)                          { command(OPSC_CMD_SQUEAK_ENABLE, e, 6);                    }
+    void SetSqueak_Interval(uint8_t s, unsigned int i, unsigned int a) { SendSqueakIntervals(i, a, s);                      }
+    void Squeak_SetEnabled(uint8_t s, boolean e)                { command(OPSC_CMD_SQUEAK_ENABLE, e, s);                    }    
   // Beeps          
     void Beep(void)                                             { command(OPSC_CMD_BEEP_ONCE);                              }
     void Beeps(uint8_t x)                                       { command(OPSC_CMD_BEEP_X, x);                              }
@@ -427,34 +370,15 @@ class OP_TaigenSound: public OP_Sound {
     void HeadlightSound(void)                                   { return;               }
     void HeadlightSound_SetEnabled(boolean e)                   { return;               }
   // User sounds                                                                        
-    void UserSound1(void)                                       { return;               }
-    void UserSound1_Repeat(void)                                { return;               }
-    void UserSound1_Stop(void)                                  { return;               }
-    void UserSound2(void)                                       { return;               }
-    void UserSound2_Repeat(void)                                { return;               }
-    void UserSound2_Stop(void)                                  { return;               }
-    void UserSound3(void)                                       { return;               }
-    void UserSound3_Repeat(void)                                { return;               }
-    void UserSound3_Stop(void)                                  { return;               }
-    void UserSound4(void)                                       { return;               }
-    void UserSound4_Repeat(void)                                { return;               }
-    void UserSound4_Stop(void)                                  { return;               }
+    void UserSound_Play(uint8_t)                                { return;               }
+    void UserSound_Repeat(uint8_t)                              { return;               }
+    void UserSound_Stop(uint8_t)                                { return;               }
   // Squeaks                                                                            
     void StartSqueaks(void)                                     { return;               }
     void StopSqueaks(void)                                      { return;               }
     boolean AreSqueaksActive(void)                              { return false;         }
-    void SetSqueak1_Interval(unsigned int i, unsigned int a)    { return;               }
-    void SetSqueak2_Interval(unsigned int i, unsigned int a)    { return;               }
-    void SetSqueak3_Interval(unsigned int i, unsigned int a)    { return;               }
-    void SetSqueak4_Interval(unsigned int i, unsigned int a)    { return;               }
-    void SetSqueak5_Interval(unsigned int i, unsigned int a)    { return;               }
-    void SetSqueak6_Interval(unsigned int i, unsigned int a)    { return;               }
-    void Squeak1_SetEnabled(boolean e)                          { return;               }
-    void Squeak2_SetEnabled(boolean e)                          { return;               }
-    void Squeak3_SetEnabled(boolean e)                          { return;               }
-    void Squeak4_SetEnabled(boolean e)                          { return;               }
-    void Squeak5_SetEnabled(boolean e)                          { return;               }
-    void Squeak6_SetEnabled(boolean e)                          { return;               }
+    void SetSqueak_Interval(uint8_t, unsigned int, unsigned int){ return;               }
+    void Squeak_SetEnabled(uint8_t, boolean)                    { return;               }
   // Beeps                                                                              
     void Beep(void)                                             { return;               }
     void Beeps(uint8_t x)                                       { return;               }

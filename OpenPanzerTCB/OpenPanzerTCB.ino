@@ -311,19 +311,19 @@ void setup()
     // SETUP SOUND STUFF
     // -------------------------------------------------------------------------------------------------------------------------------------------------->            
         // We retreived our squeak intervals from EEPROM, now load into the sound object
-        TankSound->SetSqueak1_Interval(eeprom.ramcopy.Squeak1_MinInterval_mS, eeprom.ramcopy.Squeak1_MaxInterval_mS);
-        TankSound->SetSqueak2_Interval(eeprom.ramcopy.Squeak2_MinInterval_mS, eeprom.ramcopy.Squeak2_MaxInterval_mS);
-        TankSound->SetSqueak3_Interval(eeprom.ramcopy.Squeak3_MinInterval_mS, eeprom.ramcopy.Squeak3_MaxInterval_mS);
-        TankSound->SetSqueak4_Interval(eeprom.ramcopy.Squeak4_MinInterval_mS, eeprom.ramcopy.Squeak4_MaxInterval_mS);
-        TankSound->SetSqueak5_Interval(eeprom.ramcopy.Squeak5_MinInterval_mS, eeprom.ramcopy.Squeak5_MaxInterval_mS);
-        TankSound->SetSqueak6_Interval(eeprom.ramcopy.Squeak6_MinInterval_mS, eeprom.ramcopy.Squeak6_MaxInterval_mS);          
+        TankSound->SetSqueak_Interval(1, eeprom.ramcopy.Squeak1_MinInterval_mS, eeprom.ramcopy.Squeak1_MaxInterval_mS);
+        TankSound->SetSqueak_Interval(2, eeprom.ramcopy.Squeak2_MinInterval_mS, eeprom.ramcopy.Squeak2_MaxInterval_mS);
+        TankSound->SetSqueak_Interval(3, eeprom.ramcopy.Squeak3_MinInterval_mS, eeprom.ramcopy.Squeak3_MaxInterval_mS);
+        TankSound->SetSqueak_Interval(4, eeprom.ramcopy.Squeak4_MinInterval_mS, eeprom.ramcopy.Squeak4_MaxInterval_mS);
+        TankSound->SetSqueak_Interval(5, eeprom.ramcopy.Squeak5_MinInterval_mS, eeprom.ramcopy.Squeak5_MaxInterval_mS);
+        TankSound->SetSqueak_Interval(6, eeprom.ramcopy.Squeak6_MinInterval_mS, eeprom.ramcopy.Squeak6_MaxInterval_mS);          
         // Also whether squeaks are even enabled
-        TankSound->Squeak1_SetEnabled(eeprom.ramcopy.Squeak1_Enabled);
-        TankSound->Squeak2_SetEnabled(eeprom.ramcopy.Squeak2_Enabled);
-        TankSound->Squeak3_SetEnabled(eeprom.ramcopy.Squeak3_Enabled);
-        TankSound->Squeak4_SetEnabled(eeprom.ramcopy.Squeak4_Enabled);
-        TankSound->Squeak5_SetEnabled(eeprom.ramcopy.Squeak5_Enabled);
-        TankSound->Squeak6_SetEnabled(eeprom.ramcopy.Squeak6_Enabled);        
+        TankSound->Squeak_SetEnabled(1, eeprom.ramcopy.Squeak1_Enabled);
+        TankSound->Squeak_SetEnabled(2, eeprom.ramcopy.Squeak2_Enabled);
+        TankSound->Squeak_SetEnabled(3, eeprom.ramcopy.Squeak3_Enabled);
+        TankSound->Squeak_SetEnabled(4, eeprom.ramcopy.Squeak4_Enabled);
+        TankSound->Squeak_SetEnabled(5, eeprom.ramcopy.Squeak5_Enabled);
+        TankSound->Squeak_SetEnabled(6, eeprom.ramcopy.Squeak6_Enabled);        
         // And whether some other sounds are enabled
         TankSound->HeadlightSound_SetEnabled(eeprom.ramcopy.HeadlightSound_Enabled);
         TankSound->TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);

@@ -71,6 +71,12 @@ void LoadFunctionTriggers()
                 case SF_USER_SOUND4_ONCE:           SF_Callback[i] = &SF_TriggerUserSound4;                         break;
                 case SF_USER_SOUND4_RPT:            SF_Callback[i] = &SF_UserSound4_Repeat;                         break;
                 case SF_USER_SOUND4_OFF:            SF_Callback[i] = &SF_UserSound4_Stop;                           break;
+                case SF_USER_SOUND5_ONCE:           SF_Callback[i] = &SF_TriggerUserSound5;                         break;
+                case SF_USER_SOUND5_RPT:            SF_Callback[i] = &SF_UserSound5_Repeat;                         break;
+                case SF_USER_SOUND5_OFF:            SF_Callback[i] = &SF_UserSound5_Stop;                           break;
+                case SF_USER_SOUND6_ONCE:           SF_Callback[i] = &SF_TriggerUserSound6;                         break;
+                case SF_USER_SOUND6_RPT:            SF_Callback[i] = &SF_UserSound6_Repeat;                         break;
+                case SF_USER_SOUND6_OFF:            SF_Callback[i] = &SF_UserSound6_Stop;                           break;
                 case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
@@ -427,6 +433,12 @@ void SF_UserSound3_Stop(uint16_t ignoreMe)      { UserSound3_Stop();        }
 void SF_TriggerUserSound4(uint16_t ignoreMe)    { TriggerUserSound4();      }
 void SF_UserSound4_Repeat(uint16_t ignoreMe)    { UserSound4_Repeat();      }
 void SF_UserSound4_Stop(uint16_t ignoreMe)      { UserSound4_Stop();        }
+void SF_TriggerUserSound5(uint16_t ignoreMe)    { TriggerUserSound5();      }
+void SF_UserSound5_Repeat(uint16_t ignoreMe)    { UserSound5_Repeat();      }
+void SF_UserSound5_Stop(uint16_t ignoreMe)      { UserSound5_Stop();        }
+void SF_TriggerUserSound6(uint16_t ignoreMe)    { TriggerUserSound6();      }
+void SF_UserSound6_Repeat(uint16_t ignoreMe)    { UserSound6_Repeat();      }
+void SF_UserSound6_Stop(uint16_t ignoreMe)      { UserSound6_Stop();        }
 void SF_PortA_Toggle(uint16_t ignoreMe)         { PortA_Toggle();           }
 void SF_PortA_On(uint16_t ignoreMe)             { PortA_On();               }
 void SF_PortA_Off(uint16_t ignoreMe)            { PortA_Off();              }

@@ -157,66 +157,98 @@ void StopVolume(void)
 
 void TriggerUserSound1()
 {
-    TankSound->UserSound1();
+    TankSound->UserSound_Play(1);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("1")); }
 }
 void UserSound1_Repeat()
 {
-    TankSound->UserSound1_Repeat();
+    TankSound->UserSound_Repeat(1);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("1 - Start Repeating")); }
 }
 void UserSound1_Stop()
 {
-    TankSound->UserSound1_Stop();
+    TankSound->UserSound_Stop(1);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("1 - Stop")); }
 }
 
 void TriggerUserSound2()
 {
-    TankSound->UserSound2();
+    TankSound->UserSound_Play(2);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2")); }
 }
 void UserSound2_Repeat()
 {
-    TankSound->UserSound2_Repeat();
+    TankSound->UserSound_Repeat(2);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2 - Start Repeating")); }
 }
 void UserSound2_Stop()
 {
-    TankSound->UserSound2_Stop();
+    TankSound->UserSound_Stop(2);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("2 - Stop")); }
 }
 
 void TriggerUserSound3()
 {
-    TankSound->UserSound3();
+    TankSound->UserSound_Play(3);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("3")); }
 }
 void UserSound3_Repeat()
 {
-    TankSound->UserSound3_Repeat();
+    TankSound->UserSound_Repeat(3);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("3 - Start Repeating")); }
 }
 void UserSound3_Stop()
 {
-    TankSound->UserSound3_Stop();
+    TankSound->UserSound_Stop(3);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("3 - Stop")); }
 }
 
 void TriggerUserSound4()
 {
-    TankSound->UserSound4();
+    TankSound->UserSound_Play(4);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("4")); }
 }
 void UserSound4_Repeat()
 {
-    TankSound->UserSound4_Repeat();
+    TankSound->UserSound_Repeat(4);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("4 - Start Repeating")); }
 }
 void UserSound4_Stop()
 {
-    TankSound->UserSound4_Stop();
+    TankSound->UserSound_Stop(4);
     if (DEBUG) { PrintUserSound(); DebugSerial->println(F("4 - Stop")); }
+}
+
+void TriggerUserSound5()
+{
+    TankSound->UserSound_Play(5);
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("5")); }
+}
+void UserSound5_Repeat()
+{
+    TankSound->UserSound_Repeat(5);
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("5 - Start Repeating")); }
+}
+void UserSound5_Stop()
+{
+    TankSound->UserSound_Stop(5);
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("5 - Stop")); }
+}
+
+void TriggerUserSound6()
+{
+    TankSound->UserSound_Play(6);
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("6")); }
+}
+void UserSound6_Repeat()
+{
+    TankSound->UserSound_Repeat(6);
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("6 - Start Repeating")); }
+}
+void UserSound6_Stop()
+{
+    TankSound->UserSound_Stop(6);
+    if (DEBUG) { PrintUserSound(); DebugSerial->println(F("6 - Stop")); }
 }
 
 void PrintUserSound()
