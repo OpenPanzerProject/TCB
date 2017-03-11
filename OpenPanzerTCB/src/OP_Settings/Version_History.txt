@@ -1,3 +1,12 @@
+0.92.03         03/10/2017 - Add a new option to enable a special feature of the Scout ESC that can "drag" the inner (slower) track during turns to assist in turning and steering for 
+                             heavy models using free-wheeling gearboxes such as the Taigen V2 that tend to keep spinning rather than slowing down when power is reduced. The option can 
+                             be enabled or disabled on the Driving tab of OP Config. If you don't have problems leave it disabled, but if you are using one of these free-wheeling gearboxes
+                             and find it difficult to turn, give it a try and see if it helps. The option is only available on the Scout and only if the vehicle type is set to Tank or Halftrack 
+                             in OP Config. The Scout must also be running the latest firmware (90.03 or later). 
+                           - Condense functions for playing user sounds and squeaks. Add additional user sound functions for a total of 6 available on some cards. For now we are still 
+                             posting code for Benedini Flash v1 but it too will permit up to 6 user sounds when v3 is released.
+                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                             It is advised to save an OPZ file of your settings before re-flashing.                           
 0.92.02         03/03/2017 - Added additional trigger sources - speed-based (vehicle goes above or falls below some user defined speed percentage) and ad-hoc triggers 
                              (presently the only one is "brakes applied" but we can add up to 16 in the future). These triggers departs from the traditional "input" and represent 
                              instead "events" from which the user may want other events to be triggered. 
