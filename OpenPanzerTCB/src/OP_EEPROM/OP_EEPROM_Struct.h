@@ -100,6 +100,7 @@ struct _eeprom_data {
     uint8_t MotorNudgePct;                     // To overcome the initial inertia of a stopped vehicle, we can cause throttle to jump to a higher level temporarily when 
                                                //    first moving from a stop. 0 will disable the effect, otherwise 1-100 will cause the throttle to begin at 1-100% of total. 
     uint16_t NudgeTime_mS;                     // How long will the nudge effect last in milliseconds. 
+    boolean DragInnerTrack;                    // Only applies if Scout ESC is selected as the Drive Motor type. Will drag inner track in turns to compensate for free-wheeling gearboxes such as the Taigen V2 steel boxes.
     
 // IMU Physics
     boolean EnableBarrelStabilize;             // If an accelerometer is present, and turret elevation motor is type SERVO_PAN, this will stabilize the barrel

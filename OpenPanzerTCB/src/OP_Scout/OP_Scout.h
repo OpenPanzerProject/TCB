@@ -65,6 +65,8 @@
 #define SCOUT_CMD_SET_FAN_SPEED             0x14    // 20   Direct fan speed control (or use it as a third, uni-directional ESC)
 #define SCOUT_CMD_SET_AUTO_FAN_CONTROL      0x15    // 21   Revert fan control to Scout auto control (based on temperature)
 #define SCOUT_CMD_SET_MAX_CURRENT           0x16    // 22   Set maximum current
+#define SCOUT_CMD_BRAKE_AT_STOP             0x17    // 23   Command used to enable/disable braking motors when stopped (by shorting motor leads). Pass true to enable, false to disable. 
+#define SCOUT_CMD_DRAG_INNER_TRACK          0x18    // 24   Command used to pulse brake commands to the slower of the two motors, can be used in tanks withe freewheeling gearboxes to assist in turning. See online documentation for more. 
 
 // Codes
 #define SCOUT_BAUD_CODE_2400                   1    // Codes for changing baud rates
@@ -116,8 +118,12 @@ public:
     // Disable serial watchdog (send timeout value of 0)
     inline void DisableWatchdog() { command(SCOUT_CMD_SERIAL_WATCHDOG, 0); }
     
-    
+    // Brake at stop
+    inline void BrakeAtStop(boolean enable) { command(SCOUT_CMD_BRAKE_AT_STOP, enable); }
   
+    // Drag inner track
+    inline void DragInnerTrack(boolean enable) { command(SCOUT_CMD_DRAG_INNER_TRACK, enable); }
+    
 
 private:
     void throttleCommand(byte command, int speed) const;

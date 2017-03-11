@@ -22,6 +22,8 @@ SetFanSpeed KEYWORD2
 AutoFanControl  KEYWORD2
 EnableWatchdog  KEYWORD2
 DisableWatchdog KEYWORD2
+BrakeAtStop KEYWORD2
+DragInnerTrack  KEYWORD2
 
 
 #-------------------------------------------------------------

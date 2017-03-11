@@ -42,13 +42,13 @@
 //=======================================================================================================================================>>
 // VERY IMPORTANT ! 
 //=======================================================================================================================================>>
-// If any changes are made to the _eeprom_data struct below, the EEPROM_INIT definition must be changed to a new number.
+// If any changes are made to the _eeprom_data struct in OP_EEPROM_Struct.h, the EEPROM_INIT definition below must be changed to a new number.
 // This will force the sketch to re-initialize the EEPROM and all old data will be lost - in other words, you will have to redo
-// radio setup, etc... That is a pain, but not as bad as if you don't reinitalize. In that case EEPROM data corruption WILL occur 
-// and the sketch will exhibit unstable behavior!
+// radio setup, etc... (unless you wisely saved an OPZ file in OP Config first). This is an inconvenient but not as bad as if you don't reinitalize. 
+// In that case EEPROM data corruption WILL occur and the sketch will exhibit unstable behavior!
 // 
 
-    #define EEPROM_INIT             0xF973          // Modified with 00.91.01 on 2/7/2017
+    #define EEPROM_INIT             0x62BC          // Modified with 00.92.03 on 3/10/2017
 //
 //
 //=======================================================================================================================================>>

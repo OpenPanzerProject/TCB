@@ -112,6 +112,14 @@ void OPScout_SerialESC::begin(void)
     // (OPScout_WatchdogTimeout_mS is defined in OP_Settings.h)
     OPScout_SerialESC::command(SCOUT_CMD_SERIAL_WATCHDOG, (OPScout_WatchdogTimeout_mS / 100));    
 
+    // We want the Scout to brake the motors at stop in an attempt to prevent them from freewheeling. This will aid in stopping as well as slow speed turning. 
+    OPScout_SerialESC::BrakeAtStop(true);
+    
+    // Additionally the Scout has the ability to "drag" the inner (slower) track during turns by pulsing brief brake commands to it many times per second. This option is usually 
+    // only needed if the user has a heavy, wide-tracked model being driven with a free-wheeling gearbox such as the notorious Taigen "V2" Steel 3:1 and 4:1 gearboxes. The user
+    // can choose to enable or disable the option in OP Config, here we send whatever they've chosen as a command to the Scout. 
+    OPScout_SerialESC::DragInnerTrack(dragInnerTrack);
+
     // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
     set_InternalRange(-127,127, 0);
     set_DefaultInternalRange(-127,127, 0);
