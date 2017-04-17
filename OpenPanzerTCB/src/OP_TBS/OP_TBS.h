@@ -48,25 +48,29 @@
 #define PROP2_SWITCH_OFF    1500                // Off position for Prop2 Function 1/2 (default)
 #define PROP2_SWITCH_1      2000                // Prop2, sound for 2nd Coder Position 1 (We use it for engine startup/shutdown)
 #define PROP2_SWITCH_2      1000                // Prop2, sound for 2nd Coder Position 2 (We use it for repair sound)
-// We've disabled the beep-functionality in favor of using this slot for an actual sound
-//#define BEEP_LENGTH_mS        350                 // How long is the beep sound in milliseconds
 
-// Prop3 - 12 sounds for Benedini Flash V1
+// Prop3 - 16 sounds in direct control mode (Benedini Flash v3.x only)
 #define SOUND_OFF            0          // Sound 0:  Prop3 default (off - no special sound)
 #define SOUND_TURRET         1          // Sound 1:  Turret rotation
-#define SOUND_CANNON         2          // Sound 2:  Cannon fire
-#define SOUND_MG             3          // Sound 3:  Machine gun
-#define SOUND_CANNON_HIT     4          // Sound 4:  Received cannon hit - damage
-#define SOUND_MG_HIT         5          // Sound 5:  Received machine gun hit - damage
-#define SOUND_BATTLE_DESTROY 6          // Sound 6:  Received hit - tank destroyed
-#define SOUND_HEADLIGHTS     7          // Sound 7:  Headlights on/off
-#define SOUND_SQUEAK_1       8          // Sound 8:  Squeak 1 (frequent)
-#define SOUND_SQUEAK_2       9          // Sound 9:  Squeak 2 (medium frequency)
-#define SOUND_SQUEAK_3       10         // Sound 10: Squeak 3 (less frequent)
-#define SOUND_USER_1         11         // Sound 11: Custom User Sound 1
-#define SOUND_USER_2         12         // Sound 12: Custom User Sound 2
-#define PROP3_NUM_SOUNDS     13         // How many sounds are there in total in the Prop3 register, including the SOUND_OFF "sound"
-
+#define SOUND_BARREL         2          // Sound 2:  Barrel elevation
+#define SOUND_CANNON         3          // Sound 3:  Cannon fire
+#define SOUND_MG             4          // Sound 4:  Machine gun
+#define SOUND_CANNON_HIT     5          // Sound 5:  Received cannon hit - damage
+#define SOUND_MG_HIT         6          // Sound 6:  Received machine gun hit - damage
+#define SOUND_BATTLE_DESTROY 7          // Sound 7:  Received hit - vehicle destroyed
+#define SOUND_HEADLIGHTS     8          // Sound 8:  Headlights on/off
+#define SOUND_USER_1         9          // Sound 9:  Custom User Sound 1
+#define SOUND_USER_2         10         // Sound 10: Custom User Sound 2
+#define SOUND_USER_3         11         // Sound 11: Custom User Sound 3
+#define SOUND_USER_4         12         // Sound 12: Custom User Sound 4            - SAME AS SQUEAK 1
+#define SOUND_USER_5         13         // Sound 13: Custom User Sound 5            - SAME AS SQUEAK 2
+#define SOUND_USER_6         14         // Sound 14: Custom User Sound 6            - SAME AS SQUEAK 3
+#define SOUND_SQUEAK_1       12         // Sound 12: Squeak 1 (frequent)            - SAME AS USER SOUND 4
+#define SOUND_SQUEAK_2       13         // Sound 13: Squeak 2 (medium frequency)    - SAME AS USER SOUND 5
+#define SOUND_SQUEAK_3       14         // Sound 14: Squeak 3 (less frequent)       - SAME AS USER SOUND 6
+#define SOUND_VOLUME_UP      15         // Sound 15: Increase volume
+#define SOUND_VOLUME_DN      16         // Sound 16: Decrease volume
+#define PROP3_NUM_SOUNDS     17         // How many sounds are there in total in the Prop3 register, including the SOUND_OFF "sound"
 // The Prop3 numbers above refer to positions in the array below.
 // The array holds the actual PWM values for each of the sound slots, plus one more for SOUND_OFF (1500)
 // Each sound also has a priority number associated with it. If a sound is playing, and second sound is triggered, the second
@@ -89,25 +93,30 @@ typedef struct {
 // Values were tweaked to correspond as closely to whole integers from 0-255 as possible (since that is actually how the TBS Mini reads the pulses
 // apparently). The small tweaks are probably unnecessary and irrelevant once you account for all the variability in creating and reading PWM signals. 
 const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
-{1500, 0},  // No sound
-{1000, 1},  // Turret rotation
-{1083, 1},  // Cannon fire
-{1165, 2},  // Machine gun fire - higher priority because it needs to repeat
-{1248, 1},  // Cannon hit
-{1331, 1},  // Machine gun hit
-{1413, 1},  // Vehicle destroyed
-{1587, 1},  // Headlights
-{1669, 1},  // Squeak 1
-{1752, 1},  // Squeak 2
-{1835, 1},  // Squeak 3 
-{1917, 3},  // User Sound 1 - even higher priority than MG
-{2000, 3}   // User Sound 2 - even higher priority than MG
+{1531, 0},  // Sound 0:  Prop3 default (off - no sound) - this is the odd Benedini center value
+{864,  1},  // Sound 1:  Turret rotation
+{945,  1},  // Sound 2:  Barrel elevation
+{1026, 1},  // Sound 3:  Cannon fire
+{1108, 2},  // Sound 4:  Machine gun fire - higher priority because it needs to repeat
+{1189, 1},  // Sound 5:  Received cannon hit - damage
+{1270, 1},  // Sound 6:  Received machine gun hit - damage
+{1351, 1},  // Sound 7:  Received hit - vehicle destroyed
+{1433, 1},  // Sound 8:  Headlights on/off
+{1630, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG
+{1711, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG
+{1793, 3},  // Sound 11: Custom User Sound 3 - even higher priority than MG
+{1874, 3},  // Sound 12: Squeak 1 / Custom User Sound 4
+{1955, 3},  // Sound 13: Squeak 2 / Custom User Sound 5
+{2036, 3},  // Sound 14: Squeak 3 / Custom User Sound 6
+{2117, 9},  // Sound 15: Increase volume - highest priority
+{2199, 9}   // Sound 16: Decrease volume - highest priority
 };
 // We can't refer directly to array elements and struct members when using far addresses. For some reason, even using s*sizeof(Prop3) instead of (s*3) doesn't work. 
 #define Prop3SoundPulse(s)      pgm_read_word_far(pgm_get_far_address(Prop3) + (s*3))       // Get address of Prop3 array, then skip ahead to the s-th element, since each struct is 3 bytes wide
 #define Prop3SoundPriority(s)   pgm_read_byte_far(pgm_get_far_address(Prop3) + (s*3) + 2)   // Get address of Prop3 array, then skip ahead to the s-th element, then skip the next 2 bytes to get to the 3rd byte in the struct (Priority)
 
-#define TBS_SIGNAL_mS        30         // How long to send a temporary signal for TBS to get it. 20ms didn't seem stable, so it needs to be greater than that, but as small as possible. 
+#define TBS_SIGNAL_mS         50        // How long to send a temporary signal for TBS to get it. 20ms didn't seem stable, so it needs to be greater than that, but as small as possible. 
+#define TBS_SIGNAL_PROP2_mS   500       // Prop2 is used to toggle the engine. We find it works better with a longer signal, and because it doesn't interfere with other sounds it's fine to set it long. 
 
 #define DEFAULT_SQUEAK_MIN_mS 800       // Min time between squeaks defaults to 0.8 seconds
 #define DEFAULT_SQUEAK_MAX_mS 3500      // Max time between squeaks defaults to 3.5 seconds
@@ -122,22 +131,28 @@ const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 // per name whether we need that many or not. It is harder to address these elements as well, but the tradeoff is that we get to 
 // keep these in FAR progmem (see OP_Settings.h for the exact location where), rather than in near which causes all sorts of problems, 
 // AND we didn't have to make custom modifications to the linker script.
+/*
 #define SOUNDNAME_CHARS  31
 const char _sound_descr_table_[PROP3_NUM_SOUNDS][SOUNDNAME_CHARS] PROGMEM_FAR = 
-{   "Sound Off",                            // 0
-    "Turret Rotation",                      // 1
-    "Cannon Fire",                          // 2
-    "Machine Gun",                          // 3
-    "Cannon Hit Received - Damage",         // 4
-    "MG Hit Received - Damage",             // 5
-    "Hit Received - Destroyed",             // 6
-    "Headlights on/off",                    // 7
-    "Squeak 1 - frequent",                  // 8
-    "Squeak 2 - medium frequency",          // 9
-    "Squeak 3 - less frequent",             // 10
-    "User Sound #1",                        // 11
-    "User Sound #2"                         // 12
+{   "Sound Off",                                // 0
+    "Turret Rotation",                          // 1
+    "Barrel Elevation",                         // 2
+    "Cannon Fire",                              // 3
+    "Machine Gun",                              // 4
+    "Cannon Hit Received - Damage",             // 5
+    "MG Hit Received - Damage",                 // 6
+    "Hit Received - Destroyed",                 // 7
+    "Headlights on/off",                        // 8
+    "User Sound #1",                            // 9
+    "User Sound #2",                            // 10
+    "User Sound #3",                            // 11
+    "Squeak 1 / User Sound #4",                 // 12
+    "Squeak 2 / User Sound #5",                 // 13
+    "Squeak 3 / User Sound #6",                 // 14
+    "Increase volume",                          // 15
+    "Decrease volume"                           // 16
 };
+*/
 
 class OP_TBS
 {
@@ -155,11 +170,6 @@ public:
     void ToggleEngineSound(void);                           // Toggle engine startup/shutdown
     void Repair(void);                                      // Tank repair sound
     void StopRepairSound(void);                             // Explicit call to quit repair sound
-
-//  All Beeping stuff was removed to make space for another sound
-//  static void Beep(void);                                 // Program beep
-//  static void ForceBeep(void);                            // Blocking call to beep
-//  static void ForceBeeps(int);                            // Beep number of times in a row (blocks code)
 
     // PROP3: Individual Sounds
     void Cannon(void);                                      // Play cannon fire sound
@@ -184,7 +194,7 @@ public:
     void HeadlightSound_SetEnabled(boolean);                // Headlight sound enabled or not
     void TurretSound_SetEnabled(boolean);                   // Turret sound enabled or not
     void BarrelSound_SetEnabled(boolean);                   // Barrel sound enabled or not
-
+                
     // Squeak functions
     void SetSqueak_Interval(uint8_t, unsigned int, unsigned int); // Set squeak interval for squeak x
     void Squeak_SetEnabled(uint8_t, boolean);               // Enabled or disable Squeak x
@@ -192,9 +202,7 @@ public:
     void StopSqueaks(void);                                 // Stops all squeaks
     boolean AreSqueaksActive(void);                         // Returns true or false if sqeaks are active
     
-    // Utilities
-    void TeachEncoder(void);
-    //    void testProp3(void);                                   // Used for testing
+//    void testProp3(void);                                   // Used for testing
 
  private:   
     static OP_Servos  * TBSProp;
@@ -208,15 +216,16 @@ public:
     static void         ClearProp2Timer(void);
     
     // PROP 3
-    static void         TriggerSpecialSound(int, bool);     // eg, TriggerSpecialSound(SOUND_CANNON); // will trigger cannon sound. The second parameter is an optional boolean 
+    static void         TriggerSpecialSound(int, bool = true);     // eg, TriggerSpecialSound(SOUND_CANNON); // will trigger cannon sound. The second parameter is an optional boolean 
                                                             // to keep the sound on indefinitely, rather than triggering it once (if nothing is passed, it will trigger once)
-    static void         StopSpecialSounds(void);            // Most special sounds only run once, but for repeated sounds (like machine gun), we can use this to turn them off.
+    static void         StopSpecialSounds(int);             // Most special sounds only run once, but for repeated sounds (like machine gun), we can use this to turn them off.
     
     static int          TBSProp3TimerID;
     static boolean      Prop3TimerComplete; 
     static void         StartProp3Timer(void);
     static void         ClearProp3Timer(void);
     static uint8_t      currentProp3SoundNum;               // Which sound number is currently playing
+    static uint8_t      previousProp3SoundNum;              // Which sound was playing before
     boolean             HeadlightSound_Enabled;
     boolean             TurretSound_Enabled;
     boolean             BarrelSound_Enabled;
@@ -247,9 +256,6 @@ public:
     static unsigned int SQUEAK2_MAX_mS;
     static unsigned int SQUEAK3_MIN_mS;
     static unsigned int SQUEAK3_MAX_mS;
-    
-    // BENEDINI FLASH v1
-    static void         PulseDelayProp3(int);
     
 };
 

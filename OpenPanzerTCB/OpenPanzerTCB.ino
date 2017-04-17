@@ -643,14 +643,15 @@ if (Startup)
                                 do { delay(10); InputButton.read(); } while (!InputButton.wasReleased()); 
                             }
                             break;
+                            
                         case 2: 
                             // Reserved for future use
                             break;        
+                            
                         case 3: 
                             // Reserved for future use
-                            // ACTUALLY, we are reverting back to TBS Setup for the time being since Benedini is taking longer than expected to release Flash v3
-                            TBS_Setup();
                             break;
+                            
                         case 4: 
                             // Recoil servo setup
                             SetupServo(SERVONUM_RECOIL); 

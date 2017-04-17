@@ -35,6 +35,7 @@ boolean         OP_TBS::Prop2TimerComplete;
 int             OP_TBS::TBSProp3TimerID;
 boolean         OP_TBS::Prop3TimerComplete;
 uint8_t         OP_TBS::currentProp3SoundNum;
+uint8_t         OP_TBS::previousProp3SoundNum;
 // Squeaky stuff
 boolean         OP_TBS::Squeak1_Enabled;
 boolean         OP_TBS::Squeak2_Enabled;
@@ -67,6 +68,7 @@ OP_TBS::OP_TBS(OP_SimpleTimer * t)
     TBSProp2TimerID = 0;
     TBSProp3TimerID = 0;
     currentProp3SoundNum = SOUND_OFF;
+    previousProp3SoundNum = SOUND_OFF;
     
     // Initialize squeak times, and set them to off to begin
     // Later we will load in the user's settings for squeak times and whether they are enabled or not. 
@@ -89,8 +91,7 @@ OP_TBS::OP_TBS(OP_SimpleTimer * t)
     // Initialize these as well, but again, they will in the end be set by the user's preference
     HeadlightSound_Enabled = true;
     TurretSound_Enabled = true;
-    // NO BARREL SOUND IN FLASH v1
-    BarrelSound_Enabled = false;
+    BarrelSound_Enabled = true;
 }
 
 
@@ -141,7 +142,7 @@ void OP_TBS::StartProp2Timer(void)
 {
     // Start the timer to briefly toggle the Prop2 input
     Prop2TimerComplete = false;
-    TBSProp2TimerID = TBSTimer->setTimeout(TBS_SIGNAL_mS, ClearProp2Timer);
+    TBSProp2TimerID = TBSTimer->setTimeout(TBS_SIGNAL_PROP2_mS, ClearProp2Timer);
 }
 
 void OP_TBS::StartProp2Timer(int HowLong_mS)
@@ -187,35 +188,6 @@ void OP_TBS::StopRepairSound(void)
     ClearProp2Timer();
 }
 
-// The beeping functionality was removed to make space for another actual sound (repair). I never really used the beeping anyway. 
-/*
-// Pauses all code while beeping. Only use in menus or other situations where this is ok. 
-void OP_TBS::ForceBeep(void)
-{
-    TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_2);
-    delay(TBS_SIGNAL_mS);
-    TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_OFF);
-    delay(BEEP_LENGTH_mS);  // Wait until the sound is over before returning control to the program
-}
-
-// Pauses all code while beeping. Only use in menus or other situations where this is ok. 
-void OP_TBS::ForceBeeps(int num)
-{
-    for (int i=0; i<num; i++)
-    {
-        TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_2);
-        delay(TBS_SIGNAL_mS);
-        TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_OFF);
-        delay(BEEP_LENGTH_mS);      
-    }
-}   
-
-void OP_TBS::Beep(void)
-{
-    TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_2);
-    StartProp2Timer();
-}
-*/
 
 //------------------------------------------------------------------------------------------------------------------------>>
 // PROP 3 - Sixteen sounds in the 1st Coder column of TBS Flash (v3.0.1 and later) 
@@ -243,44 +215,38 @@ void OP_TBS::StartProp3Timer(void)
 
 void OP_TBS::ClearProp3Timer(void)
 {
-    static boolean FirstPass = true;
-    
-    if (FirstPass)
-    {
-        // Quit sending the special sound signal
-        TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));
-        currentProp3SoundNum = SOUND_OFF;
-        // We also start the timer again, to ensure the SOUND_OFF signal has time to register
-        StartProp3Timer();
-        FirstPass = false;      // Reset for the next event
-    }
-    else
-    {
-        // Ok, we've sent the SOUND_OFF signal long enough. Clear the timer to allow future
-        // special sounds to be sent. 
-        TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));  // Just in case
-        Prop3TimerComplete = true;
-        currentProp3SoundNum = SOUND_OFF;
-        FirstPass = true;       // Set to true so our next time through this function we will send the OFF signal
-    }
+    // Quit sending the special sound signal
+    TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));
+    Prop3TimerComplete = true;
+    currentProp3SoundNum = SOUND_OFF;
+    previousProp3SoundNum = SOUND_OFF;
 }
 
-void OP_TBS::TriggerSpecialSound(int soundNum, boolean oneTime = true)
+void OP_TBS::TriggerSpecialSound(int soundNum, boolean oneTime /* = true */)
 {
     // Only send a special sound if it has a higher priority than the sound currently playing.
     // If no sound is playing the actual current sound will be SOUND_OFF. We made sure to set 
     // SOUND_OFF at priority 0 and all other sounds at least to priority 1, so they will always supersede SOUND_OFF. 
     if (Prop3SoundPriority(soundNum) > Prop3SoundPriority(currentProp3SoundNum))
     {   
+        // If another sound was playing and its stop timer was still running, clear it so it won't stop this new sound
+        if (TBSTimer->isEnabled(TBSProp3TimerID)) TBSTimer->deleteTimer(TBSProp3TimerID);
+        // Now set the new pulse
         TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(soundNum));
+        previousProp3SoundNum = currentProp3SoundNum;
         currentProp3SoundNum = soundNum;
         if (oneTime)    StartProp3Timer();  // If it's just a one-time sound, we start a brief timer so the pulse has time to register with the TBS, then it will turn the pulse off. 
     }
 }
 
-void OP_TBS::StopSpecialSounds(void)
-{
-    ClearProp3Timer();
+void OP_TBS::StopSpecialSounds(int soundNum)
+{   // If the priority of the sound we want to stop is equal to or greater than the current sound,
+    // stop the current sound. We need the equal-to check because we are probably trying to stop the 
+    // current sound, in other words, it will be equal. 
+    if (Prop3SoundPriority(soundNum) >= Prop3SoundPriority(currentProp3SoundNum))
+    {
+        ClearProp3Timer();
+    }
 }
 
 
@@ -303,7 +269,7 @@ void OP_TBS::MachineGun(void)
 }
 void OP_TBS::StopMachineGun(void)
 {
-    StopSpecialSounds();                    // I previously was doing some other stuff that required a little bit different procedure
+    StopSpecialSounds(SOUND_MG);            // I previously was doing some other stuff that required a little bit different procedure
                                             // to turn off MG, hence this function instead of just calling StopSpecialSounds directly. 
 }                                           // We'll leave it in case we need something like that again. The only place that calls this is OP_Tank.cpp - MachineGun_Stop() 
 
@@ -323,7 +289,7 @@ void OP_TBS::Turret(void)
 
 void OP_TBS::StopTurret(void)
 {
-    if (TurretSound_Enabled) StopSpecialSounds();
+    if (TurretSound_Enabled) StopSpecialSounds(SOUND_TURRET);
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -331,21 +297,17 @@ void OP_TBS::StopTurret(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::BarrelSound_SetEnabled(boolean enabled)
 {
-    //BarrelSound_Enabled = enabled;
-    // NO BARREL SOUND IN FLASH v1
-    BarrelSound_Enabled = false;
+    BarrelSound_Enabled = enabled;
 }
 
 void OP_TBS::Barrel(void)
 {
-    // NO BARREL SOUND IN FLASH v1
-    //if (BarrelSound_Enabled) TriggerSpecialSound(SOUND_BARREL);
+    if (BarrelSound_Enabled) TriggerSpecialSound(SOUND_BARREL);
 }
 
 void OP_TBS::StopBarrel(void)
 {
-    // NO BARREL SOUND IN FLASH v1
-    //if (BarrelSound_Enabled) StopSpecialSounds();
+    if (BarrelSound_Enabled) StopSpecialSounds(SOUND_BARREL);
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -394,11 +356,10 @@ void OP_TBS::UserSound_Play(uint8_t s)
     {
         case 1: TriggerSpecialSound(SOUND_USER_1); break;
         case 2: TriggerSpecialSound(SOUND_USER_2); break;
-// ONLY 2 USER SOUNDS IN FLASH v1
-//        case 3: TriggerSpecialSound(SOUND_USER_3); break;
-//        case 4: TriggerSpecialSound(SOUND_USER_4); break;
-//        case 5: TriggerSpecialSound(SOUND_USER_5); break;
-//        case 6: TriggerSpecialSound(SOUND_USER_6); break;
+        case 3: TriggerSpecialSound(SOUND_USER_3); break;
+        case 4: TriggerSpecialSound(SOUND_USER_4); break;
+        case 5: TriggerSpecialSound(SOUND_USER_5); break;
+        case 6: TriggerSpecialSound(SOUND_USER_6); break;
     }
 }
 void OP_TBS::UserSound_Repeat(uint8_t s)
@@ -407,35 +368,39 @@ void OP_TBS::UserSound_Repeat(uint8_t s)
     {
         case 1: TriggerSpecialSound(SOUND_USER_1, false); break;    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
         case 2: TriggerSpecialSound(SOUND_USER_2, false); break;    // until explicitly turned off, or until interrupted by another sound with a higher priority. 
-// ONLY 2 USER SOUNDS IN FLASH v1
-//        case 3: TriggerSpecialSound(SOUND_USER_3, false); break;
-//        case 4: TriggerSpecialSound(SOUND_USER_4, false); break;
-//        case 5: TriggerSpecialSound(SOUND_USER_5, false); break;
-//        case 6: TriggerSpecialSound(SOUND_USER_6, false); break;        
+        case 3: TriggerSpecialSound(SOUND_USER_3, false); break;
+        case 4: TriggerSpecialSound(SOUND_USER_4, false); break;
+        case 5: TriggerSpecialSound(SOUND_USER_5, false); break;
+        case 6: TriggerSpecialSound(SOUND_USER_6, false); break;        
     }
 }
-void OP_TBS::UserSound_Stop(uint8_t)
+void OP_TBS::UserSound_Stop(uint8_t s)
 {
-    StopSpecialSounds();                    
-}                                           
+    switch (s)
+    {
+        case 1: StopSpecialSounds(SOUND_USER_1); break;
+        case 2: StopSpecialSounds(SOUND_USER_2); break;
+        case 3: StopSpecialSounds(SOUND_USER_3); break;
+        case 4: StopSpecialSounds(SOUND_USER_4); break;
+        case 5: StopSpecialSounds(SOUND_USER_5); break;
+        case 6: StopSpecialSounds(SOUND_USER_6); break;        
+    }
+}     
 
 //------------------------------------------------------------------------------------------------------------------------>>
 // VOLUME
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::IncreaseVolume(void)
 {
-    // NO VOLUME CONTROL VIA THIS METHOD IN FLASH v1
-    //TriggerSpecialSound(SOUND_VOLUME_UP, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+    TriggerSpecialSound(SOUND_VOLUME_UP, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
 }                                                   // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 void OP_TBS::DecreaseVolume(void)
 {
-    // NO VOLUME CONTROL VIA THIS METHOD IN FLASH v1    
-    //TriggerSpecialSound(SOUND_VOLUME_DN, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+    TriggerSpecialSound(SOUND_VOLUME_DN, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
 }                                                   // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 void OP_TBS::StopVolume(void)
 {
-    // NO VOLUME CONTROL VIA THIS METHOD IN FLASH v1
-    //StopSpecialSounds();
+    StopSpecialSounds(SOUND_VOLUME_UP);             // It doesn't matter if we pass volume up or down here, as long as they both have the same priority. 
 }
 
 
@@ -469,6 +434,7 @@ boolean OP_TBS::AreSqueaksActive(void)
     return AllSqueaks_Active;
 }
 
+
 void OP_TBS::SetSqueak_Interval(uint8_t s, unsigned int min, unsigned int max)
 {
     switch (s)
@@ -498,6 +464,7 @@ void OP_TBS::Squeak_SetEnabled(uint8_t s, boolean enabled)
         case 3: Squeak3_Enabled = enabled; break;
     }
 }
+
 
 void OP_TBS::Squeak1(void)
 {
@@ -579,74 +546,9 @@ void OP_TBS::Squeak3_Pause(void)
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
-// TEACH TBS UNIT FOR ENCODER CONTROL
-//------------------------------------------------------------------------------------------------------------------------>>
-void OP_TBS::TeachEncoder(void)
-{
-    char buffer[30];    // This needs to be large enough to hold any string from our sound_descr_table (see OP_TBS.h)
-    uint32_t soundNameTableAddress = pgm_get_far_address(_sound_descr_table_);  // This is the starting address of our sound names table in far progmem. 
-
-    // Before you run this routine, the TBS Mini needs to be placed in the TEACH mode by pushing the button on the sound unit.
-    // This is handled in the sketch, as well as some other preliminary steps
-        
-    Serial.println("Start - Teaching:");
-    // Whenever they pressed the TBS button, the neutral positions were already recorded    
-    Serial.println(F("...Neutral"));
-    delay(1000);
-    
-    // Move throttle to just moving    
-    TBSProp->writeMicroseconds(PROP1, PROP1_JUST_MOVING);
-    Serial.println(F("...Just moving"));
-    PulseDelayProp3(1); // Doesn't matter what signal we send here
-    delay(1000);
-    
-    // Now move throttle to full speed
-    TBSProp->writeMicroseconds(PROP1, PROP1_FULL_SPEED);
-    Serial.println(F("...Full speed"));
-    PulseDelayProp3(1); // Doesn't matter what signal we send here
-    delay(1000);
-    // Probably doesn't matter, but let's put throttle back to idle
-    TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);    
-
-
-    // From here on out, we will be teaching the 12 positions. According to the TBS instructions, 
-    // we go to position 1, "push the encoder button" which means briefly send the PWM value associated
-    // with position 1 to Prop3, then return Prop3 back to the default state of center (1500). Then
-    // wait two seconds, and repeat for all 12 "encoder" positions
-    for (int i=1; i<=12; i++)
-    {
-        // Example:
-        // ...Sound 1: Cannon Fire
-        Serial.print(F("...Sound ")); Serial.print(i); Serial.print(F(": "));
-        // Using the string table in FAR program memory requires the use of a special function to retrieve the data.
-        strcpy_PFAR(buffer, soundNameTableAddress, i*SOUNDNAME_CHARS);
-        Serial.println(buffer);
-        // Now send the signal for this sound number briefly, then wait two seconds before sending the next one (according to TBS teaching specs)
-        PulseDelayProp3(i);
-    }
-
-}
-
-void OP_TBS::PulseDelayProp3(int whatSound)
-{
-    // This is hardcoded with delays. We don't use it in normal practice, just for teaching the TBS. 
-    TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(whatSound));
-    // Wait a short bit for the TBS to read the signal, and blink the green LED while we're waiting
-    digitalWrite(pin_GreenLED, HIGH);
-    delay(100);
-    digitalWrite(pin_GreenLED, LOW);
-    delay(300);
-    // Now put the signal back to off
-    TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));
-    // Wait 2 seconds
-    delay(2000);
-}
-
-
-
-//------------------------------------------------------------------------------------------------------------------------>>
 // TEST ALL PROP 3 POSITIONS
 //------------------------------------------------------------------------------------------------------------------------>>
+// Used in development to test Benedini Flash v3.x
 /*
 void OP_TBS::testProp3(void)
 {

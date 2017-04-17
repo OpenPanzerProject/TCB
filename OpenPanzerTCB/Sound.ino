@@ -55,72 +55,6 @@ void InstantiateSoundObject(void)
 
 }
 
-// PUTTING THIS BACK IN JUST UNTIL THOMAS BENEDINI CAN GET FLASH V3 RELEASED - He's dragging his feet so we need to keep this functionality for the time being. 
-void TBS_Setup()
-{
-    // When input button held down for 2 seconds and dipswitch 3 is in the off position while dipswitch 4 is in the on position, 
-    // we will enter this menu, that allows teaching the TBS our servo positions on its 3 "prop" inputs. 
-    // This setup menu could be rendered unnecessary if Benedini releases a TBS update. 
-    
-    // Temporary pointer to OP_TBS class directly (not through OP_Sound)
-    OP_TBS * TBS;
-    TBS = new OP_TBS (&timer);
-    
-    // Ok, before we run setup, stop everything. 
-    StopEverything();
-    
-    // Turn the Red LED on for the duration of setup
-    GreenLedOff();
-    RedLedOn();
-    
-    // 
-    DebugSerial->println();
-    PrintDebugLine();
-    DebugSerial->println(F("Start TBS Setup"));
-    PrintDebugLine();
-    
-    // Initialize TBS outputs
-    TBS->InitializeOutputs();  // Set all outputs to defaults
-
-    // Tell user to press TBS Button. TBS will record neutral positions
-    DebugSerial->println(F("Press TBS Button"));
-    DebugSerial->println(F("After TBS beeps, press button on TCB board"));
-
-    // Now we will wait for the user to press the button on the TCB board one more time. 
-    // However, this code has run so fast they are probably still holding it down from when they entered the menu. 
-    // Wait for them to release
-    do { delay(10); InputButton.read(); } while (!InputButton.wasReleased());              
-
-    // Ok, now while we're waiting, blink the green LED fast
-    GreenLedOn();
-    SetTimeUp();
-    do
-    {   if (TimeUp) 
-        {   GreenBlink(); 
-            StartWaiting_mS(100);
-        }
-        timer.run();
-        InputButton.read();
-    } while (!InputButton.wasReleased());
-
-    // Now teach the sound unit throttle speeds and encoder positions
-    TBS->TeachEncoder();
-    
-    // Ok, we're done
-    DebugSerial->println(F("All Done"));
-    PrintDebugLine();
-    DebugSerial->println(F("End TBS Setup"));
-    PrintDebugLine();
-    DebugSerial->println();    
-
-    // To let them know it's over, blink the Green LED 3 times quickly, then turn all leds off. 
-    GreenBlinkFast(3);
-    RedLedOff();
-    
-    // Now we return to the main loop
-}
-
-
 // We need local functions here in the sketch so we can assign these to our
 // special function callbacks in LoadFunctionTriggers() in the ObjectSetup tab
 void SetVolume(uint16_t unmapped_level)
@@ -256,7 +190,7 @@ void PrintUserSound()
     DebugSerial->print(F("User Sound "));
 }
 
-// This routine is only needed for testing during development of compatibility with Benedini TBS Flash v3. We will remove it when no longer needed //
+// This routine is only needed for testing during development of compatibility with Benedini TBS Flash v3. //
 /*
 void TBSTest(void)
 {
