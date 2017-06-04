@@ -1576,7 +1576,12 @@ if (Startup)
 // ====================================================================================================================================================>
 //  SOME AD-HOC TRIGGERS RELATED TO MOVEMENT
 // ====================================================================================================================================================> 
-        if (Braking && !Braking_Previous) { bitSet(AdHocTriggers, ADHOCT_BIT_BRAKES_APPLIED);  }
+        if (Braking && !Braking_Previous) 
+        { 
+            bitSet(AdHocTriggers, ADHOCT_BIT_BRAKES_APPLIED);
+            // We also use this occasion to automatically trigger the special braking sound, for those cards that support it. 
+            TankSound->Brake();
+        }
 
 
 // ====================================================================================================================================================>

@@ -1,3 +1,6 @@
+0.92.05         06/04/2017 - Added ability to trigger a brake sound automatically when vehicle brakes, presently only compatible with the Open Panzer Sound Card. The same effect
+                             can be implemented with the Benedini TBS Mini, but you must load your brake sound as one of the user sounds, then trigger the user sound using the 
+                             "Brakes Applied" trigger. 
 0.92.04         04/17/2017 - Update firmware for compatibility with Benedini Flash v3.x. This increases the number of sounds available when using the TBS Mini among other improvements. 
 0.92.03         03/10/2017 - Add a new option to enable a special feature of the Scout ESC that can "drag" the inner (slower) track during turns to assist in turning and steering for 
                              heavy models using free-wheeling gearboxes such as the Taigen V2 that tend to keep spinning rather than slowing down when power is reduced. The option can 

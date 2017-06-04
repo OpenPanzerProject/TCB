@@ -67,6 +67,7 @@ Squeak3_SetEnabled	LITERAL2
 Squeak4_SetEnabled	LITERAL2
 Squeak5_SetEnabled	LITERAL2
 Squeak6_SetEnabled	LITERAL2
+Brake   LITERAL2
 Beep	LITERAL2
 Beeps	LITERAL2
 

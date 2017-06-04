@@ -74,6 +74,8 @@ class OP_Sound {
     virtual boolean AreSqueaksActive(void) =0;          // Returns true or false if sqeaks are active
     virtual void SetSqueak_Interval(uint8_t, unsigned int, unsigned int) =0;    // squeak num, min interval, max interval
     virtual void Squeak_SetEnabled(uint8_t, boolean) =0;// Enabled or disable Squeak x
+    // Other Movement Sounds
+    virtual void Brake(void) =0;                        // Sound on braking
     // Beeps
     virtual void Beep(void) =0;                         // Beep once
     virtual void Beeps(uint8_t) =0;                     // Beep number of times in a row
@@ -134,6 +136,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     boolean AreSqueaksActive(void)                              { OP_TBS::AreSqueaksActive();          }
     void SetSqueak_Interval(uint8_t s, unsigned int a, unsigned int b) { OP_TBS::SetSqueak_Interval(s,a,b); }
     void Squeak_SetEnabled(uint8_t s, boolean b)                { OP_TBS::Squeak_SetEnabled(s,b);      }
+  // Other Movement Sounds
+    void Brake(void)                                            { return; }  // No specific brake sound implemented on TBS for now. User can still create their own by assigning the Braking trigger to a user sound.
   // Beeps
     void Beep(void)                                             { return; }  // All TBS beeping stuff was removed to make space for another sound
     void Beeps(uint8_t)                                         { return; }  // It may be added back later if the TBS gets an update for use with the TCB
@@ -189,6 +193,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_BEEP_ONCE                   0x45   // 69
 #define OPSC_CMD_BEEP_X                      0x46   // 70
 #define OPSC_CMD_SET_VOLUME                  0x47   // 71
+#define OPSC_CMD_BRAKE_SOUND                 0x48   // 72
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -247,6 +252,8 @@ class OP_SoundCard: public OP_Sound {
     boolean AreSqueaksActive(void)                              { return _squeaksActive;                                    }
     void SetSqueak_Interval(uint8_t s, unsigned int i, unsigned int a) { SendSqueakIntervals(i, a, s);                      }
     void Squeak_SetEnabled(uint8_t s, boolean e)                { command(OPSC_CMD_SQUEAK_ENABLE, e, s);                    }    
+  // Other Movement Sounds
+    void Brake(void)                                            { command(OPSC_CMD_BRAKE_SOUND);                            }  
   // Beeps          
     void Beep(void)                                             { command(OPSC_CMD_BEEP_ONCE);                              }
     void Beeps(uint8_t x)                                       { command(OPSC_CMD_BEEP_X, x);                              }
@@ -379,6 +386,8 @@ class OP_TaigenSound: public OP_Sound {
     boolean AreSqueaksActive(void)                              { return false;         }
     void SetSqueak_Interval(uint8_t, unsigned int, unsigned int){ return;               }
     void Squeak_SetEnabled(uint8_t, boolean)                    { return;               }
+  // Other Movement Sounds
+    void Brake(void)                                            { return;               }
   // Beeps                                                                              
     void Beep(void)                                             { return;               }
     void Beeps(uint8_t x)                                       { return;               }
