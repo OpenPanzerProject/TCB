@@ -133,7 +133,7 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 2 is used to generate the PWM for IR sending. It is used in phase-correct PWM mode, with OCR2A controlling the frequency and 
     // OCR2B controlling the duty cycle. There is no prescaling, so the output frequency is 16MHz / (2 * OCR2A)
-    // To turn the output on and off, the PWM running is left running, but we connect and disconnect the output pin. 
+    // To turn the output on and off, the PWM is left running, but we connect and disconnect the output pin. 
     // This pin is hardcoded below to Atmega pin 18 / Port H6 / Arduino pin 9 (OC2B).
     // As Ken Shirriff said, a few hours staring at the ATmega documentation and this will all make sense.
     // For more info, see his website "Secrets of Arduino PWM" at http://www.righto.com/2009/07/secrets-of-arduino-pwm.html
