@@ -1,7 +1,9 @@
-0.92.06         07/14/2017 - Added two ad-hoc triggers, "Cannon Hit" and "Vehicle Destroyed" that can be used to trigger any digital function. Functionality for I/O Ports A&B has 
-                             been expanded. When set to Output they now have the option to be "Default High" or "Default Low." Each also has a new function called "Pulse." 
-                             If the Pulse function is triggered the external output pin A or B will briefly be held in the opposite direction of its default state. This can be
-                             used to emulate a button press to some external device. 
+0.92.06         07/14/2017 - Added two ad-hoc triggers, "Cannon Hit" and "Vehicle Destroyed" that can be used to trigger any digital function. 
+                           - Functionality for I/O Ports A&B has been expanded. When set to Output they now have the option to be "Default High" or "Default Low." Each 
+                             also has a new function called "Pulse." If the Pulse function is triggered the external output pin A or B will briefly be held in the opposite 
+                             direction of its default state. This can beused to emulate a button press to some external device. 
+                           - New function "Inverse Flash" added for Aux Output. Works the same way as the regular Flash function except this one holds the output high (+5 volts)
+                             normally, and during the flash brings the output momentarily to ground. Again, this can be used to emulate a button press for some external device. 
 0.92.05         06/04/2017 - Added ability to trigger a brake sound automatically when vehicle brakes, presently only compatible with the Open Panzer Sound Card. The same effect
                              can be implemented with the Benedini TBS Mini, but you must load your brake sound as one of the user sounds, then trigger the user sound using the 
                              "Brakes Applied" trigger. 
