@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 111;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 112;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -72,7 +72,7 @@ enum _special_function : byte {
     SF_AUXOUT_OFF       = 27,       // 27
     SF_AUXOUT_LEVEL     = 28,       // 28   -- analog function
     SF_AUXOUT_PRESETDIM = 29,       // 29
-    SF_AUXOUT_FLASH     = 30,       // 30
+    SF_AUXOUT_FLASH     = 30,       // 30   -- see also 111 for inverse flash
     SF_AUXOUT_BLINK     = 31,       // 31
     SF_AUXOUT_TOGGLEBLINK = 32,     // 32
     SF_AUXOUT_REVOLVE   = 33,       // 33
@@ -152,7 +152,8 @@ enum _special_function : byte {
     SF_USER_SOUND6_RPT  = 107,      // 107
     SF_USER_SOUND6_OFF  = 108,      // 108    
     SF_OUTPUT_A_PULSE   = 109,      // 109   -- see also 41-43 for other OUTPUT_A functions
-    SF_OUTPUT_B_PULSE   = 110       // 110   -- see also 44-46 for other OUTPUT_B functions
+    SF_OUTPUT_B_PULSE   = 110,      // 110   -- see also 44-46 for other OUTPUT_B functions
+    SF_AUXOUT_INV_FLASH = 111       // 111   -- see also 30 for regular flash       
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -171,7 +172,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
  1,1,1,1,1,1,1,1,1,1,   // 100-109  
- 1                      // 110
+ 1,1                    // 110-111
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -216,7 +217,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Aux Output - Turn Off",                     // 27
     "Aux Output - Set Level",                    // 28
     "Aux Output - Preset Dim Level",             // 29
-    "Aux Output - Flash",                        // 30
+    "Aux Output - Flash",                        // 30  -- see also 111 for inverse flash
     "Aux Output - Blink",                        // 31
     "Aux Output - Toggle Blink",                 // 32
     "Aux Output - Revolving Light",              // 33 
@@ -296,7 +297,8 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 6 - Repeat",                     // 107
     "User Sound 6 - Stop",                       // 108    
     "External Output A - Pulse",                 // 109 -- see also 41-43 for other OUTPUT_A functions
-    "External Output B - Pulse"                  // 110 -- see also 44-46 for other OUTPUT_B functions    
+    "External Output B - Pulse",                 // 110 -- see also 44-46 for other OUTPUT_B functions   
+    "Aux Output - Inverse Flash"                 // 111 -- see also 30 for regular flash
 };
 
 

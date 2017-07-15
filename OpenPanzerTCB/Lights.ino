@@ -164,13 +164,27 @@ uint8_t auxLevel;
 }
 void AuxOutputFlash()
 {
-    // This is sort of like a one-time blink. It can be used to create a second cannon flash.
-    // First we turn the light on
+    // This is sort of like a one-time blink. It can be used to create a second cannon flash,
+    // or it can be used to emulate a button press to some external device. This is the regular
+    // version, where the pin is normally held low, but during flash it is brought high briefly. 
+    // First we turn the output on (flash)
     AuxOutputOn();  
     // Then we set a timer to turn it off after the flash length of time has passed
     AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightFlashTime_mS, AuxOutputOff);
 
     if (DEBUG) DebugSerial->println(F("Aux Output Flashed"));
+}
+void AuxOutputInverseFlash()
+{
+    // This is sort of like a one-time blink. It can be used to create a second cannon flash,
+    // or it can be used to emulate a button press to some external device. This is the inverse
+    // version, where the pin is normally held high, but during flash it is dropped low briefly.
+    // First we turn the output off (flash)
+    AuxOutputOff();  
+    // Then we set a timer to turn it on after the flash length of time has passed
+    AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightFlashTime_mS, AuxOutputOn);
+
+    if (DEBUG) DebugSerial->println(F("Aux Output Inverse Flashed"));
 }
 void AuxOutputBlink()
 {

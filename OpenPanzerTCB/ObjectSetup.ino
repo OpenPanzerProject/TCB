@@ -574,7 +574,6 @@ void SetupPins()
     pinMode(pin_Light2, OUTPUT);            // Output   - Light 2 output
     analogWrite(pin_Light2, 1);
     pinMode(pin_Brakelights, OUTPUT);	    // Output   - Brake light output. PWM capable.
-    pinMode(pin_AuxOutput, OUTPUT);         // Output   - Aux output. PWM capable. Has flyback diode, can drive a relay directly or a (very small) motor 
     pinMode(pin_HitNotifyLEDs, OUTPUT);	    // Output   - Hit notification LEDs if using the Tamiya apple
     // This one is PNP, so logic high is off
     digitalWrite(pin_MuzzleFlash, HIGH);
@@ -587,13 +586,20 @@ void SetupPins()
     digitalWrite(pin_Light1, LOW);
     digitalWrite(pin_Light2, LOW);
     digitalWrite(pin_Brakelights, LOW);
-    digitalWrite(pin_AuxOutput, LOW);
+    
     digitalWrite(pin_HitNotifyLEDs, LOW);
     MG_PORT &= ~(1 << MG_PORTPIN);          // Machine Gun LED must be set directly. We "and-not" the port pin bit with 1 to set it to 0, this turns it off
 
+    // Aux Output
+    pinMode(pin_AuxOutput, OUTPUT);         // Output   - Aux output. PWM capable. Has flyback diode, can drive a relay directly or a (very small) motor 
+    // The default state (high or low) depends on the presence or absence of certain functions.
+    // If the inverse flash function is assigned, we want the default value to be High, but in all other cases we want the default to be Low
+    if (isFunctionAssigned(SF_AUXOUT_INV_FLASH))    digitalWrite(pin_AuxOutput, HIGH);       
+    else                                            digitalWrite(pin_AuxOutput, LOW);       
+   
 
-// Mechanical Recoil Trigger
-    pinMode(pin_MechRecoilMotor, OUTPUT);	    // Output   - Transistor for Asiatam, Tamiya or similar mechanical recoil units
+    // Mechanical Recoil Trigger
+    pinMode(pin_MechRecoilMotor, OUTPUT);   // Output   - Transistor for Asiatam, Tamiya or similar mechanical recoil units
     // Also NPN, logic low is off
     digitalWrite(pin_MechRecoilMotor, LOW);
     

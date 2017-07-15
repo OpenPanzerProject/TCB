@@ -54,6 +54,7 @@ void LoadFunctionTriggers()
                 case SF_AUXOUT_LEVEL:               SF_Callback[i] = &AuxOutput_SetLevel;                           break; // Analog function
                 case SF_AUXOUT_PRESETDIM:           SF_Callback[i] = &SF_AuxOutput_PresetDim;                       break;
                 case SF_AUXOUT_FLASH:               SF_Callback[i] = &SF_AuxOutputFlash;                            break;
+                case SF_AUXOUT_INV_FLASH:           SF_Callback[i] = &SF_AuxOutputInverseFlash;                     break;
                 case SF_AUXOUT_BLINK:               SF_Callback[i] = &SF_AuxOutputBlink;                            break;
                 case SF_AUXOUT_TOGGLEBLINK:         SF_Callback[i] = &SF_AuxOutputToggleBlink;                      break;
                 case SF_AUXOUT_REVOLVE:             SF_Callback[i] = &SF_AuxOutputRevolve;                          break;
@@ -80,9 +81,11 @@ void LoadFunctionTriggers()
                 case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
+                case SF_OUTPUT_A_PULSE:             SF_Callback[i] = &SF_PortA_Pulse;                               break;
                 case SF_OUTPUT_B_TOGGLE:            SF_Callback[i] = &SF_PortB_Toggle;                              break;
                 case SF_OUTPUT_B_ON:                SF_Callback[i] = &SF_PortB_On;                                  break; 
                 case SF_OUTPUT_B_OFF:               SF_Callback[i] = &SF_PortB_Off;                                 break; 
+                case SF_OUTPUT_B_PULSE:             SF_Callback[i] = &SF_PortB_Pulse;                               break;                                
                 case SF_ACCEL_LEVEL:                SF_Callback[i] = &SF_SetAccelRampFreq;                          break;         
                 case SF_DECEL_LEVEL:                SF_Callback[i] = &SF_SetDecelRampFreq;                          break;
                 case SF_TURNMODE_1:                 SF_Callback[i] = &SF_TurnMode1;                                 break;                    
@@ -132,8 +135,6 @@ void LoadFunctionTriggers()
                 case SF_INCR_VOLUME:                SF_Callback[i] = &SF_IncreaseVolume;                            break;
                 case SF_DECR_VOLUME:                SF_Callback[i] = &SF_DecreaseVolume;                            break;
                 case SF_STOP_VOLUME:                SF_Callback[i] = &SF_StopVolume;                                break;
-                case SF_OUTPUT_A_PULSE:             SF_Callback[i] = &SF_PortA_Pulse;                               break;
-                case SF_OUTPUT_B_PULSE:             SF_Callback[i] = &SF_PortB_Pulse;                               break;                
             }
         }
     }
@@ -151,6 +152,21 @@ uint8_t CountTriggers(void)
     return tCount; 
 }
 
+boolean isFunctionAssigned(_special_function f)
+{
+    boolean does_exist = false; 
+
+    // We want to know if the passed function f is being used, meaning,it exists in the special function array and a valid trigger has been assigned to it. 
+    for (int i = 0; i <MAX_FUNCTION_TRIGGERS; i++)
+    {   
+        if (eeprom.ramcopy.SF_Trigger[i].specialFunction == f && eeprom.ramcopy.SF_Trigger[i].TriggerID > 0) 
+        {
+            does_exist = true;
+            break;
+        }
+    }
+    return does_exist;
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // CONVENIENCE FUNCTION - GET TRIGGER NAME FROM TRIGGER ID
@@ -421,6 +437,7 @@ void SF_AuxOutputOn(uint16_t ignoreMe)          { AuxOutputOn();            }
 void SF_AuxOutputOff(uint16_t ignoreMe)         { AuxOutputOff();           }
 void SF_AuxOutput_PresetDim(uint16_t ignoreMe)  { AuxOutput_PresetDim();    }
 void SF_AuxOutputFlash(uint16_t ignoreMe)       { AuxOutputFlash();         }
+void SF_AuxOutputInverseFlash(uint16_t ignoreMe){ AuxOutputInverseFlash();  }
 void SF_AuxOutputBlink(uint16_t ignoreMe)       { AuxOutputBlink();         }
 void SF_AuxOutputToggleBlink(uint16_t ignoreMe) { AuxOutputToggleBlink();   }
 void SF_AuxOutputRevolve(uint16_t ignoreMe)     { AuxOutputRevolve();       }
