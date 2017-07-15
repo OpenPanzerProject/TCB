@@ -132,6 +132,8 @@ void LoadFunctionTriggers()
                 case SF_INCR_VOLUME:                SF_Callback[i] = &SF_IncreaseVolume;                            break;
                 case SF_DECR_VOLUME:                SF_Callback[i] = &SF_DecreaseVolume;                            break;
                 case SF_STOP_VOLUME:                SF_Callback[i] = &SF_StopVolume;                                break;
+                case SF_OUTPUT_A_PULSE:             SF_Callback[i] = &SF_PortA_Pulse;                               break;
+                case SF_OUTPUT_B_PULSE:             SF_Callback[i] = &SF_PortB_Pulse;                               break;                
             }
         }
     }
@@ -249,7 +251,9 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
     {   // The only way to do these is hand-code them, that is why they are called "ad-hoc"
         switch (TriggerID)
         {   // The line should equal 29 characters
-            case ADHOC_TRIGGER_BRAKES_APPLIED:  DebugSerial->print(F("Brakes Applied")); PrintSpaces(15); break;
+            case ADHOC_TRIGGER_BRAKES_APPLIED:      DebugSerial->print(F("Brakes Applied"));    PrintSpaces(15); break;
+            case ADHOC_TRIGGER_CANNON_HIT:          DebugSerial->print(F("Cannon Hit"));        PrintSpaces(19); break;
+            case ADHOC_TRIGGER_VEHICLE_DESTROYED:   DebugSerial->print(F("Vehicle Destroyed")); PrintSpaces(12); break;
         }        
     }
     // Vehicle speed triggers - increasing speed
@@ -442,9 +446,11 @@ void SF_UserSound6_Stop(uint16_t ignoreMe)      { UserSound6_Stop();        }
 void SF_PortA_Toggle(uint16_t ignoreMe)         { PortA_Toggle();           }
 void SF_PortA_On(uint16_t ignoreMe)             { PortA_On();               }
 void SF_PortA_Off(uint16_t ignoreMe)            { PortA_Off();              }
+void SF_PortA_Pulse(uint16_t ignoreMe)          { PortA_Pulse();            }
 void SF_PortB_Toggle(uint16_t ignoreMe)         { PortB_Toggle();           }
 void SF_PortB_On(uint16_t ignoreMe)             { PortB_On();               }
 void SF_PortB_Off(uint16_t ignoreMe)            { PortB_Off();              }
+void SF_PortB_Pulse(uint16_t ignoreMe)          { PortB_Pulse();            }
 void SF_BarrelStab_On(uint16_t ignoreMe)        { EnableBarrelStabilization(true);  }
 void SF_BarrelStab_Off(uint16_t ignoreMe)       { EnableBarrelStabilization(false); }
 void SF_BarrelStab_Toggle(uint16_t ignoreMe)    { ToggleBarrelStabilization();      }

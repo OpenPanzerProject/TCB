@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 109;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 111;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -83,10 +83,10 @@ enum _special_function : byte {
     SF_USER_SOUND2_ONCE = 38,       // 38
     SF_USER_SOUND2_RPT  = 39,       // 39
     SF_USER_SOUND2_OFF  = 40,       // 40
-    SF_OUTPUT_A_TOGGLE  = 41,       // 41
+    SF_OUTPUT_A_TOGGLE  = 41,       // 41   -- see also 109 for pulse
     SF_OUTPUT_A_ON      = 42,       // 42
     SF_OUTPUT_A_OFF     = 43,       // 43
-    SF_OUTPUT_B_TOGGLE  = 44,       // 44
+    SF_OUTPUT_B_TOGGLE  = 44,       // 44   -- see also 110 for pulse
     SF_OUTPUT_B_ON      = 45,       // 45
     SF_OUTPUT_B_OFF     = 46,       // 46   
     SF_ACCEL_LEVEL      = 47,       // 47   -- analog function
@@ -150,7 +150,9 @@ enum _special_function : byte {
     SF_USER_SOUND5_OFF  = 105,      // 105
     SF_USER_SOUND6_ONCE = 106,      // 106
     SF_USER_SOUND6_RPT  = 107,      // 107
-    SF_USER_SOUND6_OFF  = 108       // 108    
+    SF_USER_SOUND6_OFF  = 108,      // 108    
+    SF_OUTPUT_A_PULSE   = 109,      // 109   -- see also 41-43 for other OUTPUT_A functions
+    SF_OUTPUT_B_PULSE   = 110       // 110   -- see also 44-46 for other OUTPUT_B functions
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -168,7 +170,8 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  0,1,1,0,0,1,0,0,0,1,   // 70-79    70,73,74 analog
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
- 1,1,1,1,1,1,1,1,1      // 100-108  
+ 1,1,1,1,1,1,1,1,1,1,   // 100-109  
+ 1                      // 110
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -224,10 +227,10 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 2 - Play Once",                  // 38
     "User Sound 2 - Repeat",                     // 39
     "User Sound 2- Stop",                        // 40
-    "External Output A - Toggle",                // 41
+    "External Output A - Toggle",                // 41   -- see also 109 for pulse
     "External Output A - Turn On",               // 42
     "External Output A - Turn Off",              // 43             
-    "External Output B - Toggle",                // 44
+    "External Output B - Toggle",                // 44   -- see also 110 for pulse
     "External Output B - Turn On",               // 45
     "External Output B - Turn Off",              // 46
     "Set Acceleration Level",                    // 47
@@ -291,7 +294,9 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 5 - Stop",                       // 105
     "User Sound 6 - Play Once",                  // 106
     "User Sound 6 - Repeat",                     // 107
-    "User Sound 6 - Stop"                        // 108    
+    "User Sound 6 - Stop",                       // 108    
+    "External Output A - Pulse",                 // 109 -- see also 41-43 for other OUTPUT_A functions
+    "External Output B - Pulse"                  // 110 -- see also 44-46 for other OUTPUT_B functions    
 };
 
 
@@ -363,7 +368,9 @@ enum _trigger_source : byte {
     TS_INPUT_B,            // External input B (if set to input)
     TS_SPEED_INCR,         // Vehicle speed increases beyond a set point
     TS_SPEED_DECR,         // Vehicle speed decreased below  a set point
-    TS_ADHC_BRAKES         // Ad-hoc - brakes applied
+    TS_ADHC_BRAKES,        // Ad-hoc - brakes applied
+    TS_ADHC_CANNONHIT,     // Ad-hoc - received cannon hit
+    TS_ADHC_DESTROYED      // Ad-hoc - vehicle destroyed
 };
 
 
@@ -431,20 +438,21 @@ enum _trigger_source : byte {
 // But in time, who knows, we may think of new events that we want for triggers, so it's good to have a process to implement them. 
 
 // Count of active Ad-Hoc triggers
-#define COUNT_ADHOC_TRIGGERS            1           // This number can not get higher than 16 unless you want to change some methods in the sketch
+#define COUNT_ADHOC_TRIGGERS            3           // This number can not get higher than 16 unless you want to change some methods in the sketch
 
 // Ad-Hoc trigger Flag Masks
 // We don't anticipate needing many ad hoc trigger events. In the Sketch we will use a single 2-byte integer for 16 flags. The sketch sets the appropriate bit when an event occurs, 
 // the flag causes execution of any function with the corresponding trigger ID defined below, and finally the flag bit is cleared after execution for the next round. 
 #define ADHOCT_BIT_BRAKES_APPLIED       0           // Brakes just applied
-//#define ADHOCT_BIT_ etc...
+#define ADHOCT_BIT_CANNON_HIT           1           // Vehicle received cannon hit
+#define ADHOCT_BIT_VEHICLE_DESTROYED    2           // Vehicle destroyed
 
 // Ad-Hoc trigger Triggger IDs 
 // The trigger IDs must start at trigger_id_adhoc_start and go up from there, but not exceed (trigger_id_adhoc_start + trigger_id_adhoc_range - 1)
 // In practice they shouldn't even go above 19015 because we only have 16 flags implemented in the sketch.
-#define ADHOC_TRIGGER_BRAKES_APPLIED    trigger_id_adhoc_start + ADHOCT_BIT_BRAKES_APPLIED      // Ad-Hoc Trigger ID  1 - brakes just applied
-//                                      19001                                                   // Ad-Hoc Trigger ID  2
-//                                      19002                                                   // Ad-Hoc Trigger ID  3
+#define ADHOC_TRIGGER_BRAKES_APPLIED    trigger_id_adhoc_start + ADHOCT_BIT_BRAKES_APPLIED      // Ad-Hoc Trigger ID  1 - brakes just applied   19000
+#define ADHOC_TRIGGER_CANNON_HIT        trigger_id_adhoc_start + ADHOCT_BIT_CANNON_HIT          // Ad-Hoc Trigger ID  2 - received cannon hit   19001
+#define ADHOC_TRIGGER_VEHICLE_DESTROYED trigger_id_adhoc_start + ADHOCT_BIT_VEHICLE_DESTROYED   // Ad-Hoc Trigger ID  3 - vehicle destroyed     19002
 //                                      19003                                                   // Ad-Hoc Trigger ID  4
 //                                      19004                                                   // Ad-Hoc Trigger ID  5
 //                                      19005                                                   // Ad-Hoc Trigger ID  6

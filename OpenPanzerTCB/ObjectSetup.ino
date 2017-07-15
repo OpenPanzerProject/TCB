@@ -519,12 +519,12 @@ void SetupPins()
     if (IO_Pin[IOA].Settings.dataDirection == OUTPUT)    
     {
         pinMode(pin_IO_A, OUTPUT);
-        PortA_Off();    // Start with it low
+        IO_Pin[IOA].Settings.dataType ? PortA_On() : PortA_Off();   // The default pin state is defined by the dataType setting
     }   
     else                                            
     {   // Use pullups if the input is "digital" (only needs to read on/off)
         // But if they want a full analog range, don't use pullups because it will prevent us from going all the way to ground (0)
-        if (IO_Pin[IOA].Settings.Digital) pinMode(pin_IO_A, INPUT_PULLUP); 
+        if (IO_Pin[IOA].Settings.dataType) pinMode(pin_IO_A, INPUT_PULLUP); 
         else pinMode(pin_IO_A, INPUT); 
         PortA_ReadValue();  // Get the present value
     }
@@ -533,12 +533,12 @@ void SetupPins()
     if (IO_Pin[IOB].Settings.dataDirection == OUTPUT)
     {
         pinMode(pin_IO_B, OUTPUT);
-        PortB_Off();    // Start with it low
+        IO_Pin[IOB].Settings.dataType ? PortB_On() : PortB_Off();   // The default pin state is defined by the dataType setting
     }
     else                                            
     {   // Use pullups if the input is "digital" (only needs to read on/off)
         // But if they want a full analog range, don't use pullups because it will prevent us from going all the way to ground (0)
-        if (IO_Pin[IOB].Settings.Digital)   pinMode(pin_IO_B, INPUT_PULLUP);
+        if (IO_Pin[IOB].Settings.dataType) pinMode(pin_IO_B, INPUT_PULLUP);
         else pinMode(pin_IO_B, INPUT);        
         PortB_ReadValue(); // Get the present value
     }

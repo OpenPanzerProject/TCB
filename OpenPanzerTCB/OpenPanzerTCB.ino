@@ -1302,9 +1302,11 @@ if (Startup)
             // Check for any trigger associated with external inputs on I/O pins A or B. This will only apply if the user set these to input (they have the option of being outputs as well). 
             for (uint8_t io=0; io<NUM_IO_PORTS; io++)
             {   // FYI - dataDirection == 0 means "input"
+                //       dataType == 0 (false) means "analog input"  (variable)
+                //       dataType == 1 (true)  means "digital input" (on/off only)
                 // The user can specify "digital" input (values converted to 1/0) 
                 if (IO_Pin[io].Settings.dataDirection == 0 &&
-                    IO_Pin[io].Settings.Digital && 
+                    IO_Pin[io].Settings.dataType && 
                     IO_Pin[io].updated &&
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_ports * (io+1)) + IO_Pin[io].inputValue))
                     {
@@ -1312,7 +1314,7 @@ if (Startup)
                     }
                 // Or the user can also keep this as an analog input
                 if (IO_Pin[io].Settings.dataDirection == 0 &&
-                    IO_Pin[io].Settings.Digital == false && 
+                    IO_Pin[io].Settings.dataType == false && 
                     IO_Pin[io].updated &&
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_ports * (io+1))))
                     {
@@ -1383,7 +1385,8 @@ if (Startup)
                     // Were we in the middle of a repair?
                     if (RepairOngoing) { DebugSerial->println(F("REPAIR OPERATION CANCELLED")); }
                 }
-                if (RepairOngoing) { RepairOngoing = REPAIR_NONE; }   // End repair if we were in the middle of one
+                bitSet(AdHocTriggers, ADHOCT_BIT_CANNON_HIT);           // Set the cannon hit ad-hoc trigger bit (will get canceled later if this was the destruction hit though)
+                if (RepairOngoing) { RepairOngoing = REPAIR_NONE; }     // End repair if we were in the middle of one
                 break;
             case HIT_TYPE_MG:
                 if (DEBUG) 
@@ -1448,6 +1451,8 @@ if (Startup)
             if (DEBUG) { DebugSerial->println(F("TANK DESTROYED")); }
             Alive = false;
             StopEverything();
+            bitSet(AdHocTriggers, ADHOCT_BIT_VEHICLE_DESTROYED);    // Set the vehicle destroyed ad-hoc trigger bit 
+            bitClear(AdHocTriggers, ADHOCT_BIT_CANNON_HIT);         // Clear the cannon hit ad-hoc trigger bit (if that's what caused the destruction) since we don't want cannon hit and destroyed to trigger at the same time. 
             // But we might not want to stop the smoker, the user can set it to run while the tank is destroyed. 
             Smoker_SetDestroyedSpeed();
         }

@@ -159,9 +159,9 @@ const _storage_var_info STORAGEVARS[NUM_STORED_VARS] PROGMEM_FAR = {
     {1293, 155, varUINT8},        // Aux12_ChannelSettings.NumPositions
     {1294, 156, varBOOL},        // Aux12_ChannelSettings.reversed
     {1311, 157, varUINT8},        // PortA_Settings.dataDirection
-    {1312, 158, varBOOL},        // PortA_Settings.Digital
+    {1312, 158, varBOOL},        // PortA_Settings.dataType
     {1313, 159, varUINT8},        // PortB_Settings.dataDirection
-    {1314, 160, varBOOL},        // PortB_Settings.Digital
+    {1314, 160, varBOOL},        // PortB_Settings.dataType
     {1411, 161, varUINT16},        // SF_Trigger[0].TriggerID
     {1412, 163, varUINT8},        // SF_Trigger[0].specialFunction
     {1413, 164, varUINT16},        // SF_Trigger[1].TriggerID

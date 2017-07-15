@@ -25,11 +25,12 @@
 // GENERAL PURPOSE I/O
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 
-#define NUM_IO_PORTS 2
+#define NUM_IO_PORTS    2
+#define IO_PULSE_TIME   300     // Time in milliseconds to pulse the IO port if set to output and the user triggers the pulse function
 
 typedef struct external_io_settings{
     uint8_t dataDirection;  // 1 = output, 0 = input
-    boolean Digital;        // If input, is this on/off (digital = 1) or analog (0)
+    boolean dataType;       // If input, 1 = "digital" (on/off only), 0 = analog (variable), default to digital. If Output, 1 = normally high, 0 = normally low, default normally high.
 };
 
 typedef struct external_io{
