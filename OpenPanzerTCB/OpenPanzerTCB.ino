@@ -205,6 +205,13 @@ void setup()
         DEBUG = false;                                             // But we leave the actual DEBUG initialized to false. It will get set equal to SAVE_DEBUG only after a certain amount of time has passed, so we 
                                                                    // don't put messages out the port right after boot - they could conflict with our ability to detect communication efforts from the PC. 
 
+    // TIMERS
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->
+    // These are macros, see OP_Settings.h for definitions. We do these before pins because PWM setup can change a pin's status
+        SetupTimer1();
+        SetupTimer4();
+        SetupTimer5();
+        
     // PINS NOT RELATED TO OBJECTS - SETUP
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // We want to setup the pins as early as possible to put all outputs in a safe state. But remember to read EEPROM first because some EEPROM settings will determine how the pins are set. 
@@ -245,13 +252,6 @@ void setup()
                 break;
             }
         } while (InputButton.isPressed());
-
-    // TIMERS
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->
-    // These are macros, see OP_Settings.h for definitions
-        SetupTimer1();
-        SetupTimer4();
-        SetupTimer5();
         
     // MOTOR OBJECTS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    

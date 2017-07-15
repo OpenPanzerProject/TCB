@@ -30,7 +30,7 @@
 
 typedef struct external_io_settings{
     uint8_t dataDirection;  // 1 = output, 0 = input
-    boolean dataType;       // If input, 1 = "digital" (on/off only), 0 = analog (variable), default to digital. If Output, 1 = normally high, 0 = normally low, default normally high.
+    uint8_t dataType;       // If input, 1 = "digital" (on/off only), 0 = analog (variable), default to digital. If Output, 1 = normally high, 0 = normally low, default normally high.
 };
 
 typedef struct external_io{

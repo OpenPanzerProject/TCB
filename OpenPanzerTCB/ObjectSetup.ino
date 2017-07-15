@@ -594,10 +594,10 @@ void SetupPins()
     pinMode(pin_AuxOutput, OUTPUT);         // Output   - Aux output. PWM capable. Has flyback diode, can drive a relay directly or a (very small) motor 
     // The default state (high or low) depends on the presence or absence of certain functions.
     // If the inverse flash function is assigned, we want the default value to be High, but in all other cases we want the default to be Low
-    if (isFunctionAssigned(SF_AUXOUT_INV_FLASH))    digitalWrite(pin_AuxOutput, HIGH);       
+    // NOTE: If you setup Timer 4 after this statement, rather than before, the HIGH setting won't be saved. 
+    if (isFunctionAssigned(SF_AUXOUT_INV_FLASH))    digitalWrite(pin_AuxOutput, HIGH); 
     else                                            digitalWrite(pin_AuxOutput, LOW);       
    
-
     // Mechanical Recoil Trigger
     pinMode(pin_MechRecoilMotor, OUTPUT);   // Output   - Transistor for Asiatam, Tamiya or similar mechanical recoil units
     // Also NPN, logic low is off

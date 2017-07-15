@@ -429,7 +429,7 @@ void AllLightsOff()
     digitalWrite(pin_Light2, LOW);
     digitalWrite(pin_Brakelights, LOW);   
     digitalWrite(pin_HitNotifyLEDs, LOW);
-    AuxOutputOff();
+    // We don't include the Aux output because we don't know if it's a light or what the user is using it for. 
     MGLightOff();
 }
 
@@ -444,7 +444,6 @@ static boolean Toggle = true;
     digitalWrite(pin_Light2, !Toggle);
     digitalWrite(pin_Brakelights, !Toggle);   
     digitalWrite(pin_HitNotifyLEDs, Toggle);
-    AuxOutputOff(); // This one doesn't toggle, just always stays off. 
     Toggle ? MGLightOff() : MGLightOn();
     // Swap for next time
     Toggle = !Toggle;
