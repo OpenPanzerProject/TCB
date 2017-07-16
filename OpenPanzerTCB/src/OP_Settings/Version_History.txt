@@ -1,4 +1,4 @@
-0.92.06         07/14/2017 - Added two ad-hoc triggers, "Cannon Hit" and "Vehicle Destroyed" that can be used to trigger any digital function. 
+0.92.06         07/15/2017 - Added two ad-hoc triggers, "Cannon Hit" and "Vehicle Destroyed" that can be used to trigger any digital function. 
                            - Functionality for I/O Ports A&B has been expanded. When set to Output they now have the option to be "Default High" or "Default Low." Each 
                              also has a new function called "Pulse." If the Pulse function is triggered the external output pin A or B will briefly be held in the opposite 
                              direction of its default state. This can be used to emulate a button press to some external device. 
