@@ -225,10 +225,24 @@ void InstantiateMotorObjects()
     TurretRotation->begin(); 
     // The user also has the option of limiting max turret rotation speed. We can easily do this by using the set_MaxSpeedPct function of the motor object. 
     // Of course this will cause unintended consequences if the motor type is set to SERVO_ESC and they are using an unmodified hobby servo (ie, not a continuous rotation servo). 
-    // In that case limiting the max speed will actually just limit the servo's travel. However for turret rotation it is unlikelyi an unmodified hobby servo would be used. 
+    // In that case limiting the max speed will actually just limit the servo's travel. However for turret rotation it is unlikely an unmodified hobby servo would be used. 
     // We could do a check for SERVO_ESC, but that won't help, because the user could have plugged in a continuous rotation servo, or be using a hobby ESC, and still selected SERVO_ESC,
     // and in those cases limiting the max speed would indeed work as intended. 
     if (eeprom.ramcopy.TurretRotation_MaxSpeedPct < 100) { TurretRotation->set_MaxSpeedPct(eeprom.ramcopy.TurretRotation_MaxSpeedPct); }   
+    
+    // We may also have some custom end-points defined for the rotation motor, if it is set to servo. 
+    // These end-points need to be set after the begin() statement, which initializes the endpoints to defaults.
+    if (eeprom.ramcopy.TurretRotationMotor == SERVO_ESC || eeprom.ramcopy.TurretRotationMotor == SERVO_PAN)
+    {
+        // The end-points are actually handled in the servo class, not the motor class. Since TurretRotation is a pointer to the motor class, 
+        // and not the servo class we need to call the servo class directly using TankServos (even though in this case TurretRotation is also a subclass of servo)
+        TankServos.setMinPulseWidth(SERVONUM_TURRETROTATION, eeprom.ramcopy.TurretRotation_EPMin);
+        TankServos.setMaxPulseWidth(SERVONUM_TURRETROTATION, eeprom.ramcopy.TurretRotation_EPMax);
+        
+        // For turret rotation, we use the reversed setting of the motor class. 
+        // FYI, we don't have a reversed setting for traditional motors (Sabertooth, onboard, etc...) because in those cases you can just swap the motor wires. 
+        TurretRotation->set_Reversed(eeprom.ramcopy.TurretRotation_Reversed);
+    }
 
     // TURRET MOTOR DEFINITION - ELEVATION
     // -------------------------------------------------------------------------------------------------------------------------------------->>

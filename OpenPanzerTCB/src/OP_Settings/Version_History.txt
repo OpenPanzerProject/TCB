@@ -1,3 +1,7 @@
+0.92.07         07/18/2017 - Added ability to select Pan Servo for turret rotation. Most users will not want this but it can be useful for turret-less tanks (eg Jagdpanther) with a 
+                             limited traverse barrel. 
+                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                             It is advised to save an OPZ file of your settings before re-flashing.                                 
 0.92.06         07/15/2017 - Added two ad-hoc triggers, "Cannon Hit" and "Vehicle Destroyed" that can be used to trigger any digital function. 
                            - Functionality for I/O Ports A&B has been expanded. When set to Output they now have the option to be "Default High" or "Default Low." Each 
                              also has a new function called "Pulse." If the Pulse function is triggered the external output pin A or B will briefly be held in the opposite 

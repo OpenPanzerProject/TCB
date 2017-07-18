@@ -430,6 +430,9 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.TurretElevation_Reversed = false;
         ramcopy.TurretElevation_MaxSpeedPct = 100;
         ramcopy.TurretRotation_MaxSpeedPct = 100;
+        ramcopy.TurretRotation_EPMin = 1000;
+        ramcopy.TurretRotation_EPMax = 2000;
+        ramcopy.TurretRotation_Reversed = false;
 
     // Mechanical Barrel and Recoil Servo settings
         ramcopy.Airsoft = true;

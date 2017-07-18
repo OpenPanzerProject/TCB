@@ -48,7 +48,7 @@
 // In that case EEPROM data corruption WILL occur and the sketch will exhibit unstable behavior!
 // 
 
-    #define EEPROM_INIT             0x62BC          // Modified with 00.92.03 on 3/10/2017
+    #define EEPROM_INIT             0x41E3          // Modified with 00.92.07 on 7/18/2017
 //
 //
 //=======================================================================================================================================>>

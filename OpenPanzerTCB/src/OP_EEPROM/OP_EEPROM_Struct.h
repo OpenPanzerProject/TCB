@@ -34,12 +34,15 @@ struct _eeprom_data {
     Drive_t TurretRotationMotor;
     Drive_t TurretElevationMotor;
 
-//  Elevation motor min/max/reversed
+//  Elevation/Rotation servo min/max/reversed/speed
     int16_t TurretElevation_EPMin;             // If the elevation motor selection is of type servo, we allow customized endpoints
     int16_t TurretElevation_EPMax;
     boolean TurretElevation_Reversed;          // And we have a motor-specific reversed flag as well, so it doesn't have to be tied to the stick reversed setting
     uint8_t TurretElevation_MaxSpeedPct;       // Barrel elevation motor speed as percent of full speed
     uint8_t TurretRotation_MaxSpeedPct;        // Turret rotation motor speed as percent of full speed
+    int16_t TurretRotation_EPMin;              // If the rotation motor selection is of type servo, we allow customized endpoints
+    int16_t TurretRotation_EPMax;
+    boolean TurretRotation_Reversed;           // And we have a motor-specific reversed flag as well, so it doesn't have to be tied to the stick reversed setting
 
 // Mechanical Barrel and Recoil Servo settings
     boolean Airsoft;                           // If true, we are controlling an airsoft unit. If false, we are controlling mechanical recoil unit. 

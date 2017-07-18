@@ -633,7 +633,7 @@ if (Startup)
                     switch (GetMenuNumber())
                     {
                         case 1: 
-                            // Barrel elevation servo setup
+                            // Barrel elevation servo setup - switch 3 & 4 ON
                             if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
                             { SetupServo(SERVONUM_TURRETELEVATION); }
                             else
@@ -645,15 +645,23 @@ if (Startup)
                             break;
                             
                         case 2: 
-                            // Reserved for future use
+                            // Reserved for future use                            
                             break;        
                             
                         case 3: 
-                            // Reserved for future use
+                            // Turret rotation servo setup - switch 3 OFF & 4 ON
+                            if (eeprom.ramcopy.TurretRotationMotor == SERVO_ESC || eeprom.ramcopy.TurretRotationMotor == SERVO_PAN)
+                            { SetupServo(SERVONUM_TURRETROTATION); }
+                            else
+                            { 
+                                if (DEBUG) DebugSerial->println(F("Turret rotation is not of type Servo. No setup available.")); 
+                                // Wait for them to release the button before proceeding
+                                do { delay(10); InputButton.read(); } while (!InputButton.wasReleased()); 
+                            }                            
                             break;
                             
                         case 4: 
-                            // Recoil servo setup
+                            // Recoil servo setup - switch 3 & 4 OFF
                             SetupServo(SERVONUM_RECOIL); 
                             break;
                     }

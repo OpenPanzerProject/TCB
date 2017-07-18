@@ -39,6 +39,15 @@ void SetupServo(ESC_POS_t servoNum)
             DebugSerial->println(F("Setup Turret Elevation Pan Servo"));
             break;
 
+        case SERVONUM_TURRETROTATION:
+            servo = new Servo_PAN(SERVONUM_TURRETROTATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+            reversed = TurretRotation->isReversed();
+            pulseMin = servo->getMinPulseWidth(SERVONUM_TURRETROTATION);
+            pulseMax = servo->getMaxPulseWidth(SERVONUM_TURRETROTATION);
+            isRecoil = false;
+            DebugSerial->println(F("Setup Turret Rotation Pan Servo"));
+            break;
+            
         case SERVONUM_RECOIL:
             servo = new Servo_PAN(SERVONUM_RECOIL,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
             reversed = RecoilServo->isReversed();
@@ -269,9 +278,42 @@ void SetupServo(ESC_POS_t servoNum)
             {   // This is a regular servo. The stop command will put it to center. 
                 TurretElevation->stop();
             }
-            
             break;
 
+        case SERVONUM_TURRETROTATION:
+            // Save the global variable
+            eeprom.ramcopy.TurretRotation_EPMin = pulseMin;
+            eeprom.ramcopy.TurretRotation_EPMax = pulseMax;
+            eeprom.ramcopy.TurretRotation_Reversed = reversed;
+            // Update eeprom too so it's permanent
+            EEPROM.updateInt(offsetof(_eeprom_data, TurretRotation_EPMin), pulseMin);
+            EEPROM.updateInt(offsetof(_eeprom_data, TurretRotation_EPMax), pulseMax);
+            EEPROM.updateByte(offsetof(_eeprom_data, TurretRotation_Reversed), reversed);
+            // Finally, set the actual end-point limits to the servo class
+            servo->setMinPulseWidth(SERVONUM_TURRETROTATION, pulseMin);
+            servo->setMaxPulseWidth(SERVONUM_TURRETROTATION, pulseMax);
+            // And in this case, we use the reversed function of the motor class
+            TurretRotation->set_Reversed(reversed);
+            // We also want to exit with the servo put back exactly to center
+            servo->writeMicroseconds(servoNum, 1500);
+            delay(150); // Give it time to get there
+            if (eeprom.ramcopy.TurretRotationMotor == SERVO_PAN)
+            {   // We want to save the position so the barrel stabilizer knows where to start.
+                // EDIT - this is not rotation servo, we have no stabilization on it yet. I am still
+                // leaving this bit in for now as it only puts us back to center. 
+                // We start moving just to set the canSetFixedPos flag, then immediately stop
+                // to record the positionm, which should probably still be 1500
+                pulseNow = servo->getPulseWidth(servoNum);
+                if (pulseNow > 1500) TurretRotation->setSpeed(-1);
+                else                 TurretRotation->setSpeed(1);
+                TurretRotation->setSpeed(0);
+            }
+            else
+            {   // This is a regular servo. The stop command will put it to center. 
+                TurretRotation->stop();
+            }
+            break;
+            
         case SERVONUM_RECOIL:
             // Save the global variable
             eeprom.ramcopy.RecoilServo_EPMin = pulseMin;
@@ -314,6 +356,7 @@ void SetupServo(ESC_POS_t servoNum)
     PrintDebugLine();
     switch (servoNum) 
     {   case SERVONUM_TURRETELEVATION: DebugSerial->println(F("End Elevation Servo Setup")); break;
+        case SERVONUM_TURRETROTATION:  DebugSerial->println(F("End Rotation Servo Setup"));  break;
         case SERVONUM_RECOIL:          DebugSerial->println(F("End Recoil Servo Setup"));    break;
     }
     PrintDebugLine();
