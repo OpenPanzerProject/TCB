@@ -36,8 +36,6 @@
 
 #include "OP_PololuQik.h"
 
-byte cmd[5]; // serial command buffer
-
 //Constructor
 OP_PololuQik::OP_PololuQik(byte deviceID, HardwareSerial *port) : _deviceID(deviceID), _port(port) {}
 
@@ -49,23 +47,37 @@ void OP_PololuQik::autobaud(boolean dontWait) const
 void OP_PololuQik::autobaud(HardwareSerial *thisport, boolean dontWait)
 {
     if (!dontWait) { delay(1500); }
-    thisport->write(QIK_INIT_COMMAND); // allow qik to autodetect baud rate
+    
+    unsigned char message[] = { QIK_INIT_COMMAND };
+    this->sendMessage(message, 1);   // allow qik to autodetect baud rate
+
 #if defined(ARDUINO) && ARDUINO >= 100
     thisport->flush();
 #endif
+
     if (!dontWait) { delay(500); }
     
     // Start off with errors cleared
-    thisport->write(QIK_GET_ERROR_BYTE);
+    clearError();
 }
 
 void OP_PololuQik::command(byte command, byte value) const
 {
-    cmd[0] = QIK_INIT_COMMAND;
-    cmd[1] = deviceID();
-    cmd[2] = command;
-    cmd[3] = value;    
-    _port->write(cmd, 4);   
+    unsigned char message[] = { QIK_INIT_COMMAND, deviceID(), command, value };
+    this->sendMessage(message, 4);
+}
+
+void OP_PololuQik::sendMessage(unsigned char message[], unsigned int length) 
+{
+    unsigned char crc = 0;
+    unsigned char c; 
+    for (uint8_t i = 0; i < length; i++)
+    {
+        c = message[i];
+		crc = GetCRC((crc ^ c));       // Tally the CRC byte-by-byte. Because we're using a macro, the second set of inner parentheses is important!!
+        _port->write(c);               // Send the message byte-by-byte
+    }
+    _port->write(crc);                 // Now send CRC byte
 }
 
 void OP_PololuQik::throttleCommand(byte command, int speed) const
@@ -161,7 +173,7 @@ boolean OP_PololuQik::configurePololu(byte SetDeviceID)
 
     // If this was a 2s9v1 we will have sent it several commands with invalid values because the 2s12v10 values do not all translate to the smaller device. 
     // This will have caused the 2s9v1 to turn the red LED on as an indication of error. Now we clear the error by calling the Get Error Byte function.
-    _port->write(QIK_GET_ERROR_BYTE);
+    clearError();
 
     // Decide whether we succeeded or not
     if (secondParts == 8 || secondParts == 0)
@@ -181,12 +193,15 @@ byte OP_PololuQik::setConfigurationParameter(byte parameter, byte value)
 {
     // Here we use the compact protocol. One of the parameters we may be getting or setting is the DeviceID itself,
     // and if we don't know it ahead of time, we can't include it in the full protocol. 
-    cmd[0] = QIK_SET_CONFIGURATION_PARAMETER;
-    cmd[1] = parameter;
-    cmd[2] = value;
-    cmd[3] = 0x55;    // 0x55 and 0x2A are format bytes that make it more difficult for this command 
-    cmd[4] = 0x2A;    // to be accidentally sent, as might result from a noisy serial connection or buggy user code.
-    _port->write(cmd, 5);
+    unsigned char message[] = 
+    { 
+        QIK_SET_CONFIGURATION_PARAMETER,
+        parameter,
+        value,
+        0x55,           // 0x55 and 0x2A are format bytes that make it more difficult for this command 
+        0x2A            // to be accidentally sent, as might result from a noisy serial connection or buggy user code.        
+    };
+    this->sendMessage(message, 5);
   
     // It takes 4mS for the Pololu to process this command. You should not send commands to the Qik again until you 
     // have received this byte, or waited at least 4mS. 
@@ -197,6 +212,12 @@ byte OP_PololuQik::setConfigurationParameter(byte parameter, byte value)
     // So we're not going to pick up any response. Instead we just wait 5mS and hard-code it to success (0 = success)
     delay(5);
     return 0;
+}
+
+void OP_PololuQik::clearError()
+{
+    unsigned char message[] = { QIK_GET_ERROR_BYTE };
+    this->sendMessage(message, 1);
 }
 
 // This one is commented out because we are not presently reading anything on the motor serial port, only transmitting
