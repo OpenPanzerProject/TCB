@@ -102,9 +102,9 @@ const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 {1270, 1},  // Sound 6:  Received machine gun hit - damage
 {1351, 1},  // Sound 7:  Received hit - vehicle destroyed
 {1433, 1},  // Sound 8:  Headlights on/off
-{1630, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG
+{1630, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG 
 {1711, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG
-{1793, 3},  // Sound 11: Custom User Sound 3 - even higher priority than MG
+{1793, 3},  // Sound 11: Custom User Sound 3 - even higher priority than MG (also used for Second MG)
 {1874, 3},  // Sound 12: Squeak 1 / Custom User Sound 4
 {1955, 3},  // Sound 13: Squeak 2 / Custom User Sound 5
 {2036, 3},  // Sound 14: Squeak 3 / Custom User Sound 6
@@ -175,6 +175,8 @@ public:
     void Cannon(void);                                      // Play cannon fire sound
     void MachineGun(void);                                  // Play machine gun sound
     void StopMachineGun(void);                              // Explicit call to stop the machine gun
+    void SecondMachineGun(void);                            // Play second machine gun sound
+    void StopSecondMachineGun(void);                        // Explicit call to stop the second machine gun    
     void Turret(void);                                      // Play turret rotation sound
     void StopTurret(void);                                  // Stop playing turret rotation sound
     void Barrel(void);                                      // Play barrel elevation sound

@@ -84,6 +84,8 @@
     boolean BrakeLightsActive = false;           // Are the brake lights on. We need to know this and running light state because they are both on the same output.
     boolean RunningLightsActive = false;         // Are the running lights active. We don't want running lights and brake lights to turn each other off if they're not supposed to. 
     uint8_t RunningLightsDimLevel;               // We will convert the user's setting (0-100) to a PWM value (0-255)
+    int Light2TimerID = 0;
+    boolean Light2Blinking = false;
     int AuxOutputTimerID = 0;                    // The AuxOutput can be set to blink or strobe. We will need a timer ID for it. 
     boolean AuxOutputBlinking = false;
     boolean AuxOutputRevolving = false;

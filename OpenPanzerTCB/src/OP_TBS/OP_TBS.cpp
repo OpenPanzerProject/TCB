@@ -275,6 +275,22 @@ void OP_TBS::StopMachineGun(void)
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
+// SECOND MACHINE GUN SOUND - Constant (needs an explicit call to StopSpecialSounds to turn off)
+//------------------------------------------------------------------------------------------------------------------------>>
+// The Second machine gun sound, if implemented, takes the place of User Sound 3
+void OP_TBS::SecondMachineGun(void)
+{
+    TriggerSpecialSound(SOUND_USER_3, false); // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+                                            // until explicitly turned off, or until interrupted by another sound with a higher priority. 
+}
+void OP_TBS::StopSecondMachineGun(void)
+{
+    StopSpecialSounds(SOUND_USER_3);        // I previously was doing some other stuff that required a little bit different procedure
+                                            // to turn off MG, hence this function instead of just calling StopSpecialSounds directly. 
+}                                           // We'll leave it in case we need something like that again. The only place that calls this is the Battle tab of the sketch - MG2_Stop() 
+
+
+//------------------------------------------------------------------------------------------------------------------------>>
 // TURRET TRAVERSE
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::TurretSound_SetEnabled(boolean enabled)

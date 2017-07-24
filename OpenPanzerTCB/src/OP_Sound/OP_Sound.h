@@ -53,6 +53,8 @@ class OP_Sound {
     // Machine Gun  
     virtual void MachineGun(void) =0;                   // Play machine gun sound
     virtual void StopMachineGun(void) =0;               // Explicit call to stop the machine gun
+    virtual void SecondMachineGun(void) =0;             // Play machine gun sound
+    virtual void StopSecondMachineGun(void) =0;         // Explicit call to stop the machine gun    
     virtual void MGHit(void) =0;                        // Play machine gun hit sound
     // Turret/Barrel
     virtual void Turret(void) =0;                       // Play turret rotation sound
@@ -115,6 +117,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
   // Machine Gun
     void MachineGun(void)                                       { OP_TBS::MachineGun();                }
     void StopMachineGun(void)                                   { OP_TBS::StopMachineGun();            }
+    void SecondMachineGun(void)                                 { OP_TBS::SecondMachineGun();          }
+    void StopSecondMachineGun(void)                             { OP_TBS::StopSecondMachineGun();      }    
     void MGHit(void)                                            { OP_TBS::MGHit();                     }
   // Turret/Barrel
     void Turret(void)                                           { OP_TBS::Turret();                    }
@@ -194,6 +198,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_BEEP_X                      0x46   // 70
 #define OPSC_CMD_SET_VOLUME                  0x47   // 71
 #define OPSC_CMD_BRAKE_SOUND                 0x48   // 72
+#define OPSC_CMD_2NDMG_START                 0x49   // 73
+#define OPSC_CMD_2NDMG_STOP                  0x4A   // 74
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -231,6 +237,8 @@ class OP_SoundCard: public OP_Sound {
   // Machine Gun                
     void MachineGun(void)                                       { command(OPSC_CMD_MG_START);                               }
     void StopMachineGun(void)                                   { command(OPSC_CMD_MG_STOP);                                }
+    void SecondMachineGun(void)                                 { command(OPSC_CMD_2NDMG_START);                            }
+    void StopSecondMachineGun(void)                             { command(OPSC_CMD_2NDMG_STOP);                             }    
     void MGHit(void)                                            { command(OPSC_CMD_MG_HIT);                                 }
   // Turret/Barrel  
     void Turret(void)                                           { if (_turretEnabled && !_turretSoundActive) { _turretSoundActive = true; command(OPSC_CMD_TURRET_START); } }
@@ -371,7 +379,9 @@ class OP_TaigenSound: public OP_Sound {
   // Repair sounds                                                                      
     void Repair(void)                                           { return;               }
     void StopRepairSound(void)                                  { return;               }
-  // MG Hit
+  // Other MG
+    void SecondMachineGun(void)                                 { return;               }
+    void StopSecondMachineGun(void)                             { return;               }
     void MGHit(void)                                            { return;               }
   // Headlight                                                                          
     void HeadlightSound(void)                                   { return;               }

@@ -552,6 +552,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.FlashLightsWhenSignalLost = true;   
         ramcopy.HiFlashWithCannon = true;   
         ramcopy.AuxFlashWithCannon = false;             
+        ramcopy.SecondMGLightBlink_mS = 30;             // milliseconds        
 
     // Program settings
         ramcopy.PrintDebug = true;                      // Default to debugging on

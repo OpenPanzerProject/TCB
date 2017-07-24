@@ -33,15 +33,53 @@ void Light2On()
 }
 
 void Light2Off()
-{
+{   // Turn off 
     digitalWrite(pin_Light2, LOW);
-    if (DEBUG) { DebugSerial->println(F("Light 2 Off")); }
+
+    // Delete blinking timer
+    if (timer.isEnabled(Light2TimerID)) timer.deleteTimer(Light2TimerID);
+
+    if (DEBUG)
+    {
+        if (Light2Blinking) { DebugSerial->println(F("2nd MG Stop"));} 
+        else                { DebugSerial->println(F("Light 2 Off")); }
+    }
+
+    // Set the blink flag to false, we're done
+    AuxOutputBlinking = false;
 }
 
 void Light2Toggle()
 {
     static boolean Light2State = false;
     Light2State ? Light2Off() : Light2On();
+    Light2State = !Light2State;
+}
+
+void Light2TempState(boolean s)
+{
+    // We use this one internally when we want to change the output but don't necessarily want to stop 
+    // a blinking effect or to display a debug message.
+    digitalWrite(pin_Light2, s);
+}
+
+void Light2Blink()
+{
+    static boolean Light2State = false;
+
+    if (!Light2Blinking)
+    {
+        Light2Blinking = true;
+        if (DEBUG) {DebugSerial->println(F("2nd MG Start"));}
+    }
+        
+    // Set the light state
+    Light2TempState(Light2State);       // Use the "temp" pin control function otherwise we would turn off the blinker
+
+    // Now set a timer to come back here and toggle it after the correct length of time has passed.
+    Light2TimerID = timer.setTimeout(eeprom.ramcopy.SecondMGLightBlink_mS, Light2Blink);
+
+    // Flip the state for next time
     Light2State = !Light2State;
 }
 

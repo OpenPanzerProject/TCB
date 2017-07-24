@@ -56,6 +56,16 @@ void MG_Stop()
     Tank.MachineGun_Stop();
     if (DEBUG) {DebugSerial->println(F("MG Stop"));}
 }
+void MG2_Start()
+{   // We're not going to deal with this inside the tank class... just handle it locally as Light 2
+    Light2Blink();
+    TankSound->SecondMachineGun();
+}
+void MG2_Stop()
+{   // Also debugging messages about the 2nd machine gun are handled in the Light 2 routines on the Lights tab
+    Light2Off();    
+    TankSound->StopSecondMachineGun();
+}
 
 
 // SPECIAL FUNCTIONS: Trigger Mechanical Barrel; Enable/Disable/Toggle Mechanical Barrel (Mechanical Barrel = Airsoft or Mechanical Recoil Unit)

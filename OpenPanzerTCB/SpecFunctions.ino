@@ -36,6 +36,8 @@ void LoadFunctionTriggers()
                 case SF_HI_FLASH:                   SF_Callback[i] = &SF_HiFlash;                                   break;
                 case SF_MG_FIRE:                    SF_Callback[i] = &SF_MG_Start;                                  break;
                 case SF_MG_OFF:                     SF_Callback[i] = &SF_MG_Stop;                                   break;
+                case SF_MG2_FIRE:                   SF_Callback[i] = &SF_MG2_Start;                                 break;
+                case SF_MG2_OFF:                    SF_Callback[i] = &SF_MG2_Stop;                                  break;
                 case SF_BARREL_ENABLE:              SF_Callback[i] = &SF_MechBarrel_Enable;                         break;
                 case SF_BARREL_DISABLE:             SF_Callback[i] = &SF_MechBarrel_Disable;                        break;
                 case SF_BARREL_TOGGLE:              SF_Callback[i] = &SF_MechBarrel_Toggle;                         break;
@@ -420,6 +422,8 @@ void SF_RecoilServo(uint16_t ignoreMe)          { TriggerServoRecoil();     }
 void SF_HiFlash(uint16_t ignoreMe)              { MuzzleFlash();            }
 void SF_MG_Start(uint16_t ignoreMe)             { MG_Start();               }
 void SF_MG_Stop(uint16_t ignoreMe)              { MG_Stop();                }
+void SF_MG2_Start(uint16_t ignoreMe)            { MG2_Start();              }
+void SF_MG2_Stop(uint16_t ignoreMe)             { MG2_Stop();               }
 void SF_MechBarrel_Enable(uint16_t ignoreMe)    { MechBarrel_Enable();      }
 void SF_MechBarrel_Disable(uint16_t ignoreMe)   { MechBarrel_Disable();     }
 void SF_MechBarrel_Toggle(uint16_t ignoreMe)    { MechBarrel_Toggle();      }
