@@ -1,3 +1,14 @@
+0.92.08         07/25/2017 - Added dedicated second machine gun functions. The effect could be created previously with the Aux output, but the dedicated functions simplify the
+                             process and leave the Aux output free for other uses. If implemented, the second machine gun light should be connected to the L2 (Light 2) port.
+                             The second machine gun has its own blink interval setting available in OP Config, independent of the primary machine gun blink interval. The
+                             second machine gun will automaically trigger a sound effect if the sound card supports it. For the Benedini this will be whatever sound is placed 
+                             in slot 11 of the 1st coder column in TBS Flash (otherwise called User Sound 3). For the Open Panzer Sound Card just add the sound files with the 
+                             appropriate names to the micro SD card. 
+                           - CRC checking has been added to the code that communicates with Pololu serial motor controllers. This prevents the Pololu from mistakenly reacting to
+                             messages intended for other devices (for example the Open Panzer Sound Card). You must also enable CRC mode on your Pololu controller by using the
+                             jumper as shown in the Pololu instructions. 
+                             - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                             It is advised to save an OPZ file of your settings before re-flashing.                                 
 0.92.07         07/18/2017 - Added ability to select Pan Servo for turret rotation. Most users will not want this but it can be useful for turret-less tanks (eg Jagdpanther) with a 
                              limited traverse barrel. 
                            - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
