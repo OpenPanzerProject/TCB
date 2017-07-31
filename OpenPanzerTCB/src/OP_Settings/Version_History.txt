@@ -7,7 +7,7 @@
                            - CRC checking has been added to the code that communicates with Pololu serial motor controllers. This prevents the Pololu from mistakenly reacting to
                              messages intended for other devices (for example the Open Panzer Sound Card). You must also enable CRC mode on your Pololu controller by using the
                              jumper as shown in the Pololu instructions. 
-                             - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
                              It is advised to save an OPZ file of your settings before re-flashing.                                 
 0.92.07         07/18/2017 - Added ability to select Pan Servo for turret rotation. Most users will not want this but it can be useful for turret-less tanks (eg Jagdpanther) with a 
                              limited traverse barrel. 

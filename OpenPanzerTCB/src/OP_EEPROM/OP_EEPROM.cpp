@@ -435,7 +435,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.TurretRotation_Reversed = false;
 
     // Mechanical Barrel and Recoil Servo settings
-        ramcopy.Airsoft = true;
+        ramcopy.Airsoft = false;                // Default to mechanical recoil, because Airsoft selection will prevent some things from working if the user doesn't actually connect an airsoft unit
         ramcopy.MechanicalBarrelWithCannon = true;
         ramcopy.RecoilDelay = 0;                // Default to no delay between recoil action, and flash/sound
         ramcopy.RecoilReversed = true;          // We default to reversed because this works with the Taigen Tiger 1 combination airsoft/servo recoil unit
