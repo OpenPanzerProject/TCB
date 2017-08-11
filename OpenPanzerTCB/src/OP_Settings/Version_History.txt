@@ -1,3 +1,7 @@
+0.92.09         08/11/2017 - Added "vehicle" speed to the sound class, in addition to "engine" speed which was already there. When used with the Open Panzer sound card, vehicle
+                             speed will allow us to play track overlay sounds that vary with actual vehicle speed, on top of the engine sounds which are played relative to 
+                             engine speed. 
+                           - Fixed minor bug with the 2nd machine gun.
 0.92.08         07/25/2017 - Added dedicated second machine gun functions. The effect could be created previously with the Aux output, but the dedicated functions simplify the
                              process and leave the Aux output free for other uses. If implemented, the second machine gun light should be connected to the L2 (Light 2) port.
                              The second machine gun has its own blink interval setting available in OP Config, independent of the primary machine gun blink interval. The
