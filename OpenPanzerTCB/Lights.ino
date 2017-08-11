@@ -46,7 +46,7 @@ void Light2Off()
     }
 
     // Set the blink flag to false, we're done
-    AuxOutputBlinking = false;
+    Light2Blinking = false;
 }
 
 void Light2Toggle()
