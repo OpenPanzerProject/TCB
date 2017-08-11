@@ -43,6 +43,7 @@ class OP_Sound {
     virtual void StopEngine(void) =0;   
     virtual void SetEngineSpeed(int) =0;                // Send the engine speed to TBS
     virtual void IdleEngine(void) =0;                   // Idle engine
+    virtual void SetVehicleSpeed(int) = 0;              // Speed of the vehicle, rather than the engine. 
     // Repair sounds    
     virtual void Repair(void) =0;                       // Tank repair sound
     virtual void StopRepairSound(void) =0;              // Explicit call to quit repair sound
@@ -107,6 +108,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void StopEngine(void)                                       { OP_TBS::ToggleEngineSound();         }   // TBS doesn't have start/stop, just toggle
     void SetEngineSpeed(int s)                                  { OP_TBS::SetEngineSpeed(s);           }
     void IdleEngine(void)                                       { OP_TBS::IdleEngine();                }
+    void SetVehicleSpeed(int)                                   { return;                              }   // No vehicle speed distinct from engine speed implemented on Benedini
   // Repair sounds
     void Repair(void)                                           { OP_TBS::Repair();                    }
     void StopRepairSound(void)                                  { OP_TBS::StopRepairSound();           }
@@ -200,10 +202,10 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_BRAKE_SOUND                 0x48   // 72
 #define OPSC_CMD_2NDMG_START                 0x49   // 73
 #define OPSC_CMD_2NDMG_STOP                  0x4A   // 74
+#define OPSC_CMD_VEHICLE_SET_SPEED           0x4B   // 75
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
-#define OPSC_MAX_NUM_CLACKS                   6     // How many clacks can this device implement
 #define OPSC_MAX_NUM_USER_SOUNDS              4     // How many user sounds does this device implement
 
 // Codes
@@ -227,6 +229,7 @@ class OP_SoundCard: public OP_Sound {
     // behavior will be unpredictable! Keep in mind also, in the case of engine sound, a speed of 0 should correspond to engine idle, not engine stopped. 
     void SetEngineSpeed(int s)                                  { command(OPSC_CMD_ENGINE_SET_SPEED, abs(s));               }
     void IdleEngine(void)                                       { command(OPSC_CMD_ENGINE_SET_IDLE);                        }   
+    void SetVehicleSpeed(int s)                                 { command(OPSC_CMD_VEHICLE_SET_SPEED, abs(s));              }   // Vehicle speed distinct from engine speed
   // Repair sounds                  
     void Repair(void)                                           { command(OPSC_CMD_REPAIR_START);                           }
     void StopRepairSound(void)                                  { command(OPSC_CMD_REPAIR_STOP);                            }
@@ -376,6 +379,8 @@ class OP_TaigenSound: public OP_Sound {
 
   // Functions that are not implemented by this card
   // ----------------------------------------------------------------------------------------------
+  // Vehicle speed, distinct from engine
+    void SetVehicleSpeed(int s)                                 { return;               }
   // Repair sounds                                                                      
     void Repair(void)                                           { return;               }
     void StopRepairSound(void)                                  { return;               }

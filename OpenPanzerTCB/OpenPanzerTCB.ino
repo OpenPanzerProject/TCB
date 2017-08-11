@@ -1163,7 +1163,7 @@ if (Startup)
         // Now pass the throttle speed to the sound unit and the smoker 
         if (ThrottleSpeed != ThrottleSpeed_Previous)    // But only if the command has changed from last time...
         {
-                TankSound->SetEngineSpeed(ThrottleSpeed);    // Sound unit speed
+                TankSound->SetEngineSpeed(ThrottleSpeed);    // Sound unit engine speed
                 SetSmoker_Speed(ThrottleSpeed);              // Smoker speed
         }
 
@@ -1178,11 +1178,8 @@ if (Startup)
                 DriveMode_LastDirection = DriveMode_Previous;    // We will use this to allow starts in the same direction without waiting for shift timer
                 DriveFlag = false;                               // Disable driving for TimeToShift_MS
                 TransitionStart = millis();                      // Start shift timer
-                StopDriveMotors();                               // Kill the motor(s)
+                StopDriveMotors();                               // Kill the motor(s). Will also stop certain sounds.
             }
-            
-            // We're not moving, so stop the squeaking
-            TankSound->StopSqueaks();
 
             // If the user set brake lights to come on automatically at stop, turn them on - but only if the engine is running,
             // which by definition it should be if we are at this point in the code
@@ -1237,6 +1234,9 @@ if (Startup)
 
             // Other checks to do when we're moving: 
 
+            // Let the sound card know how fast the vehicle is moving for track overlay sounds (not the same as engine speed, set above)
+            if (DriveSpeed_Previous != DriveSpeed) TankSound->SetVehicleSpeed(DriveSpeed);
+
             // Start squeaking if we haven't already. The sound object will automatically ignore any squeaks the user disabled in settings. 
             if (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed) { TankSound->StartSqueaks(); }
             else if (TankSound->AreSqueaksActive() && abs(DriveSpeed) <= MinSqueakSpeed)     { TankSound->StopSqueaks();  }
@@ -1259,12 +1259,11 @@ if (Startup)
             TurnSpeed = 0;
             RightSpeed = 0;
             LeftSpeed = 0;
-            StopDriveMotors();
+            StopDriveMotors();      // Stops the motors and any sounds associated with them
             DriveModeActual = STOP;
             Braking = false;
-            BrakeLightsOff();      // Don't leave the brake lights on when the engine stops
-            WasRunning = false;    // The engine is no longer running
-            TankSound->StopSqueaks(); 
+            BrakeLightsOff();       // Don't leave the brake lights on when the engine stops
+            WasRunning = false;     // The engine is no longer running
             StopEngineIdleTimer();  // Stop the timer that turns off the engine after a set amount of time, since the engine is now already off. 
         }
     }

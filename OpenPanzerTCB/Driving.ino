@@ -200,14 +200,17 @@ void StopDriveMotors()
         case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); }  break;
         default:                                                            break;
     }
+
+    // We're not moving, so stop the squeaking
+    TankSound->StopSqueaks();
+    // And stop any track overlay sounds too
+    TankSound->SetVehicleSpeed(0);
 }
 
 void StopEverything()
 {   // We use this in the event of a radio failsafe event, or just as a quick way to stop all movement. 
-    // Stop drive motor(s)
+    // Stop drive motor(s) and any sound associated with them
     StopDriveMotors();
-    // We're not moving, so stop the squeaking
-    TankSound->StopSqueaks();
     // TBS throttle speed = idle
     TankSound->IdleEngine();
     // Make sure we clear any ongoing repairs, otherwise the engine won't turn off
