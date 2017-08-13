@@ -89,6 +89,16 @@ void StopVolume(void)
     TankSound->StopVolume();
 }
 
+void EnableTrackOverlaySounds()
+{
+    TankSound->EnableTrackOverlay(true);
+}
+
+void DisableTrackOverlaySounds()
+{
+    TankSound->EnableTrackOverlay(false);
+}
+
 void TriggerUserSound1()
 {
     TankSound->UserSound_Play(1);

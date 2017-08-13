@@ -21,6 +21,7 @@ void FireCannon()
                 // Disengage the transmission - we will keep it in neutral until the repair is over. 
                 // Even if the user tries to re-engage it, the TransmissionEngage() function will check if a repair is ongoing, if so, it won't do anything. 
                 // And without an engaged transmission, the tank will not move. 
+                skipTransmissionSound = true;  // No need to clunk the transmission now
                 TransmissionDisengage();
                 
                 // Now fire the repair signal. 

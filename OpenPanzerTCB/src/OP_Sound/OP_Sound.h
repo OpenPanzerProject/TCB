@@ -32,6 +32,12 @@ typedef char SOUND_DEVICE;
 #define SD_LAST_SD              SD_BEIER_USMRC2
 const __FlashStringHelper *printSoundDevice(SOUND_DEVICE Device); //Returns a character string that is name of the sound device
 
+// The four types of volume that can be adjusted relative to each other on the Open Panzer sound card
+typedef char VOLUME_CATEGORY;
+#define VC_ENGINE               0
+#define VC_EFFECTS              1
+#define VC_TRACK_OVERLAY        2
+#define VC_FLASH                3
 
 class OP_Sound {
   public:
@@ -44,6 +50,9 @@ class OP_Sound {
     virtual void SetEngineSpeed(int) =0;                // Send the engine speed to TBS
     virtual void IdleEngine(void) =0;                   // Idle engine
     virtual void SetVehicleSpeed(int) = 0;              // Speed of the vehicle, rather than the engine. 
+    virtual void EnableTrackOverlay(boolean) = 0;       // Enable/disable track overlay sounds
+    virtual boolean isTrackOverlayEnabled(void) = 0;    // Return track overlay sound enabled status
+    virtual void EngageTransmission(boolean) = 0;       // Engage/disengage (true/false). 
     // Repair sounds    
     virtual void Repair(void) =0;                       // Tank repair sound
     virtual void StopRepairSound(void) =0;              // Explicit call to quit repair sound
@@ -87,6 +96,7 @@ class OP_Sound {
     virtual void IncreaseVolume(void) =0;               // Start increasing the volume (will keep increasing until stop is called or volume reaches max)
     virtual void DecreaseVolume(void) =0;               // Start decreasing the volume (will keep decreasing until stop is called or volume reaches min)
     virtual void StopVolume(void) =0;                   // Stop changing volume
+    virtual void setRelativeVolume(uint8_t, VOLUME_CATEGORY) =0; // Set relative volumes, first argument is level (0-100), second is the volume source
 
 };
 
@@ -109,6 +119,9 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void SetEngineSpeed(int s)                                  { OP_TBS::SetEngineSpeed(s);           }
     void IdleEngine(void)                                       { OP_TBS::IdleEngine();                }
     void SetVehicleSpeed(int)                                   { return;                              }   // No vehicle speed distinct from engine speed implemented on Benedini
+    void EnableTrackOverlay(boolean)                            { return;                              }   // Not supported
+    boolean isTrackOverlayEnabled(void)                         { return false;                        }   // Not supported, never active
+    void EngageTransmission(boolean)                            { return;                              }   // Not supported
   // Repair sounds
     void Repair(void)                                           { OP_TBS::Repair();                    }
     void StopRepairSound(void)                                  { OP_TBS::StopRepairSound();           }
@@ -152,6 +165,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void IncreaseVolume(void)                                   { OP_TBS::IncreaseVolume();            }
     void DecreaseVolume(void)                                   { OP_TBS::DecreaseVolume();            }
     void StopVolume(void)                                       { OP_TBS::StopVolume();                }
+    void setRelativeVolume(uint8_t, VOLUME_CATEGORY)            { return;                              }
     // These are other functions used internally to the TBS class. If beeps get re-enabled you would probably map the above two to these two. 
     // void ForceBeep(void);                                    // Blocking call to beep
     // void ForceBeeps(int);                                    // Beep number of times in a row (blocks code)
@@ -203,6 +217,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_2NDMG_START                 0x49   // 73
 #define OPSC_CMD_2NDMG_STOP                  0x4A   // 74
 #define OPSC_CMD_VEHICLE_SET_SPEED           0x4B   // 75
+#define OPSC_CMD_SET_RELATIVE_VOLUME         0x4C   // 76  -- Use Modifier to indicate which volume 0=Engine, 1=Track Overlay, 2=Effects, 3=Flash
+#define OPSC_CMD_ENGAGE_TRANSMISSION         0X4D   // 77  -- Pass in value: true (1) means engaged, false (0) means disengaged
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -230,6 +246,9 @@ class OP_SoundCard: public OP_Sound {
     void SetEngineSpeed(int s)                                  { command(OPSC_CMD_ENGINE_SET_SPEED, abs(s));               }
     void IdleEngine(void)                                       { command(OPSC_CMD_ENGINE_SET_IDLE);                        }   
     void SetVehicleSpeed(int s)                                 { command(OPSC_CMD_VEHICLE_SET_SPEED, abs(s));              }   // Vehicle speed distinct from engine speed
+    void EnableTrackOverlay(boolean b)                          { _trackOverlayActive = b; if (b == false) command(OPSC_CMD_VEHICLE_SET_SPEED, 0); } // If disabled, tell the sound card the speed is 0 so it will turn off the track sounds
+    boolean isTrackOverlayEnabled(void)                         { return _trackOverlayActive;                               }
+    void EngageTransmission(boolean b)                          { command(OPSC_CMD_ENGAGE_TRANSMISSION, b);                 }   // Pass true/false in value
   // Repair sounds                  
     void Repair(void)                                           { command(OPSC_CMD_REPAIR_START);                           }
     void StopRepairSound(void)                                  { command(OPSC_CMD_REPAIR_STOP);                            }
@@ -273,6 +292,7 @@ class OP_SoundCard: public OP_Sound {
     void IncreaseVolume(void)                                   { return;                                                   }   // Use SetVolume instead
     void DecreaseVolume(void)                                   { return;                                                   }   // Use SetVolume instead
     void StopVolume(void)                                       { return;                                                   }   // Use SetVolume instead
+    void setRelativeVolume(uint8_t v, VOLUME_CATEGORY vc)       { command(OPSC_CMD_SET_RELATIVE_VOLUME, v, vc);             }
 
   // Functions specific to the OP_SoundCard sub-class
     inline HardwareSerial* port() const                         { return _port;                                             }   // Return the serial port.
@@ -291,6 +311,7 @@ class OP_SoundCard: public OP_Sound {
     void SendSqueakIntervals(unsigned int min, unsigned int max, uint8_t squeakNum) const; 
       
     // Class variables
+    boolean     _trackOverlayActive;
     boolean     _squeaksActive; 
     boolean     _headlightEnabled;
     boolean     _turretEnabled;
@@ -381,6 +402,9 @@ class OP_TaigenSound: public OP_Sound {
   // ----------------------------------------------------------------------------------------------
   // Vehicle speed, distinct from engine
     void SetVehicleSpeed(int s)                                 { return;               }
+    void EnableTrackOverlay(boolean b)                          { return;               }
+    boolean isTrackOverlayEnabled(void)                         { return false;         }
+    void EngageTransmission(boolean b)                          { return;               }
   // Repair sounds                                                                      
     void Repair(void)                                           { return;               }
     void StopRepairSound(void)                                  { return;               }
@@ -411,6 +435,7 @@ class OP_TaigenSound: public OP_Sound {
     void IncreaseVolume(void)                                   { return;               } 
     void DecreaseVolume(void)                                   { return;               }     
     void StopVolume(void)                                       { return;               }
+    void setRelativeVolume(uint8_t, VOLUME_CATEGORY)            { return;               }
 
 
   public: 

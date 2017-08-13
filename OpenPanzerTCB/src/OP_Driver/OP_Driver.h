@@ -171,26 +171,5 @@ private:
 };
 
 
-// "TRANSMISSION" FUNCTIONS - this is mostly just taking care of timing requirements when engaging/disengaging the transmission 
-class OP_Transmission
-{
-public:
-    static void    begin(boolean, HardwareSerial *); // Variables passed are the  debug flag and a pointer to the debug Serial port
-    static boolean Engaged(void);               // Returns transmission state
-    static void    PutInGear(void);             // Engage transmission
-    static void    PutInNeutral(void);          // Disengage transmission
-    static void    UpdateTimer(void);           // This updates the transmission timer
-
-private:
-    static uint16_t TransmissionPauseTime;      // How long to wait before transmission can change state, in milliseconds (1000 mS = 1 second)
-    static uint32_t TransmissionTimerStartTime;
-    static boolean TransmissionTimerComplete;   // Timer flag
-    static boolean TransmissionEngaged;
-    static void StartTransmissionTimer(void);   // If these are not declared static they can't be used without first creating an object
-    static void ClearTransmissionTimer(void);   // But we want the class to use them internally, so set them to static. 
-    static boolean _debug;                      // If true, send debug messages out the serial port
-    static HardwareSerial *_debugSerial;        // The debugging serial port to use
-};
-
 #endif
 

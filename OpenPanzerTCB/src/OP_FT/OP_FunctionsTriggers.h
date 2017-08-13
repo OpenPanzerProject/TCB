@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 114;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 116;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -155,7 +155,9 @@ enum _special_function : byte {
     SF_OUTPUT_B_PULSE   = 110,      // 110   -- see also 44-46 for other OUTPUT_B functions
     SF_AUXOUT_INV_FLASH = 111,      // 111   -- see also 30 for regular flash
     SF_MG2_FIRE         = 112,      // 112   -- Second machine gun (L2 output)
-    SF_MG2_OFF          = 113       // 113   
+    SF_MG2_OFF          = 113,      // 113   
+    SF_OVERLAY_ENABLE   = 114,      // 114
+    SF_OVERLAY_DISABLE  = 115       // 115
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -174,7 +176,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
  1,1,1,1,1,1,1,1,1,1,   // 100-109  
- 1,1,1,1                // 110-113
+ 1,1,1,1,1,1            // 110-115
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -302,7 +304,9 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "External Output B - Pulse",                 // 110 -- see also 44-46 for other OUTPUT_B functions   
     "Aux Output - Inverse Flash",                // 111 -- see also 30 for regular flash
     "2nd Machine Gun - Fire",                    // 112
-    "2nd Machine Gun - Stop"                     // 123    
+    "2nd Machine Gun - Stop",                    // 113    
+    "Track Sounds - Enable",                     // 114
+    "Track Sounds - Disable"                     // 115
 };
 
 

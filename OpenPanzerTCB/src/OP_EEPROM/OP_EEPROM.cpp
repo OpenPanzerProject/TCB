@@ -515,6 +515,9 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.Squeak4_Enabled = false;       
         ramcopy.Squeak5_Enabled = false;       
         ramcopy.Squeak6_Enabled = false;       
+        ramcopy.VolumeEngine = 50;
+        ramcopy.VolumeTrackOverlay = 50;
+        ramcopy.VolumeEffects = 50;
         
     // Battle settings
         ramcopy.IR_FireProtocol = IR_TAMIYA;            // Default to Tamiya IR battle protocol

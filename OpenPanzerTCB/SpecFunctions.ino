@@ -62,6 +62,8 @@ void LoadFunctionTriggers()
                 case SF_AUXOUT_REVOLVE:             SF_Callback[i] = &SF_AuxOutputRevolve;                          break;
                 case SF_AUXOUT_TOGGLEREVOLVE:       SF_Callback[i] = &SF_AuxOutputToggleRevolve;                    break;                    
                 case SF_SET_VOLUME:                 SF_Callback[i] = &SetVolume;                                    break; // Analog function
+                case SF_OVERLAY_ENABLE:             SF_Callback[i] = &SF_OverlayEnable;                             break;
+                case SF_OVERLAY_DISABLE:            SF_Callback[i] = &SF_OverlayDisable;                            break;
                 case SF_USER_SOUND1_ONCE:           SF_Callback[i] = &SF_TriggerUserSound1;                         break;
                 case SF_USER_SOUND1_RPT:            SF_Callback[i] = &SF_UserSound1_Repeat;                         break;
                 case SF_USER_SOUND1_OFF:            SF_Callback[i] = &SF_UserSound1_Stop;                           break;
@@ -446,6 +448,8 @@ void SF_AuxOutputBlink(uint16_t ignoreMe)       { AuxOutputBlink();         }
 void SF_AuxOutputToggleBlink(uint16_t ignoreMe) { AuxOutputToggleBlink();   }
 void SF_AuxOutputRevolve(uint16_t ignoreMe)     { AuxOutputRevolve();       }
 void SF_AuxOutputToggleRevolve(uint16_t ignoreMe){ AuxOutputToggleRevolve();}
+void SF_OverlayEnable(uint16_t ignoreMe)        { EnableTrackOverlaySounds();}
+void SF_OverlayDisable(uint16_t ignoreMe)       { DisableTrackOverlaySounds();}
 void SF_TriggerUserSound1(uint16_t ignoreMe)    { TriggerUserSound1();      }
 void SF_UserSound1_Repeat(uint16_t ignoreMe)    { UserSound1_Repeat();      }
 void SF_UserSound1_Stop(uint16_t ignoreMe)      { UserSound1_Stop();        }

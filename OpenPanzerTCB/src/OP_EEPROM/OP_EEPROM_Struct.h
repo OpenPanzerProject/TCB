@@ -139,6 +139,9 @@ struct _eeprom_data {
     boolean  Squeak4_Enabled;                  // Is Squeak4 enabled or not
     boolean  Squeak5_Enabled;                  // Is Squeak5 enabled or not
     boolean  Squeak6_Enabled;                  // Is Squeak6 enabled or not
+    uint8_t  VolumeEngine;                     // Relative, not absolute volumes
+    uint8_t  VolumeTrackOverlay;               // Relative, not absolute volumes
+    uint8_t  VolumeEffects;                    // Relative, not absolute volumes
 
 // Battle settings
     IRTYPES IR_FireProtocol;                   // Which battle protocol are we *sending* by cannon fire

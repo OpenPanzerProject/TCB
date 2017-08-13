@@ -94,7 +94,6 @@
     OP_Servos TankServos;
     OP_Driver Driver;                         
     OP_Engine TankEngine;
-    OP_Transmission TankTransmission;
     OP_Sound * TankSound;
     OP_Tank Tank;                              
 
@@ -152,6 +151,8 @@
 // DRIVING ADJUSTMENTS
     uint8_t DrivingProfile = 1;                   // There are 2 driving profiles possible - we default to 1, but if the user implements a special function they can change it to 2 (alternate) on the fly
     boolean Nudge = false;                        // We can nudge the motors when first moving from a stop, for a crisper response. When the Nudge flag is true, the nudge effect will be active. 
+    boolean TransmissionEngaged = false;          // 
+    boolean skipTransmissionSound = false;        // We may not always want to play a sound when we engage/disengage the transmission
 
 // INERTIAL MEASUREMENT UNIT (IMU)
 //    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board) - NOT USED FOR NOW
@@ -268,7 +269,6 @@ void setup()
                      eeprom.ramcopy.NeutralTurnAllowed);
         SetDrivingProfile(DrivingProfile);              // See Driving tab
         TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
-        TankTransmission.begin(SAVE_DEBUG, DebugSerial);
         InstantiateSoundObject();                       // Do this after TankServos.begin();
         InstantiateOptionalServoOutputs();              // Do this after InstantiateSoundObject();
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
@@ -330,6 +330,14 @@ void setup()
         TankSound->HeadlightSound_SetEnabled(eeprom.ramcopy.HeadlightSound_Enabled);
         TankSound->TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);
         TankSound->BarrelSound_SetEnabled(eeprom.ramcopy.BarrelSound_Enabled);
+        // If we have a function trigger assigned to enable the track overlay sound, we start with it disabled, on the assumption the user will 
+        // enable it themselves using their function. Otherwise we start with it enabled and it will automatically activate when the vehicle starts to move
+        isFunctionAssigned(SF_OVERLAY_ENABLE) ? DisableTrackOverlaySounds() : EnableTrackOverlaySounds();
+        // Send volume information to the sound card (only does anything with the Open Panzer sound card)
+        TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEngine, VC_ENGINE);
+        TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEffects, VC_EFFECTS);
+        TankSound->setRelativeVolume(eeprom.ramcopy.VolumeTrackOverlay, VC_TRACK_OVERLAY);
+        // TankSound->setRelativeVolume(eeprom.ramcopy.VolumeFlash, VC_FLASH);  // Not implemented for now
 
     
     // INERTIAL MEASUREMENT UNIT    (Bosch BNO055 on Adafruit breakout board)
@@ -429,6 +437,7 @@ void setup()
             if (PCComm.CheckPC()) 
             {   // Temporarily disable the failsafe lights
                 StopFailsafeLights();
+                StopEverything();
                 RedLedOn(); // But leave the Red LED on because we still aren't to the main loop
                 // Talk to the computer
                 PCComm.ListenToPC();
@@ -921,7 +930,7 @@ if (Startup)
             TurnCommand = Radio.Sticks.Turn.command;
             
             // Get drive mode command
-            if (!TankTransmission.Engaged())
+            if (!TransmissionEngaged)
             {   // If the transmission is not engaged, we can't command any more movement. But if it was disengaged while coasting,
                 // we allow opposite command so the user can still brake. 
                 DriveModeCommand = DriveModeActual;
@@ -1154,7 +1163,7 @@ if (Startup)
             // completes. The length of this transition timer can be set by the user, and the purpose is to prevent damaging the gearboxes for example by going directly into reverse from 
             // forward. But while this timer is running, the drive command will have no effect, so we also force throttle command to stay at 0 too. 
             // However, if the the transmission is *not* engaged, we allow the user to rev away all he wants. 
-            if (TankTransmission.Engaged() && DriveSpeed == 0) { ThrottleCommand = 0; }
+            if (TransmissionEngaged && DriveSpeed == 0) { ThrottleCommand = 0; }
             
             // Now we calculate a throttle speed based on the command and other parameters
             ThrottleSpeed = Driver.GetThrottleSpeed(ThrottleCommand, ThrottleSpeed_Previous, DriveSpeed, DriveModeActual, Braking); 
@@ -1234,8 +1243,9 @@ if (Startup)
 
             // Other checks to do when we're moving: 
 
-            // Let the sound card know how fast the vehicle is moving for track overlay sounds (not the same as engine speed, set above)
-            if (DriveSpeed_Previous != DriveSpeed) TankSound->SetVehicleSpeed(DriveSpeed);
+            // Let the sound card know how fast the vehicle is moving for track overlay sounds (not the same as engine speed, set above).
+            // But only if our speed has changed, and only if the effect is even enabled (the user may choose to turn it off or on via triggers)
+            if (TankSound->isTrackOverlayEnabled() && DriveSpeed_Previous != DriveSpeed) TankSound->SetVehicleSpeed(DriveSpeed);
 
             // Start squeaking if we haven't already. The sound object will automatically ignore any squeaks the user disabled in settings. 
             if      (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed && abs(DriveSpeed_Previous) <  MinSqueakSpeed) { TankSound->StartSqueaks(); }
@@ -1424,6 +1434,7 @@ if (Startup)
                     // it will coast to a stop. 
                     // Even if the user tries to re-engage it, the function will check if a repair is ongoing, if so, it won't do anything. 
                     // And without an engaged transmission, the tank will not move. 
+                    skipTransmissionSound = true;  // No need to clunk the transmission now
                     TransmissionDisengage();
                 }
                 break;                

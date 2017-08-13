@@ -68,6 +68,7 @@ void EngineOn()
                 if (eeprom.ramcopy.TransmissionDelay_mS > 0)
                 {   // In this case the user has set a delay from the time the engine starts to when the transmission should be engaged. Typically this is to prevent the 
                     // transmission from engaging before the engine startup sound is complete. So we set a timer that will engage it after the set amount of time. 
+                    skipTransmissionSound = true;  // We skip the transmission sound unless the user is manually manipulating the transmission, but this is just an automatic engage
                     timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngage); 
     
                     // Also start the smoker. We start in fast idle until the transmission engages
@@ -75,6 +76,7 @@ void EngineOn()
                 }
                 else 
                 {   // If there is no delay specified, engage the transmission right away. This will also set the smoker speed. 
+                    skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine on
                     TransmissionEngage(); 
                 }
             // Finally, if the user has set the engine auto-off feature, we start a timer for the specified length of time.
@@ -96,9 +98,10 @@ void EngineOff()
         // Stop the smoker
             // As opposed to StopSmoker, Shutdown will let the smoker turn off slowly for a more realistic effect. 
             // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.
-            TankTransmission.Engaged() ? ShutdownSmoker(true) : ShutdownSmoker(false);
+            TransmissionEngaged ? ShutdownSmoker(true) : ShutdownSmoker(false);
         // Now disengage the transmission object (no need to have transmission in gear if engine is off)
-            TankTransmission.PutInNeutral();    
+            skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine off
+            TransmissionDisengage();
         // Play the engine stop sound
             TankSound->StopEngine();
         // Stop the drive motor(s)
@@ -150,26 +153,32 @@ void TransmissionEngage()
 {
     // No point in messing with transmission if the engine isn't running
     // We also don't allow the transmission to be engaged if we're in the midst of a repair operation. 
-    if (TankEngine.Running() && !Tank.isRepairOngoing()) 
+    if (TankEngine.Running() && !Tank.isRepairOngoing() && !TransmissionEngaged) 
     { 
+        TransmissionEngaged = true;
         SetSmoker_Idle();
-        TankTransmission.PutInGear(); 
+        if (skipTransmissionSound)  skipTransmissionSound = false;          // Skip the sound, but reset the flag for next time
+        else                        TankSound->EngageTransmission(true);    // Play the transmission engage sound
+        if (DEBUG) DebugSerial->println(F("Engage Transmission")); 
     }
 }
 
 void TransmissionDisengage()
 {
     // No point in messing with transmission if the engine isn't running
-    if (TankEngine.Running()) 
+    if (TankEngine.Running() && TransmissionEngaged) 
     { 
+        TransmissionEngaged = false;
         SetSmoker_FastIdle();
-        TankTransmission.PutInNeutral(); 
+        if (skipTransmissionSound)  skipTransmissionSound = false;          // Skip the sound, but reset the flag for next time
+        else                        TankSound->EngageTransmission(false);   // Play the transmission engage sound        
+        if (DEBUG) DebugSerial->println(F("Disengage Transmission"));
     }
 }
 
 void TransmissionToggle()
 {
-    TankTransmission.Engaged() ? TransmissionDisengage() : TransmissionEngage();
+    TransmissionEngaged ? TransmissionDisengage() : TransmissionEngage();
 }
 
 
@@ -211,8 +220,9 @@ void StopEverything()
 {   // We use this in the event of a radio failsafe event, or just as a quick way to stop all movement. 
     // Stop drive motor(s) and any sound associated with them
     StopDriveMotors();
-    // TBS throttle speed = idle
-    TankSound->IdleEngine();
+    // Sounds
+    TankSound->IdleEngine();    // TBS throttle speed = idle
+    TankSound->StopEngine();    // Other cards just turn off
     // Make sure we clear any ongoing repairs, otherwise the engine won't turn off
     Tank.StopRepair(); 
     // Turn Engine off
