@@ -1,3 +1,8 @@
+0.92.10         08/12/2017 - Add track overlay enable/disable functions (Open Panzer sound card only)
+                           - Add transmission engage/disengage sounds (Open Panzer sound card only)
+                           - Add individual volume adjustments for engine/effects/overlay (Open Panzer sound card only) 
+                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                             It is advised to save an OPZ file of your settings before re-flashing.                                                               
 0.92.09         08/11/2017 - Added "vehicle" speed to the sound class, in addition to "engine" speed which was already there. When used with the Open Panzer sound card, vehicle
                              speed will allow us to play track overlay sounds that vary with actual vehicle speed, on top of the engine sounds which are played relative to 
                              engine speed. 
