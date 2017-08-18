@@ -35,6 +35,13 @@ void FireCannon()
             {
                 if (DEBUG) { DebugSerial->println(F("Fire Cannon")); } 
                 Tank.Fire(); // See OP_Tank library. This triggers the mechanical and servo recoils, the high intensity flash unit, the cannon sound, and it sends the IR signal
+                
+                // If we are stopped, and if the user has enabled track recoil, kick that off too
+                if (DriveModeActual == STOP && eeprom.ramcopy.EnableTrackRecoil)
+                {
+                    if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
+                    else StartTrackRecoil();                                                                            // Otherwise go directly to it
+                }
             }
         }
     }

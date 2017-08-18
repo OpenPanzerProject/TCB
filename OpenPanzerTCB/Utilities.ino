@@ -319,10 +319,10 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
     DebugSerial->print(F("Reverse Speed Limited:  ")); 
     if (eeprom.ramcopy.MaxReverseSpeedPct < 100) { DebugSerial->print(F("Yes - ")); DebugSerial->print(eeprom.ramcopy.MaxReverseSpeedPct); DebugSerial->println(F("%")); }
     else PrintLnYesNo(false);
-    DebugSerial->print(F("Shift time:             ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TimeToShift_mS),1); DebugSerial->println(F(" sec"));
-    DebugSerial->print(F("Engine pause time:      ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.EnginePauseTime_mS),1); DebugSerial->println(F(" sec"));
-    DebugSerial->print(F("Transmission delay:     ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TransmissionDelay_mS),1); DebugSerial->println(F(" sec"));
-    DebugSerial->print(F("Neutral turn allowed:   "));  // Neutral turns only make sense with tanks
+    DebugSerial->print(F("Shift Time:             ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TimeToShift_mS),1); DebugSerial->println(F(" sec"));
+    DebugSerial->print(F("Engine Pause Time:      ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.EnginePauseTime_mS),1); DebugSerial->println(F(" sec"));
+    DebugSerial->print(F("Transmission Delay:     ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TransmissionDelay_mS),1); DebugSerial->println(F(" sec"));
+    DebugSerial->print(F("Neutral Turn Allowed:   "));  // Neutral turns only make sense with tanks
     if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_DKLM) 
     {   
         PrintYesNo(eeprom.ramcopy.NeutralTurnAllowed);
@@ -330,9 +330,18 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
     }
     else DebugSerial->print(F("N/A for vehicle type"));
     DebugSerial->println();        
-    DebugSerial->print(F("Turn mode:              "));  // Turn modes only apply to conventional tank drives (not clutch type) and halftracks
+    DebugSerial->print(F("Turn Mode:              "));  // Turn modes only apply to conventional tank drives (not clutch type) and halftracks
     if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK) DebugSerial->println(Driver.getTurnMode());
     else DebugSerial->println(F("N/A for vehicle type"));
+    DebugSerial->print(F("Track Recoil Enabled:   "));  
+    PrintYesNo(eeprom.ramcopy.EnableTrackRecoil);
+    if (eeprom.ramcopy.EnableTrackRecoil) 
+    { 
+        DebugSerial->print(F(" (Kickback speed ")); DebugSerial->print(eeprom.ramcopy.TrackRecoilKickbackSpeed); 
+        DebugSerial->print(F("%, Deceleration factor ")); DebugSerial->print(eeprom.ramcopy.TrackRecoilDecelerateFactor);
+        DebugSerial->print(F(")"));
+    }
+    DebugSerial->println();        
 }
 
 void DumpTurretInfo()

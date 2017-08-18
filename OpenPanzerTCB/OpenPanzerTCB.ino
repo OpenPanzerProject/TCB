@@ -153,6 +153,7 @@
     boolean Nudge = false;                        // We can nudge the motors when first moving from a stop, for a crisper response. When the Nudge flag is true, the nudge effect will be active. 
     boolean TransmissionEngaged = false;          // 
     boolean skipTransmissionSound = false;        // We may not always want to play a sound when we engage/disengage the transmission
+    _driveModes DriveModeActual = STOP;           // As opposed to DriveModeCommand, this is the actual DriveMode being implemented
 
 // INERTIAL MEASUREMENT UNIT (IMU)
 //    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board) - NOT USED FOR NOW
@@ -266,7 +267,9 @@ void setup()
         Radio.saveTimer(&timer);                        // Pass the radio a pointer our timer object
         Driver.begin(eeprom.ramcopy.DriveType, 
                      eeprom.ramcopy.TurnMode, 
-                     eeprom.ramcopy.NeutralTurnAllowed);
+                     eeprom.ramcopy.NeutralTurnAllowed, 
+                     eeprom.ramcopy.TrackRecoilKickbackSpeed,
+                     eeprom.ramcopy.TrackRecoilDecelerateFactor);
         SetDrivingProfile(DrivingProfile);              // See Driving tab
         TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
         InstantiateSoundObject();                       // Do this after TankServos.begin();
@@ -484,7 +487,6 @@ void loop()
     static _driveModes DriveModeCommand_Previous = STOP;              // What was the command last time around? We can use this to ignore spurious transmitter signals.
     static uint8_t ModeChangeCount = 0;                               // How many times through the loop has a new drive mode command (different from the last) been present?
     static uint8_t ModeChangeLimit = 3;                               // The number of times through the loop a new drive mode needs to be detected before we actually change it. 
-    static _driveModes DriveModeActual = STOP;                        // As opposed to DriveModeCommand, this is the actual DriveMode being implemented. 
     static _driveModes DriveMode_Previous = STOP;                     // The previous Drive Mode implemented
     static _driveModes DriveMode_LastDirection = STOP;
     static boolean Braking = false;                                   // Are we braking
@@ -916,14 +918,14 @@ if (Startup)
 
     // DRIVING
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-    if (TankEngine.Running() && HavePower)
+    if ((TankEngine.Running() || DriveModeActual == TRACK_RECOIL) && HavePower)     // Typicaly we only move the tank when the engine is running, but track recoil is an exception
     {
-        if (WasRunning == false) { WasRunning = true; }     // Means, we just started the engine running
+        if (WasRunning == false && DriveModeActual != TRACK_RECOIL) { WasRunning = true; }     // Means, we just started the engine running
         
         // GET DRIVE MODE - COMMANDED & ACTUAL
         // ---------------------------------------------------------------------------------------------------------------------------------------------->
         // This runs faster than the radio updates - so skip it entirely if nothing new has come in
-        if (Radio.Sticks.Throttle.updated || Radio.Sticks.Turn.updated)
+        if ((Radio.Sticks.Throttle.updated || Radio.Sticks.Turn.updated) && DriveModeActual != TRACK_RECOIL)
         {    
             // We set Throttle (engine speed) and Drive (wheel speed) equal to begin with, but they will diverge as we proceed. 
             DriveCommand = ThrottleCommand = Radio.Sticks.Throttle.command;
@@ -1111,22 +1113,36 @@ if (Startup)
             // this starting level to the DriveSpeed_Previous variable, so there will be no ramping required to reach it (ramping
             // is used to change speed from the prior amount to the current amount, but if it thinks the prior amount is already at the level
             // we want to be, it won't need to ramp)
-            if (NudgeStarted)
+            if (DriveModeActual != TRACK_RECOIL)    // Ignore nudge during track recoil
             {
-                if      (DriveModeActual == FORWARD) DriveSpeed_Previous =  NudgeAmount;
-                else if (DriveModeActual == REVERSE) DriveSpeed_Previous = -NudgeAmount;
-                NudgeStarted = false;   // We only do this at the start, so set this to false. 
-            }    
-
-            // So long as the nudge flag is active (user determines how long it lasts), we don't let throttle command fall below the minimium set nudge amount
-            if (Nudge)
-            {    
-                if      (DriveModeActual == FORWARD) DriveSpeed = max(DriveSpeed,  NudgeAmount); 
-                else if (DriveModeActual == REVERSE) DriveSpeed = min(DriveSpeed, -NudgeAmount); 
+                if (NudgeStarted)
+                {
+                    if      (DriveModeActual == FORWARD) DriveSpeed_Previous =  NudgeAmount;
+                    else if (DriveModeActual == REVERSE) DriveSpeed_Previous = -NudgeAmount;
+                    NudgeStarted = false;   // We only do this at the start, so set this to false. 
+                }    
+    
+                // So long as the nudge flag is active (user determines how long it lasts), we don't let throttle command fall below the minimium set nudge amount
+                if (Nudge)
+                {    
+                    if      (DriveModeActual == FORWARD) DriveSpeed = max(DriveSpeed,  NudgeAmount); 
+                    else if (DriveModeActual == REVERSE) DriveSpeed = min(DriveSpeed, -NudgeAmount); 
+                }
+            }
+            else
+            {
+                // During track recoil we will be doing our own "nudging"
+                TurnSpeed = 0;      // No turning during track recoil
             }
 
             // Ok, DriveSpeed finally - GetDriveSpeed() primarily applies any acceleration/deceleration constraints. Remember, DriveSpeed is the speed of the vehicle.
             DriveSpeed = Driver.GetDriveSpeed(DriveSpeed, DriveSpeed_Previous, DriveModeActual, Braking);
+
+            // In this case the recoil is over, return DriveModeActual to STOP
+            if (DriveModeActual == TRACK_RECOIL && DriveSpeed == 0)
+            {
+                DriveModeActual = STOP;
+            }
         }
         else
         {   // This is a neutral turn
@@ -1615,14 +1631,14 @@ if (Startup)
     // Set previous variables to current
     DriveModeCommand_Previous = DriveModeCommand;
     DriveMode_Previous = DriveModeActual;
-    DriveSpeed_Previous = DriveSpeed;
+    DriveSpeed_Previous = DriveSpeed;       
     DriveSpeedPct_Previous = DriveSpeedPct;
     TurnSpeed_Previous = TurnSpeed;
     Braking_Previous = Braking;
-
+    
     ThrottleCommand_Previous = ThrottleCommand;
     ThrottleSpeed_Previous = ThrottleSpeed;
-    TurnCommand_Previous = TurnCommand;
+    TurnCommand_Previous = TurnCommand;   
 }
 
 

@@ -23,6 +23,9 @@
 // Static variables must be initialized outside the class 
 // Driving
 uint8_t             OP_Driver::DriveType;
+// Track recoil
+uint8_t             OP_Driver::KickbackSpeed;
+float               OP_Driver::DecelerationFactor;
 // Drive speed ramping
 boolean             OP_Driver::DriveRampEnabled;
 volatile uint16_t   OP_Driver::RampedDriveSpeed;
@@ -65,7 +68,7 @@ const __FlashStringHelper *printDriveType(DRIVETYPE Type)
 const __FlashStringHelper *printMode(_driveModes Type) 
 {
     if(Type>LAST_MODE) Type=UNKNOWN;
-    const __FlashStringHelper *Names[LAST_MODE+1]={F("UNKNOWN"),F("STOP"),F("FORWARD"),F("REVERSE"),F("NEUTRAL TURN")};
+    const __FlashStringHelper *Names[LAST_MODE+1]={F("UNKNOWN"),F("STOP"),F("FORWARD"),F("REVERSE"),F("NEUTRAL TURN"),F("TRACK RECOIL")};
     return Names[Type];
 };
 
@@ -96,12 +99,17 @@ OP_Driver::OP_Driver(void)
     Forward_FullStopCmd = abs(MOTOR_MAX_REVSPEED) - COMPLETE_STOP_NEARLIMIT;
 }
 
-void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta)
+void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta, uint8_t kbs, uint8_t dcf)
 {
     DriveType = dt;                                 // Is this a tank with independent treads for steering? Or a halftrack with independent treads and also steerable front wheels?     
                                                     // Or a car with a single rear drive and steerable front wheels (also a halftrack with synchronized rear treads)
     TurnMode = tm;                                  // What turn mode to start off with
     NeutralTurnAllowed = nta;                       // Are neutral turns allowed
+    
+    KickbackSpeed = map(kbs, 0, 100, 0, 255);       // Kickback speed is passed as some number between 0-100, we want to scale it to 0-255
+    DecelerationFactor = 0.85 + (0.0013 * (float)dcf);  // Deceleration factor. dcf will range from 0-100, what we want is a floating point number somewhere 
+                                                    // roughly between 0.8 and 0.99. At 0.8 the kickback spike would last 1/2 second. At .99 it would last approximately 8 seconds.
+                                                    // Here we let it range from 0.85 (somewhat less than 1 second) to 0.98 (somewhere around 4 seconds)
     
 
     // SET INTERRUPT FREQUENCY
@@ -286,9 +294,16 @@ int16_t t_DriveSpeed = 0;               // temp
 int16_t FullStopCmd;                    // Any brake command greater than this, will result in an immediate full stop
 boolean neg;
 
+// Track recoil 
+static boolean TrackRecoilStarted = false;
+static uint16_t lastRampSpeed;
+static uint16_t lastTRSpeed;
+
+
     // First, to avoid repeating a bunch of code for forward & reverse, we convert everything to positive values, then convert them back to signed at the end.
     // We save a "neg" flag if the variable is negative, so we know at the end what sign to set it back to. 
-    if (DriveMode == REVERSE || (DriveMode == NEUTRALTURN && DriveCMD < 0)) neg = true;
+    // Note that track recoil assumes negative movement, so we check that here as well. 
+    if (DriveMode == REVERSE || DriveMode == TRACK_RECOIL || (DriveMode == NEUTRALTURN && DriveCMD < 0)) neg = true;
     else neg = false;
     // Now convert to absolute
     DriveCMD = abs(DriveCMD);
@@ -307,6 +322,62 @@ boolean neg;
     if (DriveMode == STOP)
     {   
         t_DriveSpeed = 0;
+    }
+    // TRACK RECOIL
+    // =============================================================================================================================================================>>    
+    else if (DriveMode == TRACK_RECOIL)
+    {
+        // Track recoil is an anomaly and we are going to handle things exceptionally in this case. 
+        if (!TrackRecoilStarted)
+        {
+            // Just started track recoil movement
+            // The first thing we do, is set the motor speed to KickbackSpeed. Above we already set the motor direction to reverse by setting the "neg" flag
+            t_DriveSpeed = DriveCMD = lastTRSpeed = KickbackSpeed;       
+            DriveRampEnabled = true;                    // Now we will enable ramping although we will not use normally, see below
+            RampDir         = 1;                        // Ramp goes up
+            t_DriveSkipNum  = 1;                        // No skipping
+            t_DriveRampStep = 1;                        // 1 step at a time (256 steps per second)
+            RampedDriveSpeed = lastRampSpeed = 1;       // Save the start
+            TrackRecoilStarted = true;                  // Go
+        }
+        else
+        {
+            // Typically we use the ramping feature to slowly increase or decrease our actual motor speed (RampedDriveSpeed). 
+            // In this case, we are going to use RampedDriveSpeed essentially as a counter instead. We set step and skip to 1 such that 
+            // RampedDriveSpeed will count to 256 every 1 second. After every 8 steps (1/32nd of a second) we decrement our
+            // actual speed manually (t_DriveSpeed) by some deceleration factor set by the user but that falls somewhere in the general 
+            // range of 80-99%. In other words, if speed last time was 100 and our factor is 85%, this time speed will be 85%, next
+            // time around it will be 72%, etc... In this way we exponentially decrease our speed (not linearly), which results in 
+            // a smooth but rapid deceleration from our original kickback speed
+            if (RampedDriveSpeed >= 1536)  { t_DriveSpeed = 0; } // We've waited 6 full seconds, that's more than long enough, we're done
+            else 
+            {
+                DriveRampEnabled = true;
+                RampDir         = 1;
+                t_DriveSkipNum  = 1;
+                t_DriveRampStep = 1; 
+                if ((RampedDriveSpeed - lastRampSpeed) >= 8)    // Every 1/32nd of a second we decrement speed
+                {
+                    t_DriveSpeed = (int16_t)(((float)lastTRSpeed * DecelerationFactor) + 0.5);  // Decrease speed exponentially by our factor somewhere in the range of ~80-99%
+                    lastTRSpeed = DriveCMD = t_DriveSpeed;
+                    lastRampSpeed = RampedDriveSpeed;           // Save this so we know when the next 1/32nd of a second transpires
+                }
+                else
+                {
+                    t_DriveSpeed = DriveCMD = lastTRSpeed;      // Still waiting for 1/32nd of a second to pass, hold last speed
+                }
+            }
+
+            // If the speed has approached 0, we consider ourselves done recoiling. 
+            // When this function spits out a speed of 0, the sketch will automatically end the track recoil DriveMode
+            if (t_DriveSpeed <= 30)     // 30 out of 255 is ~12%. Below this level most gearboxes are moving imperceptibly if at all.
+            {
+                // We're done
+                DriveRampEnabled = false;
+                t_DriveSpeed = DriveCMD = lastTRSpeed = 0;  
+                TrackRecoilStarted = false;
+            }            
+        }
     }
     // BRAKING
     // =============================================================================================================================================================>>
@@ -442,7 +513,7 @@ boolean neg;
             // Since we do not want to return zero, in this case we set RampedDriveSpeed = to the first DriveRampStep. 
             // Afterwards, RampedDriveSpeed will be > 0 so this "if" statement will get skipped. 
             if (t_DriveSpeed > 0 && RampedDriveSpeed == 0) RampedDriveSpeed = DriveRampStep;
-            t_DriveSpeed = RampedDriveSpeed;    
+            if (DriveMode != TRACK_RECOIL) t_DriveSpeed = RampedDriveSpeed;    // We handle things differently during track recoil
         SREG = sreg;                                    // Restore register
     }
     else
@@ -467,7 +538,7 @@ boolean neg;
     else
     {
         if (RampDir == 1)          // ACCEL
-        {
+        {   
             // If we are accelerating, we are trying to reach DriveCMD. We don't want to accelerate PAST what we have commanded. 
             t_DriveSpeed = constrain(t_DriveSpeed, 0, DriveCMD);    // (we already turned DriveCMD into abs() at the start, so this works for forward or reverse acceleration)
         }

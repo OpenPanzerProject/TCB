@@ -481,6 +481,9 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.MotorNudgePct = 0;              // Default to disabled (when 0, nudge effect disabled)
         ramcopy.NudgeTime_mS = 250;             // Default to 1/4 second
         ramcopy.DragInnerTrack = false;         // Default to false (off)
+        ramcopy.EnableTrackRecoil = false;      // Default to false (off)
+        ramcopy.TrackRecoilKickbackSpeed = 100; // Initial motor kickback speed as percent 0-100
+        ramcopy.TrackRecoilDecelerateFactor = 65; // Deceleration factor applied to the original kick-back speed        
 
     // "Physics"
         ramcopy.EnableBarrelStabilize = false;  // If an accelerometer is present, and turret elevation motor is type SERVO_PAN, this will stabilize the barrel

@@ -41,7 +41,8 @@ typedef char _driveModes;
 #define FORWARD      2
 #define REVERSE      3
 #define NEUTRALTURN  4
-#define LAST_MODE    NEUTRALTURN
+#define TRACK_RECOIL 5
+#define LAST_MODE    TRACK_RECOIL
 const __FlashStringHelper *printMode(_driveModes Type);     //Returns a character string that is name of the drive mode.
 
 // Accel/decel presets 
@@ -81,7 +82,7 @@ public:
     OP_Driver(void);
 
     // Also configures timer3
-    static void begin(DRIVETYPE, uint8_t, boolean);         // Variables are: Drive type, Turn mode, Neutral turn allowed
+    static void begin(DRIVETYPE, uint8_t, boolean, uint8_t, uint8_t);  // Variables are: Drive type, Turn mode, Neutral turn allowed, track recoil kickback speed, track recoil deceleration factor
     static void setDrivingProfileSettings(boolean, boolean, ACCEL_DRIVE_PRESET, DECEL_DRIVE_PRESET, uint8_t, uint8_t); // Variables are: accel ramp enabled, decel ramp enabled, accel preset, decel preset, accel skip num, decel skip num
     
     // called by the timer interrupt service routine, see the cpp file for details.
@@ -116,6 +117,10 @@ protected:
 
     // Driving 
     static uint8_t DriveType;                   // Tank, halftrack, car
+    
+    // Track recoil
+    static uint8_t KickbackSpeed;               // Track recoil initial kick-back speed
+    static float DecelerationFactor;            // Track recoil deceleration factor applied to kick-back speed
     
     // Drive speed ramping
     static boolean DriveRampEnabled;            // Is ramping enabled for drive speed

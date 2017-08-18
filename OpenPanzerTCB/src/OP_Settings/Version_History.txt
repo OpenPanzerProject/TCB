@@ -1,3 +1,6 @@
+0.92.11         08/17/2017 - Added track recoil functionality.
+                           - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
+                             It is advised to save an OPZ file of your settings before re-flashing.                                                               
 0.92.10         08/12/2017 - Add track overlay enable/disable functions (Open Panzer sound card only)
                            - Add transmission engage/disengage sounds (Open Panzer sound card only)
                            - Add individual volume adjustments for engine/effects/overlay (Open Panzer sound card only) 

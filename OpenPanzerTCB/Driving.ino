@@ -6,6 +6,15 @@ void Nudge_End()
     Nudge = false;
 }
 
+// TRACK RECOIL
+// -------------------------------------------------------------------------------------------------------------------------------------------------->
+void StartTrackRecoil()
+{
+    // The track recoil action is accomplished by changing the drive mode
+    // For now, we only permit track recoil if the vehicle is stopped
+    if (DriveModeActual == STOP) DriveModeActual = TRACK_RECOIL;
+}
+    
 
 // SPECIAL FUNCTIONS: Driving Profile
 // -------------------------------------------------------------------------------------------------------------------------------------------------->

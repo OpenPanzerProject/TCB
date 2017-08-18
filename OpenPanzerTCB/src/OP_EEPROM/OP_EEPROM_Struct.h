@@ -104,7 +104,10 @@ struct _eeprom_data {
                                                //    first moving from a stop. 0 will disable the effect, otherwise 1-100 will cause the throttle to begin at 1-100% of total. 
     uint16_t NudgeTime_mS;                     // How long will the nudge effect last in milliseconds. 
     boolean DragInnerTrack;                    // Only applies if Scout ESC is selected as the Drive Motor type. Will drag inner track in turns to compensate for free-wheeling gearboxes such as the Taigen V2 steel boxes.
-    
+    boolean EnableTrackRecoil;                 // Track recoil enabled true/false
+    uint8_t TrackRecoilKickbackSpeed;          // Initial motor kickback speed as percent 0-100
+    uint8_t TrackRecoilDecelerateFactor;       // Deceleration factor applied to the original kick-back speed
+
 // IMU Physics
     boolean EnableBarrelStabilize;             // If an accelerometer is present, and turret elevation motor is type SERVO_PAN, this will stabilize the barrel
     uint8_t BarrelSensitivity;                 // Sensitivity number from 1 - 10
