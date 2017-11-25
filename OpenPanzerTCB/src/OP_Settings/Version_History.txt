@@ -1,3 +1,4 @@
+0.92.12         11/25/2017 - Added event for cannon reload complete, used to play a notification sound when paired with the Open Panzer Sound Card.
 0.92.11         08/17/2017 - Added track recoil functionality.
                            - IMPORTANT NOTE: Changes in this release will cause all EEPROM settings to be reverted to default after the firmware is flashed.
                              It is advised to save an OPZ file of your settings before re-flashing.                                                               

@@ -60,6 +60,7 @@ class OP_Sound {
     virtual void Cannon(void) =0;                       // Play cannon fire sound
     virtual void CannonHit(void) =0;                    // Play cannon hit sound
     virtual void Destroyed(void) =0;                    // Play tank destroyed sound
+    virtual void CannonReady(void) = 0;                 // Cannon reload delay complete
     // Machine Gun  
     virtual void MachineGun(void) =0;                   // Play machine gun sound
     virtual void StopMachineGun(void) =0;               // Explicit call to stop the machine gun
@@ -129,6 +130,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void Cannon(void)                                           { OP_TBS::Cannon();                    }
     void CannonHit(void)                                        { OP_TBS::CannonHit();                 }
     void Destroyed(void)                                        { OP_TBS::Destroyed();                 }
+    void CannonReady(void)                                      { return;                              }    // Skip for now. But we could replace one of the squeaks/or user sounds for it
   // Machine Gun
     void MachineGun(void)                                       { OP_TBS::MachineGun();                }
     void StopMachineGun(void)                                   { OP_TBS::StopMachineGun();            }
@@ -219,6 +221,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_VEHICLE_SET_SPEED           0x4B   // 75
 #define OPSC_CMD_SET_RELATIVE_VOLUME         0x4C   // 76  -- Use Modifier to indicate which volume 0=Engine, 1=Track Overlay, 2=Effects, 3=Flash
 #define OPSC_CMD_ENGAGE_TRANSMISSION         0X4D   // 77  -- Pass in value: true (1) means engaged, false (0) means disengaged
+#define OPSC_CMD_CANNON_READY                0x4E   // 78
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -256,6 +259,7 @@ class OP_SoundCard: public OP_Sound {
     void Cannon(void)                                           { command(OPSC_CMD_CANNON);                                 }
     void CannonHit(void)                                        { command(OPSC_CMD_CANNON_HIT);                             }
     void Destroyed(void)                                        { command(OPSC_CMD_TANK_DESTROYED);                         }
+    void CannonReady(void)                                      { command(OPSC_CMD_CANNON_READY);                           }
   // Machine Gun                
     void MachineGun(void)                                       { command(OPSC_CMD_MG_START);                               }
     void StopMachineGun(void)                                   { command(OPSC_CMD_MG_STOP);                                }
@@ -405,6 +409,8 @@ class OP_TaigenSound: public OP_Sound {
     void EnableTrackOverlay(boolean b)                          { return;               }
     boolean isTrackOverlayEnabled(void)                         { return false;         }
     void EngageTransmission(boolean b)                          { return;               }
+  // Cannon
+    void CannonReady(void)                                      { return;               }
   // Repair sounds                                                                      
     void Repair(void)                                           { return;               }
     void StopRepairSound(void)                                  { return;               }

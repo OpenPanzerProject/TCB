@@ -26,6 +26,7 @@ void FireCannon()
                 
                 // Now fire the repair signal. 
                 Tank.Fire(); 
+                CannonWasFired = true;
             }
         }
         else
@@ -35,6 +36,7 @@ void FireCannon()
             {
                 if (DEBUG) { DebugSerial->println(F("Fire Cannon")); } 
                 Tank.Fire(); // See OP_Tank library. This triggers the mechanical and servo recoils, the high intensity flash unit, the cannon sound, and it sends the IR signal
+                CannonWasFired = true;
                 
                 // If we are stopped, and if the user has enabled track recoil, kick that off too
                 if (DriveModeActual == STOP && eeprom.ramcopy.EnableTrackRecoil)

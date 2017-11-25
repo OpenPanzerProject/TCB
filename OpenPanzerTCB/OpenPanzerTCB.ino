@@ -173,11 +173,12 @@
     int LVC_TimerID = 0;                          // This timer is used to periodically check the battery voltage level
     int LVC_BlinkTimerID = 0;                     // Timer used to blink lights when the battery voltage has got too low
 
-// REPAIR
+// REPAIR / BATTLE
     #define REPAIR_NONE     0                     // No repair operation ongoing
     #define REPAIR_SELF     1                     // We are being repaired by another tank
     #define REPAIR_OTHER    2                     // We are repairing another tank
     uint8_t RepairOngoing = REPAIR_NONE;          // Init 
+    boolean CannonWasFired = false;               
 
 // INPUT BUTTON
     OP_Button InputButton = OP_Button(pin_Button, true, true, 25);   // Initialize a button object. Set pin, internal pullup = true, inverted = true, debounce time = 25 mS
@@ -1538,6 +1539,26 @@ if (Startup)
             if (DEBUG) { DebugSerial->println(F("TANK RESTORED")); }
     }
 
+    // Had we fired the cannon, and now reload is complete? If so, play the cannon ready sound.
+    if (CannonWasFired)
+    {
+        if (Tank.isRepairTank()) 
+        {
+            // Don't do anything here, when the repair sound is done playing the user knows they can repair again
+            CannonWasFired = false;
+            
+        }
+        else
+        {   // Not a repair tank: when the cannon is done being reloaded, play the cannon ready sound
+            if (Tank.CannonReloaded()) 
+            { 
+                TankSound->CannonReady(); 
+                CannonWasFired = false; 
+            }
+        }
+    }
+
+    
 
 // ====================================================================================================================================================>
 //  DEBUGGING
