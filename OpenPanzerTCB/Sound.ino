@@ -11,8 +11,15 @@ void InstantiateSoundObject(void)
     switch (eeprom.ramcopy.SoundDevice)
     {
         case SD_BENEDINI_TBSMINI:
-            TankSound = new BenediniTBS(&timer);
-            RCOutput6_Available = false;                // The Benedini requires all three of these RC outputs, so they are not available for other uses
+            TankSound = new BenediniTBS(&timer, false); // false means "not the Micro" but instead this is the Mini
+            RCOutput6_Available = false;                // The Benedini Mini requires all three of these RC outputs, so they are not available for other uses
+            RCOutput7_Available = false;
+            RCOutput8_Available = false;
+            break;
+
+        case SD_BENEDINI_TBSMICRO:
+            TankSound = new BenediniTBS(&timer, true);  // true means "Micro" (not Mini)
+            RCOutput6_Available = true;                 // The Benedini Micro will only use Prop 1 and 2 (RC Outputs 8 and 7), Prop 3 is open for the user, he could program some fancy switches in the Tx and pass them through. 
             RCOutput7_Available = false;
             RCOutput8_Available = false;
             break;
@@ -44,7 +51,7 @@ void InstantiateSoundObject(void)
             // We set it to TBS Mini and save it to EEPROM so we don't end up here again next time
             eeprom.ramcopy.SoundDevice = SD_BENEDINI_TBSMINI;
             EEPROM.updateInt(offsetof(_eeprom_data, SoundDevice), SD_BENEDINI_TBSMINI);
-            TankSound = new BenediniTBS(&timer);
+            TankSound = new BenediniTBS(&timer, false); // false meaning Mini, not Micro
             RCOutput6_Available = false;                // The Benedini requires all three of these RC outputs, so they are not available for other uses
             RCOutput7_Available = false;
             RCOutput8_Available = false;            

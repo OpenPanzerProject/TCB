@@ -157,7 +157,7 @@ const char _sound_descr_table_[PROP3_NUM_SOUNDS][SOUNDNAME_CHARS] PROGMEM_FAR =
 class OP_TBS
 {
 public:
-    OP_TBS(OP_SimpleTimer * t);                             // Constructor
+    OP_TBS(OP_SimpleTimer * t, boolean Micro);              // Constructor
     void begin();                                           // Attach servo outputs and initialize
     void InitializeOutputs(void);                           // Initialize
                 
@@ -168,6 +168,8 @@ public:
     // PROP2: Engine startup/shutdown and second sound 
     void PROP2_OFF(void);                                   // Direct control of the Prop2 switch
     void ToggleEngineSound(void);                           // Toggle engine startup/shutdown
+    void StartEngine(void);                                 // The Benedini device doesn't actually have an on/off (just toggle), but we need independent functions anyway 
+    void StopEngine(void);                                  //     to account for different handling between Mini and Micro
     void Repair(void);                                      // Tank repair sound
     void StopRepairSound(void);                             // Explicit call to quit repair sound
 
@@ -209,6 +211,10 @@ public:
  private:   
     static OP_Servos  * TBSProp;
     static OP_SimpleTimer * TBSTimer;                       // Pointer to the sketch's simple timer so we don't have to create a whole new one.
+    static boolean      Micro;                              // Is this the Micro? If not, it's the Mini
+
+    // PROP 1
+    static void         ClearThrottleBlip(void);            // We will send a brief throttle signal to the Mini when the engine is started so it knows to wake up
 
     // PROP 2
     static int          TBSProp2TimerID;

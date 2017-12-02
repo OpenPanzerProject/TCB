@@ -28,8 +28,9 @@ typedef char SOUND_DEVICE;
 #define SD_OP_SOUND_CARD        1
 #define SD_TAIGEN_SOUND         2
 #define SD_BEIER_USMRC2         3
+#define SD_BENEDINI_TBSMICRO    4       // Added December 2017
 #define SD_FIRST_SD             SD_BENEDINI_TBSMINI
-#define SD_LAST_SD              SD_BEIER_USMRC2
+#define SD_LAST_SD              SD_BENEDINI_TBSMICRO
 const __FlashStringHelper *printSoundDevice(SOUND_DEVICE Device); //Returns a character string that is name of the sound device
 
 // The four types of volume that can be adjusted relative to each other on the Open Panzer sound card
@@ -111,12 +112,12 @@ class OP_Sound {
 
 class BenediniTBS: public OP_Sound, public OP_TBS {
   public:
-    BenediniTBS(OP_SimpleTimer * t) : OP_Sound(), OP_TBS(t)    {} // TBS requires pointer to SimpleTimer object
+    BenediniTBS(OP_SimpleTimer * t, boolean m) : OP_Sound(), OP_TBS(t, m)  {} // TBS requires pointer to SimpleTimer object, plus a boolean to indicate Micro (true) or Mini (false)
     void begin()                                                { OP_TBS::begin();                     }
 
   // Engine sound functions
-    void StartEngine(void)                                      { OP_TBS::ToggleEngineSound();         }   // TBS doesn't have start/stop, just toggle
-    void StopEngine(void)                                       { OP_TBS::ToggleEngineSound();         }   // TBS doesn't have start/stop, just toggle
+    void StartEngine(void)                                      { OP_TBS::StartEngine();               }   // TBS doesn't have start/stop, just toggle. But we use independent functions anyway
+    void StopEngine(void)                                       { OP_TBS::StopEngine();                }   
     void SetEngineSpeed(int s)                                  { OP_TBS::SetEngineSpeed(s);           }
     void IdleEngine(void)                                       { OP_TBS::IdleEngine();                }
     void SetVehicleSpeed(int)                                   { return;                              }   // No vehicle speed distinct from engine speed implemented on Benedini

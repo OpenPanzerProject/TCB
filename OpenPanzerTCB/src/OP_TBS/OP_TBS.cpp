@@ -30,6 +30,7 @@
 // Static variables must be initialized outside the class 
 OP_SimpleTimer * OP_TBS::TBSTimer;
 OP_Servos      * OP_TBS::TBSProp;
+boolean         OP_TBS::Micro;
 int             OP_TBS::TBSProp2TimerID;
 boolean         OP_TBS::Prop2TimerComplete;
 int             OP_TBS::TBSProp3TimerID;
@@ -56,9 +57,11 @@ unsigned int    OP_TBS::SQUEAK3_MAX_mS;
 
 
 // CONSTRUCTOR 
-OP_TBS::OP_TBS(OP_SimpleTimer * t) 
+OP_TBS::OP_TBS(OP_SimpleTimer * t, boolean m) 
 {
     TBSTimer = t;                       // We will use the sketch's SimpleTimer object rather than creating a new instance of the class
+    
+    Micro = m;                          // Are we interfacing with the Benidini Micro? If not, it's the Mini
     
     TBSProp = new OP_Servos; 
     
@@ -99,7 +102,7 @@ void OP_TBS::begin()
 {
     TBSProp->attach(PROP1);
     TBSProp->attach(PROP2);
-    TBSProp->attach(PROP3);
+    if (Micro == false) TBSProp->attach(PROP3); // We only use Prop3 on the Mini
     InitializeOutputs();
 }
 
@@ -107,8 +110,11 @@ void OP_TBS::InitializeOutputs(void)
 {
     TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);          // Initialize to speed = 0
     TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_OFF);    // Initialize to engine off
-    TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));  // Initialize to no special sounds
-    ClearProp3Timer();
+    if (Micro == false)
+    {   
+        TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));  // Initialize to no special sounds, only if using Mini
+        ClearProp3Timer();
+    }
 }
 
 
@@ -129,9 +135,15 @@ void OP_TBS::IdleEngine(void)
     TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);
 }
 
+void OP_TBS::ClearThrottleBlip(void)
+{   // Same as IdleEngine which however we can't call from this static function since it is public, and we need this one static so it can be used with SimpleTimer...
+    TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);  // Return the throttle to idle from our brief blip (only used with Mini)
+}
 
 //------------------------------------------------------------------------------------------------------------------------>>
-// PROP 2 - Two sounds in 2nd Coder column of TBS Flash: 1) ENGINE STARTUP/SHUTDOWN, 2) SOMETHING ELSE (Tank Repair sound)
+// PROP 2 - Two sounds in 2nd Coder column of TBS Flash
+//          When using the Mini:  1) ENGINE STARTUP/SHUTDOWN, 2) Tank Repair sound
+//          When using the Micro: 1) Cannon Fire              2) Machine Gun
 //------------------------------------------------------------------------------------------------------------------------>>
 // The way this is set up, the two Prop2 sounds block each other. So if the engine is starting up/shutting down, the repair sound 
 // can't play (but the startup/shutdown sounds don't last long). But, if we are in the midst of a repair operation (lasts 15 seconds)
@@ -165,17 +177,40 @@ void OP_TBS::PROP2_OFF(void)
     TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_OFF);
 }
 
+void OP_TBS::StartEngine(void)
+{
+    // In the case of the Micro we don't have a function specifically to start/stop the engine. Instead we ask the user to set the Micro to engine Auto Start
+    // and we will blip the throttle instead. 
+    if (Micro)
+    {
+        SetEngineSpeed(75); // Not full throttle, but enough it should be registered
+        TBSTimer->setTimeout(TBS_SIGNAL_mS, ClearThrottleBlip); // After a brief time the blip will be reverted to idle
+    }
+    else ToggleEngineSound();
+}
+
+void OP_TBS::StopEngine(void)
+{
+    if (Micro) return;  // We have no way of turning off the engine on the Micro, other than letting it turn off itself after some idle time. 
+    else ToggleEngineSound();
+}
+
 void OP_TBS::ToggleEngineSound(void)
 {
-    if (Prop2TimerComplete) // Only send a signal if we are done with the last signal
+    if (Micro) return;
+    else
     {
-        TBSProp->writeMicroseconds(PROP2,PROP2_SWITCH_1);
-        StartProp2Timer();
+        if (Prop2TimerComplete) // Only send a signal if we are done with the last signal
+        {
+            TBSProp->writeMicroseconds(PROP2,PROP2_SWITCH_1);
+            StartProp2Timer();
+        }
     }
 }
 
 void OP_TBS::Repair(void)
 {
+    if (Micro) return;
     if (Prop2TimerComplete) // Only send a signal if we are done with the last signal
     {
         TBSProp->writeMicroseconds(PROP2,PROP2_SWITCH_2);   // Set to 2nd position
@@ -185,12 +220,14 @@ void OP_TBS::Repair(void)
 
 void OP_TBS::StopRepairSound(void)
 {
+    if (Micro) return;
     ClearProp2Timer();
 }
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
 // PROP 3 - Sixteen sounds in the 1st Coder column of TBS Flash (v3.0.1 and later) 
+// Only when using the Mini 
 //------------------------------------------------------------------------------------------------------------------------>>
 // Prop 3 - can only play one sound at a time. If a sound is playing and a second sound begins before the first is finished, 
 // the first will stop. This can occasionally cause odd behavior. For example, assume you have a cannon fire sound that lasts 
@@ -208,6 +245,7 @@ void OP_TBS::StopRepairSound(void)
 // and no sound with a lower priority will play until it is turned off. 
 void OP_TBS::StartProp3Timer(void)
 {
+    if (Micro) return;
     // Start the timer to briefly send a special sound signal. 
     Prop3TimerComplete = false;
     TBSProp3TimerID = TBSTimer->setTimeout(TBS_SIGNAL_mS, ClearProp3Timer);    
@@ -215,6 +253,7 @@ void OP_TBS::StartProp3Timer(void)
 
 void OP_TBS::ClearProp3Timer(void)
 {
+    if (Micro) return;
     // Quit sending the special sound signal
     TBSProp->writeMicroseconds(PROP3, Prop3SoundPulse(SOUND_OFF));
     Prop3TimerComplete = true;
@@ -224,6 +263,7 @@ void OP_TBS::ClearProp3Timer(void)
 
 void OP_TBS::TriggerSpecialSound(int soundNum, boolean oneTime /* = true */)
 {
+    if (Micro) return;
     // Only send a special sound if it has a higher priority than the sound currently playing.
     // If no sound is playing the actual current sound will be SOUND_OFF. We made sure to set 
     // SOUND_OFF at priority 0 and all other sounds at least to priority 1, so they will always supersede SOUND_OFF. 
@@ -240,7 +280,9 @@ void OP_TBS::TriggerSpecialSound(int soundNum, boolean oneTime /* = true */)
 }
 
 void OP_TBS::StopSpecialSounds(int soundNum)
-{   // If the priority of the sound we want to stop is equal to or greater than the current sound,
+{   
+    if (Micro) return;
+    // If the priority of the sound we want to stop is equal to or greater than the current sound,
     // stop the current sound. We need the equal-to check because we are probably trying to stop the 
     // current sound, in other words, it will be equal. 
     if (Prop3SoundPriority(soundNum) >= Prop3SoundPriority(currentProp3SoundNum))
@@ -256,7 +298,12 @@ void OP_TBS::StopSpecialSounds(int soundNum)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::Cannon(void)
 {
-    TriggerSpecialSound(SOUND_CANNON);
+    if (Micro)
+    {
+        TBSProp->writeMicroseconds(PROP2,PROP2_SWITCH_1);
+        StartProp2Timer();
+    }
+    else    TriggerSpecialSound(SOUND_CANNON);  // Mini
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -264,14 +311,16 @@ void OP_TBS::Cannon(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::MachineGun(void)
 {
-    TriggerSpecialSound(SOUND_MG, false);   // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
-                                            // until explicitly turned off, or until interrupted by another sound with a higher priority. 
+    if (Micro) TBSProp->writeMicroseconds(PROP2,PROP2_SWITCH_2);    // Go to position 2 on the Prop 2 output
+    else TriggerSpecialSound(SOUND_MG, false);  // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
+                                                // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 }
 void OP_TBS::StopMachineGun(void)
 {
-    StopSpecialSounds(SOUND_MG);            // I previously was doing some other stuff that required a little bit different procedure
-                                            // to turn off MG, hence this function instead of just calling StopSpecialSounds directly. 
-}                                           // We'll leave it in case we need something like that again. The only place that calls this is OP_Tank.cpp - MachineGun_Stop() 
+    if (Micro) TBSProp->writeMicroseconds(PROP2, PROP2_SWITCH_OFF); // Turn off the Prop2 switch (return to center)
+    else StopSpecialSounds(SOUND_MG);           // I previously was doing some other stuff that required a little bit different procedure
+                                                // to turn off MG, hence this function instead of just calling StopSpecialSounds directly. 
+}                                               // We'll leave it in case we need something like that again. The only place that calls this is OP_Tank.cpp - MachineGun_Stop() 
 
 
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -280,11 +329,13 @@ void OP_TBS::StopMachineGun(void)
 // The Second machine gun sound, if implemented, takes the place of User Sound 3
 void OP_TBS::SecondMachineGun(void)
 {
+    if (Micro) return;
     TriggerSpecialSound(SOUND_USER_3, false); // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
                                             // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 }
 void OP_TBS::StopSecondMachineGun(void)
 {
+    if (Micro) return;
     StopSpecialSounds(SOUND_USER_3);        // I previously was doing some other stuff that required a little bit different procedure
                                             // to turn off MG, hence this function instead of just calling StopSpecialSounds directly. 
 }                                           // We'll leave it in case we need something like that again. The only place that calls this is the Battle tab of the sketch - MG2_Stop() 
@@ -295,16 +346,19 @@ void OP_TBS::StopSecondMachineGun(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::TurretSound_SetEnabled(boolean enabled)
 {
+    if (Micro) return;
     TurretSound_Enabled = enabled;
 }
 
 void OP_TBS::Turret(void)
 {
+    if (Micro) return;
     if (TurretSound_Enabled) TriggerSpecialSound(SOUND_TURRET);
 }
 
 void OP_TBS::StopTurret(void)
 {
+    if (Micro) return;
     if (TurretSound_Enabled) StopSpecialSounds(SOUND_TURRET);
 }
 
@@ -313,16 +367,19 @@ void OP_TBS::StopTurret(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::BarrelSound_SetEnabled(boolean enabled)
 {
+    if (Micro) return;
     BarrelSound_Enabled = enabled;
 }
 
 void OP_TBS::Barrel(void)
 {
+    if (Micro) return;
     if (BarrelSound_Enabled) TriggerSpecialSound(SOUND_BARREL);
 }
 
 void OP_TBS::StopBarrel(void)
 {
+    if (Micro) return;
     if (BarrelSound_Enabled) StopSpecialSounds(SOUND_BARREL);
 }
 
@@ -331,6 +388,7 @@ void OP_TBS::StopBarrel(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::MGHit(void)
 {
+    if (Micro) return;
     TriggerSpecialSound(SOUND_MG_HIT);
 }
 
@@ -339,6 +397,7 @@ void OP_TBS::MGHit(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::CannonHit(void)
 {
+    if (Micro) return;
     TriggerSpecialSound(SOUND_CANNON_HIT);
 }
 
@@ -347,6 +406,7 @@ void OP_TBS::CannonHit(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::Destroyed(void)
 {
+    if (Micro) return;
     TriggerSpecialSound(SOUND_BATTLE_DESTROY);
 }
 
@@ -355,11 +415,13 @@ void OP_TBS::Destroyed(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::HeadlightSound_SetEnabled(boolean enabled)
 {
+    if (Micro) return;
     HeadlightSound_Enabled = enabled;
 }
 
 void OP_TBS::HeadlightSound(void)
 {
+    if (Micro) return;
     if (HeadlightSound_Enabled) TriggerSpecialSound(SOUND_HEADLIGHTS);
 }
 
@@ -368,6 +430,7 @@ void OP_TBS::HeadlightSound(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::UserSound_Play(uint8_t s)
 {
+    if (Micro) return;
     switch (s)
     {
         case 1: TriggerSpecialSound(SOUND_USER_1); break;
@@ -380,6 +443,7 @@ void OP_TBS::UserSound_Play(uint8_t s)
 }
 void OP_TBS::UserSound_Repeat(uint8_t s)
 {
+    if (Micro) return;
     switch (s)
     {
         case 1: TriggerSpecialSound(SOUND_USER_1, false); break;    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
@@ -392,6 +456,7 @@ void OP_TBS::UserSound_Repeat(uint8_t s)
 }
 void OP_TBS::UserSound_Stop(uint8_t s)
 {
+    if (Micro) return;
     switch (s)
     {
         case 1: StopSpecialSounds(SOUND_USER_1); break;
@@ -408,14 +473,17 @@ void OP_TBS::UserSound_Stop(uint8_t s)
 //------------------------------------------------------------------------------------------------------------------------>>
 void OP_TBS::IncreaseVolume(void)
 {
+    if (Micro) return;
     TriggerSpecialSound(SOUND_VOLUME_UP, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
 }                                                   // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 void OP_TBS::DecreaseVolume(void)
 {
+    if (Micro) return;
     TriggerSpecialSound(SOUND_VOLUME_DN, false);    // We pass false, meaning this sound will Not occur just once, but instead remain active (repeating)
 }                                                   // until explicitly turned off, or until interrupted by another sound with a higher priority. 
 void OP_TBS::StopVolume(void)
 {
+    if (Micro) return;
     StopSpecialSounds(SOUND_VOLUME_UP);             // It doesn't matter if we pass volume up or down here, as long as they both have the same priority. 
 }
 
@@ -426,6 +494,7 @@ void OP_TBS::StopVolume(void)
 void OP_TBS::StartSqueaks(void)
 {   // We actually don't start squeaking right away because that can sound weird. We wait until the tank has been moving for
     // SQUEAK_DELAY_mS time before truly starting them
+    if (Micro) return;    
     if (AllSqueaks_Active == false)
     {   // It doesn't matter what ID we use for this, so long as it's one that will get cleared when StopSqueaks() gets called
         Squeak1TimerID = TBSTimer->setTimeout(SQUEAK_DELAY_mS, StartSqueaksForReal);
@@ -434,12 +503,14 @@ void OP_TBS::StartSqueaks(void)
 }
 void OP_TBS::StartSqueaksForReal(void)
 {
+    if (Micro) return;
     if (Squeak1_Enabled) Squeak1_Activate();
     if (Squeak2_Enabled) Squeak2_Activate();
     if (Squeak3_Enabled) Squeak3_Activate();
 }
 void OP_TBS::StopSqueaks(void)
 {
+    if (Micro) return;
     Squeak1_Pause();
     Squeak2_Pause();
     Squeak3_Pause();
@@ -484,6 +555,7 @@ void OP_TBS::Squeak_SetEnabled(uint8_t s, boolean enabled)
 
 void OP_TBS::Squeak1(void)
 {
+    if (Micro) return;
     if (Squeak1_Active)
     {
         // Play the squeak sound
@@ -494,6 +566,7 @@ void OP_TBS::Squeak1(void)
 }
 void OP_TBS::Squeak1_Activate(void)
 {
+    if (Micro) return;
     // Only activate me if I'm not already running and if I'm enabled in the first place. 
     if (Squeak1_Active == false && Squeak1_Enabled == true)
     {
@@ -503,6 +576,7 @@ void OP_TBS::Squeak1_Activate(void)
 }
 void OP_TBS::Squeak1_Pause(void)
 {
+    if (Micro) return;
     TBSTimer->deleteTimer(Squeak1TimerID);
     Squeak1_Active = false;
 }
@@ -510,6 +584,7 @@ void OP_TBS::Squeak1_Pause(void)
 
 void OP_TBS::Squeak2(void)
 {   
+    if (Micro) return;
     if (Squeak2_Active)
     {
         // Play the squeak sound
@@ -520,6 +595,7 @@ void OP_TBS::Squeak2(void)
 }
 void OP_TBS::Squeak2_Activate(void)
 {
+    if (Micro) return;
     // Only activate me if I'm not already running and if I'm enabled in the first place. 
     if (Squeak2_Active == false && Squeak2_Enabled == true) 
     {
@@ -529,6 +605,7 @@ void OP_TBS::Squeak2_Activate(void)
 }
 void OP_TBS::Squeak2_Pause(void)
 {
+    if (Micro) return;
     TBSTimer->deleteTimer(Squeak2TimerID);
     Squeak2_Active = false;
 }
@@ -536,6 +613,7 @@ void OP_TBS::Squeak2_Pause(void)
 
 void OP_TBS::Squeak3(void)
 {
+    if (Micro) return;
     if (Squeak3_Active)
     {
         // Play the squeak sound
@@ -546,6 +624,7 @@ void OP_TBS::Squeak3(void)
 }
 void OP_TBS::Squeak3_Activate(void)
 {
+    if (Micro) return;
     // Only activate me if I'm not already running and if I'm enabled in the first place. 
     if (Squeak3_Active == false && Squeak3_Enabled == true) 
     {
@@ -555,6 +634,7 @@ void OP_TBS::Squeak3_Activate(void)
 }
 void OP_TBS::Squeak3_Pause(void)
 {
+    if (Micro) return;
     TBSTimer->deleteTimer(Squeak3TimerID);
     Squeak3_Active = false;
 }
