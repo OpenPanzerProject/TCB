@@ -154,6 +154,7 @@
     boolean TransmissionEngaged = false;          // 
     boolean skipTransmissionSound = false;        // We may not always want to play a sound when we engage/disengage the transmission
     _driveModes DriveModeActual = STOP;           // As opposed to DriveModeCommand, this is the actual DriveMode being implemented
+    _ManualTransGear ManualGear = GEAR_NA;        // Manual transmission not detected yet
 
 // INERTIAL MEASUREMENT UNIT (IMU)
 //    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board) - NOT USED FOR NOW
@@ -930,6 +931,14 @@ if (Startup)
         {    
             // We set Throttle (engine speed) and Drive (wheel speed) equal to begin with, but they will diverge as we proceed. 
             DriveCommand = ThrottleCommand = Radio.Sticks.Throttle.command;
+            // However in manual transmission mode, our throttle command is absolute and spans the full range of stick movement so we need to re-scale
+            if (ManualGear) 
+            { 
+                DriveCommand = ThrottleCommand = map(DriveCommand, MOTOR_MAX_REVSPEED, MOTOR_MAX_FWDSPEED, 0, MOTOR_MAX_FWDSPEED); 
+                if (ManualGear == GEAR_REVERSE) DriveCommand = ThrottleCommand = -DriveCommand;     // If reverse, convert back to negative value
+                if (ManualGear == GEAR_NEUTRAL) DriveCommand = 0;   // But if we're in neutral we can't be driving. But we still allow ThrottleCommand to pass through so the user can control the engine sound.
+            }
+            // Turn command
             TurnCommand = Radio.Sticks.Turn.command;
             
             // Get drive mode command
@@ -939,16 +948,16 @@ if (Startup)
                 DriveModeCommand = DriveModeActual;
                 switch (DriveModeActual)
                 {   case FORWARD:
-                        if (DriveCommand >= 0)
+                        if (DriveCommand >= 0)  // Same direction as we're already going
                         {   DriveCommand = 0; }
-                        else
+                        else    
                         {   // In this case they are trying to brake, which we allow. Throttle speed goes to zero.
                             DriveModeCommand = REVERSE;
                             ThrottleCommand  = 0;
                         }
                         break;
                     case REVERSE:
-                        if (DriveCommand < 0)
+                        if (DriveCommand < 0)   // Same direction as we're already going, set command to 0
                         {   DriveCommand = 0; }
                         else
                         {   // In this case they are trying to brake, which we allow. Throttle speed goes to zero.
@@ -966,8 +975,9 @@ if (Startup)
                 }
             }
             else
-            {   // If the transmission is engaged, we just get drive mode *command* from the actual command
-                DriveModeCommand = Driver.GetDriveMode(DriveCommand, TurnCommand); 
+            {  
+                // If the transmission is engaged, we just get drive mode *command* from the actual command
+                DriveModeCommand = Driver.GetDriveMode(DriveCommand, TurnCommand);                 
             }
             
             // Check commanded mode against actual mode
@@ -984,7 +994,7 @@ if (Startup)
                         else
                         {   
                             // Ok, we have enough times in a row to allow a transition, but now we need to check it against the transition time constraint. 
-                            // This is a user-setting that limits how quicky the tank can change directions, for example from forward to reverse
+                            // This is a user-setting that limits how quickly the tank can change directions, for example from forward to reverse
                             if (eeprom.ramcopy.TimeToShift_mS > 0) 
                             {
                                 if (DriveFlag == false && (((millis() - TransitionStart) >= eeprom.ramcopy.TimeToShift_mS) || (DriveMode_LastDirection == DriveModeCommand)))
@@ -1102,7 +1112,7 @@ if (Startup)
             }
             else if (DriveModeActual == REVERSE && eeprom.ramcopy.MaxReverseSpeedPct < 100)
             {
-                DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_REVSPEED, 0, ReverseSpeed_Max);  
+                DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_REVSPEED, 0, ReverseSpeed_Max);
             }
             else
             {

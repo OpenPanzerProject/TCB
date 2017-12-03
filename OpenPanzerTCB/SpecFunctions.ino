@@ -139,6 +139,9 @@ void LoadFunctionTriggers()
                 case SF_INCR_VOLUME:                SF_Callback[i] = &SF_IncreaseVolume;                            break;
                 case SF_DECR_VOLUME:                SF_Callback[i] = &SF_DecreaseVolume;                            break;
                 case SF_STOP_VOLUME:                SF_Callback[i] = &SF_StopVolume;                                break;
+                case SF_MANTRANS_FWD:               SF_Callback[i] = &SF_ManualTransForward;                        break;
+                case SF_MANTRANS_REV:               SF_Callback[i] = &SF_ManualTransReverse;                        break;
+                case SF_MANTRANS_NEUTRAL:           SF_Callback[i] = &SF_ManualTransNeutral;                        break;
             }
         }
     }
@@ -496,6 +499,9 @@ void SF_Smoker_ManualOff(uint16_t ignoreMe)     { Smoker_ManualOff();       }
 void SF_IncreaseVolume(uint16_t ignoreMe)       { IncreaseVolume();         }
 void SF_DecreaseVolume(uint16_t ignoreMe)       { DecreaseVolume();         }
 void SF_StopVolume(uint16_t ignoreMe)           { StopVolume();             }
+void SF_ManualTransForward(uint16_t ignoreMe)   { ManualTransmission(GEAR_FORWARD);}
+void SF_ManualTransReverse(uint16_t ignoreMe)   { ManualTransmission(GEAR_REVERSE);}
+void SF_ManualTransNeutral(uint16_t ignoreMe)   { ManualTransmission(GEAR_NEUTRAL);}
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>

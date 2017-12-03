@@ -31,19 +31,25 @@ typedef char DRIVETYPE;
 #define DT_TANK         1
 #define DT_HALFTRACK    2
 #define DT_CAR          3
-#define DT_DKLM         4       // For the unusual DKLM gearboxes that use a single motor for propulsion and a second motor for steering. Basically same as a car, but we give it a unique drive type.
+#define DT_DKLM         4           // For the unusual DKLM gearboxes that use a single motor for propulsion and a second motor for steering. Basically same as a car, but we give it a unique drive type.
 #define LAST_DT         DT_DKLM
 const __FlashStringHelper *printDriveType(DRIVETYPE Type); //Returns a character string that is name of the drive type.
 
 typedef char _driveModes; 
 #define UNKNOWN      0
-#define STOP         1
-#define FORWARD      2
-#define REVERSE      3
+#define STOP         1              // Should match Neutral _ManualTransGear
+#define FORWARD      2              // Make sure forward and reverse numbers match the _ManualTransGear defines
+#define REVERSE      3              // Make sure forward and reverse numbers match the _ManualTransGear defines
 #define NEUTRALTURN  4
 #define TRACK_RECOIL 5
 #define LAST_MODE    TRACK_RECOIL
 const __FlashStringHelper *printMode(_driveModes Type);     //Returns a character string that is name of the drive mode.
+
+typedef char _ManualTransGear;
+#define GEAR_NA      0              // Not using manual transmission, or not detected yet
+#define GEAR_NEUTRAL 1              // Should match Stop _driveModes
+#define GEAR_FORWARD 2              // Make sure forward and reverse numbers match the _driveModes defines
+#define GEAR_REVERSE 3              // Make sure forward and reverse numbers match the _driveModes defines
 
 // Accel/decel presets 
 typedef char ACCEL_DRIVE_PRESET;
@@ -89,7 +95,7 @@ public:
     static void OCR3A_ISR(void);                            // The ISR simply adjusts RampedDriveSpeed/RampedThrottleSpeed by +/- Step
     
     static boolean GetBrakeFlag(_driveModes, _driveModes);  // Are we braking? Pass previous drive mode and current drive mode command
-    static _driveModes GetDriveMode(int, int);              // Returns the drive mode from Throttle and Turn commands
+    static _driveModes GetDriveMode(int, int);              // Return the drive mode from throttle and turn commands
     
 
     // We may want to change these on the fly

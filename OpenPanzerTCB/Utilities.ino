@@ -319,6 +319,7 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
     DebugSerial->print(F("Reverse Speed Limited:  ")); 
     if (eeprom.ramcopy.MaxReverseSpeedPct < 100) { DebugSerial->print(F("Yes - ")); DebugSerial->print(eeprom.ramcopy.MaxReverseSpeedPct); DebugSerial->println(F("%")); }
     else PrintLnYesNo(false);
+    DebugSerial->print(F("Transmission Type:      ")); ManualGear ? DebugSerial->println(F("Manual")) : DebugSerial->println(F("Automatic"));
     DebugSerial->print(F("Shift Time:             ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TimeToShift_mS),1); DebugSerial->println(F(" sec"));
     DebugSerial->print(F("Engine Pause Time:      ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.EnginePauseTime_mS),1); DebugSerial->println(F(" sec"));
     DebugSerial->print(F("Transmission Delay:     ")); DebugSerial->print(Convert_mS_to_Sec(eeprom.ramcopy.TransmissionDelay_mS),1); DebugSerial->println(F(" sec"));

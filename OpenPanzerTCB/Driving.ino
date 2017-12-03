@@ -68,25 +68,31 @@ void EngineOn()
     // We don't permit engine status changes during repair operations, because it will cause the sounds to get out of sync
     if (!Tank.isRepairOngoing())
     {
+        // But if we're operating a manual transmission require the gear to be in neutral first
+        if (ManualGear && ManualGear != GEAR_NEUTRAL) { if (DEBUG) DebugSerial->println(F("Manual transmission - put in neutral gear before starting engine!")); return; }
+        
         // Start the engine object
         if (TankEngine.StartEngine())
         {
             // Play the engine start sound
                 TankSound->StartEngine();
             // Should the transmission be engaged now too? 
-                if (eeprom.ramcopy.TransmissionDelay_mS > 0)
-                {   // In this case the user has set a delay from the time the engine starts to when the transmission should be engaged. Typically this is to prevent the 
-                    // transmission from engaging before the engine startup sound is complete. So we set a timer that will engage it after the set amount of time. 
-                    skipTransmissionSound = true;  // We skip the transmission sound unless the user is manually manipulating the transmission, but this is just an automatic engage
-                    timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngage); 
-    
-                    // Also start the smoker. We start in fast idle until the transmission engages
-                    SetSmoker_FastIdle();
-                }
-                else 
-                {   // If there is no delay specified, engage the transmission right away. This will also set the smoker speed. 
-                    skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine on
-                    TransmissionEngage(); 
+                if (ManualGear == GEAR_NA)  // Only if we are not manually manipulating the transmission
+                {
+                    if (eeprom.ramcopy.TransmissionDelay_mS > 0)
+                    {   // In this case the user has set a delay from the time the engine starts to when the transmission should be engaged. Typically this is to prevent the 
+                        // transmission from engaging before the engine startup sound is complete. So we set a timer that will engage it after the set amount of time. 
+                        skipTransmissionSound = true;  // We skip the transmission sound unless the user is manually manipulating the transmission, but this is just an automatic engage
+                        timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngage); 
+        
+                        // Also start the smoker. We start in fast idle until the transmission engages
+                        SetSmoker_FastIdle();
+                    }
+                    else 
+                    {   // If there is no delay specified, engage the transmission right away. This will also set the smoker speed. 
+                        skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine on
+                        TransmissionEngage(); 
+                    }
                 }
             // Finally, if the user has set the engine auto-off feature, we start a timer for the specified length of time.
             // If this timer expires, the engine will be automatically shut off. The timer is restarted each time throttle command goes beyond idle. 
@@ -188,6 +194,30 @@ void TransmissionDisengage()
 void TransmissionToggle()
 {
     TransmissionEngaged ? TransmissionDisengage() : TransmissionEngage();
+}
+
+void ManualTransmission(_ManualTransGear m)
+{
+    // Save the setting to our manual gear global variable
+    ManualGear = m; 
+    
+    switch (ManualGear)
+    {
+        case GEAR_FORWARD:
+            TransmissionEngage();
+            if (DEBUG) DebugSerial->println(F("Forward Gear"));
+            break;
+
+        case GEAR_REVERSE:
+            TransmissionEngage();
+            if (DEBUG) DebugSerial->println(F("Reverse Gear"));
+            break;
+
+        case GEAR_NEUTRAL:
+            TransmissionDisengage();
+            if (DEBUG) DebugSerial->println(F("Neutral Gear"));
+            break;
+    }
 }
 
 

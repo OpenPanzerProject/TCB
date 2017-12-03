@@ -708,13 +708,13 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
     return t_ThrottleSpeed;
 }
 
-// Determine the drove mode being *commanded* as interpreted by the position of the throttle stick
+// Determine the drive mode being *commanded* as interpreted by the position of the throttle stick
 _driveModes OP_Driver::GetDriveMode(int ThrottleCMD, int TurnCMD)
 {
     if (ThrottleCMD       >  0) { return FORWARD;     }
     else if (ThrottleCMD  <  0) { return REVERSE;     }
     else if (TurnCMD      == 0) { return STOP;        }
-    else                        { if (NeutralTurnAllowed) {return NEUTRALTURN;} else {return STOP;} }   // Neutral turn commands when neutral turns are not allowed, are converted to STOP
+    else                        { if (NeutralTurnAllowed) {return NEUTRALTURN;} else {return STOP;} }   // Neutral turn commands are converted to STOP when not allowed
 }
 
 // But just because the throttle is forward or reverse, doesn't necesarily mean the user is commanding forward or reverse - 
