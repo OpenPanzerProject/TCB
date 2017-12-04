@@ -1,6 +1,10 @@
+0.92.14         12/03/2017 - Added support for Tamiya DMD units (T-01, T-03, T-08). These units integrate dual brushed speed controllers and an electronic mixer, they are operated 
+                             by standard RC signals. When this type is selected the TCB will off-load all mixing to the DMD (this means the TCB's turn modes will not work).
+                           - IMPORTANT NOTE: When attaching your DMD to the TCB, be sure to remove the positive (center) wire from your servo leads! Otherwise the BEC on the DMD
+                             will fight with the BEC on the TCB. Instructions for this are in the Wiki and are also shown in OP Config when DMD is selected. 
 0.92.13         12/02/2017 - Added minimal support for the Benedini Micro and clones (DasMikro/Orlandoo/etc). See Wiki for details. 
                            - Added manual transmission functionality for those without self-centering throttle sticks. Assign a 3 position switch to the three 
-                             Manual Transmission functions (Forward, Reverse, Neutral) and select the gear manually, throttle stick controls speed only (not direction). 
+                             Manual Transmission functions (Forward, Reverse, Neutral) and select the gear manually, the throttle stick now controls speed only (not direction). 
                              Beware, there is no brake when using a manual transmission! You can force a brake to occur by changing gear. Also, the engine will refuse to
                              start unless you are in neutral gear. For those with self-centering sticks, simply ignore the manual transmission functions and the TCB will 
                              default to auto. 
