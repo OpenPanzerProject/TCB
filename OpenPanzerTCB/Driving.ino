@@ -245,7 +245,8 @@ void StopDriveMotors()
         case DT_TANK:       { RightTread->stop(); LeftTread->stop();     }  break;
         case DT_HALFTRACK:  { RightTread->stop(); LeftTread->stop();     }  break;
         case DT_CAR:        { DriveMotor->stop();                        }  break;
-        case DT_DKLM:       { DriveMotor->stop(); SteeringMotor->stop(); }  break;
+        case DT_DKLM:       // Fall through
+        case DT_DMD:        { DriveMotor->stop(); SteeringMotor->stop(); }  break;
         default:                                                            break;
     }
 

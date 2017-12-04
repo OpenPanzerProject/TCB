@@ -21,8 +21,9 @@ void InstantiateMotorObjects()
         eeprom.ramcopy.DriveType = DT_TANK;
         EEPROM.updateInt(offsetof(_eeprom_data, DriveType), DT_TANK);
     }
-   
-    if (eeprom.ramcopy.DriveType == DT_CAR || eeprom.ramcopy.DriveType == DT_DKLM)
+
+    // These drive types involve un-mixed drive and steering outputs. It could be a car, or a tank driven by some device that already takes care of mixing (DKLM gearbox, Tamiya DMD unit)
+    if (eeprom.ramcopy.DriveType == DT_CAR || eeprom.ramcopy.DriveType == DT_DKLM || eeprom.ramcopy.DriveType == DT_DMD)
     {   
         switch (eeprom.ramcopy.DriveMotors)
         {
@@ -78,20 +79,40 @@ void InstantiateMotorObjects()
                 break;
                 
             case SERVO_ESC:
-                // For a single rear drive motor, connect it to the "Left" servo port (Servo 1)
-                DriveMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
-                DriveMotor->begin();                    
-                RCOutput1_Available = false;
-
                 if (eeprom.ramcopy.DriveType == DT_DKLM)
                 {
-                    // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
-                    // we have a "SteeringMotor" which will be RC Output 2.
+                    // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to mechanically shift power from one tread to the other. 
+                    // Drive motor will be on RC Output 1
+                    DriveMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    DriveMotor->begin();                    
+                    RCOutput1_Available = false;    // This slot becomes unavailable for general purpose servo
+                    
+                    // Steering motor will be RC Output 2
                     SteeringMotor = new Servo_ESC (SERVONUM_RIGHTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                     SteeringMotor->begin();
                     RCOutput2_Available = false;    // This slot becomes unavailable for general purpose servo
                 }
-                // else - if car or halftrack we create a steering servo output, see below
+                else if (eeprom.ramcopy.DriveType = DT_DMD)
+                {
+                    // When using the Tamiya DMD we are doing the same thing as the DKLM but Tamiya uses a different order (Channel 1 steering, Channel 2 throttle)
+                    // Steering motor will be RC Output 1
+                    SteeringMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    SteeringMotor->begin();
+                    RCOutput1_Available = false;    // This slot becomes unavailable for general purpose servo                    
+
+                    // Drive motor will be on RC Output 2
+                    DriveMotor = new Servo_ESC (SERVONUM_RIGHTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    DriveMotor->begin();                 
+                    RCOutput2_Available = false;    // This slot becomes unavailable for general purpose servo                    
+                }
+                else
+                {
+                    // For a single rear drive motor, connect it to the "Left" servo port (Servo 1)
+                    DriveMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    DriveMotor->begin();                    
+                    RCOutput1_Available = false;
+                    // If car we create a steering servo output, see below
+                }
                 break;
     
             default:

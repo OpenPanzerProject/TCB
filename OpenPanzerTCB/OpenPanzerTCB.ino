@@ -1254,8 +1254,9 @@ if (Startup)
                     // We set the front wheel steering servo a bit later, outside of this code block because we want servo steering control even when the engine is not running
                     break;
 
-                case DT_DKLM:
-                    // In this case the gearbox physically "mixes" turning, we just need to send it a drive speed for the single propulsion motor
+                case DT_DKLM:   // DKLM or mechanical mixing gearboxes
+                case DT_DMD:    // Tamiya DMD or other electrical mixers
+                    // In this case the gearbox / DMD physically "mixes" turning, we just need to send it a drive speed for the single propulsion motor
                     if (DriveSpeed_Previous != DriveSpeed)
                     {
                         DriveMotor->setSpeed(DriveSpeed);
@@ -1481,7 +1482,7 @@ if (Startup)
             // In this case, there is a single rear axle and a steering servo. We allow both to be damaged.
             Tank.Damage(DriveMotor, SteeringServo, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
         }
-        else if (eeprom.ramcopy.DriveType == DT_DKLM)
+        else if (eeprom.ramcopy.DriveType == DT_DKLM || eeprom.ramcopy.DriveType == DT_DMD)
         {
             // In this case, there is a single propulsion motor as well as a separate steering motor. We allow both to be damaged.
             Tank.Damage(DriveMotor, SteeringMotor, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
@@ -1535,11 +1536,12 @@ if (Startup)
                 LeftTread->restore_Speed();
                 if (eeprom.ramcopy.DriveType == DT_HALFTRACK) SteeringServo->restore_Speed();
             }
-            else // Car or DKLM
+            else // Car or DKLM or DMD
             {
                 DriveMotor->restore_Speed();
                 if (eeprom.ramcopy.DriveType == DT_CAR)  SteeringServo->restore_Speed();
                 if (eeprom.ramcopy.DriveType == DT_DKLM) SteeringMotor->restore_Speed();
+                if (eeprom.ramcopy.DriveType == DT_DMD)  SteeringMotor->restore_Speed();
             }
             TurretRotation->restore_Speed();
             TurretElevation->restore_Speed();

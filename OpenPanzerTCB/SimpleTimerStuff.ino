@@ -22,7 +22,8 @@ void UpdateSimpleTimers()
         case DT_TANK:       { RightTread->update(); LeftTread->update();     } break;
         case DT_HALFTRACK:  { RightTread->update(); LeftTread->update();     } break;
         case DT_CAR:        { DriveMotor->update();                          } break;
-        case DT_DKLM:       { DriveMotor->update(); SteeringMotor->update(); } break;
+        case DT_DKLM:       // Fall through
+        case DT_DMD:        { DriveMotor->update(); SteeringMotor->update(); } break;
         default:                                                               break;
     }    
 

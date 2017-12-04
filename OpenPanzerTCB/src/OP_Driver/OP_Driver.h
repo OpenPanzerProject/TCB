@@ -32,7 +32,8 @@ typedef char DRIVETYPE;
 #define DT_HALFTRACK    2
 #define DT_CAR          3
 #define DT_DKLM         4           // For the unusual DKLM gearboxes that use a single motor for propulsion and a second motor for steering. Basically same as a car, but we give it a unique drive type.
-#define LAST_DT         DT_DKLM
+#define DT_DMD          5           // For the Tamiya DMD integrated ESCs and mixer units
+#define LAST_DT         DT_DMD
 const __FlashStringHelper *printDriveType(DRIVETYPE Type); //Returns a character string that is name of the drive type.
 
 typedef char _driveModes; 
