@@ -397,8 +397,8 @@ void Onboard_Smoker::begin(void)
 {
     // Set the internal speed range (min, max). We are using 8 bit PWM so the values are 0-255
     // The smoker output has no reverse, so minimum is always 0. We also set middle to 0 so the full range is only one-sided.
-        set_InternalRange(0,255, 0);
-        set_DefaultInternalRange(0,255, 0);
+        set_InternalRange(0,_MaxSpeed, 0);
+        set_DefaultInternalRange(0,_MaxSpeed, 0);
 
     // The onboard smoker controller uses Timer5 for PWM. See OP_Settings.h for details. 
 
@@ -421,7 +421,7 @@ void Onboard_Smoker::setSpeed(int s)
     
     s = map_Range(abs(s));      // make sure we are using the internal range
                                 // We don't do reverse so negative values are converted to positive with abs()
-    
+
     // Set the PWM duty cycle
     OB_SMOKER_OCR = (s);        // OB_SMOKER_OCR is defined in OP_Settings.h
 
@@ -462,7 +462,7 @@ void Onboard_Smoker::setIdle(void)
     
     // When idling, we want the minimum speed (speed at input of 0) to be IdleSpeed
     // The easiest way to do this is just change the internal range. 
-    set_InternalRange(_IdleSpeed, 255, _IdleSpeed);
+    set_InternalRange(_IdleSpeed, _MaxSpeed, _IdleSpeed);
     this->setSpeed(0);
     
     curspeed = 0;               // Save current speed
@@ -475,7 +475,7 @@ void Onboard_Smoker::setFastIdle(void)
     
     // At fast idle (idle with transmission disengaged) we want the minimum speed (speed at input of 0) to be FastIdleSpeed
     // The easiest way to do this is just change the internal range. 
-    this->set_InternalRange(_FastIdleSpeed, 255, _FastIdleSpeed);
+    this->set_InternalRange(_FastIdleSpeed, _MaxSpeed, _FastIdleSpeed);
     this->setSpeed(0);
 
     curspeed = 0;               // Save current speed    

@@ -122,7 +122,7 @@ class Motor {
     // Other common functions
     void cut_SpeedPct(uint8_t);         // Cut the total speed range by some percent
     void set_MaxSpeedPct(uint8_t);      // Alternate way of writing cut_SpeedPct
-
+    
     // This maps the external speed range to the internal one
     int map_Range(int s)
     {   if (s == this->e_middlespeed) {return this->i_middlespeed;}
@@ -197,7 +197,7 @@ class Onboard_ESC: public Motor {
 
 class Onboard_Smoker: public Motor {
   public:
-    Onboard_Smoker(ESC_POS_t pos, int min, int max, int middle, int IdleSpeed, int FastIdleSpeed) : Motor(pos,min,max,middle), _IdleSpeed(IdleSpeed), _FastIdleSpeed(FastIdleSpeed) {}
+    Onboard_Smoker(ESC_POS_t pos, int min, int max, int middle, int IdleSpeed, int FastIdleSpeed, int MaxSpeed) : Motor(pos,min,max,middle), _IdleSpeed(IdleSpeed), _FastIdleSpeed(FastIdleSpeed), _MaxSpeed(MaxSpeed) {}
     void setSpeed(int s);
     void begin(void);   
     void stop(void);
@@ -208,6 +208,7 @@ class Onboard_Smoker: public Motor {
 private:
     const int _IdleSpeed;
     const int _FastIdleSpeed;
+    const int _MaxSpeed;
     uint32_t LastUpdate_mS;    
     
     // These can be used for special smoker effects. The main sketch will poll the update() function routinely, 

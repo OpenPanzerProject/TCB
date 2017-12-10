@@ -1,3 +1,4 @@
+0.92.15         12/10/2017 - Fixed smoker max speed bug (when smoker set to Auto the max speed setting didn't work unless it was set to 100%)
 0.92.14         12/03/2017 - Added support for Tamiya DMD units (T-01, T-03, T-08). These units integrate dual brushed speed controllers and an electronic mixer, they are operated 
                              by standard RC signals. When this type is selected the TCB will off-load all mixing to the DMD (this means the TCB's turn modes will not work).
                            - IMPORTANT NOTE: When attaching your DMD to the TCB, be sure to remove the positive (center) wire from your servo leads! Otherwise the BEC on the DMD

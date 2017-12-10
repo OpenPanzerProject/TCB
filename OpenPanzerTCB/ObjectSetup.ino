@@ -356,15 +356,16 @@ void InstantiateMotorObjects()
     // HENG LONG/OTHER SMOKER OUTPUT MOTOR DEFINITION
     // -------------------------------------------------------------------------------------------------------------------------------------->>
     	// There is only one smoker output, we use SIDEA. It does not do reverse, so min speed is always 0 (not negative). Max speed can be set by user. 
-        // The smoker object also has two settings for idle and fast idle, which the user can save to EEPROM. Those are also passed to the constructor. 
+        // In Auto mode, the smoker object has three settings specified by the user: idle, fast idle and max speed. Those are also passed to the constructor. 
         if (eeprom.ramcopy.SmokerControlAuto)
-        {   // If the user wants the smoker to be controlled automatically with engine speed, we pass the user's  max speed setting
-            Smoker = new Onboard_Smoker (SIDEA,0,eeprom.ramcopy.SmokerMaxSpeed,0,eeprom.ramcopy.SmokerIdleSpeed,eeprom.ramcopy.SmokerFastIdleSpeed);
+        {   // If the user wants the smoker to be controlled automatically with engine speed, we pass the user's max speed setting
+                                      // Pos, Throttle (external input) Min / Max /Middle, Idle     , Fast Idle                        , Max Speed
+            Smoker = new Onboard_Smoker (SIDEA,0,MOTOR_MAX_FWDSPEED,0,eeprom.ramcopy.SmokerIdleSpeed,eeprom.ramcopy.SmokerFastIdleSpeed,eeprom.ramcopy.SmokerMaxSpeed);
         }
         else
         {   // But if the user wants to disconnect the smoker from the engine and control it manually, we set max speed to MOTOR_MAX_FWDSPEED (100%)
             // We still pass the Idle and FastIdle speeds but they will not be used. 
-            Smoker = new Onboard_Smoker (SIDEA,0,MOTOR_MAX_FWDSPEED,0,eeprom.ramcopy.SmokerIdleSpeed,eeprom.ramcopy.SmokerFastIdleSpeed);
+            Smoker = new Onboard_Smoker (SIDEA,0,MOTOR_MAX_FWDSPEED,0,eeprom.ramcopy.SmokerIdleSpeed,eeprom.ramcopy.SmokerFastIdleSpeed,MOTOR_MAX_FWDSPEED);
         }
         Smoker->begin();
 
