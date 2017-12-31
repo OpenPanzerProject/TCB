@@ -1407,7 +1407,20 @@ if (Startup)
             EngineOn();
         }
     }
-    // Having processed all ad-hoc triggers, we now reset all 16 flags so they don't trip again unless they are explicitly set once more
+    else if (HavePower)
+    {
+        // There is one exception to the above - we do want to run the vehicle destroyed trigger when the vehicle is destroyed (in other words, Alive = false)
+        // The "if" statement above requires Alive = true before we even check the triggers
+        if (bitRead(AdHocTriggers, ADHOCT_BIT_VEHICLE_DESTROYED))   // Check if the vehicle destroyed bit is set
+        {   
+            for (uint8_t t=0; t<triggerCount; t++)                  // Now run through every trigger and see if one matches the vehicle destroyed Trigger ID
+            {                
+                if (eeprom.ramcopy.SF_Trigger[t].TriggerID == ADHOC_TRIGGER_VEHICLE_DESTROYED) { SF_Callback[t](0); }
+            }
+        }
+    }
+    
+    // Ok, having processed all ad-hoc triggers, we now reset all 16 flags so they don't trip again unless they are explicitly set once more
     AdHocTriggers = 0; 
 
 
