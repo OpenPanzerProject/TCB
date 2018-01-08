@@ -75,6 +75,7 @@
     void_FunctionPointer_uint16 SF_Callback[MAX_FUNCTION_TRIGGERS];  // An array of function pointers that we will tie to our special function triggers. 
     uint8_t triggerCount = 0;                    // How many triggers defined. Will be determined at run time. 
     uint16_t AdHocTriggers = 0x0000;             // We use individual bits of a 2-byte number to flag up to 16 different ad-hoc triggers. Initialize all to zero.
+    boolean ForceTriggersOnFirstPass = true;     // This flag will force us to run through most special functions at least once on startup, even if the radio or other input doesn't show as updated
 
 // I/O PINS
     external_io IO_Pin[NUM_IO_PORTS];            // Information about the general purpose I/O pins
@@ -1326,21 +1327,21 @@ if (Startup)
         for (uint8_t t=0; t<triggerCount; t++)
         {
             // Check for any trigger matching the current turret stick position
-            if (Radio.UsingSpecialPositions && Radio.SpecialStick.updated && (eeprom.ramcopy.SF_Trigger[t].TriggerID == Radio.SpecialStick.Position)) { SF_Callback[t](0); }
+            if (Radio.UsingSpecialPositions && (Radio.SpecialStick.updated || ForceTriggersOnFirstPass) && (eeprom.ramcopy.SF_Trigger[t].TriggerID == Radio.SpecialStick.Position)) { SF_Callback[t](0); }
     
             // Check for any trigger matched to current aux channel switch positions. Aux channel IDs are set by the formula: 
             // (trigger_id_multiplier_auxchannel * Aux Channel Number) + (number of switch positions * switch_pos_multiplier) + Switch Position
             for (uint8_t a=0; a<AUXCHANNELS; a++)
             {   // Digital aux channel triggers
                 if (Radio.AuxChannel[a].Settings->Digital && 
-                    Radio.AuxChannel[a].updated && 
+                    (Radio.AuxChannel[a].updated || ForceTriggersOnFirstPass) && 
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_auxchannel * (a+1)) + (switch_pos_multiplier * Radio.AuxChannel[a].Settings->numPositions) + Radio.AuxChannel[a].switchPos))
                     {
                         SF_Callback[t](0);
                     }
                 // Anallog aux channel triggers
                 if (Radio.AuxChannel[a].Settings->Digital == false &&
-                    Radio.AuxChannel[a].updated &&
+                    (Radio.AuxChannel[a].updated || ForceTriggersOnFirstPass) &&
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_auxchannel * (a+1))))
                     {
                         SF_Callback[t](ScaleAuxChannelPulse_to_AnalogInput(a));
@@ -1355,7 +1356,7 @@ if (Startup)
                 // The user can specify "digital" input (values converted to 1/0) 
                 if (IO_Pin[io].Settings.dataDirection == 0 &&
                     IO_Pin[io].Settings.dataType && 
-                    IO_Pin[io].updated &&
+                    (IO_Pin[io].updated || ForceTriggersOnFirstPass) &&
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_ports * (io+1)) + IO_Pin[io].inputValue))
                     {
                         SF_Callback[t](0);
@@ -1363,7 +1364,7 @@ if (Startup)
                 // Or the user can also keep this as an analog input
                 if (IO_Pin[io].Settings.dataDirection == 0 &&
                     IO_Pin[io].Settings.dataType == false && 
-                    IO_Pin[io].updated &&
+                    (IO_Pin[io].updated || ForceTriggersOnFirstPass) &&
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_ports * (io+1))))
                     {
                         SF_Callback[t](IO_Pin[io].inputValue);
@@ -1423,6 +1424,9 @@ if (Startup)
     
     // Ok, having processed all ad-hoc triggers, we now reset all 16 flags so they don't trip again unless they are explicitly set once more
     AdHocTriggers = 0; 
+
+    // And we can clear this, it only needs to happen once
+    ForceTriggersOnFirstPass = false;
 
 
     // BATTLE 
