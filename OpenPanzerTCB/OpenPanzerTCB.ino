@@ -180,6 +180,7 @@
     #define REPAIR_OTHER    2                     // We are repairing another tank
     uint8_t RepairOngoing = REPAIR_NONE;          // Init 
     boolean CannonWasFired = false;               
+    int CheckAirsoftTimerID = 0;                  // We will have to poll the Tank class with a timer to see when the airsoft has actually fired. 
 
 // INPUT BUTTON
     OP_Button InputButton = OP_Button(pin_Button, true, true, 25);   // Initialize a button object. Set pin, internal pullup = true, inverted = true, debounce time = 25 mS
@@ -816,7 +817,7 @@ if (Startup)
             PerLoopUpdates();    // Update timers
         }
         // We're out of failsafe - stop the blinking
-        EndFailsafe();
+        EndFailsafe();  // This only does anything if we were already in failsafe, otherwise it does nothing. 
 
 
     // GET EXTERNAL INPUTS

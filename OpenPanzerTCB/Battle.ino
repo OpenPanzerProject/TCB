@@ -41,14 +41,54 @@ void FireCannon()
                 // If we are stopped, and if the user has enabled track recoil, kick that off too
                 if (DriveModeActual == STOP && eeprom.ramcopy.EnableTrackRecoil)
                 {
-                    if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
-                    else StartTrackRecoil();                                                                            // Otherwise go directly to it
+                    // However when we start the track recoil depends on whether we have airsoft enabled or not.
+                    if (eeprom.ramcopy.Airsoft)
+                    {
+                        // With the airsoft unit we must wait until the airsoft actually fires, which will happen after it has cocked. We will just have to poll the tank class to see when this is. 
+                        CheckAirsoftTimerID = timer.setInterval(50, CheckAirsoft);
+                    }
+                    else
+                    {
+                        // Otherwise we can start it more or less right away, or at any rate, after a single, pre-known delay
+                        if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
+                        else StartTrackRecoil();                                                                            // Otherwise go directly to it
+                    }
                 }
             }
         }
     }
 }
 
+void CheckAirsoft()
+{
+static uint8_t timesThrough = 0; 
+
+    if (Tank.AirsoftFired())
+    {
+        // Ok, the airsoft has finally fired. 
+        timer.deleteTimer(CheckAirsoftTimerID);         // Stop the polling timer
+        CheckAirsoftTimerID = 0;
+        Tank.ClearAirsoft();                            // Reset the airsoft flag in the Tank class
+        if (DriveModeActual == STOP && eeprom.ramcopy.EnableTrackRecoil)
+        {
+            StartTrackRecoil();
+        }
+        timesThrough = 0;                               // Reset the count
+    }
+    else
+    {   // Otherwise just incrment our count and come back later. 
+        timesThrough += 1;
+    
+        if (timesThrough >= 80)                         // 80 times 50mS = 4 seconds, something should have happend by now for sure. 
+        {
+            // In this case we've been coming back for some time now and the airsoft has never fired, so we assume something went wrong and cancel this timer so we don't keep wasting resources
+            timer.deleteTimer(CheckAirsoftTimerID);     // Stop the polling timer
+            CheckAirsoftTimerID = 0;
+            Tank.ClearAirsoft();                        // Reset the airsoft flag in the Tank class   
+            timesThrough = 0;         
+        }    
+    }
+}
 
 // SPECIAL FUNCTIONS: Machine Gun
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
