@@ -123,6 +123,8 @@ class OP_Tank
         // Functions - Cannon Fire
         static void     Fire(void);                 // Fires the correct IR signal based on the IR protocol 
         static boolean  CannonReloaded(void);       // Has the cannon finished reloading?
+        static boolean  AirsoftFired(void);         // Has the airsoft unit fired yet?
+        static void     ClearAirsoft(void);         // Reset the airsoft fired flag
         
         // Direct control over portions of the typical cannon fire event
         static void     TriggerMechBarrel(void);    // Will trigger the mechanical recoil or airsoft unit (depending on which is selected), apart from any cannon fire. Used for manual control.
@@ -171,6 +173,7 @@ class OP_Tank
         // Mechanical Barrel functions (mechanical recoil/airsoft)
         static boolean  _MechBarrelWithCannon;
         static boolean  _Airsoft;   
+        static boolean  _AirsoftFired;              // The Airsoft unit doesn't fire right away when powered, but after it has cocked. This variable gets set to true when the cocked limit switch is activated.
         static boolean  _RecoilServoWithCannon;
         static void     FireAirsoft(void);
         static void     MechanicalRecoil(void);

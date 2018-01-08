@@ -30,6 +30,7 @@ IRdecode        OP_Tank::IR_Decoder;
 boolean         OP_Tank::CannonReloadComplete;
 boolean         OP_Tank::_MechBarrelWithCannon;
 boolean         OP_Tank::_Airsoft;
+boolean         OP_Tank::_AirsoftFired;
 boolean         OP_Tank::_RecoilServoWithCannon;
 int             OP_Tank::_RecoilDelay = 0;      
 boolean         OP_Tank::_HiFlashWithCannon;
@@ -92,6 +93,7 @@ OP_Tank::OP_Tank()
     DisableHitReception();                      // We start by ignoring hits
     IR_Rx = new IRrecvPCI(IR_RECEIVE_INT_NUM);  // Pass the external interrupt number to the IRrecvPCI class (Arduino Interrupt 0 on the TCB - see OP_Tank.h)
     //IR_Rx->setBlinkingOnReceive(true);        // For testing only. This will cause the headlights to flash on any IR reception, whether the IR can be decoded or not.
+    _AirsoftFired = false;                      // Will get set when the airsoft limit switch it tripped
     
 }
 
@@ -372,6 +374,9 @@ void OP_Tank::Fire(void)
 }
 void OP_Tank::Fire_Part2(void)
 {
+    // The main sketch will be polling to see when this gets set, so it can activate track recoil
+    if (_Airsoft)  _AirsoftFired = true;
+    
     // Play cannon fire sound
     Cannon_Sound();
     
@@ -386,6 +391,14 @@ void OP_Tank::Fire_Part2(void)
     
     // Now start the reload timer
     Cannon_StartReload();
+}
+boolean OP_Tank::AirsoftFired(void)
+{
+    return _AirsoftFired;         // Has the airsoft unit fired yet?
+}
+void OP_Tank::ClearAirsoft(void)
+{
+    _AirsoftFired = false;         // Reset the airsoft fired flag
 }
 void OP_Tank::Cannon_Flash(void)
 {
@@ -636,7 +649,7 @@ void OP_Tank::INT6_RECOIL_ISR()
 
         // As with the mechanical recoil unit, this is our signal to cut power to the airsoft motor (it's done firing). But unlike the mechanical recoil unit, 
         // this is also when all the other effects *start* - flash, sound, and servo recoil. 
-        
+       
         if ((PINE & (1<<PE6)) == 0) // pin low
         {
             // The pin is still low. If it were high, it means some low signal triggered the interrupt (that's why we're here) but it was so short
