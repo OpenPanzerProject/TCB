@@ -542,7 +542,6 @@ void BlinkLightsTankDestroyed()
 
 void ResetAllLights()
 {   // This resets all the lights blinked above, otherwise when we exit failsafe some may be left on
-    // This uses Delays and blocks all code!
     digitalWrite(pin_RedLED, LOW);
     digitalWrite(pin_GreenLED, LOW);
     digitalWrite(pin_Light1, LOW);
