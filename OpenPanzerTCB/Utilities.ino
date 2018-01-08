@@ -232,6 +232,7 @@ void DumpMotorInfo()
         case POLOLU: DebugSerial->println(F(" (M1)")); break;
         default: DebugSerial->println(); }
     DebugSerial->print(F("Mechanical Barrel: ")); if (eeprom.ramcopy.Airsoft) DebugSerial->print(F("Airsoft")); else DebugSerial->print(F("Mechanical recoil")); 
+    if (Tank.isMechBarrelSetWithCannon()) DebugSerial->print(F(" (Enabled)")); else DebugSerial->print(F(" (Disabled)"));
     DebugSerial->println();
 }
 
