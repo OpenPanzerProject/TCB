@@ -17,6 +17,7 @@ void EndFailsafe()
     {
         Failsafe = false;
         StopFailsafeLights();
+        ForceTriggersOnFirstPass = true;    // Force a re-execution of all function triggers
         if (SAVE_DEBUG) 
         { 
             DebugSerial->print(F("Radio Ready - ")); 
