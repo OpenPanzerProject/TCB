@@ -46,6 +46,8 @@
 #include "src/OP_Radio/OP_Radio.h"
 #include "src/OP_Tank/OP_Tank.h"
 #include "src/OP_PCComm/OP_PCComm.h"
+#include "src/elapsedMillis/elapsedMillis.h"
+#include "src/LedHandler/LedHandler.h"
 // It would be nice to just have the user install the EEPROMex library through Arduino library manager, 
 // but we actually need to make a change to the default settings, so we include a copy in our own src folder.
 // You must comment-out the "#define _EEPROMEX_DEBUG" line in EEPROMex.cpp

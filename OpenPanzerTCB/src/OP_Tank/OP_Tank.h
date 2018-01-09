@@ -27,6 +27,7 @@
 #include "../OP_SimpleTimer/OP_SimpleTimer.h"
 #include "../OP_Motors/OP_Motors.h"
 #include "../OP_Sound/OP_Sound.h"
+#include "../LedHandler/LedHandler.h"
 #include "OP_BattleTimes.h"
 
 #define MECHRECOIL_TRIGGER_MODE     RISING  // Arduino defines these as:
@@ -155,6 +156,7 @@ class OP_Tank
         static void     MachineGun_Stop(void);
         
         // Misc
+        static void     Update(void);               // For actions that need to be polled by the sketch for updating
         static boolean  isRepairTank(void);         // Returns status of fight/repair switch on the TCB.
         static void     StopRepair(void);           // The only time the sketch might need to call this is a failsafe, LVC or other dire situation occured, and we want to
                                                     // shut everything down. Some functions check for a repair before they actually do anything (ie EngineOn/EngineOff in the sketch).
@@ -228,6 +230,7 @@ class OP_Tank
         static boolean  FadeOut;
         static int      FadeStep_TimerID;
         static int      HitLED_TimerID;
+        static LedHandler AppleLEDs;                // Might have been useful to have the LedHandler class years ago... 
 
         // Machine Gun
         static void     MG_BlinkLight(void);        // Blink MG light

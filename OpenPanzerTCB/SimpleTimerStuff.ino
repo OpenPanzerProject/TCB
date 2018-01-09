@@ -13,6 +13,7 @@ void UpdateSimpleTimers()
     timer.run();                        // Our simple timer object, used all over the place including by various libraries.  
     Radio.Update();                     // Radio update (polls SBus and iBus)
     TankEngine.UpdateTimer();           // Engine timer (see OP_Driver library)
+    Tank.Update();                      // Polled updates for the tank object
     
     // Now we also update the four motor objects. The motor update() routines will only do something if the motor type is a serial controller. 
     // We can use this to force serial commands be sent at set intervals even if the command hasn't changed; this keeps us from tripping the serial 

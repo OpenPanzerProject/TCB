@@ -622,7 +622,6 @@ void SetupPins()
     digitalWrite(pin_Light1, LOW);
     digitalWrite(pin_Light2, LOW);
     digitalWrite(pin_Brakelights, LOW);
-    
     digitalWrite(pin_HitNotifyLEDs, LOW);
     MG_PORT &= ~(1 << MG_PORTPIN);          // Machine Gun LED must be set directly. We "and-not" the port pin bit with 1 to set it to 0, this turns it off
 

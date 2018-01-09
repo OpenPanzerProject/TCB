@@ -62,6 +62,7 @@ int16_t         OP_Tank::CurrentFadeLevel;
 boolean         OP_Tank::FadeOut;
 int             OP_Tank::FadeStep_TimerID;
 int             OP_Tank::HitLED_TimerID;
+LedHandler      OP_Tank::AppleLEDs;
 
 
 
@@ -128,6 +129,9 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     // Pointers to objects
     _RecoilServo = sr;
     _TankSound = os;
+
+    // LedHandler object for the Apple LEDs
+    AppleLEDs.begin(pin_HitNotifyLEDs, false);      // false means not inverted                        
 
     // Sanity check the MG IR setting
     if (BattleSettings.IR_MGProtocol == IR_DISABLED) { BattleSettings.Use_MG_Protocol = false; }
@@ -456,6 +460,7 @@ void OP_Tank::Cannon_StartReload(void)
 void OP_Tank::ReloadComplete(void)
 {
     CannonReloadComplete = true;
+    AppleLEDs.DoubleTap();              // Give the user visual notification that the reload process is done by blinking the Apple LEDs
 }
 boolean OP_Tank::CannonReloaded(void)
 {
@@ -1410,5 +1415,14 @@ void OP_Tank::HitLEDs_Repair(void)
     Interval -= Subtract;    
 }
 
+
+//------------------------------------------------------------------------------------------------------------------------>>
+// LedHandler objects and other items that need polled updates
+//------------------------------------------------------------------------------------------------------------------------>>
+// The sketch will call this function every loop
+void OP_Tank::Update(void)
+{
+    AppleLEDs.update();
+}
 
 
