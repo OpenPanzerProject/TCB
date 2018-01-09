@@ -536,7 +536,8 @@ void DumpFunctionTriggers()
                 DebugSerial->print(F(" -> "));
                 DebugSerial->print(F("Function #"));
                 DebugSerial->print(eeprom.ramcopy.SF_Trigger[i].specialFunction);
-                if (eeprom.ramcopy.SF_Trigger[i].specialFunction < 10) PrintSpace();
+                if (eeprom.ramcopy.SF_Trigger[i].specialFunction < 10) PrintSpaces(2);
+                else if (eeprom.ramcopy.SF_Trigger[i].specialFunction < 100) PrintSpace();
                 PrintSpaceDash();
                 // This worked back in those innocent days when we didn't have progmem in far memory. 
                 //strcpy_P(buffer, (char*)pgm_read_byte_far(&(function_name_table[eeprom.ramcopy.SF_Trigger[i].specialFunction])));
