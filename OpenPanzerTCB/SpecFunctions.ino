@@ -297,6 +297,24 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
         PrintPct(triggerSpeed); 
         PrintSpaces(4);
     }
+    // Throttle command (variable)
+    else if (TriggerID == trigger_id_throttle_command)
+    {
+        DebugSerial->print(F("Throttle Command"));
+        PrintSpaces(PadLength - 16);
+    }
+    // Engine speed (variable)
+    else if (TriggerID == trigger_id_engine_speed)
+    {
+        DebugSerial->print(F("Engine Speed"));
+        PrintSpaces(PadLength - 12);
+    }    
+    // Vehicle speed (variable)
+    else if (TriggerID == trigger_id_vehicle_speed)
+    {
+        DebugSerial->print(F("Vehicle Speed"));
+        PrintSpaces(PadLength - 13);
+    }
 }
 
 // The Trigger ID for the 9 turret stick positions are not numbers 1-9, 
@@ -521,6 +539,13 @@ uint16_t ScaleAuxChannelPulse_to_AnalogInput(int chan)
     return val;
 }
 
+// This scales our global MOTOR_MAX_REVSPEED and MOTOR_MAX_FWDSPEED to the analog range. These two are used widely throughout the project and are defined as -255 and 255.
+// Radio commands and most motor speeds are set to those values. This function so far is only used to scale throttle command, engine speed, and vehicle speed as variable 
+// inputs to analog functions, so we want the speed command to be absolute (0-255) where no command/speed is zero, rather than allowing negative speeds. 
+uint16_t ScaleSpeed_to_AnalogInput(int16_t speed)
+{
+    return map(abs(speed), 0, MOTOR_MAX_FWDSPEED, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL);
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // RE-DIRECT FUNCTIONS - FOR ANALOG FUNCTIONS WITH PARAMETER

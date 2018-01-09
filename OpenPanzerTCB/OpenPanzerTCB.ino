@@ -523,7 +523,7 @@ void loop()
 // Driving Variables Calculated at Startup
     static int ReverseSpeed_Max;                                      // Calculate an absolute figure for max reverse speed based on the user's setting of MaxReverseSpeedPct
     static int ForwardSpeed_Max;                                      // Calcluate an absolute figure for max forward speed based on teh user's setting of MaxForwardSpeedPct
-    static float BrakeSensitivityPct;                                 // NOT IMPLEMENTED: We convert the user's BrakeSensitivityPct to a number between 0-1. 
+//    static float BrakeSensitivityPct;                                 // NOT IMPLEMENTED: We convert the user's BrakeSensitivityPct to a number between 0-1. 
     static int NeutralTurn_Max;                                       // Calculate an absolute figure for max neutral turn speed based on the user's setting of NeutralTurnPct
     static int HalftrackTurn_Max;                                     // Calculate an absolute figure for max rear tread turn based on the user's setting of HalftrackTreadTurnPct
     static uint8_t NudgeAmount = 0;                                   // User saves nudge amount as percent, we convert it to an actual number between 0-255
@@ -1374,6 +1374,7 @@ if (Startup)
             }
 
             // We also have triggers based on vehicle speed. Only bother checking if the speed has changed
+            // Percent versions, triggers based on ranges
             if (DriveSpeedPct != DriveSpeedPct_Previous)
             {
                 // Check for triggers based on vehicle speed rising above a given percent
@@ -1390,6 +1391,11 @@ if (Startup)
                     if ((DriveSpeedPct < triggerSpeed) && (DriveSpeedPct_Previous >= triggerSpeed)) SF_Callback[t](0);
                 }
             }
+            // Analog pass-throughs of throttle command, engine speed, and vehicle speed
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_throttle_command && ThrottleCommand != ThrottleCommand_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput(ThrottleCommand));
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_engine_speed && ThrottleSpeed != ThrottleSpeed_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput(ThrottleSpeed));
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_vehicle_speed && DriveSpeed != DriveSpeed_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput(DriveSpeed));
+            
 
             // Ad-hoc triggers. As compared to other triggers which are in essence inputs, these are internal events which advanced users may want to use to trigger further events.
             // AdHocTriggers is a 2-byte integer. We use each bit (there are 16) as a flag, for a total of 16 ad-hoc triggers. We shift through each bit and check if it is 1, if 

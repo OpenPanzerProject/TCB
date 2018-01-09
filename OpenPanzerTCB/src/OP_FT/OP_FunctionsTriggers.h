@@ -332,7 +332,8 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
 // 19000 - 19999        19001 - 19016       Ad-hoc triggers 1-16 (these are events rather than inputs)
 // 20000 - 20999        20000 - 20090       Speed increase triggers (when speed rises above a certain level)
 // 21000 - 21999        21001 - 21100       Speed decrease triggers (when speed falls below a certain level)
-// 22000 - 65535                            Unallocated
+// 22000 - 22999        22001 - 22003       Variable (analog) triggers for throttle command (22001), engine speed (22002) and vehicle speed (22003).
+// 23000 - 65535                            Unallocated
 
 // Some range definitions
 #define trigger_id_multiplier_ports         100         // External ports input trigger ID is defined as: (multipler_ports * port number) + 0/1 (off/on)
@@ -347,6 +348,10 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
 #define trigger_id_speed_increase           20000       // Trigger IDs for speed rising above  a set level. Range FROM trigger_id_speed_increase TO (trigger_id_speed_increase + trigger_id_speed_range - 1)
 #define trigger_id_speed_decrease           21000       // Trigger IDs for speed falling below a set level. Range FROM trigger_id_speed_decrease TO (trigger_id_speed_decrease + trigger_id_speed_range - 1)
 #define trigger_id_speed_range              1000        
+
+#define trigger_id_throttle_command         22001       // Variable trigger synchronous with actual throttle stick position
+#define trigger_id_engine_speed             22002       // Variable trigger synchronous with engine speed (modified/massaged throttle command)
+#define trigger_id_vehicle_speed            22003       // Variable trigger synchronous with vehicle movement speed
 
 
 // Function/Trigger Pair Definition
@@ -384,9 +389,25 @@ enum _trigger_source : byte {
     TS_INPUT_B,            // External input B (if set to input)
     TS_SPEED_INCR,         // Vehicle speed increases beyond a set point
     TS_SPEED_DECR,         // Vehicle speed decreased below  a set point
+    TS_THROTTLE_COMMAND,   // Throttle command (variable)
+    TS_ENGINE_SPEED,       // Engine speed (variable)
+    TS_VEHICLE_SPEED,      // Vehicle speed (variable)
     TS_ADHC_BRAKES,        // Ad-hoc - brakes applied
     TS_ADHC_CANNONHIT,     // Ad-hoc - received cannon hit
-    TS_ADHC_DESTROYED      // Ad-hoc - vehicle destroyed
+    TS_ADHC_DESTROYED,     // Ad-hoc - vehicle destroyed
+    TS_ADHC_UNUSED_4,      // Ad-hoc - unused      
+    TS_ADHC_UNUSED_5,      // Ad-hoc - unused      
+    TS_ADHC_UNUSED_6,      // Ad-hoc - unused      
+    TS_ADHC_UNUSED_7,      // Ad-hoc - unused      
+    TS_ADHC_UNUSED_8,      // Ad-hoc - unused      
+    TS_ADHC_UNUSED_9,      // Ad-hoc - unused      
+    TS_ADHC_UNUSED_10,     // Ad-hoc - unused      
+    TS_ADHC_UNUSED_11,     // Ad-hoc - unused      
+    TS_ADHC_UNUSED_12,     // Ad-hoc - unused      
+    TS_ADHC_UNUSED_13,     // Ad-hoc - unused      
+    TS_ADHC_UNUSED_14,     // Ad-hoc - unused      
+    TS_ADHC_UNUSED_15,     // Ad-hoc - unused      
+    TS_ADHC_UNUSED_16      // Ad-hoc - unused          
 };
 
 
