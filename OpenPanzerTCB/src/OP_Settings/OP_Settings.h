@@ -88,8 +88,8 @@
     // We could easily change the IRrecvPCI class to check against Timer 1 (TCNT1) and convert the ticks to uS. Not only would this remove any dependence on the micros()
     // function, it would probably be faster, and it would enhance resolution though that isn't strictly necessary.  
 
-    // OP_SimpleTimer, OP_Button, and the main sketch all use calls to the Arduino built-in function millis(), which is also based on Timer 0. Again, these could
-    // be modified to use Timer 1 but so far have not. We would want to write our own custom micros() and millis() functions if so. 
+    // OP_SimpleTimer, OP_Button, the ElapsedMillis class, and the main sketch all use calls to the Arduino built-in function millis(), which is also based on Timer 0. 
+    // Again, these could be modified to use Timer 1 but so far have not. We would want to write our own custom micros() and millis() functions if so. 
     
     // The advantage would be that we could then change the prescaler and other settings of Timer 0, but that doesn't really net us much. 
 
@@ -162,14 +162,17 @@
     
     // We also use Timer 4's overflow interrupt to generate a stream of data that can control a Taigen sound card. 
     
-    // We set Timer 4 to Fast PWM 10-bit (WGM4 3:0 0111) with a prescaler of 8 (CS4 2:0 010). We leave COM4B and COM4C pins connected to PWM (COM 10)
+    // We set Timer 4 to Fast PWM 10-bit (WGM4 3:0 0111) with a prescaler of 1 (CS4 2:0 001). We leave COM4B and COM4C pins connected to PWM (COM 10)
     // but disconnect PWM from COM4A pin (it can still be used as a digital I/O and it controls part of the direction for onboard motor driver A and is 
     // unaffected by what we do here). 
     
-    // PWM for the Aux output and Hit Notify LEDs will be 1.95kHz (basically 2kHz). That would be kind of noisy for motors but for switching LEDs is more than fast enough. 
-    // Timer 4 will tick (TCNT4 increment) once every 0.5 uS, or in other words, one uS = 2 ticks. 10-bit mode means TOP is equal to 1024, which means Timer 4 will overflow
-    // every (1024 ticks * 0.5uS per tick) = 512 uS or almost exactly 1/2 mS. This works very well because the data stream for the Taigen sound cards all involve
-    // pulses in increments of 1/2mS. 
+    // PWM for the Aux output and Hit Notify LEDs will be ~15.6kHz. That is not actually ultrasonic (>20kHz) but should be relatively quiet if a motor is used on the Aux output. 
+    // For switching LEDs even something far lower would be fine.  
+    // Timer 4 will tick (TCNT4 increment) once every 0.0625 uS, or in other words, one uS = 16 ticks. 10-bit mode means TOP is equal to 1024, which means Timer 4 will overflow
+    // every (1024 ticks * 0.0625uS per tick) = 64 uS. This doesn't sound like a useful number but multiplied by 8 it equals .512mS. This works very well because the data stream 
+    // for the Taigen sound cards all involve pulses in increments of ~1/2mS. In fact we could have set the prescaler to 8 and then the overflow would occur every ~1/2mS, which is 
+    // more convenient, however this gives us a very low PWM frequency which means a noisy motor on the Aux output if the user chooses to use it for that (some are driving fans from it). 
+    // Since we are going to have to count multiple overflows anyway, it is no more work to count 8 more overflows. 
 
     // NOTE: Our first thought was to use an output compare (OCR4A) to create interrupts at specified times the way we do with generating servo pulses. The problem with this is 
     // that unless you are in Normal or CTC mode, OCRnx doesn't update immediately, making it of little use for this purpose. But using Normal or CTC mode doesn't really leave us
@@ -179,12 +182,12 @@
     // Nothing wrong with that, but actually the Taigen pulses tend to go a little long anyway, so 1024 seems to work just fine. 
 
     // TCCR4A = 0x2B    // PWM disabled on OCR4A - Fast PWM 10 bit
-    // TCCR4B = 0x0A    // Fast PWM, 8  prescaler, TOP 1024 - frequency 2 KHz, tick every 0.5uS (2 ticks per uS)
+    // TCCR4B = 0x09    // Fast PWM, 1 (no) prescaler, TOP 1024 - frequency ~16 KHz, tick every 0.0625uS (16 ticks per uS)
     // TIFR4 = 0x2F     // Clear all interrupt flags
     // TIMSK4 = 0x00    // No interrupts enabled - later in OP_TaigenSound.cpp we will enable overflow interrupts by setting the TOIE4 bit in TIMSK4. 
     #define SetupTimer4() ({ \  
         TCCR4A = 0x2B;       \
-        TCCR4B = 0x0A;       \
+        TCCR4B = 0x09;       \
         TIFR4 =  0x2F;       \
         TIMSK4 = 0x00;       \
         TCNT4 = 0;           \

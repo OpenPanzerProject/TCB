@@ -37,9 +37,9 @@ void OP_TaigenSound::begin()
     
     // TaigenSound uses Timer 4 Overflow interrupt. Timer 4 is setup in the main sketch, using a macro defined in OP_Settings.h
 
-    // We set Timer 4 to Fast PWM 10-bit (TOP = 1024) with a prescaler of 8. Timer 4 will tick (TCNT4 increment) once every 0.5 uS, or in other words, one uS = 2 ticks. 
-    // Timer 4 will overflow every (1024 ticks * 0.5uS per tick) = 512 uS or just a hair over 1/2 mS. This works very well because the data stream for the 
-    // Taigen sound cards all involve pulses in increments of 1/2mS. 
+    // We set Timer 4 to Fast PWM 10-bit (TOP = 1024) with a prescaler of 1. Timer 4 will tick (TCNT4 increment) once every 0.0625 uS, or in other words, one uS = 16 ticks. 
+    // Timer 4 will overflow every (1024 ticks * 0.06uS per tick) = 64 uS. This means that for every 8 overflows just a hair over 1/2 mS will have transpired (8*64 = 512uS = 0.512mS). 
+    // This works well because the data stream for the Taigen sound cards all involve pulses in increments of 1/2mS. 
 
     // Set pint to output, start high
     pinMode(pin_Prop1, OUTPUT);
@@ -48,8 +48,7 @@ void OP_TaigenSound::begin()
     // Enable Timer 4 Overflow interrupt
     TIMSK4 |= (1 << TOIE4);         // TIMSK4, bit TOIE4 = Timer Overflow Interrupt Enable 4
                                     // We set this flag to enable an interrupt to occur whenever TCNT4 equals TOP. 
-                                    // TCNT4 will tick every 0.5uS. TOP is set to 1024 so TCNT4 will rollover every (1024*0.5) = 512uS .
-                                    // If we need to wait longer than 1/2mS, we simply overflow multiple times and count up until we reach the length of time we need. 
+                                    // We will need to wait longer than 64uS but we simply overflow multiple times and count the number of overflows in 64uS chunks until we reach the length of time we need. 
     
     // No command to start
     command = 0x00;
@@ -75,6 +74,8 @@ void OP_TaigenSound::OVF_ISR()
     static uint16_t data = 0;
     static boolean TriggerSent = false;
 
+    #define OverflowPerHalfmS 8         // How many overflows equals 1/2 millisecond
+
     // We use a state machine to decide if the pin should go high or low, and for how long
 
     OverflowsWaited += 1; 
@@ -87,13 +88,13 @@ void OP_TaigenSound::OVF_ISR()
         {
             case 0:                                         // Header low
                 digitalWrite(pin_Prop1, LOW);   
-                OverflowsToWait = 8;                        // 4.16 mS, we just wait 4.096
+                OverflowsToWait = 8 * OverflowPerHalfmS;    // 4.16 mS, we just wait 4.096
                 NextState = 1;  
                 break;  
     
             case 1:                                         // Header high
                 digitalWrite(pin_Prop1, HIGH);              // 0.52 mS, we wait 0.512
-                OverflowsToWait = 1;                        // This will only take a single overflow
+                OverflowsToWait = 1 * OverflowPerHalfmS;    
                 NextState = 2;  
                 break;  
                     
@@ -101,19 +102,19 @@ void OP_TaigenSound::OVF_ISR()
                 digitalWrite(pin_Prop1, LOW);   
                 if (data & TOP_BIT)     
                 {   
-                    OverflowsToWait = 3;                    // If this bit is 1, drop for 1.56 mS, we do 1.536
+                    OverflowsToWait = 3 * OverflowPerHalfmS;// If this bit is 1, drop for 1.56 mS, we do 1.536
                     NextState = 4;                          // 1 bits have shorter high portion after
                 }   
                 else    
                 {   
-                    OverflowsToWait = 1;                    // If this bit is 0, drop for 0.52 ms, we do 0.512
+                    OverflowsToWait = 1 * OverflowPerHalfmS;// If this bit is 0, drop for 0.52 ms, we do 0.512
                     NextState = 3;                          // 0 bits have longer high portion after
                 }   
                 break;  
                 
             case 3:                                         // Data high - 0 bit
                 digitalWrite(pin_Prop1, HIGH);  
-                OverflowsToWait = 3;                        // If the bit was 0 (short), the high portion is longer (1.56mS, we do 1.536)
+                OverflowsToWait = 3 * OverflowPerHalfmS;    // If the bit was 0 (short), the high portion is longer (1.56mS, we do 1.536)
                 if (++bitNum >= NUM_BITS)                   // Increment bitNum and see if we're done
                 {       
                     bitNum = 0;                             // We've finished, reset the count
@@ -128,7 +129,7 @@ void OP_TaigenSound::OVF_ISR()
                 
             case 4:                                         // Data high - 1 bit
                 digitalWrite(pin_Prop1, HIGH);  
-                OverflowsToWait = 1;                        // If the bit was 1 (long), the high portion is shorter (0.52mS, we do 0.512)
+                OverflowsToWait = 1 * OverflowPerHalfmS;    // If the bit was 1 (long), the high portion is shorter (0.52mS, we do 0.512)
                 if (++bitNum >= NUM_BITS)                   // Increment bitNum and see if we're done
                 {       
                     bitNum = 0;                             // We've finished, reset the count
@@ -143,13 +144,13 @@ void OP_TaigenSound::OVF_ISR()
                     
             case 5:                                         // Closing low
                 digitalWrite(pin_Prop1, LOW);               // 0.52 mS, we wait 0.512
-                OverflowsToWait = 1;                        // This will only take a single overflow
+                OverflowsToWait = 1 * OverflowPerHalfmS;    // This will only take a single overflow
                 NextState = 6;            
                 break;
             
             case 6:                                         // Gap high
                 digitalWrite(pin_Prop1, HIGH);
-                OverflowsToWait = 24;                       // 12.52 mS, we wait 12.288
+                OverflowsToWait = 24 * OverflowPerHalfmS;   // 12.52 mS, we wait 12.288
                 data = command;                             // Here is where we update our data variable
                 
                 // Start signal only gets sent once
