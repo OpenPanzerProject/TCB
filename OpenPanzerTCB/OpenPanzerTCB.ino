@@ -189,7 +189,6 @@
     OP_Button InputButton = OP_Button(pin_Button, true, true, 25);   // Initialize a button object. Set pin, internal pullup = true, inverted = true, debounce time = 25 mS
 
 
-
 void setup()
 {   // Here we get everything started. Begin with the most important things, and keep going in descending order
 
@@ -418,12 +417,12 @@ void setup()
         RunningLightsDimLevel = map(eeprom.ramcopy.RunningLightsDimLevelPct, 0, 100, 0, 255);   // The user sets the dim level as a percent from 0-100, but we want it as a PWM value from 0-255
         if (eeprom.ramcopy.RunningLightsAlwaysOn) RunningLightsOn();
 
-       
+     
     // WAIT FOR PC COMM - AND TRY TO DETECT RECEIVER (kill two birds with one stone)
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // Assume no connection to start with. 
         StartFailsafe();    // This would usually give a message we don't need right now, except we've initialized DEBUG to false for now
-        
+
         // Now we try to detect radio input. This loop will run forever until the Radio class successfully detects a PPM, SBus, iBus or other stream. 
         // While waiting, it will also be listening for any communication from the computer, since this frequently occurs on reboot. And in fact, 
         // even if we do detect the radio right away, we still wait a short bit of time to give the computer a chance to talk to us. Of course we can
@@ -471,7 +470,7 @@ void setup()
         
         // Now check how many channels were detected. If the Radio state is READY_state, we are assured of at least 4 channels.
         int ChannelsDetected = Radio.getChannelCount();
-  
+ 
 
     // RANDOM SEED
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    

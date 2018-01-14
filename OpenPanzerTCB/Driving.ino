@@ -260,13 +260,16 @@ void StopEverything()
 {   // We use this in the event of a radio failsafe event, or just as a quick way to stop all movement. 
     // Stop drive motor(s) and any sound associated with them
     StopDriveMotors();
-    // Sounds
-    TankSound->IdleEngine();    // TBS throttle speed = idle
-    TankSound->StopEngine();    // Other cards just turn off
     // Make sure we clear any ongoing repairs, otherwise the engine won't turn off
     Tank.StopRepair(); 
     // Turn Engine off
-    if (TankEngine.Running()) { EngineOff(); }
+    if (TankEngine.Running()) 
+    { 
+        EngineOff(); 
+        // Sounds
+        TankSound->IdleEngine();        // TBS throttle speed = idle
+        TankSound->StopEngine();
+    }
     // Stop turret motors
     TurretElevation->stop();
     TurretRotation->stop();

@@ -62,7 +62,7 @@ OP_TBS::OP_TBS(OP_SimpleTimer * t, boolean m)
     TBSTimer = t;                       // We will use the sketch's SimpleTimer object rather than creating a new instance of the class
     
     Micro = m;                          // Are we interfacing with the Benidini Micro? If not, it's the Mini
-    
+
     TBSProp = new OP_Servos; 
     
     // Initialize
