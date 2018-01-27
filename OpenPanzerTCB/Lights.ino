@@ -179,6 +179,13 @@ void AuxOutput_PresetDim()
     analogWrite(pin_AuxOutput, eeprom.ramcopy.AuxLightPresetDim);
     if (DEBUG) DebugSerial->println(F("Aux Output Preset Dim"));
 }
+void AuxOutputToggleDim()
+{
+    static boolean AuxDimState = false;
+    // Toggle the light state from dim/off
+    AuxDimState ? AuxOutputOff() : AuxOutput_PresetDim();
+    AuxDimState = !AuxDimState;
+}
 void AuxOutput_SetLevel(uint16_t level)
 {   
 uint8_t auxLevel;

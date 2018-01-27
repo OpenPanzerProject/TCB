@@ -55,6 +55,7 @@ void LoadFunctionTriggers()
                 case SF_AUXOUT_OFF:                 SF_Callback[i] = &SF_AuxOutputOff;                              break;
                 case SF_AUXOUT_LEVEL:               SF_Callback[i] = &AuxOutput_SetLevel;                           break; // Analog function
                 case SF_AUXOUT_PRESETDIM:           SF_Callback[i] = &SF_AuxOutput_PresetDim;                       break;
+                case SF_AUXOUT_TOGGLEDIM:           SF_Callback[i] = &SF_AuxOutput_ToggleDim;                       break;
                 case SF_AUXOUT_FLASH:               SF_Callback[i] = &SF_AuxOutputFlash;                            break;
                 case SF_AUXOUT_INV_FLASH:           SF_Callback[i] = &SF_AuxOutputInverseFlash;                     break;
                 case SF_AUXOUT_BLINK:               SF_Callback[i] = &SF_AuxOutputBlink;                            break;
@@ -463,6 +464,7 @@ void SF_AuxOutputToggle(uint16_t ignoreMe)      { AuxOutputToggle();        }
 void SF_AuxOutputOn(uint16_t ignoreMe)          { AuxOutputOn();            }
 void SF_AuxOutputOff(uint16_t ignoreMe)         { AuxOutputOff();           }
 void SF_AuxOutput_PresetDim(uint16_t ignoreMe)  { AuxOutput_PresetDim();    }
+void SF_AuxOutput_ToggleDim(uint16_t ignoreMe)  { AuxOutputToggleDim();     }
 void SF_AuxOutputFlash(uint16_t ignoreMe)       { AuxOutputFlash();         }
 void SF_AuxOutputInverseFlash(uint16_t ignoreMe){ AuxOutputInverseFlash();  }
 void SF_AuxOutputBlink(uint16_t ignoreMe)       { AuxOutputBlink();         }
