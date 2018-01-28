@@ -105,13 +105,13 @@ void InstantiateMotorObjects()
                     DriveMotor->begin();                 
                     RCOutput2_Available = false;    // This slot becomes unavailable for general purpose servo                    
                 }
-                else
+                else // Car or halftrack with single drive
                 {
                     // For a single rear drive motor, connect it to the "Left" servo port (Servo 1)
                     DriveMotor = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                     DriveMotor->begin();                    
                     RCOutput1_Available = false;
-                    // If car we create a steering servo output, see below
+                    // We will also create a steering servo output, see below
                 }
                 break;
     
@@ -157,17 +157,7 @@ void InstantiateMotorObjects()
                 break;
                 
             case SERVO_ESC:
-                if (eeprom.ramcopy.DriveType == DT_HALFTRACK)
-                {   // This case should not happen. If the user wants independent treads *and* a steering servo, 
-                    // they need to use a dual motor serial controller, or the onboard motor drivers, but not the two ESC ports 
-                    // because we are going to assign the steering servo to the Right Tread servo output.
-    
-                    // What do we do? We change drive type to tank and proceed as if that had been the selection. 
-                    eeprom.ramcopy.DriveType = DT_TANK;
-                    // We change it in EEPROM as well, so it will be fixed next time
-                    EEPROM.updateInt(offsetof(_eeprom_data, DriveType), DT_TANK);
-                }
-                // In this case they have selected DriveType = DT_TANK. That means they won't be needing a steering servo. 
+                // Left drive to RC Output 1, Right to RC Output 2
                 LeftTread = new Servo_ESC (SERVONUM_LEFTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                 RightTread = new Servo_ESC (SERVONUM_RIGHTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
                 RCOutput1_Available = false;
@@ -189,18 +179,28 @@ void InstantiateMotorObjects()
 
     // STEERING SERVO
     // -------------------------------------------------------------------------------------------------------------------------------------->>
-    if (eeprom.ramcopy.DriveType == DT_HALFTRACK || eeprom.ramcopy.DriveType == DT_CAR)
-    {   // Cars and halftrack requre a steering servo, which gets assigned to the Right tread servo port. Obviously the Right tread servo port can no longer
-        // be used for the right tread. If a single rear drive axle is used, the drive ESC can be plugged into the Left tread servo port. Otherwise
-        // if independent tread speeds are still desired in addition to the steering servo (halftracks with independent tread control), 
-        // the user will have to use a serial dual motor controller or the onboard motor controllers. 
+    // Cars and halftrack requre a steering servo. In the case of a car or a halftrack without independent tread control, the steering servo will get 
+    // assigned to the Right tread servo port (RC Output 2), leaving RC Output 1 free for the drive output should they choose to control it with an RC ESC (likely).
+    // However if they want independent tread control and they are using RC then both RC Outputs 1 and 2 will be taken, in that case we re-purpose the barrel elevation 
+    // output for the steering servo, which also means they will be prevented from using RC Output for barrel elevation (most would use onboard for it anyway)
+    if (eeprom.ramcopy.DriveType == DT_CAR || (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors != SERVO_ESC))
+    {   // They are using a single axle drive, or if they are using independent treads they are not using RC for it - in this case 
+        // steering will be assigned to RC Output 2
         SteeringServo = new Servo_ESC (SERVONUM_RIGHTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
         // Initialize the servo
         SteeringServo->begin();
         // This slot is unavailable for general purpose servo
         RCOutput2_Available = false;
     }
-    
+    else if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
+    {   // Here they want independent control by RC, meaning 1 and 2 are taken and we will assing steering to 4 instead (barrel elevation)
+        SteeringServo = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+        // Initialize the servo
+        SteeringServo->begin();
+        // This slot is unavailable for general purpose servo
+        RCOutput4_Available = false;
+    }
+
     // TURRET MOTOR DEFINITION - ROTATION
     // -------------------------------------------------------------------------------------------------------------------------------------->>
     switch (eeprom.ramcopy.TurretRotationMotor)
@@ -283,17 +283,38 @@ void InstantiateMotorObjects()
             MotorB_Available = false;
             break;
         case SERVO_ESC:
-            TurretElevation = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
-            RCOutput4_Available = false;
-            break;
         case SERVO_PAN:
-            TurretElevation = new Servo_PAN (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
-            // TurretElevation is a pointer of class Motor. But if we are using barrel stabilization it will be useful to have an 
-            // object of Servo_PAN type directly, we call this one Barrel. The two are the same, but Barrel will expose some methods that TurretElevation won't have.
-            // FYI: Barrel stabilization can only be enabled if TurretElevation is set to pan servo, so you won't see this under any other category. 
-            Barrel = new Servo_PAN (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
-            Barrel->begin();    // Initialize the barrel
-            RCOutput4_Available = false;
+            if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
+            {   // This case should not happen. If the user wants independent treads, controlled by RC, *and* a steering servo (halftrack),
+                // then we have decreed the barrel elevation RC output will be re-purposed for the steering servo, and therefore the barrel 
+                // elevation must be controlled by something other than RC (like onboard or serial control)
+                // What do we do? We change the barrel elevation to Onboard and proceed as if that had been the selection. 
+                eeprom.ramcopy.TurretElevationMotor = ONBOARD;
+                // We change it in EEPROM as well, so it will be fixed next time
+                EEPROM.updateInt(offsetof(_eeprom_data, TurretElevationMotor), ONBOARD);
+                // Now create the object
+                TurretElevation = new Onboard_ESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                MotorB_Available = false;
+            }    
+            else
+            {
+                // It's ok to use RC output 
+                if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC)
+                {
+                    TurretElevation = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    RCOutput4_Available = false;
+                }
+                else if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
+                {
+                    TurretElevation = new Servo_PAN (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    // TurretElevation is a pointer of class Motor. But if we are using barrel stabilization it will be useful to have an 
+                    // object of Servo_PAN type directly, we call this one Barrel. The two are the same, but Barrel will expose some methods that TurretElevation won't have.
+                    // FYI: Barrel stabilization can only be enabled if TurretElevation is set to pan servo, so you won't see this under any other category. 
+                    Barrel = new Servo_PAN (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                    Barrel->begin();    // Initialize the barrel
+                    RCOutput4_Available = false;
+                }
+            }
             break;
         case DRIVE_DETACHED:
             // In this case we don't need a turret motor object, and even if we create one, it won't be controlled in any way by the turret stick. 
@@ -305,11 +326,22 @@ void InstantiateMotorObjects()
             break;
         default:
             // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime
-            // We set it to SERVO_ESC, and save it to EEPROM so we don't end up here next time. 
-            eeprom.ramcopy.TurretElevationMotor = SERVO_ESC;
-            EEPROM.updateInt(offsetof(_eeprom_data, TurretElevationMotor), SERVO_ESC);            
-            TurretElevation = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
-            RCOutput4_Available = false;
+            if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
+            {
+                // If we have repurposed the barrel elevation RC output for steering servo, set it to Onboard
+                eeprom.ramcopy.TurretElevationMotor = ONBOARD;
+                EEPROM.updateInt(offsetof(_eeprom_data, TurretElevationMotor), ONBOARD);
+                TurretElevation = new Onboard_ESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                MotorB_Available = false;
+            }
+            else
+            {
+                // Otherwise set it to SERVO_ESC, and save it to EEPROM so we don't end up here next time. 
+                eeprom.ramcopy.TurretElevationMotor = SERVO_ESC;
+                EEPROM.updateInt(offsetof(_eeprom_data, TurretElevationMotor), SERVO_ESC);            
+                TurretElevation = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                RCOutput4_Available = false;
+            }
     }
     // Now initialize the motor
     TurretElevation->begin();    
