@@ -1391,10 +1391,13 @@ if (Startup)
                 }
             }
             // Analog pass-throughs of throttle command, engine speed, and vehicle speed
-            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_throttle_command && ThrottleCommand != ThrottleCommand_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput(ThrottleCommand));
-            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_engine_speed && ThrottleSpeed != ThrottleSpeed_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput(ThrottleSpeed));
-            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_vehicle_speed && DriveSpeed != DriveSpeed_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput(DriveSpeed));
-            
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_throttle_command && ThrottleCommand != ThrottleCommand_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput_Abs(ThrottleCommand));
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_engine_speed && ThrottleSpeed != ThrottleSpeed_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput_Abs(ThrottleSpeed));
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_vehicle_speed && DriveSpeed != DriveSpeed_Previous) SF_Callback[t](ScaleSpeed_to_AnalogInput_Abs(DriveSpeed));
+            // Analog pass-throughs of steering command and turret commands
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_steering_command && Radio.Sticks.Turn.updated) SF_Callback[t](ScaleSpeed_to_AnalogInput_Signed(Radio.Sticks.Turn.command));
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_rotation_command && Radio.Sticks.Azimuth.updated) SF_Callback[t](ScaleSpeed_to_AnalogInput_Signed(Radio.Sticks.Azimuth.command));
+            if (eeprom.ramcopy.SF_Trigger[t].TriggerID == trigger_id_elevation_command && Radio.Sticks.Elevation.updated) SF_Callback[t](ScaleSpeed_to_AnalogInput_Signed(Radio.Sticks.Elevation.command));
 
             // Ad-hoc triggers. As compared to other triggers which are in essence inputs, these are internal events which advanced users may want to use to trigger further events.
             // AdHocTriggers is a 2-byte integer. We use each bit (there are 16) as a flag, for a total of 16 ad-hoc triggers. We shift through each bit and check if it is 1, if 

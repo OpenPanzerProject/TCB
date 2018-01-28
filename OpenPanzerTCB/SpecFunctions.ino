@@ -316,6 +316,24 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
         DebugSerial->print(F("Vehicle Speed"));
         PrintSpaces(PadLength - 13);
     }
+    // Steering command (variable)
+    else if (TriggerID == trigger_id_steering_command)
+    {
+        DebugSerial->print(F("Steering Command"));
+        PrintSpaces(PadLength - 16);
+    }    
+    // Turret rotation command (variable)
+    else if (TriggerID == trigger_id_rotation_command)
+    {
+        DebugSerial->print(F("Turret Rotation Command"));
+        PrintSpaces(PadLength - 23);
+    }    
+    // Barrel elevation command (variable)
+    else if (TriggerID == trigger_id_elevation_command)
+    {
+        DebugSerial->print(F("Barrel Elevation Command"));
+        PrintSpaces(PadLength - 24);
+    }    
 }
 
 // The Trigger ID for the 9 turret stick positions are not numbers 1-9, 
@@ -543,10 +561,16 @@ uint16_t ScaleAuxChannelPulse_to_AnalogInput(int chan)
 
 // This scales our global MOTOR_MAX_REVSPEED and MOTOR_MAX_FWDSPEED to the analog range. These two are used widely throughout the project and are defined as -255 and 255.
 // Radio commands and most motor speeds are set to those values. This function so far is only used to scale throttle command, engine speed, and vehicle speed as variable 
-// inputs to analog functions, so we want the speed command to be absolute (0-255) where no command/speed is zero, rather than allowing negative speeds. 
-uint16_t ScaleSpeed_to_AnalogInput(int16_t speed)
+// inputs to analog functions, so we want the speed command to be absolute (0-255) where no command/speed = zero, rather than allowing negative speeds. 
+uint16_t ScaleSpeed_to_AnalogInput_Abs(int16_t speed)
 {
     return map(abs(speed), 0, MOTOR_MAX_FWDSPEED, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL);
+}
+// This is a similar case for other RC inputs used as variable triggers such as the steering channel and turret rotation/elevation channels. In this case we do account for 
+// both negative and postivie values (to account for left/right or up/down, etc...)
+uint16_t ScaleSpeed_to_AnalogInput_Signed(int16_t speed)
+{
+    return map(speed, MOTOR_MAX_REVSPEED, MOTOR_MAX_FWDSPEED, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
