@@ -1594,6 +1594,7 @@ if (Startup)
             { 
                 TankSound->CannonReady(); 
                 CannonWasFired = false; 
+                bitSet(AdHocTriggers, ADHOCT_BIT_CANNON_RELOADED);  // Set the cannon reloaded ad-hoc trigger bit
             }
         }
     }

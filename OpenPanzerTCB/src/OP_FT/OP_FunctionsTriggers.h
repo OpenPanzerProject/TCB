@@ -483,7 +483,7 @@ enum _trigger_source : byte {
 // But in time, who knows, we may think of new events that we want for triggers, so it's good to have a process to implement them. 
 
 // Count of active Ad-Hoc triggers
-#define COUNT_ADHOC_TRIGGERS            3           // This number can not get higher than 16 unless you want to change some methods in the sketch
+#define COUNT_ADHOC_TRIGGERS            4           // This number can not get higher than 16 unless you want to change some methods in the sketch
 
 // Ad-Hoc trigger Flag Masks
 // We don't anticipate needing many ad hoc trigger events. In the Sketch we will use a single 2-byte integer for 16 flags. The sketch sets the appropriate bit when an event occurs, 
@@ -491,6 +491,7 @@ enum _trigger_source : byte {
 #define ADHOCT_BIT_BRAKES_APPLIED       0           // Brakes just applied
 #define ADHOCT_BIT_CANNON_HIT           1           // Vehicle received cannon hit
 #define ADHOCT_BIT_VEHICLE_DESTROYED    2           // Vehicle destroyed
+#define ADHOCT_BIT_CANNON_RELOADED      3           // Cannon reloaded
 
 // Ad-Hoc trigger Triggger IDs 
 // The trigger IDs must start at trigger_id_adhoc_start and go up from there, but not exceed (trigger_id_adhoc_start + trigger_id_adhoc_range - 1)
@@ -498,7 +499,7 @@ enum _trigger_source : byte {
 #define ADHOC_TRIGGER_BRAKES_APPLIED    trigger_id_adhoc_start + ADHOCT_BIT_BRAKES_APPLIED      // Ad-Hoc Trigger ID  1 - brakes just applied   19000
 #define ADHOC_TRIGGER_CANNON_HIT        trigger_id_adhoc_start + ADHOCT_BIT_CANNON_HIT          // Ad-Hoc Trigger ID  2 - received cannon hit   19001
 #define ADHOC_TRIGGER_VEHICLE_DESTROYED trigger_id_adhoc_start + ADHOCT_BIT_VEHICLE_DESTROYED   // Ad-Hoc Trigger ID  3 - vehicle destroyed     19002
-//                                      19003                                                   // Ad-Hoc Trigger ID  4
+#define ADHOC_TRIGGER_CANNON_RELOADED   trigger_id_adhoc_start + ADHOCT_BIT_CANNON_RELOADED     // Ad-Hoc Trigger ID  4 - cannon reloaded       19003
 //                                      19004                                                   // Ad-Hoc Trigger ID  5
 //                                      19005                                                   // Ad-Hoc Trigger ID  6
 //                                      19006                                                   // Ad-Hoc Trigger ID  7

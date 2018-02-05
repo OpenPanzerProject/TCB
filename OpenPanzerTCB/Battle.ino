@@ -13,7 +13,7 @@ void FireCannon()
         {   
             if (!Tank.isRepairOngoing() && !RepairOngoing)
             {
-                // If we are a repair tank, we immobilze the tank when firing the repair signal. 
+                // If we are a repair tank, we immobilize the tank when firing the repair signal. 
                 // This is very similar to what we do if we *receive* a repair signal
                 RepairOngoing = REPAIR_OTHER;   // This marks the start of a repair operation - we are repairing an other vehicle
                 if (DEBUG) { DebugSerial->println(F("Fire Repair Signal")); }
