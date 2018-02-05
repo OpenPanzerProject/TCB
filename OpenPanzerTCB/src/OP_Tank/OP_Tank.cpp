@@ -77,7 +77,7 @@ const __FlashStringHelper *ptrWeightClassName(WEIGHTCLASS wClass) {
 // Return a character string of the name of the damage profile, used for printing
 const __FlashStringHelper *ptrDamageProfile(DAMAGEPROFILES dProfile) {
   if(dProfile>LAST_DAMAGE_PROFILE) dProfile = LAST_DAMAGE_PROFILE+1;
-  const __FlashStringHelper *Names[LAST_DAMAGE_PROFILE+2]={F("Tamiya Spec"), F("Open Panzer"), F("Unknown")};
+  const __FlashStringHelper *Names[LAST_DAMAGE_PROFILE+2]={F("Tamiya Spec"), F("Open Panzer"), F("None"), F("Unknown")};
   return Names[dProfile];
 };
 
@@ -1085,13 +1085,17 @@ int cut_Pct;
                     Left_orSteering->restore_Speed();
                 }
             }
-            else if (driveType == DT_CAR || driveType == DT_DKLM)
+            else if (driveType == DT_CAR || driveType == DT_DKLM || driveType == DT_DMD)
             {   // A single rear axle or drive motor
                 if (cut_Pct > 0) Right_orRear->cut_SpeedPct(cut_Pct);
                 else             Right_orRear->restore_Speed(); 
                 // In this case, we leave the steering servo alone because Tamiya has no damage setting specified for steering servos. 
                 // We also leave the steering motor alone in the case of DKLM gearbox. 
             }
+            break;
+        
+        case NO_DAMAGE:
+            // We do nothing here
             break;
     }
 

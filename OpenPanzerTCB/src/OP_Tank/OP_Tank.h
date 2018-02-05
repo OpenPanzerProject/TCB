@@ -79,8 +79,9 @@ const __FlashStringHelper *ptrWeightClassName(WEIGHTCLASS wClass); //Returns a c
 typedef char DAMAGEPROFILES;
 #define TAMIYA_DAMAGE       0       // Stock Tamiya damage profile
 #define OPENPANZER_DAMAGE   1       // Open Panzer damage profile
+#define NO_DAMAGE           2       // No damage
 //#define ADDITIONAL (number)
-#define LAST_DAMAGE_PROFILE OPENPANZER_DAMAGE
+#define LAST_DAMAGE_PROFILE NO_DAMAGE
 const __FlashStringHelper *ptrDamageProfile(DAMAGEPROFILES dProfile); //Returns a character string that is name of the damage profile 
 
 

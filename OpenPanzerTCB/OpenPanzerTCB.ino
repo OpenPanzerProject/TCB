@@ -1499,25 +1499,28 @@ if (Startup)
         // Now apply "damage", it doesn't matter if we were "damaged" or "repaired". The Damage function will take into account
         // the current amount of damage. If we were repaired, the amount of damage will be less than before, so the Damage function will 
         // calculate a new, lesser damage. Of course if we were hit by cannon or machine gun fire, then Damage will calculate a new, more severe damage. 
-        if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK)
+        if (Tank.BattleSettings.DamageProfile != NO_DAMAGE)
         {
-            // In this case, we have two treads. Either can be damaged. 
-            // If this is a halftrack there is also a steering servo, which for now we don't bother damaging. 
-            Tank.Damage(RightTread, LeftTread, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
+            if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK)
+            {
+                // In this case, we have two treads. Either can be damaged. 
+                // If this is a halftrack there is also a steering servo, which for now we don't bother damaging. 
+                Tank.Damage(RightTread, LeftTread, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
+            }
+            else if (eeprom.ramcopy.DriveType == DT_CAR)
+            {
+                // In this case, there is a single rear axle and a steering servo. We allow both to be damaged.
+                Tank.Damage(DriveMotor, SteeringServo, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
+            }
+            else if (eeprom.ramcopy.DriveType == DT_DKLM || eeprom.ramcopy.DriveType == DT_DMD)
+            {
+                // In this case, there is a single propulsion motor as well as a separate steering motor. We allow both to be damaged.
+                Tank.Damage(DriveMotor, SteeringMotor, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
+            }        
+            // Force treads to update
+            RightSpeed_Previous = 0;
+            LeftSpeed_Previous = 0;
         }
-        else if (eeprom.ramcopy.DriveType == DT_CAR)
-        {
-            // In this case, there is a single rear axle and a steering servo. We allow both to be damaged.
-            Tank.Damage(DriveMotor, SteeringServo, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
-        }
-        else if (eeprom.ramcopy.DriveType == DT_DKLM || eeprom.ramcopy.DriveType == DT_DMD)
-        {
-            // In this case, there is a single propulsion motor as well as a separate steering motor. We allow both to be damaged.
-            Tank.Damage(DriveMotor, SteeringMotor, TurretRotation, TurretElevation, Smoker, eeprom.ramcopy.SmokerControlAuto, eeprom.ramcopy.DriveType);
-        }        
-        // Force treads to update
-        RightSpeed_Previous = 0;
-        LeftSpeed_Previous = 0;
 
         // Now show the remaining health level if this was a damaging hit (not a repair hit)
         if (DEBUG && HitType != HIT_TYPE_REPAIR) { DebugSerial->print(F("Health Level: ")); DebugSerial->print(Tank.PctHealthRemaining()); DebugSerial->println(F("%")); }
