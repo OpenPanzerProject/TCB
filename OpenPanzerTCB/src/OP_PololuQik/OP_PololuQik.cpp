@@ -80,16 +80,30 @@ void OP_PololuQik::sendMessage(unsigned char message[], unsigned int length)
     _port->write(crc);                 // Now send CRC byte
 }
 
-void OP_PololuQik::throttleCommand(byte command, int speed) const
+void OP_PololuQik::motorCommand(byte command, int speed) const
 {
-    speed = constrain(speed, -126, 126);
+    speed = constrain(speed, -127, 127);
     this->command(command, (byte)abs(speed));
 }
 
 void OP_PololuQik::motor(byte motor, int speed) const
 {
-    if      (motor == 1)    throttleCommand((speed < 0 ? QIK_MOTOR_M0_REVERSE : QIK_MOTOR_M0_FORWARD), speed);
-    else if (motor == 2)    throttleCommand((speed < 0 ? QIK_MOTOR_M1_REVERSE : QIK_MOTOR_M1_FORWARD), speed);
+    // If speed is 0 we issue a brake command to make sure the motor really does stop rather than freewheel. The brake amount
+    // is also passed but we use 100%. Otherwise if the speed is positive or negative we issue forward or reverse commands. 
+    // Note these brake commands only work for the 2s12v10, confoundingly on the 2s9v1 these same commands enable "coasting"
+    // wherease braking is enabled by default. For now we have no way of knowing which device is in use, but the 2s12v10 is 
+    // going to be the most common, and any application that requires the 2s9v1 will probably have enough internal resistance
+    // to stop anyway. 
+    if      (motor == 1)    
+    {
+        if (speed == 0) motorCommand(QIK_MOTOR_M0_BRAKE, QIK_MOTOR_BRAKE_LEVEL);
+        else motorCommand((speed < 0 ? QIK_MOTOR_M0_REVERSE : QIK_MOTOR_M0_FORWARD), speed);
+    }
+    else if (motor == 2)    
+    {
+        if (speed == 0) motorCommand(QIK_MOTOR_M1_BRAKE, QIK_MOTOR_BRAKE_LEVEL);
+        else motorCommand((speed < 0 ? QIK_MOTOR_M1_REVERSE : QIK_MOTOR_M1_FORWARD), speed);
+    }
     else    return;
 }
 
@@ -152,8 +166,9 @@ boolean OP_PololuQik::configurePololu(byte SetDeviceID)
     if (!setConfigurationParameter(QIK_PARAM_NUM_M0_ACCEL, 0)) secondParts += 1;
     if (!setConfigurationParameter(QIK_PARAM_NUM_M1_ACCEL, 0)) secondParts += 1;
 
-    // Param 6 & 7 - Braking
-    // Disabled because once again the TCB handles this
+    // Param 6 & 7 - Braking on Direction change
+    // Disable braking on direction change, let the TCB handle that. This is not the same as braking the motors
+    // to stop, which we do want (but which is not set in configuration, but rather at run time)
     if (!setConfigurationParameter(QIK_PARAM_NUM_M0_BRAKE, 0)) secondParts += 1;
     if (!setConfigurationParameter(QIK_PARAM_NUM_M1_BRAKE, 0)) secondParts += 1;
 

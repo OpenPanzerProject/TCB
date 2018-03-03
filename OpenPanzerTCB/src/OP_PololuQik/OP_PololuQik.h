@@ -68,7 +68,9 @@
 #define QIK_MOTOR_M0_REVERSE             0x0A
 #define QIK_MOTOR_M1_FORWARD             0x0C
 #define QIK_MOTOR_M1_REVERSE             0x0E
-
+#define QIK_MOTOR_M0_BRAKE               0x06
+#define QIK_MOTOR_M1_BRAKE               0x07
+#define QIK_MOTOR_BRAKE_LEVEL            0x7F   // Maximum = 127
 
 // CRC7 lookup table, takes up 256 bytes, stick it PROGRMEM
 const unsigned char CRC7Table[256] PROGMEM_FAR = 
@@ -163,7 +165,7 @@ class OP_PololuQik
   private:
     void sendMessage(unsigned char message[], unsigned int length); // Sends a message of any length, including CRC
 
-    void throttleCommand(byte command, int speed) const;
+    void motorCommand(byte command, int speed) const;
 
     void clearError(void);
 
