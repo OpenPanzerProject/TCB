@@ -95,14 +95,19 @@ void OP_PololuQik::motor(byte motor, int speed) const
     // going to be the most common, and any application that requires the 2s9v1 will probably have enough internal resistance
     // to stop anyway. 
     if      (motor == 1)    
-    {
+    {   // Set speed
+        motorCommand((speed < 0 ? QIK_MOTOR_M0_REVERSE : QIK_MOTOR_M0_FORWARD), speed);
+        // Additionally apply brake if speed == 0
         if (speed == 0) motorCommand(QIK_MOTOR_M0_BRAKE, QIK_MOTOR_BRAKE_LEVEL);
-        else motorCommand((speed < 0 ? QIK_MOTOR_M0_REVERSE : QIK_MOTOR_M0_FORWARD), speed);
+        
     }
     else if (motor == 2)    
     {
+        // Set speed
+        motorCommand((speed < 0 ? QIK_MOTOR_M1_REVERSE : QIK_MOTOR_M1_FORWARD), speed);
+        // Additionally apply brake if speed == 0
         if (speed == 0) motorCommand(QIK_MOTOR_M1_BRAKE, QIK_MOTOR_BRAKE_LEVEL);
-        else motorCommand((speed < 0 ? QIK_MOTOR_M1_REVERSE : QIK_MOTOR_M1_FORWARD), speed);
+        
     }
     else    return;
 }
