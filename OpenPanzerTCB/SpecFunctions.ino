@@ -101,6 +101,12 @@ void LoadFunctionTriggers()
                 case SF_SMOKER_OFF:                 SF_Callback[i] = &SF_Smoker_ManualOff;                          break;
                 case SF_MOTOR_A:                    SF_Callback[i] = &MotorA_ManualControl;                         break; // Analog function
                 case SF_MOTOR_B:                    SF_Callback[i] = &MotorB_ManualControl;                         break; // Analog function
+                case SF_MOTOR_A_ON:                 SF_Callback[i] = &MotorA_On;                                    break;
+                case SF_MOTOR_A_OFF:                SF_Callback[i] = &MotorA_Off;                                   break;
+                case SF_MOTOR_A_TOGGLE:             SF_Callback[i] = &MotorA_Toggle;                                break;
+                case SF_MOTOR_B_ON:                 SF_Callback[i] = &MotorB_On;                                    break;
+                case SF_MOTOR_B_OFF:                SF_Callback[i] = &MotorB_Off;                                   break;
+                case SF_MOTOR_B_TOGGLE:             SF_Callback[i] = &MotorB_Toggle;                                break;                
                 case SF_RC1_PASS:                   SF_Callback[i] = &RC_Passthrough_1;                             break; // Analog function
                 case SF_RC2_PASS:                   SF_Callback[i] = &RC_Passthrough_2;                             break; // Analog function
                 case SF_RC3_PASS:                   SF_Callback[i] = &RC_Passthrough_3;                             break; // Analog function
@@ -711,12 +717,47 @@ void MotorA_ManualControl(uint16_t level)
 {
     if (MotorA_Available) MotorA->setSpeed(level);
 }
+void MotorA_On(uint16_t IgnoreMe)
+{
+    if (MotorA_Available) MotorA->setSpeed(ANALOG_SPECFUNCTION_MAX_VAL);
+}
+void MotorA_Off(uint16_t IgnoreMe)
+{
+    if (MotorA_Available) MotorA->stop();
+}
+void MotorA_Toggle(uint16_t IgnoreMe)
+{
+    static boolean ison = false;
+
+    if (MotorA_Available) 
+    {
+        ison ? MotorA_Off(0) : MotorA_On(0);
+        ison = !ison;
+    }
+}
+
 void MotorB_ManualControl(uint16_t level)
 {
     if (MotorB_Available) MotorB->setSpeed(level);
 }
+void MotorB_On(uint16_t IgnoreMe)
+{
+    if (MotorB_Available) MotorB->setSpeed(ANALOG_SPECFUNCTION_MAX_VAL);
+}
+void MotorB_Off(uint16_t IgnoreMe)
+{
+    if (MotorB_Available) MotorB->stop();
+}
+void MotorB_Toggle(uint16_t IgnoreMe)
+{
+    static boolean ison = false;
 
-
+    if (MotorB_Available) 
+    {
+        ison ? MotorB_Off(0) : MotorB_On(0);
+        ison = !ison;
+    }
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // SAVE ADJUSTMENTS

@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 120;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 126;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -161,7 +161,13 @@ enum _special_function : byte {
     SF_MANTRANS_FWD     = 116,      // 116
     SF_MANTRANS_REV     = 117,      // 117
     SF_MANTRANS_NEUTRAL = 118,      // 118
-    SF_AUXOUT_TOGGLEDIM = 119       // 119
+    SF_AUXOUT_TOGGLEDIM = 119,      // 119
+    SF_MOTOR_A_ON       = 120,      // 120
+    SF_MOTOR_A_OFF      = 121,      // 121
+    SF_MOTOR_A_TOGGLE   = 122,      // 122
+    SF_MOTOR_B_ON       = 123,      // 123
+    SF_MOTOR_B_OFF      = 124,      // 124
+    SF_MOTOR_B_TOGGLE   = 125       // 125
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -180,7 +186,8 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,0,1,1,1,1,   // 80-89    85 analog
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
  1,1,1,1,1,1,1,1,1,1,   // 100-109  
- 1,1,1,1,1,1,1,1,1,1    // 110-119
+ 1,1,1,1,1,1,1,1,1,1,   // 110-119
+ 1,1,1,1,1,1            // 120-125
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -314,7 +321,13 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Manual Transmission - Forward",             // 116
     "Manual Transmission - Reverse",             // 117
     "Manual Transmission - Neutral",             // 118
-    "Aux Output - Toggle Dim Level"              // 119
+    "Aux Output - Toggle Dim Level",             // 119
+    "Motor A - On",                              // 120
+    "Motor A - Off",                             // 121
+    "Motor A - Toggle On/Off",                   // 122
+    "Motor B - On",                              // 123
+    "Motor B - Off",                             // 124
+    "Motor B - Toggle On/Off"                    // 125
 };
 
 
