@@ -306,6 +306,7 @@ void setup()
                    eeprom.ramcopy.AuxFlashWithCannon,
                    eeprom.ramcopy.AuxLightFlashTime_mS,
                    eeprom.ramcopy.MGLightBlink_mS,
+                   eeprom.ramcopy.CannonReloadBlink,
                    RecoilServo, 
                    TankSound,
                    &timer);

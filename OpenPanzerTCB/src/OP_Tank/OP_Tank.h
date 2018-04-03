@@ -119,8 +119,8 @@ typedef struct battle_settings{
 class OP_Tank
 {   public:
         OP_Tank(void);                              // Constructor
-        static void     begin(battle_settings, bool, bool, bool, int, bool, bool, uint16_t, uint8_t, Servo_RECOIL *, OP_Sound *, OP_SimpleTimer *);     
-        // battle_settings, boolean mechanical barrel with cannon, boolean airsoft, boolean servo recoil with cannon, int recoil delay, bool flash with cannon, uint16_t aux flash time, bool aux light flash with cannon, uint8_t machine gun blink interval, pointers to recoil servo, sound object, and sketch's SimpleTimer
+        static void     begin(battle_settings, bool, bool, bool, int, bool, bool, uint16_t, uint8_t, bool, Servo_RECOIL *, OP_Sound *, OP_SimpleTimer *);     
+        // battle_settings, boolean mechanical barrel with cannon, boolean airsoft, boolean servo recoil with cannon, int recoil delay, bool flash with cannon, uint16_t aux flash time, bool aux light flash with cannon, uint8_t machine gun blink interval, boolean cannon reload blink, pointers to recoil servo, sound object, and sketch's SimpleTimer
         
         // Functions - Cannon Fire
         static void     Fire(void);                 // Fires the correct IR signal based on the IR protocol 
@@ -196,6 +196,7 @@ class OP_Tank
         static void     Cannon_StartReload();
         static void     ReloadComplete(void);
         static boolean  CannonReloadComplete;
+        static boolean  _CannonReloadBlink;
     
         // High Intensity Flash / Aux Light Flash
         static boolean  _HiFlashWithCannon;

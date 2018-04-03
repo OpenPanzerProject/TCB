@@ -36,6 +36,7 @@ int             OP_Tank::_RecoilDelay = 0;
 boolean         OP_Tank::_HiFlashWithCannon;
 boolean         OP_Tank::_AuxFlashWithCannon;
 uint16_t        OP_Tank::_AuxFlashTime_mS;
+boolean         OP_Tank::_CannonReloadBlink;
 int             OP_Tank::MechRecoilTimeoutTimerID;
 boolean         OP_Tank::isInvulnerable;            
 boolean         OP_Tank::isDestroyed;           
@@ -99,7 +100,7 @@ OP_Tank::OP_Tank()
 }
 
 
-void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, boolean afwc, uint16_t aftms, uint8_t mgint, Servo_RECOIL * sr, OP_Sound * os, OP_SimpleTimer * t)
+void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean rswc, int mrd, boolean hfwc, boolean afwc, uint16_t aftms, uint8_t mgint, bool crb, Servo_RECOIL * sr, OP_Sound * os, OP_SimpleTimer * t)
 {
     // Save settings
     
@@ -125,6 +126,7 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     _HiFlashWithCannon = hfwc;
     _AuxFlashWithCannon = afwc;
     _AuxFlashTime_mS = aftms;
+    _CannonReloadBlink = crb;
     
     // Pointers to objects
     _RecoilServo = sr;
@@ -460,7 +462,7 @@ void OP_Tank::Cannon_StartReload(void)
 void OP_Tank::ReloadComplete(void)
 {
     CannonReloadComplete = true;
-    AppleLEDs.DoubleTap();              // Give the user visual notification that the reload process is done by blinking the Apple LEDs
+    if (_CannonReloadBlink) AppleLEDs.DoubleTap();              // Give the user visual notification that the reload process is done by blinking the Apple LEDs
 }
 boolean OP_Tank::CannonReloaded(void)
 {
