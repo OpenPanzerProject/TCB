@@ -182,7 +182,7 @@ void InstantiateMotorObjects()
     // Cars and halftrack requre a steering servo. In the case of a car or a halftrack without independent tread control, the steering servo will get 
     // assigned to the Right tread servo port (RC Output 2), leaving RC Output 1 free for the drive output should they choose to control it with an RC ESC (likely).
     // However if they want independent tread control and they are using RC then both RC Outputs 1 and 2 will be taken, in that case we re-purpose the barrel elevation 
-    // output for the steering servo, which also means they will be prevented from using RC Output for barrel elevation (most would use onboard for it anyway)
+    // output for the steering servo, which also means they will be prevented from using RC Output for barrel elevation
     if (eeprom.ramcopy.DriveType == DT_CAR || (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors != SERVO_ESC))
     {   // They are using a single axle drive, or if they are using independent treads they are not using RC for it - in this case 
         // steering will be assigned to RC Output 2
@@ -193,7 +193,7 @@ void InstantiateMotorObjects()
         RCOutput2_Available = false;
     }
     else if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
-    {   // Here they want independent control by RC, meaning 1 and 2 are taken and we will assing steering to 4 instead (barrel elevation)
+    {   // Here they want independent control by RC, meaning 1 and 2 are taken and we will assign steering to 4 instead (barrel elevation)
         SteeringServo = new Servo_ESC (SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
         // Initialize the servo
         SteeringServo->begin();
