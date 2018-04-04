@@ -531,6 +531,7 @@ void loop()
     static boolean Alive = true;                                      // Has the tank been destroyed? If so, Alive = false
     static int DestroyedBlinkerID = 0;                                // Timer ID for blinking lights when tank is destroyed
     HIT_TYPE HitType;                                                 // If we were hit, what kind of hit was it
+    static uint8_t LastDamagePct = 0;                                 // Number from 0-100 of our damage percentage on the last time through the loop
 // Inertial Measurement Unit
     const int IMU_SampleDelay = 20;                                   // The BNO055 can output fusion data up to 100hz. If we set this delay to 20mS that will actually be a refresh rate of 50 times per second. 
     static boolean IMU_WaitingForSample = false;
@@ -1526,6 +1527,14 @@ if (Startup)
         // Now show the remaining health level if this was a damaging hit (not a repair hit)
         if (DEBUG && HitType != HIT_TYPE_REPAIR) { DebugSerial->print(F("Health Level: ")); DebugSerial->print(Tank.PctHealthRemaining()); DebugSerial->println(F("%")); }
 
+        // Let the sound card know if we are damaged or restored
+        if (Tank.PctDamaged() != LastDamagePct)
+        {
+            LastDamagePct = Tank.PctDamaged();
+            if (LastDamagePct > 0) TankSound->SetVehicleDamaged(true);
+            else TankSound->SetVehicleDamaged(false);
+        }
+
         if (Tank.isDestroyed && Alive)
         {
             if (DEBUG) { DebugSerial->println(F("TANK DESTROYED")); }
@@ -1590,7 +1599,6 @@ if (Startup)
         {
             // Don't do anything here, when the repair sound is done playing the user knows they can repair again
             CannonWasFired = false;
-            
         }
         else
         {   // Not a repair tank: when the cannon is done being reloaded, play the cannon ready sound

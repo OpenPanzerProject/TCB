@@ -68,6 +68,8 @@ class OP_Sound {
     virtual void SecondMachineGun(void) =0;             // Play machine gun sound
     virtual void StopSecondMachineGun(void) =0;         // Explicit call to stop the machine gun    
     virtual void MGHit(void) =0;                        // Play machine gun hit sound
+    // Other battle
+    virtual void SetVehicleDamaged(boolean) = 0;        // Damage/restore vehicle (true/false)
     // Turret/Barrel
     virtual void Turret(void) =0;                       // Play turret rotation sound
     virtual void StopTurret(void) =0;                   // Stop turret rotation sound
@@ -138,6 +140,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void SecondMachineGun(void)                                 { OP_TBS::SecondMachineGun();          }
     void StopSecondMachineGun(void)                             { OP_TBS::StopSecondMachineGun();      }    
     void MGHit(void)                                            { OP_TBS::MGHit();                     }
+  // Other battle
+    void SetVehicleDamaged(boolean)                             { return;                              }
   // Turret/Barrel
     void Turret(void)                                           { OP_TBS::Turret();                    }
     void StopTurret(void)                                       { OP_TBS::StopTurret();                }
@@ -223,6 +227,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_SET_RELATIVE_VOLUME         0x4C   // 76  -- Use Modifier to indicate which volume 0=Engine, 1=Track Overlay, 2=Effects, 3=Flash
 #define OPSC_CMD_ENGAGE_TRANSMISSION         0X4D   // 77  -- Pass in value: true (1) means engaged, false (0) means disengaged
 #define OPSC_CMD_CANNON_READY                0x4E   // 78
+#define OPSC_CMD_VEHICLE_DAMAGED             0x4F   // 79  -- Pass in value: true (1) means vehicle damage, false (0) means not damaged aka restored
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -267,6 +272,8 @@ class OP_SoundCard: public OP_Sound {
     void SecondMachineGun(void)                                 { command(OPSC_CMD_2NDMG_START);                            }
     void StopSecondMachineGun(void)                             { command(OPSC_CMD_2NDMG_STOP);                             }    
     void MGHit(void)                                            { command(OPSC_CMD_MG_HIT);                                 }
+  // Other battle
+    void SetVehicleDamaged(boolean b)                           { command(OPSC_CMD_VEHICLE_DAMAGED, b);                     }   // Pass true/false in value
   // Turret/Barrel  
     void Turret(void)                                           { if (_turretEnabled && !_turretSoundActive) { _turretSoundActive = true; command(OPSC_CMD_TURRET_START); } }
     void StopTurret(void)                                       { if (_turretEnabled &&  _turretSoundActive) { _turretSoundActive = false; command(OPSC_CMD_TURRET_STOP); } }
@@ -419,6 +426,8 @@ class OP_TaigenSound: public OP_Sound {
     void SecondMachineGun(void)                                 { return;               }
     void StopSecondMachineGun(void)                             { return;               }
     void MGHit(void)                                            { return;               }
+  // Other battle
+    void SetVehicleDamaged(boolean)                             { return;               }    
   // Headlight                                                                          
     void HeadlightSound(void)                                   { return;               }
     void HeadlightSound_SetEnabled(boolean e)                   { return;               }

@@ -28,6 +28,7 @@ Destroyed	LITERAL2
 MachineGun	LITERAL2
 StopMachineGun	LITERAL2
 MGHit	LITERAL2
+SetVehicleDamaged   LITERAL2
 Turret	LITERAL2
 StopTurret  LITERAL2
 TurretSound_SetEnabled	LITERAL2
