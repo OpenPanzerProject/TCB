@@ -439,6 +439,7 @@ void OP_TBS::UserSound_Play(uint8_t s)
         case 4: TriggerSpecialSound(SOUND_USER_4); break;
         case 5: TriggerSpecialSound(SOUND_USER_5); break;
         case 6: TriggerSpecialSound(SOUND_USER_6); break;
+        default: break;
     }
 }
 void OP_TBS::UserSound_Repeat(uint8_t s)
@@ -451,7 +452,8 @@ void OP_TBS::UserSound_Repeat(uint8_t s)
         case 3: TriggerSpecialSound(SOUND_USER_3, false); break;
         case 4: TriggerSpecialSound(SOUND_USER_4, false); break;
         case 5: TriggerSpecialSound(SOUND_USER_5, false); break;
-        case 6: TriggerSpecialSound(SOUND_USER_6, false); break;        
+        case 6: TriggerSpecialSound(SOUND_USER_6, false); break;
+        default: break;
     }
 }
 void OP_TBS::UserSound_Stop(uint8_t s)
@@ -465,6 +467,7 @@ void OP_TBS::UserSound_Stop(uint8_t s)
         case 4: StopSpecialSounds(SOUND_USER_4); break;
         case 5: StopSpecialSounds(SOUND_USER_5); break;
         case 6: StopSpecialSounds(SOUND_USER_6); break;        
+        default: break;        
     }
 }     
 

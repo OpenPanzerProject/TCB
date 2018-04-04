@@ -83,6 +83,24 @@ void LoadFunctionTriggers()
                 case SF_USER_SOUND6_ONCE:           SF_Callback[i] = &SF_TriggerUserSound6;                         break;
                 case SF_USER_SOUND6_RPT:            SF_Callback[i] = &SF_UserSound6_Repeat;                         break;
                 case SF_USER_SOUND6_OFF:            SF_Callback[i] = &SF_UserSound6_Stop;                           break;
+                case SF_USER_SOUND7_ONCE:           SF_Callback[i] = &SF_TriggerUserSound7;                         break;
+                case SF_USER_SOUND7_RPT:            SF_Callback[i] = &SF_UserSound7_Repeat;                         break;
+                case SF_USER_SOUND7_OFF:            SF_Callback[i] = &SF_UserSound7_Stop;                           break;
+                case SF_USER_SOUND8_ONCE:           SF_Callback[i] = &SF_TriggerUserSound8;                         break;
+                case SF_USER_SOUND8_RPT:            SF_Callback[i] = &SF_UserSound8_Repeat;                         break;
+                case SF_USER_SOUND8_OFF:            SF_Callback[i] = &SF_UserSound8_Stop;                           break;
+                case SF_USER_SOUND9_ONCE:           SF_Callback[i] = &SF_TriggerUserSound9;                         break;
+                case SF_USER_SOUND9_RPT:            SF_Callback[i] = &SF_UserSound9_Repeat;                         break;
+                case SF_USER_SOUND9_OFF:            SF_Callback[i] = &SF_UserSound9_Stop;                           break;
+                case SF_USER_SOUND10_ONCE:          SF_Callback[i] = &SF_TriggerUserSound10;                         break;
+                case SF_USER_SOUND10_RPT:           SF_Callback[i] = &SF_UserSound10_Repeat;                         break;
+                case SF_USER_SOUND10_OFF:           SF_Callback[i] = &SF_UserSound10_Stop;                           break;
+                case SF_USER_SOUND11_ONCE:          SF_Callback[i] = &SF_TriggerUserSound11;                         break;
+                case SF_USER_SOUND11_RPT:           SF_Callback[i] = &SF_UserSound11_Repeat;                         break;
+                case SF_USER_SOUND11_OFF:           SF_Callback[i] = &SF_UserSound11_Stop;                           break;
+                case SF_USER_SOUND12_ONCE:          SF_Callback[i] = &SF_TriggerUserSound12;                         break;
+                case SF_USER_SOUND12_RPT:           SF_Callback[i] = &SF_UserSound12_Repeat;                         break;
+                case SF_USER_SOUND12_OFF:           SF_Callback[i] = &SF_UserSound12_Stop;                           break;
                 case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
@@ -498,24 +516,42 @@ void SF_AuxOutputRevolve(uint16_t ignoreMe)     { AuxOutputRevolve();       }
 void SF_AuxOutputToggleRevolve(uint16_t ignoreMe){ AuxOutputToggleRevolve();}
 void SF_OverlayEnable(uint16_t ignoreMe)        { EnableTrackOverlaySounds();}
 void SF_OverlayDisable(uint16_t ignoreMe)       { DisableTrackOverlaySounds();}
-void SF_TriggerUserSound1(uint16_t ignoreMe)    { TriggerUserSound1();      }
-void SF_UserSound1_Repeat(uint16_t ignoreMe)    { UserSound1_Repeat();      }
-void SF_UserSound1_Stop(uint16_t ignoreMe)      { UserSound1_Stop();        }
-void SF_TriggerUserSound2(uint16_t ignoreMe)    { TriggerUserSound2();      }
-void SF_UserSound2_Repeat(uint16_t ignoreMe)    { UserSound2_Repeat();      }
-void SF_UserSound2_Stop(uint16_t ignoreMe)      { UserSound2_Stop();        }
-void SF_TriggerUserSound3(uint16_t ignoreMe)    { TriggerUserSound3();      }
-void SF_UserSound3_Repeat(uint16_t ignoreMe)    { UserSound3_Repeat();      }
-void SF_UserSound3_Stop(uint16_t ignoreMe)      { UserSound3_Stop();        }
-void SF_TriggerUserSound4(uint16_t ignoreMe)    { TriggerUserSound4();      }
-void SF_UserSound4_Repeat(uint16_t ignoreMe)    { UserSound4_Repeat();      }
-void SF_UserSound4_Stop(uint16_t ignoreMe)      { UserSound4_Stop();        }
-void SF_TriggerUserSound5(uint16_t ignoreMe)    { TriggerUserSound5();      }
-void SF_UserSound5_Repeat(uint16_t ignoreMe)    { UserSound5_Repeat();      }
-void SF_UserSound5_Stop(uint16_t ignoreMe)      { UserSound5_Stop();        }
-void SF_TriggerUserSound6(uint16_t ignoreMe)    { TriggerUserSound6();      }
-void SF_UserSound6_Repeat(uint16_t ignoreMe)    { UserSound6_Repeat();      }
-void SF_UserSound6_Stop(uint16_t ignoreMe)      { UserSound6_Stop();        }
+void SF_TriggerUserSound1(uint16_t ignoreMe)    { TriggerUserSound(1);      }
+void SF_UserSound1_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(1);      }
+void SF_UserSound1_Stop(uint16_t ignoreMe)      { UserSound_Stop(1);        }
+void SF_TriggerUserSound2(uint16_t ignoreMe)    { TriggerUserSound(2);      }
+void SF_UserSound2_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(2);      }
+void SF_UserSound2_Stop(uint16_t ignoreMe)      { UserSound_Stop(2);        }
+void SF_TriggerUserSound3(uint16_t ignoreMe)    { TriggerUserSound(3);      }
+void SF_UserSound3_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(3);      }
+void SF_UserSound3_Stop(uint16_t ignoreMe)      { UserSound_Stop(3);        }
+void SF_TriggerUserSound4(uint16_t ignoreMe)    { TriggerUserSound(4);      }
+void SF_UserSound4_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(4);      }
+void SF_UserSound4_Stop(uint16_t ignoreMe)      { UserSound_Stop(4);        }
+void SF_TriggerUserSound5(uint16_t ignoreMe)    { TriggerUserSound(5);      }
+void SF_UserSound5_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(5);      }
+void SF_UserSound5_Stop(uint16_t ignoreMe)      { UserSound_Stop(5);        }
+void SF_TriggerUserSound6(uint16_t ignoreMe)    { TriggerUserSound(6);      }
+void SF_UserSound6_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(6);      }
+void SF_UserSound6_Stop(uint16_t ignoreMe)      { UserSound_Stop(6);        }
+void SF_TriggerUserSound7(uint16_t ignoreMe)    { TriggerUserSound(7);      }
+void SF_UserSound7_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(7);      }
+void SF_UserSound7_Stop(uint16_t ignoreMe)      { UserSound_Stop(7);        }
+void SF_TriggerUserSound8(uint16_t ignoreMe)    { TriggerUserSound(8);      }
+void SF_UserSound8_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(8);      }
+void SF_UserSound8_Stop(uint16_t ignoreMe)      { UserSound_Stop(8);        }
+void SF_TriggerUserSound9(uint16_t ignoreMe)    { TriggerUserSound(9);      }
+void SF_UserSound9_Repeat(uint16_t ignoreMe)    { UserSound_Repeat(9);      }
+void SF_UserSound9_Stop(uint16_t ignoreMe)      { UserSound_Stop(9);        }
+void SF_TriggerUserSound10(uint16_t ignoreMe)   { TriggerUserSound(10);     }
+void SF_UserSound10_Repeat(uint16_t ignoreMe)   { UserSound_Repeat(10);     }
+void SF_UserSound10_Stop(uint16_t ignoreMe)     { UserSound_Stop(10);       }
+void SF_TriggerUserSound11(uint16_t ignoreMe)   { TriggerUserSound(11);     }
+void SF_UserSound11_Repeat(uint16_t ignoreMe)   { UserSound_Repeat(11);     }
+void SF_UserSound11_Stop(uint16_t ignoreMe)     { UserSound_Stop(11);       }
+void SF_TriggerUserSound12(uint16_t ignoreMe)   { TriggerUserSound(12);     }
+void SF_UserSound12_Repeat(uint16_t ignoreMe)   { UserSound_Repeat(12);     }
+void SF_UserSound12_Stop(uint16_t ignoreMe)     { UserSound_Stop(12);       }
 void SF_PortA_Toggle(uint16_t ignoreMe)         { PortA_Toggle();           }
 void SF_PortA_On(uint16_t ignoreMe)             { PortA_On();               }
 void SF_PortA_Off(uint16_t ignoreMe)            { PortA_Off();              }

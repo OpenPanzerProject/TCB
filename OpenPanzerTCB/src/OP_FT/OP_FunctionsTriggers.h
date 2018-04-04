@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 126;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 144;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -167,7 +167,25 @@ enum _special_function : byte {
     SF_MOTOR_A_TOGGLE   = 122,      // 122
     SF_MOTOR_B_ON       = 123,      // 123
     SF_MOTOR_B_OFF      = 124,      // 124
-    SF_MOTOR_B_TOGGLE   = 125       // 125
+    SF_MOTOR_B_TOGGLE   = 125,      // 125
+    SF_USER_SOUND7_ONCE = 126,      // 126  -- see also 35-40 for user sounds 1 & 2, 86-91 for user sounds 3 & 4, 103-108 for user sounds 5 & 6
+    SF_USER_SOUND7_RPT  = 127,      // 127  -- PEOPLE WANT SHIT TONS OF SOUNDS I GUESS
+    SF_USER_SOUND7_OFF  = 128,      // 128
+    SF_USER_SOUND8_ONCE = 129,      // 129
+    SF_USER_SOUND8_RPT  = 130,      // 130
+    SF_USER_SOUND8_OFF  = 131,      // 131
+    SF_USER_SOUND9_ONCE = 132,      // 132  
+    SF_USER_SOUND9_RPT  = 133,      // 133
+    SF_USER_SOUND9_OFF  = 134,      // 134
+    SF_USER_SOUND10_ONCE= 135,      // 135
+    SF_USER_SOUND10_RPT = 136,      // 136
+    SF_USER_SOUND10_OFF = 137,      // 137        
+    SF_USER_SOUND11_ONCE= 138,      // 138  
+    SF_USER_SOUND11_RPT = 139,      // 139
+    SF_USER_SOUND11_OFF = 140,      // 140
+    SF_USER_SOUND12_ONCE= 141,      // 141
+    SF_USER_SOUND12_RPT = 142,      // 142
+    SF_USER_SOUND12_OFF = 143       // 143        
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -187,7 +205,9 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,0,0,0,0,0,0,1,1,   // 90-99    92-97 analog    
  1,1,1,1,1,1,1,1,1,1,   // 100-109  
  1,1,1,1,1,1,1,1,1,1,   // 110-119
- 1,1,1,1,1,1            // 120-125
+ 1,1,1,1,1,1,1,1,1,1,   // 120-129
+ 1,1,1,1,1,1,1,1,1,1,   // 130-139
+ 1,1,1,1                // 140-143
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -327,7 +347,25 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Motor A - Toggle On/Off",                   // 122
     "Motor B - On",                              // 123
     "Motor B - Off",                             // 124
-    "Motor B - Toggle On/Off"                    // 125
+    "Motor B - Toggle On/Off",                   // 125
+    "User Sound 7 - Play Once",                  // 126
+    "User Sound 7 - Repeat",                     // 127
+    "User Sound 7 - Stop",                       // 128
+    "User Sound 8 - Play Once",                  // 129
+    "User Sound 8 - Repeat",                     // 130
+    "User Sound 8 - Stop",                       // 131
+    "User Sound 9 - Play Once",                  // 132
+    "User Sound 9 - Repeat",                     // 133
+    "User Sound 9 - Stop",                       // 134
+    "User Sound 10 - Play Once",                 // 135
+    "User Sound 10 - Repeat",                    // 136
+    "User Sound 10 - Stop",                      // 137
+    "User Sound 11 - Play Once",                 // 138
+    "User Sound 11 - Repeat",                    // 139
+    "User Sound 11 - Stop"                       // 140    
+    "User Sound 12 - Play Once",                 // 141
+    "User Sound 12 - Repeat",                    // 142
+    "User Sound 12 - Stop"                       // 143   
 };
 
 
