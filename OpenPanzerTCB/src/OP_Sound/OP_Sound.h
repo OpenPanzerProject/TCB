@@ -80,6 +80,8 @@ class OP_Sound {
     // Headlight
     virtual void HeadlightSound(void) =0;               // Play the headlight on/off sound
     virtual void HeadlightSound_SetEnabled(boolean) =0; // Headlight sound enabled or not
+    virtual void HeadlightSound2(void) =0;              // Play the headlight 2 on/off sound
+    virtual void HeadlightSound2_SetEnabled(boolean) =0;// Headlight sound 2 enabled or not    
     // User sounds
     virtual void UserSound_Play(uint8_t) = 0;           // Play user sound x once
     virtual void UserSound_Repeat(uint8_t) =0;          // Repeat user sound x
@@ -152,6 +154,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
   // Headlight
     void HeadlightSound(void)                                   { OP_TBS::HeadlightSound();            }
     void HeadlightSound_SetEnabled(boolean b)                   { OP_TBS::HeadlightSound_SetEnabled(b);}
+    void HeadlightSound2(void)                                  { return;                              }
+    void HeadlightSound2_SetEnabled(boolean)                    { return;                              }
   // User Sounds
     void UserSound_Play(uint8_t s)                              { OP_TBS::UserSound_Play(s);           }
     void UserSound_Repeat(uint8_t s)                            { OP_TBS::UserSound_Repeat(s);         }
@@ -228,6 +232,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_ENGAGE_TRANSMISSION         0X4D   // 77  -- Pass in value: true (1) means engaged, false (0) means disengaged
 #define OPSC_CMD_CANNON_READY                0x4E   // 78
 #define OPSC_CMD_VEHICLE_DAMAGED             0x4F   // 79  -- Pass in value: true (1) means vehicle damage, false (0) means not damaged aka restored
+#define OPSC_CMD_HEADLIGHT2                  0x50   // 80
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -284,6 +289,8 @@ class OP_SoundCard: public OP_Sound {
   // Headlight
     void HeadlightSound(void)                                   { if (_headlightEnabled) command(OPSC_CMD_HEADLIGHT);       }
     void HeadlightSound_SetEnabled(boolean e)                   { _headlightEnabled = e;                                    }
+    void HeadlightSound2(void)                                  { if (_headlight2Enabled) command(OPSC_CMD_HEADLIGHT2);     }
+    void HeadlightSound2_SetEnabled(boolean e)                  { _headlight2Enabled = e;                                   }
   // User sounds                                  
     void UserSound_Play(uint8_t s)                              { command(OPSC_CMD_USER_SOUND_PLAY, 0, s);                  }
     void UserSound_Repeat(uint8_t s)                            { command(OPSC_CMD_USER_SOUND_REPEAT, 0, s);                }
@@ -326,6 +333,7 @@ class OP_SoundCard: public OP_Sound {
     boolean     _trackOverlayActive;
     boolean     _squeaksActive; 
     boolean     _headlightEnabled;
+    boolean     _headlight2Enabled;
     boolean     _turretEnabled;
     boolean     _turretSoundActive;
     boolean     _barrelEnabled;
@@ -430,7 +438,9 @@ class OP_TaigenSound: public OP_Sound {
     void SetVehicleDamaged(boolean)                             { return;               }    
   // Headlight                                                                          
     void HeadlightSound(void)                                   { return;               }
-    void HeadlightSound_SetEnabled(boolean e)                   { return;               }
+    void HeadlightSound_SetEnabled(boolean)                     { return;               }
+    void HeadlightSound2(void)                                  { return;               }
+    void HeadlightSound2_SetEnabled(boolean)                    { return;               }
   // User sounds                                                                        
     void UserSound_Play(uint8_t)                                { return;               }
     void UserSound_Repeat(uint8_t)                              { return;               }

@@ -145,6 +145,7 @@ struct _eeprom_data {
     uint8_t  VolumeEngine;                     // Relative, not absolute volumes
     uint8_t  VolumeTrackOverlay;               // Relative, not absolute volumes
     uint8_t  VolumeEffects;                    // Relative, not absolute volumes
+    boolean  HeadlightSound2_Enabled;          // Light 2 sound enabled or not
 
 // Battle settings
     IRTYPES IR_FireProtocol;                   // Which battle protocol are we *sending* by cannon fire

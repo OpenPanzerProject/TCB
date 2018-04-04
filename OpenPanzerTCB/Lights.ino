@@ -28,13 +28,17 @@ void Light1Toggle()
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void Light2On()
 {
-    digitalWrite(pin_Light2, HIGH);    
+    digitalWrite(pin_Light2, HIGH);
+    TankSound->HeadlightSound2(); // The sound object will automatically ignore this if the headlight 2 sound was disabled
     if (DEBUG) { DebugSerial->println(F("Light 2 On")); }
 }
 
 void Light2Off()
 {   // Turn off 
     digitalWrite(pin_Light2, LOW);
+    
+    // Only play the headlight 2 sound if we are turning off the light, not if we are ending the machine gun
+    if (Light2Blinking == false) TankSound->HeadlightSound2(); // The sound object will automatically ignore this if the headlight 2 sound was disabled
 
     // Delete blinking timer
     if (timer.isEnabled(Light2TimerID)) timer.deleteTimer(Light2TimerID);

@@ -100,7 +100,6 @@ void EnableTrackOverlaySounds()
 {
     TankSound->EnableTrackOverlay(true);
 }
-
 void DisableTrackOverlaySounds()
 {
     TankSound->EnableTrackOverlay(false);

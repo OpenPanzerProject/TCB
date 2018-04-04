@@ -30,6 +30,7 @@ void OP_SoundCard::begin()
     // Initialize to false, but they will ultimately get set to the user's preference
     _squeaksActive = false;
     _headlightEnabled = false;
+    _headlight2Enabled = false;
     _turretEnabled = false;
     _turretSoundActive = false;
     _barrelEnabled = false;    

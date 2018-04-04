@@ -337,6 +337,7 @@ void setup()
         TankSound->Squeak_SetEnabled(6, eeprom.ramcopy.Squeak6_Enabled);        
         // And whether some other sounds are enabled
         TankSound->HeadlightSound_SetEnabled(eeprom.ramcopy.HeadlightSound_Enabled);
+        TankSound->HeadlightSound2_SetEnabled(eeprom.ramcopy.HeadlightSound2_Enabled);
         TankSound->TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);
         TankSound->BarrelSound_SetEnabled(eeprom.ramcopy.BarrelSound_Enabled);
         // If we have a function trigger assigned to enable the track overlay sound, we start with it disabled, on the assumption the user will 
