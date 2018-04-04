@@ -100,7 +100,7 @@ const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 {1108, 2},  // Sound 4:  Machine gun fire - higher priority because it needs to repeat
 {1189, 1},  // Sound 5:  Received cannon hit - damage
 {1270, 1},  // Sound 6:  Received machine gun hit - damage
-{1351, 1},  // Sound 7:  Received hit - vehicle destroyed
+{1351, 4},  // Sound 7:  Received hit - vehicle destroyed - set to high priority though it shouldn't matter, nothing else will be playing at this time anyway
 {1433, 1},  // Sound 8:  Headlights on/off
 {1630, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG 
 {1711, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG
