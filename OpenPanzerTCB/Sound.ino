@@ -117,7 +117,7 @@ void UserSound_Repeat(uint8_t s)
 }
 void UserSound_Stop(uint8_t s)
 {
-    TankSound->UserSound_Stop(2);
+    TankSound->UserSound_Stop(s);
     if (DEBUG) { PrintUserSound(); DebugSerial->print(s); DebugSerial->println(F(" - Stop")); }
 }
 
