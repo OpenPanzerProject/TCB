@@ -118,12 +118,23 @@ void EngineOff()
             skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine off
             TransmissionDisengage();
         // Play the engine stop sound
-            TankSound->StopEngine();
+            if (eeprom.ramcopy.SoundDevice == SD_BENEDINI_TBSMINI && Tank.isDestroyed)
+            {
+                // The Benedini Mini doesn't like to play the engine shutdown and destroyed sounds simultaneously, but we definitely do still need
+                // to give it the engine off signal. If we delay it slightly the destroyed sound will play and the engine off signal still gets received.
+                timer.setTimeout(100, EngineOffSound); 
+            }
+            else EngineOffSound();  // Otherwise if not destroyed or not Benedini Mini we can play the sound immediately
         // Stop the drive motor(s)
             StopDriveMotors();
         // Clear the engine idle timer
             UpdateEngineIdleTimer();  
     }    
+}
+void EngineOffSound()
+{
+    TankSound->StopEngine();
+    TankSound->IdleEngine();  // TBS throttle speed = idle - makes no difference if included or not, or before or after stop, in terms of destroyed sound playing. 
 }
 void EngineToggle()
 {
@@ -265,10 +276,8 @@ void StopEverything()
     // Turn Engine off
     if (TankEngine.Running()) 
     { 
+        // Now turn engine off, this will also play the engine stop sound
         EngineOff(); 
-        // Sounds
-        TankSound->IdleEngine();        // TBS throttle speed = idle
-        TankSound->StopEngine();
     }
     // Stop turret motors
     TurretElevation->stop();
