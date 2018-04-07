@@ -468,6 +468,7 @@ boolean OP_Radio::GetCommands()
                 // switch position hasn't changed, regardless of whether the pulse did change. Small changes in pulse do not necessarily
                 // mean a new switch position, and we don't want to be triggering things unecessarily. 
                 if (AuxChannel[a].present && AuxChannel[a].Settings->Digital && AuxChannel[a].updated) { GetSwitchPosition(a); }
+
             }
         }
         else
@@ -747,6 +748,7 @@ void OP_Radio::EnableAzimuthStick(void)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
 // COMMANDS - DIGITAL AUX CHANNELS 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
+/*
 void OP_Radio::GetSwitchPosition(int a)
 {
 // Aux channels can be digital (switch input) or analog (knob input with PWM values from 1000 to 2000 (1500 center)
@@ -807,7 +809,93 @@ int Pulse = AuxChannel[a].pulse;
         AuxChannel[a].switchPos = POS;
     }
 }
+*/
 
+void OP_Radio::GetSwitchPosition(int a)
+{
+    int pulse = AuxChannel[a].pulse;
+
+    uint8_t numPos = AuxChannel[a].Settings->numPositions;
+
+    // Thanks to Rob Tillaart for the distance function
+    // http://forum.arduino.cc/index.php?topic=254836.0
+
+    // This takes a pulse and returns the switch position with the 
+    // nearest matching pulse
+    
+    byte POS = 0; 
+    int d = 9999;
+    int distance = abs(RC_MULTISWITCH_START_POS - pulse);
+
+    for (int i = 1; i < numPos; i++)
+    {
+        switch (numPos)
+        {
+            case 2: d = abs(MultiSwitch_MatchArray2[i] - pulse);   break;
+            case 3: d = abs(MultiSwitch_MatchArray3[i] - pulse);   break;
+            case 4: d = abs(MultiSwitch_MatchArray4[i] - pulse);   break;
+            case 5: d = abs(MultiSwitch_MatchArray5[i] - pulse);   break;
+            case 6: d = abs(MultiSwitch_MatchArray6[i] - pulse);   break;
+        }
+
+        if (d < distance)
+        {
+            POS = i;
+            distance = d;
+        }
+    }
+    
+    // Add 1 to POS because from here we don't want zero-based
+    POS += 1;
+    
+    // Swap positions if channel is reversed. 
+    if (AuxChannel[a].Settings->reversed)
+    {
+        switch (numPos)
+        {
+            case 2: 
+                if (POS == Pos1) POS = Pos2; 
+                else POS = Pos1; 
+                break;
+            case 3: 
+                if (POS == Pos1) POS = Pos3; 
+                else if (POS == Pos3) POS = Pos1; 
+                break;
+            case 4: 
+                if (POS == Pos1) POS = Pos4; 
+                else if (POS == Pos2) POS = Pos3; 
+                else if (POS == Pos3) POS = Pos2; 
+                else if (POS == Pos4) POS = Pos1; 
+                break;
+            case 5: 
+                if (POS == Pos1) POS = Pos5; 
+                else if (POS == Pos2) POS = Pos4; 
+                else if (POS == Pos4) POS = Pos2; 
+                else if (POS == Pos5) POS = Pos1; 
+                break;                
+            case 6: 
+                if (POS == Pos1) POS = Pos6; 
+                else if (POS == Pos2) POS = Pos5; 
+                else if (POS == Pos3) POS = Pos4; 
+                else if (POS == Pos4) POS = Pos3; 
+                else if (POS == Pos5) POS = Pos2; 
+                else if (POS == Pos6) POS = Pos1; 
+                break;                                
+        }    
+    }
+    
+    // We re-set the Updated flag here even though it was already set before, because a small change in the pulse might not 
+    // actually result in any change in the switchPos
+    if (AuxChannel[a].switchPos == POS)
+    {
+        AuxChannel[a].updated = false;
+    }
+    else
+    {
+        AuxChannel[a].updated = true;
+        AuxChannel[a].switchPos = POS;
+    }    
+}
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
 // FAILSAFE

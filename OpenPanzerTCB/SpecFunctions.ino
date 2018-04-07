@@ -258,13 +258,15 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
         // Up to this point we now have something like "Aux Channel  4 - "
         if (sf_digital)
         {
-            // But we still need to append the position. Complicating matters is that the text description of the switch position
-            // depends on how many positions have been defined for that switch
-            // If for example the position is 5, and this is a 2-position switch, we want to actually display a description that says
-            // "Pos 2 (of 2)".
+            // But we still need to append the position. 
             TriggerAction = getTriggerActionFromTriggerID(TriggerID);
             int numPositions = getNumPositionsFromTriggerID(TriggerID);
             DebugSerial->print(F("Pos "));
+            DebugSerial->print(TriggerAction);
+            DebugSerial->print(F(" (of "));
+            DebugSerial->print(numPositions);
+            DebugSerial->print(F(")"));
+            /*
             switch (numPositions)
             {
                 case 2:
@@ -286,7 +288,7 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
                     DebugSerial->print(F(" (of 5)"));
                     PrintSpaces(PadLength - 29);
                     break;
-            }
+            } */
         }
         else
         {
