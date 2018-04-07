@@ -97,9 +97,9 @@ void LedHandler::startBlinking(uint16_t on_interval, uint16_t off_interval)
 void LedHandler::DoubleTap(boolean repeat /*=false*/)
 {
     BlinkStream bs;
-    bs.interval[0] = 140;               // On
-    bs.interval[1] = 100;               // Off
-    bs.interval[2] = 120;               // On
+    bs.interval[0] = 50;                // On
+    bs.interval[1] = 40;                // Off
+    bs.interval[2] = 110;               // On
     bs.interval[3] = 500;               // Off
     bs.repeat = repeat;
     this->StreamBlink(bs, 4);           // 4 steps in the double-tap
