@@ -748,69 +748,6 @@ void OP_Radio::EnableAzimuthStick(void)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
 // COMMANDS - DIGITAL AUX CHANNELS 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
-/*
-void OP_Radio::GetSwitchPosition(int a)
-{
-// Aux channels can be digital (switch input) or analog (knob input with PWM values from 1000 to 2000 (1500 center)
-// Up to 5 positions are defined for each switch. A 3 position switch will work equally as well but only the top, middle, and bottom positions will ever trigger.
-
-// Ranges:
-const int cutoff_4 = 1850;   // 2000 - 150  // Above cutoff_4 is Position 5 (Top)
-const int cutoff_3 = 1600;   // 1500 + 100  // Between cutoff_3 & 4 is Position 4
-const int cutoff_2 = 1400;   // 1500 - 100  // Between cutoff_2 & 3 is Position 3 (Middle)
-const int cutoff_1 = 1150;   // 1000 + 150  // Between cutoff_1 & 2 is Position 2
-// Below cutoff_1 is Position 1 (Bottom)
-
-switch_positions POS = Pos1;
-
-int Pulse = AuxChannel[a].pulse;
-
-    AuxChannel[a].present = true;
-    // Turn pulse into one of five possible positions
-    if (Pulse >= cutoff_4)
-    {    
-        POS = Pos5;
-    }
-    else if ((Pulse > cutoff_3) && (Pulse < cutoff_4))
-    {
-        POS = Pos4;
-    }
-    else if ((Pulse >= cutoff_2) && (Pulse <= cutoff_3))
-    {
-        POS = Pos3;
-    }
-    else if ((Pulse < cutoff_2) && (Pulse > cutoff_1))
-    {
-        POS = Pos2;
-    }
-    else 
-    {
-        POS = Pos1;
-    }
-
-    // Swap positions if channel is reversed. 
-    if (AuxChannel[a].Settings->reversed)
-    {
-        if      (POS == Pos1) POS = Pos5;
-        else if (POS == Pos2) POS = Pos4;
-        else if (POS == Pos4) POS = Pos2;
-        else if (POS == Pos5) POS = Pos1;
-    }
-
-    // We re-set the Updated flag here even though it was already set before, because a small change in the pulse might not 
-    // actually result in any change in the switchPos
-    if (AuxChannel[a].switchPos == POS)
-    {
-        AuxChannel[a].updated = false;
-    }
-    else
-    {
-        AuxChannel[a].updated = true;
-        AuxChannel[a].switchPos = POS;
-    }
-}
-*/
-
 void OP_Radio::GetSwitchPosition(int a)
 {
     int pulse = AuxChannel[a].pulse;
