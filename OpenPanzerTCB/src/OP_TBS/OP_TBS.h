@@ -202,9 +202,8 @@ public:
     // Squeak functions
     void SetSqueak_Interval(uint8_t, unsigned int, unsigned int); // Set squeak interval for squeak x
     void Squeak_SetEnabled(uint8_t, boolean);               // Enabled or disable Squeak x
-    static void StartSqueaks(void);                         // Starts all squeaks
+    void StartSqueaks(void);                                // Starts all squeaks
     void StopSqueaks(void);                                 // Stops all squeaks
-    boolean AreSqueaksActive(void);                         // Returns true or false if sqeaks are active
     
 //    void testProp3(void);                                   // Used for testing
 

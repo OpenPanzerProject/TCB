@@ -161,9 +161,9 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void UserSound_Repeat(uint8_t s)                            { OP_TBS::UserSound_Repeat(s);         }
     void UserSound_Stop(uint8_t s)                              { OP_TBS::UserSound_Stop(s);           }
   // Squeaks
-    void StartSqueaks(void)                                     { OP_TBS::StartSqueaks();              }
-    void StopSqueaks(void)                                      { OP_TBS::StopSqueaks();               }
-    boolean AreSqueaksActive(void)                              { OP_TBS::AreSqueaksActive();          }
+    void StartSqueaks(void)                                     { if (_squeaksActive == false) { OP_TBS::StartSqueaks(); _squeaksActive = true; } } 
+    void StopSqueaks(void)                                      { if (_squeaksActive == true)  { OP_TBS::StopSqueaks();  _squeaksActive = false;} }
+    boolean AreSqueaksActive(void)                              { return _squeaksActive;               }
     void SetSqueak_Interval(uint8_t s, unsigned int a, unsigned int b) { OP_TBS::SetSqueak_Interval(s,a,b); }
     void Squeak_SetEnabled(uint8_t s, boolean b)                { OP_TBS::Squeak_SetEnabled(s,b);      }
   // Other Movement Sounds
@@ -180,6 +180,9 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     // These are other functions used internally to the TBS class. If beeps get re-enabled you would probably map the above two to these two. 
     // void ForceBeep(void);                                    // Blocking call to beep
     // void ForceBeeps(int);                                    // Beep number of times in a row (blocks code)
+
+  private:
+    boolean     _squeaksActive; 
 };
 
 

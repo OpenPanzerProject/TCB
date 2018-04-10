@@ -347,7 +347,6 @@ void setup()
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEngine, VC_ENGINE);
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEffects, VC_EFFECTS);
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeTrackOverlay, VC_TRACK_OVERLAY);
-        // TankSound->setRelativeVolume(eeprom.ramcopy.VolumeFlash, VC_FLASH);  // Not implemented for now
 
     
     // INERTIAL MEASUREMENT UNIT    (Bosch BNO055 on Adafruit breakout board)

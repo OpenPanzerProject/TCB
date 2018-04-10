@@ -87,6 +87,7 @@ OP_TBS::OP_TBS(OP_SimpleTimer * t, boolean m)
     Squeak1_Active = false;
     Squeak2_Active = false;
     Squeak3_Active = false;
+    AllSqueaks_Active = false;
     Squeak1TimerID = 0;
     Squeak2TimerID = 0;
     Squeak3TimerID = 0;
@@ -497,7 +498,7 @@ void OP_TBS::StopVolume(void)
 void OP_TBS::StartSqueaks(void)
 {   // We actually don't start squeaking right away because that can sound weird. We wait until the tank has been moving for
     // SQUEAK_DELAY_mS time before truly starting them
-    if (Micro) return;    
+    if (Micro) return;  
     if (AllSqueaks_Active == false)
     {   // It doesn't matter what ID we use for this, so long as it's one that will get cleared when StopSqueaks() gets called
         Squeak1TimerID = TBSTimer->setTimeout(SQUEAK_DELAY_mS, StartSqueaksForReal);
@@ -518,10 +519,6 @@ void OP_TBS::StopSqueaks(void)
     Squeak2_Pause();
     Squeak3_Pause();
     AllSqueaks_Active = false;
-}
-boolean OP_TBS::AreSqueaksActive(void)
-{
-    return AllSqueaks_Active;
 }
 
 
