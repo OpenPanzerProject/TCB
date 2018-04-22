@@ -665,12 +665,11 @@ void OP_Tank::INT6_RECOIL_ISR()
             // time to the microcontroller. 
             Disable_MechRecoilInterrupt();  // These are called "MechRecoil" but it's the same plug for the airsoft motor
             StopMechRecoilMotor();
-            
+
             // If this is part of a cannon-fire event, kick off the remaining actions
             if (_MechBarrelWithCannon)
             {
-                if (_RecoilServoWithCannon) { _RecoilServo->Recoil(); }     // Start recoil servo if enabled
-                Fire_Part2();           // This takes care of sound and flash, IR we already did in the case of Airsoft
+                Fire_Part2();           // This takes care of sound, flash, and recoil servo; IR we already did in the case of Airsoft
             }
             
             // Another Note: in the case of airsoft, the BB actually seems to fire just before the switch is triggered. That means our flash, sound, etc...
