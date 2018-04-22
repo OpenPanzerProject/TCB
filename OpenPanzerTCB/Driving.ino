@@ -133,8 +133,8 @@ void EngineOff()
 }
 void EngineOffSound()
 {
-    TankSound->StopEngine();
     TankSound->IdleEngine();  // TBS throttle speed = idle - makes no difference if included or not, or before or after stop, in terms of destroyed sound playing. 
+    TankSound->StopEngine();
 }
 void EngineToggle()
 {
@@ -191,15 +191,19 @@ void TransmissionEngage()
 
 void TransmissionDisengage()
 {
-    // No point in messing with transmission if the engine isn't running
+    // If the engine is running and we disengage, we need to possibly play a sound and adjust the smoker speed
     if (TankEngine.Running() && TransmissionEngaged) 
     { 
         TransmissionEngaged = false;
         SetSmoker_FastIdle();
         if (skipTransmissionSound)  skipTransmissionSound = false;          // Skip the sound, but reset the flag for next time
-        else                        TankSound->EngageTransmission(false);   // Play the transmission engage sound        
+        else                        TankSound->EngageTransmission(false);   // Play the transmission disengage sound        
         if (DEBUG) DebugSerial->println(F("Disengage Transmission"));
     }
+
+    // Otherwise we might be disengaging the engine because we've just turned the engine off. In that case the smoker was already handled in the EngineOff function,
+    // and we don't want to play a sound or print a message anyway, so just set this to false. 
+    TransmissionEngaged = false;    // But even if the engine wasn't running, clear this variable
 }
 
 void TransmissionToggle()
