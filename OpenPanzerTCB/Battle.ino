@@ -41,8 +41,8 @@ void FireCannon()
                 // If we are stopped, and if the user has enabled track recoil, kick that off too
                 if (DriveModeActual == STOP && eeprom.ramcopy.EnableTrackRecoil)
                 {
-                    // However when we start the track recoil depends on whether we have airsoft enabled or not.
-                    if (eeprom.ramcopy.Airsoft)
+                    // However when we start the track recoil depends on whether we are in airsoft mode and whether it is enabled or not.
+                    if (eeprom.ramcopy.Airsoft && Tank.isMechBarrelSetWithCannon())
                     {
                         // With the airsoft unit we must wait until the airsoft actually fires, which will happen after it has cocked. We will just have to poll the tank class to see when this is. 
                         CheckAirsoftTimerID = timer.setInterval(50, CheckAirsoft);
@@ -76,7 +76,7 @@ static uint8_t timesThrough = 0;
         timesThrough = 0;                               // Reset the count
     }
     else
-    {   // Otherwise just incrment our count and come back later. 
+    {   // Otherwise just increment our count and come back later. 
         timesThrough += 1;
     
         if (timesThrough >= 80)                         // 80 times 50mS = 4 seconds, something should have happend by now for sure. 
