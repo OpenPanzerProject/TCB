@@ -492,7 +492,7 @@ void Onboard_Smoker::Shutdown(boolean engaged)
     // Restore the internal range to full so we can actually get down to zero speed
     restore_Speed();
 
-    // But now we need to modify our curspeed varialbe so the shutdown effect knows where to start from. Under normal operation we modify the internal speed range of the 
+    // But now we need to modify our curspeed variable so the shutdown effect knows where to start from. Under normal operation we modify the internal speed range of the 
     // smoker object, setting the minimum to something greater than zero, which becomes idle. Under that scheme, curspeed of 0 actually represents some none-zero smoker speed. 
     // Now that we are using the full speed scale range where 0 actually means 0 (stopped), we need to adjust our prior curspeed variable to the new range. The adjustment 
     // depends on whether the transmission was engaged or not. 
