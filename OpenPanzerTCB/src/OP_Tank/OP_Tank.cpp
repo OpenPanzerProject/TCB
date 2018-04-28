@@ -380,8 +380,8 @@ void OP_Tank::Fire(void)
 }
 void OP_Tank::Fire_Part2(void)
 {
-    // The main sketch will be polling to see when this gets set, so it can activate track recoil
-    if (_Airsoft)  _AirsoftFired = true;
+    // If airsoft active the main sketch will be polling to see when this gets set, so it can activate track recoil
+    if (_Airsoft && _MechBarrelWithCannon)  _AirsoftFired = true;
     
     // Play cannon fire sound
     Cannon_Sound();
@@ -664,8 +664,8 @@ void OP_Tank::INT6_RECOIL_ISR()
             // checking, we assume it really was the switch. Note: the switch is only closed momentarily. But still this brief moment seems like a long
             // time to the microcontroller. 
             Disable_MechRecoilInterrupt();  // These are called "MechRecoil" but it's the same plug for the airsoft motor
-            StopMechRecoilMotor();
-
+            TankTimer->setTimeout(300, StopMechRecoilMotor);    // Keep it running just a little bit longer to be sure we have passed the firing point
+            
             // If this is part of a cannon-fire event, kick off the remaining actions
             if (_MechBarrelWithCannon)
             {
