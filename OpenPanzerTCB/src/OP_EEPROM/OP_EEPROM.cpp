@@ -434,6 +434,11 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.TurretRotation_EPMax = 2000;
         ramcopy.TurretRotation_Reversed = false;
 
+    // Steering servo adjustments
+        ramcopy.SteeringServo_EPMin = 1000;
+        ramcopy.SteeringServo_EPMax = 2000;
+        ramcopy.SteeringServo_Reversed = false;
+
     // Mechanical Barrel and Recoil Servo settings
         ramcopy.Airsoft = false;                // Default to mechanical recoil, because Airsoft selection will prevent some things from working if the user doesn't actually connect an airsoft unit
         ramcopy.MechanicalBarrelWithCannon = true;

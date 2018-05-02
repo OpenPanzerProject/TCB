@@ -44,6 +44,11 @@ struct _eeprom_data {
     int16_t TurretRotation_EPMax;
     boolean TurretRotation_Reversed;           // And we have a motor-specific reversed flag as well, so it doesn't have to be tied to the stick reversed setting
 
+// Steering servo adjustments
+    int16_t SteeringServo_EPMin;               // We allow customized endpoints for the steering servo. If the user tries adjusting endpoints on their radio it will inadvertently impact halftrack tread steering
+    int16_t SteeringServo_EPMax;
+    boolean SteeringServo_Reversed;            
+
 // Mechanical Barrel and Recoil Servo settings
     boolean Airsoft;                           // If true, we are controlling an airsoft unit. If false, we are controlling mechanical recoil unit. 
     boolean MechanicalBarrelWithCannon;        // If true, mechanical barrel (airsoft or recoil) will trigger automatically with cannon fire. If false, 

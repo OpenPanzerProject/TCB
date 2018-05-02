@@ -665,7 +665,22 @@ if (Startup)
                             break;
                             
                         case 2: 
-                            // Reserved for future use                            
+                            // Steering servo for cars/halftracks - switch 3 ON & 4 OFF
+                            if (eeprom.ramcopy.DriveType == DT_CAR || (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors != SERVO_ESC))
+                            {   // They are using a single axle drive, or if they are using independent treads they are not using RC for it - in this case 
+                                // steering will be assigned to RC Output 2
+                                SetupServo(SERVONUM_RIGHTTREAD);
+                            }
+                            else if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
+                            {   // Here they want independent control by RC, meaning 1 and 2 are taken and we will assign steering to 4 instead (barrel elevation)
+                                SetupServo(SERVONUM_TURRETELEVATION);
+                            }
+                            else
+                            {
+                                if (DEBUG) DebugSerial->println(F("No steering servo assigned, re-check vehicle type."));
+                                // Wait for them to release the button before proceeding
+                                do { delay(10); InputButton.read(); } while (!InputButton.wasReleased());                                 
+                            }
                             break;        
                             
                         case 3: 

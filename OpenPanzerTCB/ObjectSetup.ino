@@ -11,6 +11,7 @@ void InstantiateMotorObjects()
     RCOutput4_Available = true;    
     MotorA_Available = true;
     MotorB_Available = true;
+    uint8_t SteeringServoNum = 255; // Initialize to value that means nothing
 
    
     // DRIVE MOTORS
@@ -191,6 +192,8 @@ void InstantiateMotorObjects()
         SteeringServo->begin();
         // This slot is unavailable for general purpose servo
         RCOutput2_Available = false;
+        // Save this temporarily for the next bit
+        SteeringServoNum = SERVONUM_RIGHTTREAD;
     }
     else if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
     {   // Here they want independent control by RC, meaning 1 and 2 are taken and we will assign steering to 4 instead (barrel elevation)
@@ -199,7 +202,23 @@ void InstantiateMotorObjects()
         SteeringServo->begin();
         // This slot is unavailable for general purpose servo
         RCOutput4_Available = false;
+        // Save this temporarily for the next bit
+        SteeringServoNum = SERVONUM_TURRETELEVATION;
     }
+    
+    // We may also have some custom end-points defined for the steering servo. 
+    // These end-points need to be set after the begin() statement, which initializes the endpoints to defaults.
+    if (SteeringServoNum == SERVONUM_TURRETELEVATION || SteeringServoNum == SERVONUM_RIGHTTREAD)
+    {   
+        // The end-points are actually handled in the servo class, not the motor class. Since SteeringServo is a pointer to the motor class, 
+        // and not the servo class we need to call the servo class directly using TankServos (even though in this case SteeringServo is also a subclass of servo)
+        TankServos.setMinPulseWidth(SteeringServoNum, eeprom.ramcopy.SteeringServo_EPMin);
+        TankServos.setMaxPulseWidth(SteeringServoNum, eeprom.ramcopy.SteeringServo_EPMax);
+        
+        // Wse the reversed setting of the motor class since servo doesn't have one. This won't affect the reverse status of the drive motors in the case of halftrack, that is dependent on the radio channel reversed status
+        SteeringServo->set_Reversed(eeprom.ramcopy.SteeringServo_Reversed);
+    }
+    
 
     // TURRET MOTOR DEFINITION - ROTATION
     // -------------------------------------------------------------------------------------------------------------------------------------->>

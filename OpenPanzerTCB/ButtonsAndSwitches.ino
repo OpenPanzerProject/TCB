@@ -33,7 +33,7 @@ char GetWeightClass(void)
 uint8_t GetMenuNumber(void)
 {
     if (DipSwitchOn(3) && DipSwitchOn(4))           return 1;       // Barrel elevation pan servo setup
-    else if (DipSwitchOn(3) && DipSwitchOff(4))     return 2;       // Future use/testing
+    else if (DipSwitchOn(3) && DipSwitchOff(4))     return 2;       // Steering servo for cars/halftracks
     else if (DipSwitchOff(3) && DipSwitchOn(4))     return 3;       // Turret rotation servo setup
     else if (DipSwitchOff(3) && DipSwitchOff(4))    return 4;       // Recoil servo setup
 }

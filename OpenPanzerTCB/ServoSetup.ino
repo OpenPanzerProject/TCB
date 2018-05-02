@@ -12,7 +12,8 @@ void SetupServo(ESC_POS_t servoNum)
     #define absMin 900
 
 
-    boolean isRecoil;
+    boolean isRecoil = false;
+    boolean isSteering = false;
     boolean reversed;
     int16_t pulseMin;
     int16_t pulseMax;
@@ -31,12 +32,35 @@ void SetupServo(ESC_POS_t servoNum)
     switch (servoNum)
     {
         case SERVONUM_TURRETELEVATION:
-            servo = new Servo_PAN(SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
-            reversed = TurretElevation->isReversed();
-            pulseMin = servo->getMinPulseWidth(SERVONUM_TURRETELEVATION);
-            pulseMax = servo->getMaxPulseWidth(SERVONUM_TURRETELEVATION);
+            // Two possible cases for output 4, but either way: 
+                servo = new Servo_PAN(SERVONUM_TURRETELEVATION,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+                pulseMin = servo->getMinPulseWidth(SERVONUM_TURRETELEVATION);
+                pulseMax = servo->getMaxPulseWidth(SERVONUM_TURRETELEVATION);
+                isRecoil = false;            
+            // First, this could actually be the turret elevation servo as expected
+            if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
+            {
+                reversed = TurretElevation->isReversed();   // Elevation motor object
+                isSteering = false; 
+                DebugSerial->println(F("Setup Turret Elevation Servo"));
+            }
+            // Or it could actually be the steering servo assigned to the turret elevation output
+            else if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)
+            {
+                reversed = SteeringServo->isReversed();     // Steering motor object
+                isSteering = true;
+                DebugSerial->println(F("Setup Steering Servo (Output 4)"));
+            }
+            break;
+
+        case SERVONUM_RIGHTTREAD:
+            // If we see the right tread, we are actually using it for steering servo for cars and haltracks with single rear drive
+            servo = new Servo_PAN(SERVONUM_RIGHTTREAD,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0);
+            reversed = SteeringServo->isReversed();
+            pulseMin = servo->getMinPulseWidth(SERVONUM_RIGHTTREAD);
+            pulseMax = servo->getMaxPulseWidth(SERVONUM_RIGHTTREAD);
             isRecoil = false;
-            DebugSerial->println(F("Setup Turret Elevation Pan Servo"));
+            DebugSerial->println(F("Setup Steering Servo (Output 2)"));
             break;
 
         case SERVONUM_TURRETROTATION:
@@ -243,41 +267,88 @@ void SetupServo(ESC_POS_t servoNum)
     // Now save settings
     switch (servoNum)
     {
-        case SERVONUM_TURRETELEVATION:
+        case SERVONUM_TURRETELEVATION:  // This could be elevation or steering
             // Save the global variable
-            eeprom.ramcopy.TurretElevation_EPMin = pulseMin;
-            eeprom.ramcopy.TurretElevation_EPMax = pulseMax;
-            eeprom.ramcopy.TurretElevation_Reversed = reversed;
-            // Update eeprom too so it's permanent
-            EEPROM.updateInt(offsetof(_eeprom_data, TurretElevation_EPMin), pulseMin);
-            EEPROM.updateInt(offsetof(_eeprom_data, TurretElevation_EPMax), pulseMax);
-            EEPROM.updateByte(offsetof(_eeprom_data, TurretElevation_Reversed), reversed);
+            if (isSteering)
+            {
+                eeprom.ramcopy.SteeringServo_EPMin = pulseMin;
+                eeprom.ramcopy.SteeringServo_EPMax = pulseMax;
+                eeprom.ramcopy.SteeringServo_Reversed = reversed;    
+                // Update eeprom too so it's permanent
+                EEPROM.updateInt(offsetof(_eeprom_data, SteeringServo_EPMin), pulseMin);
+                EEPROM.updateInt(offsetof(_eeprom_data, SteeringServo_EPMax), pulseMax);
+                EEPROM.updateByte(offsetof(_eeprom_data, SteeringServo_Reversed), reversed);
+            }
+            else
+            {
+                eeprom.ramcopy.TurretElevation_EPMin = pulseMin;
+                eeprom.ramcopy.TurretElevation_EPMax = pulseMax;
+                eeprom.ramcopy.TurretElevation_Reversed = reversed;
+                // Update eeprom too so it's permanent
+                EEPROM.updateInt(offsetof(_eeprom_data, TurretElevation_EPMin), pulseMin);
+                EEPROM.updateInt(offsetof(_eeprom_data, TurretElevation_EPMax), pulseMax);
+                EEPROM.updateByte(offsetof(_eeprom_data, TurretElevation_Reversed), reversed);
+            }
             // Finally, set the actual end-point limits to the servo class
             servo->setMinPulseWidth(SERVONUM_TURRETELEVATION, pulseMin);
             servo->setMaxPulseWidth(SERVONUM_TURRETELEVATION, pulseMax);
-            // And in this case, we use the reversed function of the motor class
-            TurretElevation->set_Reversed(reversed);
-            // Set it to the duplicate Barrel object too if we have one of those
-            if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
-            { 
-                Barrel->set_Reversed(reversed); 
+            if (isSteering)
+            {
+                // And in this case, we use the reversed function of the motor class
+                SteeringServo->set_Reversed(reversed);
+                // We also want to exit with the servo put back exactly to center
+                servo->writeMicroseconds(servoNum, 1500);
+                delay(150); // Give it time to get there
+                // This is a regular servo. The stop command will put it to center. 
+                SteeringServo->stop();                
             }
+            else
+            {
+                // And in this case, we use the reversed function of the motor class
+                TurretElevation->set_Reversed(reversed);
+                // Set it to the duplicate Barrel object too if we have one of those
+                if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
+                { 
+                    Barrel->set_Reversed(reversed); 
+                }
+                // We also want to exit with the servo put back exactly to center
+                servo->writeMicroseconds(servoNum, 1500);
+                delay(150); // Give it time to get there
+                if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
+                {   // We want to save the position so the barrel stabilizer knows where to start
+                    // We start moving just to set the canSetFixedPos flag, then immediately stop
+                    // to record the positionm, which should probably still be 1500
+                    pulseNow = servo->getPulseWidth(servoNum);
+                    if (pulseNow > 1500) TurretElevation->setSpeed(-1);
+                    else                 TurretElevation->setSpeed(1);
+                    TurretElevation->setSpeed(0);
+                }
+                else
+                {   // This is a regular servo. The stop command will put it to center. 
+                    TurretElevation->stop();
+                }
+            }
+            break;
+
+        case SERVONUM_RIGHTTREAD:   // This is the steering servo
+            // Save the global variable
+            eeprom.ramcopy.SteeringServo_EPMin = pulseMin;
+            eeprom.ramcopy.SteeringServo_EPMax = pulseMax;
+            eeprom.ramcopy.SteeringServo_Reversed = reversed;
+            // Update eeprom too so it's permanent
+            EEPROM.updateInt(offsetof(_eeprom_data, SteeringServo_EPMin), pulseMin);
+            EEPROM.updateInt(offsetof(_eeprom_data, SteeringServo_EPMax), pulseMax);
+            EEPROM.updateByte(offsetof(_eeprom_data, SteeringServo_Reversed), reversed);
+            // Finally, set the actual end-point limits to the servo class
+            servo->setMinPulseWidth(SERVONUM_RIGHTTREAD, pulseMin);
+            servo->setMaxPulseWidth(SERVONUM_RIGHTTREAD, pulseMax);
+            // And in this case, we use the reversed function of the motor class
+            SteeringServo->set_Reversed(reversed);
             // We also want to exit with the servo put back exactly to center
             servo->writeMicroseconds(servoNum, 1500);
             delay(150); // Give it time to get there
-            if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN)
-            {   // We want to save the position so the barrel stabilizer knows where to start
-                // We start moving just to set the canSetFixedPos flag, then immediately stop
-                // to record the positionm, which should probably still be 1500
-                pulseNow = servo->getPulseWidth(servoNum);
-                if (pulseNow > 1500) TurretElevation->setSpeed(-1);
-                else                 TurretElevation->setSpeed(1);
-                TurretElevation->setSpeed(0);
-            }
-            else
-            {   // This is a regular servo. The stop command will put it to center. 
-                TurretElevation->stop();
-            }
+            // This is a regular servo. The stop command will put it to center. 
+            SteeringServo->stop();
             break;
 
         case SERVONUM_TURRETROTATION:
