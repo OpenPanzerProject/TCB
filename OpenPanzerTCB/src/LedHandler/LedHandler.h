@@ -46,7 +46,7 @@ class LedHandler
         void ExpireIn(uint16_t); 
         void Blink(uint16_t interval=DEFAULT_BLINK_INTERVAL);                   // Blinks once at set interval
         void Blink(uint8_t times, uint16_t  interval=DEFAULT_BLINK_INTERVAL);   // Overload - Blinks N times at set interval
-        void startBlinking(uint16_t on_interval=DEFAULT_BLINK_INTERVAL, uint16_t off_interval=DEFAULT_BLINK_INTERVAL);   // Starts a continuous blink at the set intervals, to stop call stopBlinking();
+        void startBlinking(uint16_t on_interval=DEFAULT_BLINK_INTERVAL, uint16_t off_interval=DEFAULT_BLINK_INTERVAL);   // Starts a continuous blink at the set intervals, to stop call stopBlinking() or Off()
         void stopBlinking(void);
         void DoubleTap(boolean repeat=false);
         void TripleTap(boolean repeat=false);
