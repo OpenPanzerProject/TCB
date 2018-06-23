@@ -239,7 +239,6 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
-#define OPSC_MAX_NUM_USER_SOUNDS              4     // How many user sounds does this device implement
 
 // Codes
 #define OPSC_BAUD_CODE_2400                   1     // Codes for changing baud rates, same numbers as used for Scout
