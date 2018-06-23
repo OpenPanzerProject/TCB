@@ -67,8 +67,8 @@ const PROGMEM uint8_t Tamiya135Cannon[TAMIYA_135_STEPS] = {199, 242, 192, 120, 1
 // I never scoped the Heng Long signal directly from an RX-18, I am taking these parameters from Clark and Mako boards. 
 const PROGMEM uint16_t HengLongSig[HengLong_BITS+1] = {19000, 4700, 9500, 4700, 4700, 9500, 4700, HengLong_GAP}; // Add 1 to include gap
 
-#define Taigen_MARK         620
-#define Taigen_SPACE        570
+#define Taigen_MARK         620     // The Taigen has been measured at everything from 600/600 to 620/570 (V1/V2). It seems to respond to most anything in that range, 
+#define Taigen_SPACE        570     // but the TCB receives hits better at 620/570. Receiving is difficult because Taigen only sends the signal a single time. 
 #define Taigen_BITS         7       // 4 marks and 3 spaces
 #define Taigen_GAP          14000   // Since Taigen only sends the signal once, it has no gap. But since we send it multiple times, we make up a gap out of thin air. It needs to be longer than GAP. 
 #define Taigen_TIMESTOSEND  6       // Taigen MFUs only send the signal once, but we repeat it 6 times, same as HengLong
