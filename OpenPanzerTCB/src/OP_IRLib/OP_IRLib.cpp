@@ -97,10 +97,10 @@ unsigned char Pin_from_Intr(unsigned char inum)
 // Returns a pointer to a flash stored string that is the name of the protocol received. 
 const __FlashStringHelper *ptrIRName(IRTYPES Type) {
   if(Type>LAST_IRPROTOCOL) Type=IR_UNKNOWN;
-  const __FlashStringHelper *Names[LAST_IRPROTOCOL+1]={F("Unknown"),F("Tamiya"),F("Tamiya 2-Shot"),F("Tamiya 1/35"), F("Heng Long"),F("Taigen"),F("FOV"),F("VsTank"),F("OpenPanzer"), // Cannon IR
+  const __FlashStringHelper *Names[LAST_IRPROTOCOL+1]={F("Unknown"),F("Tamiya"),F("Tamiya 2-Shot"),F("Tamiya 1/35"), F("Heng Long"),F("Taigen V1"),F("FOV"),F("VsTank"),F("OpenPanzer"), // Cannon IR
                                                        F("Clark Repair"),F("IBU Repair"),F("RCTA Repair"),  // Repair IR
                                                        F("Clark Machine Gun"),F("RCTA Machine Gun"),        // Machine Gun IR
-                                                       F("Sony")};                                          // Generic IR
+                                                       F("Sony"), F("Taigen V2/V3")};                       // Generic IR, new additions (Taigen V2/V3)
   return Names[Type];
 };
 
@@ -544,7 +544,7 @@ bool IRdecodeHengLong::decode(void) {
     value = 0;          // The Heng Long signal doesn't have a data "value"
     return true;                        
 }
-bool IRdecodeTaigen::decode(void) {
+bool IRdecodeTaigenV1::decode(void) {
 // Taigen signal is very simple and very brief. It is only sent once by the Taigen unit: 
 // Signal in uS:
 // 0. 620  ON   Mark
@@ -560,7 +560,44 @@ bool IRdecodeTaigen::decode(void) {
 // by a Sony code, so probably not terribly likely (Clark uses Sony codes for machine gun and repair). 
 // A Sony code can be confused for a Taigen hit, but a Taigen code will not be confused with a Sony code. 
 
-    OP_IRLib_ATTEMPT_MESSAGE(F("Taigen"));   
+    OP_IRLib_ATTEMPT_MESSAGE(F("Taigen V1"));   
+
+    if (rawlen <= TaigenV1_BITS) return RAW_COUNT_ERROR;
+
+    // Now check each item in the buffer against the the Taigen space or mark length, depending. If at any point the bit length doesn't match, exit. 
+    for (unsigned char i = 0; i < TaigenV1_BITS; i++) 
+    {
+        if (i & 1)  // Odd numbers - spaces
+        {
+            if (!MATCH(rawbuf[1 + i], TaigenV1_SPACE))    return DATA_SPACE_ERROR(TaigenV1_SPACE);
+        } 
+        else        // Even numbers - marks
+        {
+            if (!MATCH(rawbuf[1 + i], TaigenV1_MARK))     return DATA_MARK_ERROR(TaigenV1_MARK);
+        }
+    }
+
+    // Success
+    bits = TaigenV1_BITS;
+    value = 0;          // The Taigen signal doesn't have a data value
+    return true;
+}
+bool IRdecodeTaigen::decode(void) {
+// Taigen V2 and V3 signals are the same. Very similar to V1 except Mark has been reduced to 600uS and space increased to 620, also 9 marks are sent instead of 4. 
+// As with Taigen V1, the signal is sent only a single time with no repeats. 
+// Signal in uS:
+// 0. 600  ON   Mark        | Repeat 9 times
+// 1. 620  OFF  Space       |
+// .... 
+// 16. 620 ON   Mark        | Except instead of a space at the last, we do GAP
+// 17.          GAP         | We make this up
+// Taigen only sends this once, but if the TCB is sending it repeats it 6 times with a gap of 14,000 uS in-between
+// The marks and spaces are very short and nearly the same length as each other. Sony protocols have a similar spacing
+// and may be confused for a Taigen cannon hit. But for this to happen you must be set to receive Taigen hits and be hit
+// by a Sony code, so probably not terribly likely (Clark uses Sony codes for machine gun and repair). 
+// A Sony code can be confused for a Taigen hit, but a Taigen code will not be confused with a Sony code. 
+
+    OP_IRLib_ATTEMPT_MESSAGE(F("Taigen V2/V3"));   
 
     if (rawlen <= Taigen_BITS) return RAW_COUNT_ERROR;
 
@@ -582,6 +619,7 @@ bool IRdecodeTaigen::decode(void) {
     value = 0;          // The Taigen signal doesn't have a data value
     return true;
 }
+
 bool IRdecodeFOV::decode(void) {
 // FOV is surely the best thought-out IR code of all the many tank manufacturers. These models were discontinued in the early 2010s. 
 // After a distinct header mark there are 8 data bits which construct a single integer from 0-256. Different numbers represent different teams. 
@@ -1451,16 +1489,34 @@ void IRsendHengLong::send(void)
     }    
     startSending();                                     // Send it out
 }
-void IRsendTaigen::send(void)
+void IRsendTaigenV1::send(void)
 {
 // Unlike most other protocols, Taigen only sends their signal a single time. We however send it 6 times, which is what HengLong does. 
-// The Taigen signal is similar to HengLong's in that it consists of 4 marks and 3 spaces. However marks and spaces don't vary in length, 
+// The Taigen V1 signal is similar to HengLong's in that it consists of 4 marks and 3 spaces. However marks and spaces don't vary in length, 
 // nor are they the same length as HengLong's. 
+
+    // Load the IR_SendParams struct with our signal data
+    IR_SendParams.bitsToSend = TaigenV1_BITS+1;         // Number of bits plus gap
+    IR_SendParams.timesToRepeat = Taigen_TIMESTOSEND;   // How many times to repeat
+    IR_SendParams.kHz = 39;                             // 39 kHz
+    IR_SendParams.currentStep = 1;                      // On step 1
+    IR_SendParams.numSteps = 1;                         // This protocol only has 1 step
+    IR_SendParams.sendProtocol = IR_TAIGEN_V1;          // What protocol are we sending     
+    for (int i=0; i<IR_SendParams.bitsToSend; i++)      // Array of bit lengths
+    {
+        IR_SendParams.sendStream[i] = IR_uS_TO_TICKS((uint32_t)pgm_read_word_near(&(TaigenSigV1[i])));  // Convert bit lengths in uS -> to number of Timer 1 clock ticks
+    }    
+    startSending();                                     // Send it out
+}
+void IRsendTaigen::send(void)
+{
+// This is used for Taigen V2 and v3 signals, which are similar to the V1 protocol but involves 9 marks instead of 4, and the timing is slightly different (shorter mark, longer space). 
+// Unlike most other protocols, Taigen only sends their signal a single time. We however send it 6 times, which is what HengLong does. 
 
     // Load the IR_SendParams struct with our signal data
     IR_SendParams.bitsToSend = Taigen_BITS+1;           // Number of bits plus gap
     IR_SendParams.timesToRepeat = Taigen_TIMESTOSEND;   // How many times to repeat
-    IR_SendParams.kHz = 38;                             // 38 kHz
+    IR_SendParams.kHz = 39;                             // 39 kHz
     IR_SendParams.currentStep = 1;                      // On step 1
     IR_SendParams.numSteps = 1;                         // This protocol only has 1 step
     IR_SendParams.sendProtocol = IR_TAIGEN;             // What protocol are we sending     
@@ -1795,7 +1851,8 @@ void IRsendRaw::send(uint32_t buf[], unsigned char len, unsigned char khz)
     case IR_TAMIYA_2SHOT:   IRsendTamiya_2Shot::send();             break;
     case IR_TAMIYA_35:      IRsendTamiya35::send();                 break;  
     case IR_HENGLONG:       IRsendHengLong::send();                 break;
-    case IR_TAIGEN:         IRsendTaigen::send();                   break;  
+    case IR_TAIGEN_V1:      IRsendTaigenV1::send();                 break;  // Taigen V1
+    case IR_TAIGEN:         IRsendTaigen::send();                   break;  // Taigen V2/V3
     case IR_FOV:            IRsendFOV::send(data);                  break;  // data
     case IR_VSTANK:         IRsendVsTank::send(data);               break;  // data, although so far we know of only one valid data
     case IR_OPENPANZER:     IRsendOpenPanzer::send();               break;  // data, but this protocol is not written yet
@@ -1816,7 +1873,8 @@ void IRsend::send(IRTYPES Type) {
     case IR_TAMIYA_2SHOT:   IRsendTamiya_2Shot::send();     break;
     case IR_TAMIYA_35:      IRsendTamiya35::send();         break;  
     case IR_HENGLONG:       IRsendHengLong::send();         break;
-    case IR_TAIGEN:         IRsendTaigen::send();           break;
+    case IR_TAIGEN_V1:      IRsendTaigenV1::send();         break;  // Taigen V1
+    case IR_TAIGEN:         IRsendTaigen::send();           break;  // Taigen V2/V3
     case IR_FOV:            IRsendFOV::send();              break;  // Will default to Team 1
     case IR_VSTANK:         IRsendVsTank::send();           break;
 //  case IR_OPENPANZER:     IRsendOpenPanzer::send();       break;  
