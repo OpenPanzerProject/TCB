@@ -265,7 +265,8 @@ bool IRdecode::decode(void) {
   if (IRdecodeTamiya_2Shot::decode())   { decode_type = IR_TAMIYA_2SHOT; return true; }
   if (IRdecodeTamiya35::decode())       { decode_type = IR_TAMIYA_35;   return true; }
   if (IRdecodeHengLong::decode())       { decode_type = IR_HENGLONG;    return true; }
-  if (IRdecodeTaigen::decode())         { decode_type = IR_TAIGEN;      return true; }
+  if (IRdecodeTaigenV1::decode())       { decode_type = IR_TAIGEN_V1;   return true; }  // Taigen V1
+  if (IRdecodeTaigen::decode())         { decode_type = IR_TAIGEN;      return true; }  // Taigen V2/V3
   if (IRdecodeFOV::decode())            { decode_type = IR_FOV;         return true; }  
   if (IRdecodeVsTank::decode())         { decode_type = IR_VSTANK;      return true; }
   if (IRdecodeOpenPanzer::decode())     { decode_type = IR_OPENPANZER;  return true; }
@@ -291,7 +292,8 @@ decode_type = IR_UNKNOWN;
         case IR_TAMIYA_2SHOT:   if (IRdecodeTamiya_2Shot::decode()) { decode_type = Type; } break; 
         case IR_TAMIYA_35:      if (IRdecodeTamiya35::decode())     { decode_type = Type; } break; 
         case IR_HENGLONG:       if (IRdecodeHengLong::decode())     { decode_type = Type; } break; 
-        case IR_TAIGEN:         if (IRdecodeTaigen::decode())       { decode_type = Type; } break; 
+        case IR_TAIGEN_V1:      if (IRdecodeTaigenV1::decode())     { decode_type = Type; } break;  // Taigen V1 
+        case IR_TAIGEN:         if (IRdecodeTaigen::decode())       { decode_type = Type; } break;  // Taigen V2/V3
         case IR_FOV:            if (IRdecodeFOV::decode())          { decode_type = Type; } break; 
         case IR_VSTANK:         if (IRdecodeVsTank::decode())       { decode_type = Type; } break;
         case IR_OPENPANZER:     if (IRdecodeOpenPanzer::decode())   { decode_type = Type; } break; 
@@ -619,7 +621,6 @@ bool IRdecodeTaigen::decode(void) {
     value = 0;          // The Taigen signal doesn't have a data value
     return true;
 }
-
 bool IRdecodeFOV::decode(void) {
 // FOV is surely the best thought-out IR code of all the many tank manufacturers. These models were discontinued in the early 2010s. 
 // After a distinct header mark there are 8 data bits which construct a single integer from 0-256. Different numbers represent different teams. 
