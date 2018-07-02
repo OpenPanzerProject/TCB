@@ -567,6 +567,9 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.SecondMGLightBlink_mS = 30;             // milliseconds        
         ramcopy.CannonReloadBlink = true;
 
+    // Scout settings
+        ramcopy.ScoutCurrentLimit = 12;                 // Default to 12 amps
+
     // Program settings
         ramcopy.PrintDebug = true;                      // Default to debugging on
 }

@@ -30,12 +30,12 @@ void InstantiateMotorObjects()
         {
             case OP_SCOUT:
                 // For a single rear drive motor (or a single propulsion motor), connect it to M1
-                DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false);    
+                DriveMotor = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false, eeprom.ramcopy.ScoutCurrentLimit);    
                 DriveMotor->begin();
                 
                 // For ancient Tamiya gearboxes, the DKLM "Propulsion Dynamic" gearboxes, and any others that use a single motor for drive and a secondary motor to shift power from one tread to the other, 
                 // we have a "SteeringMotor" which will be the otherwise unused second output of the dual-motor serial controller 
-                SteeringMotor = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false);
+                SteeringMotor = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false, eeprom.ramcopy.ScoutCurrentLimit);
                 SteeringMotor->begin();    
                 break;
                 
@@ -133,8 +133,8 @@ void InstantiateMotorObjects()
         {
             case OP_SCOUT:
                 // Left drive to M1, Right drive to M2. 
-                LeftTread = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.DragInnerTrack);    
-                RightTread = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.DragInnerTrack);
+                LeftTread = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.DragInnerTrack, eeprom.ramcopy.ScoutCurrentLimit);    
+                RightTread = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_DRIVE_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.DragInnerTrack, eeprom.ramcopy.ScoutCurrentLimit);
                 break;
                 
             case SABERTOOTH:
@@ -225,7 +225,7 @@ void InstantiateMotorObjects()
     switch (eeprom.ramcopy.TurretRotationMotor)
     {
         case OP_SCOUT:      // M1
-            TurretRotation = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false);
+            TurretRotation = new OPScout_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false, eeprom.ramcopy.ScoutCurrentLimit);
             break;
         case SABERTOOTH:    // M1
             TurretRotation = new Sabertooth_SerialESC (SIDEA,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_TURRET_Address,&MotorSerial);
@@ -289,7 +289,7 @@ void InstantiateMotorObjects()
     switch (eeprom.ramcopy.TurretElevationMotor)
     {
         case OP_SCOUT:      // M2
-            TurretElevation = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false);
+            TurretElevation = new OPScout_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,OPScout_TURRET_Address,&MotorSerial,&eeprom.ramcopy.MotorSerialBaud, false, eeprom.ramcopy.ScoutCurrentLimit);
             break;
         case SABERTOOTH:    // M2
             TurretElevation = new Sabertooth_SerialESC (SIDEB,MOTOR_MAX_REVSPEED,MOTOR_MAX_FWDSPEED,0,Sabertooth_TURRET_Address,&MotorSerial);

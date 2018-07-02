@@ -151,7 +151,7 @@ class Motor {
 
 class OPScout_SerialESC: public Motor, public OP_Scout {
   public:
-    OPScout_SerialESC(ESC_POS_t pos, int min, int max, int middle, byte addr, HardwareSerial *hwSerial, uint32_t *baud, boolean drag) : Motor(pos,min,max,middle), OP_Scout(addr,hwSerial), motorbaud(baud), dragInnerTrack(drag) {}
+    OPScout_SerialESC(ESC_POS_t pos, int min, int max, int middle, byte addr, HardwareSerial *hwSerial, uint32_t *baud, boolean drag, uint8_t cl) : Motor(pos,min,max,middle), OP_Scout(addr,hwSerial), motorbaud(baud), dragInnerTrack(drag), currentLimit(cl) {}
     void setSpeed(int s);
     void begin(void);
     void stop(void);
@@ -160,6 +160,7 @@ class OPScout_SerialESC: public Motor, public OP_Scout {
     uint32_t LastUpdate_mS;
     uint32_t *motorbaud;
     boolean dragInnerTrack;
+    uint8_t currentLimit;
 };
 
 class Sabertooth_SerialESC: public Motor, public OP_Sabertooth {

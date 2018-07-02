@@ -216,7 +216,14 @@ void DumpMotorInfo()
     PrintDebugLine();
     DebugSerial->println(F("MOTOR TYPES"));
     PrintDebugLine();
-    DebugSerial->print(F("Drive Motors:      ")); DebugSerial->println(ptrDriveType(eeprom.ramcopy.DriveMotors)); 
+    DebugSerial->print(F("Drive Motors:      ")); DebugSerial->print(ptrDriveType(eeprom.ramcopy.DriveMotors)); 
+    if (eeprom.ramcopy.DriveMotors == OP_SCOUT)
+    {
+        DebugSerial->print(F(" (Current Limit: "));
+        DebugSerial->print(eeprom.ramcopy.ScoutCurrentLimit);
+        DebugSerial->print(F(" Amps)"));
+    }
+    DebugSerial->println();
     DebugSerial->print(F("Turret Rotation:   ")); DebugSerial->print(ptrDriveType(eeprom.ramcopy.TurretRotationMotor)); 
     switch (eeprom.ramcopy.TurretRotationMotor) {
         case ONBOARD: DebugSerial->println(F(" (A)")); break;

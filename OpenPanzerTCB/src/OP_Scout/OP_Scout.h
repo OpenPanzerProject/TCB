@@ -48,6 +48,10 @@
 #define SCOUT_ADDRESS_A                     0x83    // 131
 #define SCOUT_ADDRESS_B                     0x84    // 132
 
+// Defaults
+#define SCOUT_DEFAULT_CURRENT_LIMIT         12      // 12 amps by default
+#define SCOUT_MAXIMUM_CURRENT_LIMIT         30      // 30 amps max
+
 // Commands                                         // 0    Motor 1 forward
                                                     // 1    Motor 1 reverse
                                                     // 2    Set minimum voltage
@@ -124,6 +128,12 @@ public:
     // Drag inner track
     inline void DragInnerTrack(boolean enable) { command(SCOUT_CMD_DRAG_INNER_TRACK, enable); }
     
+    // Set maximum current
+    inline void SetMaximumCurrent(uint8_t cl) 
+    { 
+        if (cl > 0 && cl <= SCOUT_MAXIMUM_CURRENT_LIMIT) command(SCOUT_CMD_SET_MAX_CURRENT, cl); 
+        else                                             command(SCOUT_CMD_SET_MAX_CURRENT, SCOUT_DEFAULT_CURRENT_LIMIT);
+    }
 
 private:
     void throttleCommand(byte command, int speed) const;
