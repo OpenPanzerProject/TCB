@@ -18,6 +18,7 @@ void setup()
     // Give the Scout some time to startup
     delay(1000); 
 
+
     
     // SERIAL WATCHDOG 
     // This is optional. You can choose to enable the Serial Watchdog feature on the Scout (it is disabled by default). 
@@ -30,9 +31,24 @@ void setup()
     //      Data byte = Desired time in mS / 100
     // Let's enable the serial watchdog with a timeout of 1 second (1000mS), so data byte will be:
     //      1000 / 100 = 10
+    
     Scout.EnableWatchdog(10); 
+
+
+
+    // CURRENT LIMITS
+    // By default the Scout will limit current to 12 amps per motor, since this is roughly the amount of continuous current draw the board can handle
+    // without extra heatsinking/cooling. The absolute limit of the motor driver chips is 30 amps per motor, but that will definitely require the 
+    // addition of heatsinks and fan. If the chips become too hot, they are over-temperature protected and will automatically shut down. 
+    // You may also want to limit the current to an even lower level than default, for example to protect a sensitive drive-train. 
+    // You can use the SetMaxCurrent function to specify the maximum current (per motor) that the Scout will permit, but beyond which it will turn off the motors.
+    // Note: if even one motor exceeds the current limit, both motors will be turned off. 
+    // Note: any custom current limit setting is not retained by the Scout, it always boots to the default of 12 amps, so if you want a different value send it each time on boot
+    
+    Scout.SetMaxCurrent(5);     // This would limit the maximum current per motor to 5 amps. Acceptable values are 1 to 30
     
 }
+
 
 void loop() 
 {
@@ -44,14 +60,18 @@ void loop()
 
     // TEST DIRECT FAN CONTROL
     // ================================================================================================================================>>
-    // Uncomment this section to test direct fan control
+    // Uncomment this section to test direct fan control, which could be used as a third channel, uni-directional, low current ESC (1 amp), running at VBatt
     /*
-        Scout.SetFanSpeed(127);
+        Scout.SetFanSpeed(127);     // 50%
         delay(4000);
-        Scout.SetFanSpeed(255);
+        Scout.SetFanSpeed(255);     // 100%
         delay(4000);
-        Scout.SetFanSpeed(0);
+        Scout.SetFanSpeed(0);       // Stop
         delay(4000);
+    
+        // We can also revert back to auto fan control, where the Scout manages the fan in order to cool itself
+        // Auto control is the default mode and the Scout will initialize to that mode unless and until an explicity SetFanSpeed function call is made. 
+        AutoFanControl();
     */
     
 

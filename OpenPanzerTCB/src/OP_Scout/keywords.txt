@@ -24,6 +24,7 @@ EnableWatchdog  KEYWORD2
 DisableWatchdog KEYWORD2
 BrakeAtStop KEYWORD2
 DragInnerTrack  KEYWORD2
+SetMaxCurrent   KEYWORD2
 
 
 #-------------------------------------------------------------

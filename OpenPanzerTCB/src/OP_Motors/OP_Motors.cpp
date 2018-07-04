@@ -121,7 +121,7 @@ void OPScout_SerialESC::begin(void)
     OPScout_SerialESC::DragInnerTrack(dragInnerTrack);
 
     // The Scout has an adjustable current limit from 1 to 30 amps, pass the desired value here
-    OPScout_SerialESC::SetMaximumCurrent(currentLimit);
+    OPScout_SerialESC::SetMaxCurrent(currentLimit);
 
     // Set the internal speed range (min, max). The Scout accepts speed commands from -127 to 127 with a middle point of 0
     set_InternalRange(-127,127, 0);
