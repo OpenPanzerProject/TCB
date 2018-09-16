@@ -74,6 +74,8 @@ void EngineOn()
         // Start the engine object
         if (TankEngine.StartEngine())
         {
+            // Set the engine start ad-hoc trigger bit 
+                bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_START);
             // Play the engine start sound
                 TankSound->StartEngine();
             // Should the transmission be engaged now too? 
@@ -110,6 +112,8 @@ void EngineOff()
     {
         // Stop the engine object 
             TankEngine.StopEngine();
+        // Set the engine stop ad-hoc trigger bit 
+            bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_STOP);
         // Stop the smoker
             // As opposed to StopSmoker, Shutdown will let the smoker turn off slowly for a more realistic effect. 
             // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.

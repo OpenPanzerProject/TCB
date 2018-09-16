@@ -313,6 +313,8 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
             case ADHOC_TRIGGER_CANNON_HIT:          DebugSerial->print(F("Cannon Hit"));        PrintSpaces(19); break;
             case ADHOC_TRIGGER_VEHICLE_DESTROYED:   DebugSerial->print(F("Vehicle Destroyed")); PrintSpaces(12); break;
             case ADHOC_TRIGGER_CANNON_RELOADED:     DebugSerial->print(F("Cannon Reloaded"));   PrintSpaces(14); break;
+            case ADHOC_TRIGGER_ENGINE_START:        DebugSerial->print(F("Engine Start"));      PrintSpaces(17); break;
+            case ADHOC_TRIGGER_ENGINE_STOP:         DebugSerial->print(F("Engine Stop"));       PrintSpaces(18); break;
         }        
     }
     // Vehicle speed triggers - increasing speed
