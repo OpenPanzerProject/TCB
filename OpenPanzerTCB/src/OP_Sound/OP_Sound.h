@@ -106,7 +106,8 @@ class OP_Sound {
     virtual void UserSound_Repeat(uint8_t) =0;          // Repeat user sound x
     virtual void UserSound_Stop(uint8_t) =0;            // Stop user sound x
     // Sound banks
-    virtual void SoundBank(soundbank sb, switch_action a) =0;  // Sound banks
+    virtual void SoundBank(soundbank, switch_action) =0;  // Sound banks
+    virtual void SoundBank_SetAutoloop(soundbank, boolean) =0; // Set auto-loop on this sound bank
     // Squeaks  
     virtual void StartSqueaks(void) =0;                 // Starts all squeaks
     virtual void StopSqueaks(void) =0;                  // Stops all squeaks
@@ -182,7 +183,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void UserSound_Repeat(uint8_t s)                            { OP_TBS::UserSound_Repeat(s);         }
     void UserSound_Stop(uint8_t s)                              { OP_TBS::UserSound_Stop(s);           }
   // Sound banks
-    void SoundBank(soundbank sb, switch_action a)               { return;                              }
+    void SoundBank(soundbank, switch_action)                    { return;                              }
+    void SoundBank_SetAutoloop(soundbank, boolean)              { return;                              }
   // Squeaks
     void StartSqueaks(void)                                     { if (_squeaksActive == false) { OP_TBS::StartSqueaks(); _squeaksActive = true; } } 
     void StopSqueaks(void)                                      { if (_squeaksActive == true)  { OP_TBS::StopSqueaks();  _squeaksActive = false;} }
@@ -259,7 +261,8 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_CANNON_READY                0x4E   // 78
 #define OPSC_CMD_VEHICLE_DAMAGED             0x4F   // 79  -- Pass in value: true (1) means vehicle damage, false (0) means not damaged aka restored
 #define OPSC_CMD_HEADLIGHT2                  0x50   // 80
-#define OPSC_CMD_SOUNDBANK                   0x51   // 81  -- Use Value to specify A or B (0 or 1). Modifier specifies action (ACTION_ONSTART, ACTION_PLAYNEXT, ACTION_PLAYPREV, ACTION_PLAYRANDOM)
+#define OPSC_CMD_SOUNDBANK                   0x51   // 81  -- Use Value to specify Soundbank A or B (0 or 1). Modifier specifies action (ACTION_ONSTART, ACTION_PLAYNEXT, ACTION_PLAYPREV, ACTION_PLAYRANDOM)
+#define OPSC_CMD_SOUNDBANK_LOOP              0x52   // 82  -- Use Value to specify Soundbank A or B (0 or 1). Modifier indicates whether auto-loop is enabled or not (true/false)
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -323,6 +326,7 @@ class OP_SoundCard: public OP_Sound {
     void UserSound_Stop(uint8_t s)                              { command(OPSC_CMD_USER_SOUND_STOP, 0, s);                  }
   // Sound banks
     void SoundBank(soundbank sb, switch_action a)               { command(OPSC_CMD_SOUNDBANK, sb, a);                       }
+    void SoundBank_SetAutoloop(soundbank sb, boolean b)         { command(OPSC_CMD_SOUNDBANK_LOOP, sb, b);                  }
   // Squeaks                
     void StartSqueaks(void)                                     { if (_squeaksActive == false) { command(OPSC_CMD_SQUEAKS_START); _squeaksActive = true; } } 
     void StopSqueaks(void)                                      { if (_squeaksActive == true)  { command(OPSC_CMD_SQUEAKS_STOP);  _squeaksActive = false;} }
@@ -474,7 +478,8 @@ class OP_TaigenSound: public OP_Sound {
     void UserSound_Repeat(uint8_t)                              { return;               }
     void UserSound_Stop(uint8_t)                                { return;               }
   // Sound banks
-    void SoundBank(soundbank sb, switch_action a)               { return;               }    
+    void SoundBank(soundbank, switch_action)                    { return;               }    
+    void SoundBank_SetAutoloop(soundbank, boolean)              { return;               }    
   // Squeaks                                                                            
     void StartSqueaks(void)                                     { return;               }
     void StopSqueaks(void)                                      { return;               }

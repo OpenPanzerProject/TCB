@@ -527,6 +527,8 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.VolumeTrackOverlay = 50;
         ramcopy.VolumeEffects = 50;
         ramcopy.HeadlightSound2_Enabled = false;
+        ramcopy.SoundBankA_Loop = false;
+        ramcopy.SoundBankB_Loop = false;
         
     // Battle settings
         ramcopy.IR_FireProtocol = IR_TAMIYA;            // Default to Tamiya IR battle protocol

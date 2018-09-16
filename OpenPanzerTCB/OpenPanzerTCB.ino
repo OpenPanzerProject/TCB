@@ -340,6 +340,9 @@ void setup()
         TankSound->HeadlightSound2_SetEnabled(eeprom.ramcopy.HeadlightSound2_Enabled);
         TankSound->TurretSound_SetEnabled(eeprom.ramcopy.TurretSound_Enabled);
         TankSound->BarrelSound_SetEnabled(eeprom.ramcopy.BarrelSound_Enabled);
+        // Sound bank auto-loop
+        TankSound->SoundBank_SetAutoloop(SOUNDBANK_A, eeprom.ramcopy.SoundBankA_Loop);
+        TankSound->SoundBank_SetAutoloop(SOUNDBANK_B, eeprom.ramcopy.SoundBankB_Loop);
         // If we have a function trigger assigned to enable the track overlay sound, we start with it disabled, on the assumption the user will 
         // enable it themselves using their function. Otherwise we start with it enabled and it will automatically activate when the vehicle starts to move
         isFunctionAssigned(SF_OVERLAY_ENABLE) ? DisableTrackOverlaySounds() : EnableTrackOverlaySounds();
