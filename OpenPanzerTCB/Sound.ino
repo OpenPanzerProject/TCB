@@ -126,6 +126,33 @@ void PrintUserSound()
     DebugSerial->print(F("User Sound "));
 }
 
+void SoundBank(soundbank sb, switch_action a)
+{
+    TankSound->SoundBank(sb, a);    // Send the sound bank command
+    if (DEBUG) 
+    { 
+        PrintSoundBank(sb); 
+        switch (a)
+        {
+            case ACTION_ONSTART:    DebugSerial->println(F("Play/Stop")); 
+            case ACTION_PLAYNEXT:   DebugSerial->println(F("Play Next")); 
+            case ACTION_PLAYPREV:   DebugSerial->println(F("Play Previous")); 
+            case ACTION_PLAYRANDOM: DebugSerial->println(F("Play Random")); 
+        }
+    }
+}
+
+void PrintSoundBank(soundbank sb)
+{
+    DebugSerial->print(F("Sound Bank ")); 
+    switch (sb)
+    {
+        case SOUNDBANK_A: DebugSerial->print(F("A - ")); break;
+        case SOUNDBANK_B: DebugSerial->print(F("B - ")); break;
+        default: break;
+    }
+}
+
 // This routine is only needed for testing during development of compatibility with Benedini TBS Flash v3. //
 /*
 void TBSTest(void)

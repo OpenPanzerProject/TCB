@@ -92,15 +92,23 @@ void LoadFunctionTriggers()
                 case SF_USER_SOUND9_ONCE:           SF_Callback[i] = &SF_TriggerUserSound9;                         break;
                 case SF_USER_SOUND9_RPT:            SF_Callback[i] = &SF_UserSound9_Repeat;                         break;
                 case SF_USER_SOUND9_OFF:            SF_Callback[i] = &SF_UserSound9_Stop;                           break;
-                case SF_USER_SOUND10_ONCE:          SF_Callback[i] = &SF_TriggerUserSound10;                         break;
-                case SF_USER_SOUND10_RPT:           SF_Callback[i] = &SF_UserSound10_Repeat;                         break;
-                case SF_USER_SOUND10_OFF:           SF_Callback[i] = &SF_UserSound10_Stop;                           break;
-                case SF_USER_SOUND11_ONCE:          SF_Callback[i] = &SF_TriggerUserSound11;                         break;
-                case SF_USER_SOUND11_RPT:           SF_Callback[i] = &SF_UserSound11_Repeat;                         break;
-                case SF_USER_SOUND11_OFF:           SF_Callback[i] = &SF_UserSound11_Stop;                           break;
-                case SF_USER_SOUND12_ONCE:          SF_Callback[i] = &SF_TriggerUserSound12;                         break;
-                case SF_USER_SOUND12_RPT:           SF_Callback[i] = &SF_UserSound12_Repeat;                         break;
-                case SF_USER_SOUND12_OFF:           SF_Callback[i] = &SF_UserSound12_Stop;                           break;
+                case SF_USER_SOUND10_ONCE:          SF_Callback[i] = &SF_TriggerUserSound10;                        break;
+                case SF_USER_SOUND10_RPT:           SF_Callback[i] = &SF_UserSound10_Repeat;                        break;
+                case SF_USER_SOUND10_OFF:           SF_Callback[i] = &SF_UserSound10_Stop;                          break;
+                case SF_USER_SOUND11_ONCE:          SF_Callback[i] = &SF_TriggerUserSound11;                        break;
+                case SF_USER_SOUND11_RPT:           SF_Callback[i] = &SF_UserSound11_Repeat;                        break;
+                case SF_USER_SOUND11_OFF:           SF_Callback[i] = &SF_UserSound11_Stop;                          break;
+                case SF_USER_SOUND12_ONCE:          SF_Callback[i] = &SF_TriggerUserSound12;                        break;
+                case SF_USER_SOUND12_RPT:           SF_Callback[i] = &SF_UserSound12_Repeat;                        break;
+                case SF_USER_SOUND12_OFF:           SF_Callback[i] = &SF_UserSound12_Stop;                          break;
+                case SF_SBA_PLAYSTOP:               SF_Callback[i] = &SF_Soundbank_A_PlayStop;                      break;
+                case SF_SBA_NEXT:                   SF_Callback[i] = &SF_Soundbank_A_Next;                          break;
+                case SF_SBA_PREVIOUS:               SF_Callback[i] = &SF_Soundbank_A_Previous;                      break;
+                case SF_SBA_RANDOM:                 SF_Callback[i] = &SF_Soundbank_A_Random;                        break;
+                case SF_SBB_PLAYSTOP:               SF_Callback[i] = &SF_Soundbank_B_PlayStop;                      break;
+                case SF_SBB_NEXT:                   SF_Callback[i] = &SF_Soundbank_B_Next;                          break;
+                case SF_SBB_PREVIOUS:               SF_Callback[i] = &SF_Soundbank_B_Previous;                      break;
+                case SF_SBB_RANDOM:                 SF_Callback[i] = &SF_Soundbank_B_Random;                        break;                
                 case SF_OUTPUT_A_TOGGLE:            SF_Callback[i] = &SF_PortA_Toggle;                              break;
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
@@ -554,6 +562,14 @@ void SF_UserSound11_Stop(uint16_t ignoreMe)     { UserSound_Stop(11);       }
 void SF_TriggerUserSound12(uint16_t ignoreMe)   { TriggerUserSound(12);     }
 void SF_UserSound12_Repeat(uint16_t ignoreMe)   { UserSound_Repeat(12);     }
 void SF_UserSound12_Stop(uint16_t ignoreMe)     { UserSound_Stop(12);       }
+void SF_Soundbank_A_PlayStop(uint16_t ignoreMe) { SoundBank(SOUNDBANK_A, ACTION_ONSTART); }
+void SF_Soundbank_A_Next(uint16_t ignoreMe)     { SoundBank(SOUNDBANK_A, ACTION_PLAYNEXT); }
+void SF_Soundbank_A_Previous(uint16_t ignoreMe) { SoundBank(SOUNDBANK_A, ACTION_PLAYPREV); }
+void SF_Soundbank_A_Random(uint16_t ignoreMe)   { SoundBank(SOUNDBANK_A, ACTION_PLAYRANDOM); }
+void SF_Soundbank_B_PlayStop(uint16_t ignoreMe) { SoundBank(SOUNDBANK_B, ACTION_ONSTART); }
+void SF_Soundbank_B_Next(uint16_t ignoreMe)     { SoundBank(SOUNDBANK_B, ACTION_PLAYNEXT); }
+void SF_Soundbank_B_Previous(uint16_t ignoreMe) { SoundBank(SOUNDBANK_B, ACTION_PLAYPREV); }
+void SF_Soundbank_B_Random(uint16_t ignoreMe)   { SoundBank(SOUNDBANK_B, ACTION_PLAYRANDOM); }
 void SF_PortA_Toggle(uint16_t ignoreMe)         { PortA_Toggle();           }
 void SF_PortA_On(uint16_t ignoreMe)             { PortA_On();               }
 void SF_PortA_Off(uint16_t ignoreMe)            { PortA_Off();              }

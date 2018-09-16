@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 144;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 152;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -185,7 +185,15 @@ enum _special_function : byte {
     SF_USER_SOUND11_OFF = 140,      // 140
     SF_USER_SOUND12_ONCE= 141,      // 141
     SF_USER_SOUND12_RPT = 142,      // 142
-    SF_USER_SOUND12_OFF = 143       // 143        
+    SF_USER_SOUND12_OFF = 143,      // 143   
+    SF_SBA_PLAYSTOP     = 144,      // 144
+    SF_SBA_NEXT         = 145,      // 145
+    SF_SBA_PREVIOUS     = 146,      // 146
+    SF_SBA_RANDOM       = 147,      // 147
+    SF_SBB_PLAYSTOP     = 148,      // 148
+    SF_SBB_NEXT         = 149,      // 149
+    SF_SBB_PREVIOUS     = 150,      // 150
+    SF_SBB_RANDOM       = 151       // 151
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -207,7 +215,8 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,1,1,1,1,1,   // 110-119
  1,1,1,1,1,1,1,1,1,1,   // 120-129
  1,1,1,1,1,1,1,1,1,1,   // 130-139
- 1,1,1,1                // 140-143
+ 1,1,1,1,1,1,1,1,1,1,   // 140-149
+ 1,1                    // 150-151
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -365,7 +374,15 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 11 - Stop"                       // 140    
     "User Sound 12 - Play Once",                 // 141
     "User Sound 12 - Repeat",                    // 142
-    "User Sound 12 - Stop"                       // 143   
+    "User Sound 12 - Stop",                      // 143   
+    "Sound Bank A - Play/Stop",                  // 144
+    "Sound Bank A - Next",                       // 145
+    "Sound Bank A - Previous",                   // 146
+    "Sound Bank A - Random",                     // 147    
+    "Sound Bank B - Play/Stop",                  // 148
+    "Sound Bank B - Next",                       // 149
+    "Sound Bank B - Previous",                   // 150
+    "Sound Bank B - Random",                     // 151
 };
 
 
