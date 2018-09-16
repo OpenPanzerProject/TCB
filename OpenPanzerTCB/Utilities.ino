@@ -383,6 +383,27 @@ void DumpSoundInfo()
     PrintDebugLine();    
     DebugSerial->print(F("Sound card: ")); 
     DebugSerial->println(printSoundDevice(eeprom.ramcopy.SoundDevice));
+    if (eeprom.ramcopy.SoundDevice == SD_OP_SOUND_CARD)
+    {
+        PrintSoundBank1();
+        DebugSerial->print(F("A"));
+        PrintSoundBank2();
+        PrintLnYesNo(eeprom.ramcopy.SoundBankA_Loop);
+        PrintSoundBank1();
+        DebugSerial->print(F("B"));
+        PrintSoundBank2();
+        PrintLnYesNo(eeprom.ramcopy.SoundBankB_Loop);
+    }
+}
+
+void PrintSoundBank1()
+{
+    DebugSerial->print(F("Sound Bank "));
+}
+
+void PrintSoundBank2()
+{
+    DebugSerial->print(F(" Auto-Loop: "));
 }
 
 void DumpIMUInfo()
