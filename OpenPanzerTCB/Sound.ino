@@ -134,10 +134,11 @@ void SoundBank(soundbank sb, switch_action a)
         PrintSoundBank(sb); 
         switch (a)
         {
-            case ACTION_ONSTART:    DebugSerial->println(F("Play/Stop")); 
-            case ACTION_PLAYNEXT:   DebugSerial->println(F("Play Next")); 
-            case ACTION_PLAYPREV:   DebugSerial->println(F("Play Previous")); 
-            case ACTION_PLAYRANDOM: DebugSerial->println(F("Play Random")); 
+            case ACTION_ONSTART:    DebugSerial->println(F("Play/Stop"));       break;
+            case ACTION_PLAYNEXT:   DebugSerial->println(F("Play Next"));       break;
+            case ACTION_PLAYPREV:   DebugSerial->println(F("Play Previous"));   break;
+            case ACTION_PLAYRANDOM: DebugSerial->println(F("Play Random"));     break;
+            default:                break;
         }
     }
 }

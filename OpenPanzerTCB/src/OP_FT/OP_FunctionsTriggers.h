@@ -371,7 +371,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 10 - Stop",                      // 137
     "User Sound 11 - Play Once",                 // 138
     "User Sound 11 - Repeat",                    // 139
-    "User Sound 11 - Stop"                       // 140    
+    "User Sound 11 - Stop",                      // 140    
     "User Sound 12 - Play Once",                 // 141
     "User Sound 12 - Repeat",                    // 142
     "User Sound 12 - Stop",                      // 143   

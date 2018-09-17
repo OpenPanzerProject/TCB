@@ -678,7 +678,7 @@ void SF_SetDecelRampFreq(uint16_t val)
     }
 }
 
-// Barrel stabilizatoin and "Hill physics" adjustment
+// Barrel stabilization and "Hill physics" adjustment
 // ----------------------------------------------------------------------------------------------------------------------------------------------->>
 // Barrel Stabilization and Hill Physics sensitivy numbers can vary between 1-100. 
 void SetBarrelSensitivity(uint16_t level)       
