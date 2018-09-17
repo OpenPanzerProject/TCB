@@ -383,6 +383,8 @@ void DumpSoundInfo()
     PrintDebugLine();    
     DebugSerial->print(F("Sound card: ")); 
     DebugSerial->println(printSoundDevice(eeprom.ramcopy.SoundDevice));
+/* 
+    //Actually we are not dumping the rest of the sound-card specific settings, so either do all of them or none. For now we will do none.     
     if (eeprom.ramcopy.SoundDevice == SD_OP_SOUND_CARD)
     {
         PrintSoundBank1();
@@ -394,6 +396,7 @@ void DumpSoundInfo()
         PrintSoundBank2();
         PrintLnYesNo(eeprom.ramcopy.SoundBankB_Loop);
     }
+*/
 }
 
 void PrintSoundBank1()
