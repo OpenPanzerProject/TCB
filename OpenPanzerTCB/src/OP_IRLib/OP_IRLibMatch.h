@@ -69,7 +69,7 @@ const PROGMEM uint16_t HengLongSig[HengLong_BITS+1] = {19000, 4700, 9500, 4700, 
 
 // Taigen - common to all versions
 #define Taigen_GAP          14000   // Since Taigen only sends the signal once, it has no gap. But since we send it multiple times, we make up a gap out of thin air. It needs to be longer than GAP. 
-#define Taigen_TIMESTOSEND  6       // Taigen MFUs only send the signal once, but we repeat it 6 times, same as HengLong
+#define Taigen_TIMESTOSEND  1       // Taigen MFUs only send the signal once. If you try to repeat it, the Taigen will read it as sequential hits. So keep it at 1. 
 
 // Taigen V1
 #define TaigenV1_MARK       620     
@@ -80,7 +80,7 @@ const PROGMEM uint16_t TaigenSigV1[TaigenV1_BITS+1] = {TaigenV1_MARK, TaigenV1_S
 // Taigen V2, V3 
 #define Taigen_MARK         600     // The Taigen has been measured at everything from 600/600 to 620/570 (V1/V2). It seems to respond to most anything in that range, 
 #define Taigen_SPACE        620     // but the TCB receives hits better at 620/570. Receiving is difficult because Taigen only sends the signal a single time. 
-#define Taigen_BITS         17      // V1 is 4 marks and 3 spaces (7 bits). V2/VC3 are 9 marks and 8 spaces (17 bits)
+#define Taigen_BITS         17      // V2/V3 are 9 marks and 8 spaces (17 bits)
 const PROGMEM uint16_t TaigenSig[Taigen_BITS+1] = {Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_SPACE, Taigen_MARK, Taigen_GAP}; // Add 1 to include gap
 
 #define FOV_HDR_MARK        8300
