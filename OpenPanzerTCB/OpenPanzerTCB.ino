@@ -1450,13 +1450,18 @@ if (Startup)
                 if (eeprom.ramcopy.SF_Trigger[t].TriggerID == ADHOC_TRIGGER_VEHICLE_DESTROYED) { SF_Callback[t](0); }
             }
         }
+        // Clear this bit
+        bitClear(AdHocTriggers, ADHOCT_BIT_VEHICLE_DESTROYED);
     }
-    
-    // Ok, having processed all ad-hoc triggers, we now reset all 16 flags so they don't trip again unless they are explicitly set once more
-    AdHocTriggers = 0; 
 
-    // And we can clear this, it only needs to happen once
-    ForceTriggersOnFirstPass = false;
+    if (Alive && HavePower)
+    {
+        // Ok, having processed all ad-hoc triggers, we now reset all 16 flags so they don't trip again unless they are explicitly set once more
+        AdHocTriggers = 0; 
+
+        // And we can clear this, it only needs to happen once
+        ForceTriggersOnFirstPass = false;
+    }
 
 
     // BATTLE 
