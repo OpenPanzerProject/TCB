@@ -1336,8 +1336,11 @@ if (Startup)
     // The servo command is just passed through directly from the radio. 
     if (HavePower && (eeprom.ramcopy.DriveType == DT_HALFTRACK || eeprom.ramcopy.DriveType == DT_CAR))
     {
-        // The servo object knows that "setSpeed" actually means "set servo position." 
-        SteeringServo->setSpeed(Radio.Sticks.Turn.command);   
+        if (Radio.Sticks.Turn.updated)
+        {   
+            // The servo object knows that "setSpeed" actually means "set servo position." 
+            SteeringServo->setSpeed(Radio.Sticks.Turn.command);   
+        }
     }
 
 

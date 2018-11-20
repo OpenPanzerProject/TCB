@@ -93,7 +93,7 @@ void InstantiateMotorObjects()
                     SteeringMotor->begin();
                     RCOutput2_Available = false;    // This slot becomes unavailable for general purpose servo
                 }
-                else if (eeprom.ramcopy.DriveType = DT_DMD)
+                else if (eeprom.ramcopy.DriveType == DT_DMD)
                 {
                     // When using the Tamiya DMD we are doing the same thing as the DKLM but Tamiya uses a different order (Channel 1 steering, Channel 2 throttle)
                     // Steering motor will be RC Output 1
@@ -215,7 +215,7 @@ void InstantiateMotorObjects()
         TankServos.setMinPulseWidth(SteeringServoNum, eeprom.ramcopy.SteeringServo_EPMin);
         TankServos.setMaxPulseWidth(SteeringServoNum, eeprom.ramcopy.SteeringServo_EPMax);
         
-        // Wse the reversed setting of the motor class since servo doesn't have one. This won't affect the reverse status of the drive motors in the case of halftrack, that is dependent on the radio channel reversed status
+        // Use the reversed setting of the motor class since servo doesn't have one. This won't affect the reverse status of the drive motors in the case of halftrack, that is dependent on the radio channel reversed status
         SteeringServo->set_Reversed(eeprom.ramcopy.SteeringServo_Reversed);
     }
     
