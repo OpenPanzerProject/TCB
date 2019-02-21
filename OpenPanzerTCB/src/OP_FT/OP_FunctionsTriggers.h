@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 152;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 158;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -83,10 +83,10 @@ enum _special_function : byte {
     SF_USER_SOUND2_ONCE = 38,       // 38
     SF_USER_SOUND2_RPT  = 39,       // 39
     SF_USER_SOUND2_OFF  = 40,       // 40
-    SF_OUTPUT_A_TOGGLE  = 41,       // 41   -- see also 109 for pulse
+    SF_OUTPUT_A_TOGGLE  = 41,       // 41   -- see also 109 for pulse, and 156 for blink
     SF_OUTPUT_A_ON      = 42,       // 42
     SF_OUTPUT_A_OFF     = 43,       // 43
-    SF_OUTPUT_B_TOGGLE  = 44,       // 44   -- see also 110 for pulse
+    SF_OUTPUT_B_TOGGLE  = 44,       // 44   -- see also 110 for pulse, and 157 for blink
     SF_OUTPUT_B_ON      = 45,       // 45
     SF_OUTPUT_B_OFF     = 46,       // 46   
     SF_ACCEL_LEVEL      = 47,       // 47   -- analog function
@@ -193,7 +193,13 @@ enum _special_function : byte {
     SF_SBB_PLAYSTOP     = 148,      // 148
     SF_SBB_NEXT         = 149,      // 149
     SF_SBB_PREVIOUS     = 150,      // 150
-    SF_SBB_RANDOM       = 151       // 151
+    SF_SBB_RANDOM       = 151,      // 151
+    SF_SPEED_75         = 154,      // 152
+    SF_SPEED_50         = 153,      // 153
+    SF_SPEED_25         = 152,      // 154
+    SF_SPEED_RESTORE    = 155,      // 155
+    SF_OUTPUT_A_BLINK   = 156,      // 156
+    SF_OUTPUT_B_BLINK   = 157      // 157
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -216,7 +222,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,1,1,1,1,1,   // 120-129
  1,1,1,1,1,1,1,1,1,1,   // 130-139
  1,1,1,1,1,1,1,1,1,1,   // 140-149
- 1,1                    // 150-151
+ 1,1,1,1,1,1,1,1        // 150-157
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -272,10 +278,10 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 2 - Play Once",                  // 38
     "User Sound 2 - Repeat",                     // 39
     "User Sound 2- Stop",                        // 40
-    "External Output A - Toggle",                // 41   -- see also 109 for pulse
+    "External Output A - Toggle",                // 41   -- see also 109 for pulse and 156 for blink
     "External Output A - Turn On",               // 42
     "External Output A - Turn Off",              // 43             
-    "External Output B - Toggle",                // 44   -- see also 110 for pulse
+    "External Output B - Toggle",                // 44   -- see also 110 for pulse and 157 for blink
     "External Output B - Turn On",               // 45
     "External Output B - Turn Off",              // 46
     "Set Acceleration Level",                    // 47
@@ -383,6 +389,12 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Sound Bank B - Next",                       // 149
     "Sound Bank B - Previous",                   // 150
     "Sound Bank B - Random",                     // 151
+    "Reduce Speed to 75%",                       // 152
+    "Reduce Speed to 50%",                       // 153
+    "Reduce Speed to 25%",                       // 154
+    "Restore Speed",                             // 155      
+    "External Output A - Blink",                 // 156
+    "External Output B - Blink"                 // 157
 };
 
 
@@ -474,12 +486,12 @@ enum _trigger_source : byte {
     TS_ADHC_CANNONRELOAD,  // Ad-hoc - cannon reloaded    
     TS_ADHC_ENGINE_START,  // Ad-hoc - engine start
     TS_ADHC_ENGINE_STOP,   // Ad-hoc - engine stop
-    TS_ADHC_UNUSED_7,      // Ad-hoc - unused      
-    TS_ADHC_UNUSED_8,      // Ad-hoc - unused      
-    TS_ADHC_UNUSED_9,      // Ad-hoc - unused      
-    TS_ADHC_UNUSED_10,     // Ad-hoc - unused      
-    TS_ADHC_UNUSED_11,     // Ad-hoc - unused      
-    TS_ADHC_UNUSED_12,     // Ad-hoc - unused      
+    TS_ADHC_MOVE_FWD,      // Ad-hoc - forward movement started
+    TS_ADHC_MOVE_REV,      // Ad-hoc - reverse movement started
+    TS_ADHC_VEHICLE_STOP,  // Ad-hoc - vehicle stopped
+    TS_ADHC_RIGHT_TURN,    // Ad-hoc - right turn started
+    TS_ADHC_LEFT_TURN,     // Ad-hoc - left turn started
+    TS_ADHC_NO_TURN,       // Ad-hoc - no turn
     TS_ADHC_UNUSED_13,     // Ad-hoc - unused      
     TS_ADHC_UNUSED_14,     // Ad-hoc - unused      
     TS_ADHC_UNUSED_15,     // Ad-hoc - unused      
@@ -551,7 +563,7 @@ enum _trigger_source : byte {
 // But in time, who knows, we may think of new events that we want for triggers, so it's good to have a process to implement them. 
 
 // Count of active Ad-Hoc triggers
-#define COUNT_ADHOC_TRIGGERS            6           // This number can not get higher than 16 unless you want to change some methods in the sketch
+#define COUNT_ADHOC_TRIGGERS            12          // This number can not get higher than 16 unless you want to change some methods in the sketch
 
 // Ad-Hoc trigger Flag Masks
 // We don't anticipate needing many ad hoc trigger events. In the Sketch we will use a single 2-byte integer for 16 flags. The sketch sets the appropriate bit when an event occurs, 
@@ -562,6 +574,12 @@ enum _trigger_source : byte {
 #define ADHOCT_BIT_CANNON_RELOADED      3           // Cannon reloaded
 #define ADHOCT_BIT_ENGINE_START         4           // Engine started
 #define ADHOCT_BIT_ENGINE_STOP          5           // Engine stopped
+#define ADHOCT_BIT_MOVE_FORWARD         6           // Forward movement begun
+#define ADHOCT_BIT_MOVE_REVERSE         7           // Reverse movement begun
+#define ADHOCT_BIT_VEHICLE_STOP         8           // Vehicle has come to a stop
+#define ADHOCT_BIT_RIGHT_TURN           9           // Right turn begun
+#define ADHOCT_BIT_LEFT_TURN            10          // Left turn begun
+#define ADHOCT_BIT_NO_TURN              11          // Vehicle is no longer turning
 
 // Ad-Hoc trigger Triggger IDs 
 // The trigger IDs must start at trigger_id_adhoc_start and go up from there, but not exceed (trigger_id_adhoc_start + trigger_id_adhoc_range - 1)
@@ -572,12 +590,12 @@ enum _trigger_source : byte {
 #define ADHOC_TRIGGER_CANNON_RELOADED   trigger_id_adhoc_start + ADHOCT_BIT_CANNON_RELOADED     // Ad-Hoc Trigger ID  4 - cannon reloaded       19003
 #define ADHOC_TRIGGER_ENGINE_START      trigger_id_adhoc_start + ADHOCT_BIT_ENGINE_START        // Ad-Hoc Trigger ID  5 - engine start          19004
 #define ADHOC_TRIGGER_ENGINE_STOP       trigger_id_adhoc_start + ADHOCT_BIT_ENGINE_STOP         // Ad-Hoc Trigger ID  6 - engine stop           19005
-//                                      19006                                                   // Ad-Hoc Trigger ID  7
-//                                      19007                                                   // Ad-Hoc Trigger ID  8
-//                                      19008                                                   // Ad-Hoc Trigger ID  9
-//                                      19009                                                   // Ad-Hoc Trigger ID 10
-//                                      19010                                                   // Ad-Hoc Trigger ID 11
-//                                      19011                                                   // Ad-Hoc Trigger ID 12
+#define ADHOC_TRIGGER_MOVE_FORWARD      trigger_id_adhoc_start + ADHOCT_BIT_MOVE_FORWARD        // Ad-Hoc Trigger ID  7 - forward movement      19006
+#define ADHOC_TRIGGER_MOVE_REVERSE      trigger_id_adhoc_start + ADHOCT_BIT_MOVE_REVERSE        // Ad-Hoc Trigger ID  8 - reverse movement      19007
+#define ADHOC_TRIGGER_VEHICLE_STOP      trigger_id_adhoc_start + ADHOCT_BIT_VEHICLE_STOP        // Ad-Hoc Trigger ID  9 - vehicle stopped       19008
+#define ADHOC_TRIGGER_RIGHT_TURN        trigger_id_adhoc_start + ADHOCT_BIT_RIGHT_TURN          // Ad-Hoc Trigger ID 10 - right turn            19009
+#define ADHOC_TRIGGER_LEFT_TURN         trigger_id_adhoc_start + ADHOCT_BIT_LEFT_TURN           // Ad-Hoc Trigger ID 11 - left turn             19010
+#define ADHOC_TRIGGER_NO_TURN           trigger_id_adhoc_start + ADHOCT_BIT_NO_TURN             // Ad-Hoc Trigger ID 12 - no turn               19011
 //                                      19012                                                   // Ad-Hoc Trigger ID 13
 //                                      19013                                                   // Ad-Hoc Trigger ID 14
 //                                      19014                                                   // Ad-Hoc Trigger ID 15

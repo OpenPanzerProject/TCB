@@ -113,10 +113,12 @@ void LoadFunctionTriggers()
                 case SF_OUTPUT_A_ON:                SF_Callback[i] = &SF_PortA_On;                                  break; 
                 case SF_OUTPUT_A_OFF:               SF_Callback[i] = &SF_PortA_Off;                                 break; 
                 case SF_OUTPUT_A_PULSE:             SF_Callback[i] = &SF_PortA_Pulse;                               break;
+                case SF_OUTPUT_A_BLINK:             SF_Callback[i] = &SF_PortA_Blink;                               break;
                 case SF_OUTPUT_B_TOGGLE:            SF_Callback[i] = &SF_PortB_Toggle;                              break;
                 case SF_OUTPUT_B_ON:                SF_Callback[i] = &SF_PortB_On;                                  break; 
                 case SF_OUTPUT_B_OFF:               SF_Callback[i] = &SF_PortB_Off;                                 break; 
                 case SF_OUTPUT_B_PULSE:             SF_Callback[i] = &SF_PortB_Pulse;                               break;                                
+                case SF_OUTPUT_B_BLINK:             SF_Callback[i] = &SF_PortB_Blink;                               break;                
                 case SF_ACCEL_LEVEL:                SF_Callback[i] = &SF_SetAccelRampFreq;                          break;         
                 case SF_DECEL_LEVEL:                SF_Callback[i] = &SF_SetDecelRampFreq;                          break;
                 case SF_TURNMODE_1:                 SF_Callback[i] = &SF_TurnMode1;                                 break;                    
@@ -166,6 +168,10 @@ void LoadFunctionTriggers()
                 case SF_DRIVEPROFILE_1:             SF_Callback[i] = &SF_DriveProfile_1;                            break;
                 case SF_DRIVEPROFILE_2:             SF_Callback[i] = &SF_DriveProfile_2;                            break;
                 case SF_DRIVEPROFILE_TOGGLE:        SF_Callback[i] = &SF_DriveProfile_Toggle;                       break;
+                case SF_SPEED_75:                   SF_Callback[i] = &SF_ReduceSpeed_75;                            break;
+                case SF_SPEED_50:                   SF_Callback[i] = &SF_ReduceSpeed_50;                            break;
+                case SF_SPEED_25:                   SF_Callback[i] = &SF_ReduceSpeed_25;                            break;
+                case SF_SPEED_RESTORE:              SF_Callback[i] = &SF_RestoreSpeed;                              break;
                 case SF_SMOKER_ENABLE:              SF_Callback[i] = &SF_Smoker_Enable;                             break;
                 case SF_SMOKER_DISABLE:             SF_Callback[i] = &SF_Smoker_Disable;                            break;
                 case SF_SMOKER_TOGGLE:              SF_Callback[i] = &SF_Smoker_Toggle;                             break;
@@ -315,6 +321,12 @@ void PrintTriggerDescription(_special_function sf, uint16_t TriggerID)
             case ADHOC_TRIGGER_CANNON_RELOADED:     DebugSerial->print(F("Cannon Reloaded"));   PrintSpaces(14); break;
             case ADHOC_TRIGGER_ENGINE_START:        DebugSerial->print(F("Engine Start"));      PrintSpaces(17); break;
             case ADHOC_TRIGGER_ENGINE_STOP:         DebugSerial->print(F("Engine Stop"));       PrintSpaces(18); break;
+            case ADHOC_TRIGGER_MOVE_FORWARD:        DebugSerial->print(F("Moving Forward"));    PrintSpaces(15); break;
+            case ADHOC_TRIGGER_MOVE_REVERSE:        DebugSerial->print(F("Moving Reverse"));    PrintSpaces(15); break;
+            case ADHOC_TRIGGER_VEHICLE_STOP:        DebugSerial->print(F("Vehicle Stopped"));   PrintSpaces(14); break;
+            case ADHOC_TRIGGER_RIGHT_TURN:          DebugSerial->print(F("Right Turn Started"));PrintSpaces(11); break;
+            case ADHOC_TRIGGER_LEFT_TURN:           DebugSerial->print(F("Left Turn Started")); PrintSpaces(12); break;
+            case ADHOC_TRIGGER_NO_TURN:             DebugSerial->print(F("Turn Stopped"));      PrintSpaces(17); break;
         }        
     }
     // Vehicle speed triggers - increasing speed
@@ -576,10 +588,12 @@ void SF_PortA_Toggle(uint16_t ignoreMe)         { PortA_Toggle();           }
 void SF_PortA_On(uint16_t ignoreMe)             { PortA_On();               }
 void SF_PortA_Off(uint16_t ignoreMe)            { PortA_Off();              }
 void SF_PortA_Pulse(uint16_t ignoreMe)          { PortA_Pulse();            }
+void SF_PortA_Blink(uint16_t ignoreMe)          { PortA_Blink();            }
 void SF_PortB_Toggle(uint16_t ignoreMe)         { PortB_Toggle();           }
 void SF_PortB_On(uint16_t ignoreMe)             { PortB_On();               }
 void SF_PortB_Off(uint16_t ignoreMe)            { PortB_Off();              }
 void SF_PortB_Pulse(uint16_t ignoreMe)          { PortB_Pulse();            }
+void SF_PortB_Blink(uint16_t ignoreMe)          { PortB_Blink();            }
 void SF_BarrelStab_On(uint16_t ignoreMe)        { EnableBarrelStabilization(true);  }
 void SF_BarrelStab_Off(uint16_t ignoreMe)       { EnableBarrelStabilization(false); }
 void SF_BarrelStab_Toggle(uint16_t ignoreMe)    { ToggleBarrelStabilization();      }
@@ -592,6 +606,10 @@ void SF_DumpDebug(uint16_t ignoreMe)            { DumpSysInfo();            }
 void SF_DriveProfile_1(uint16_t ignoreMe)       { SetDrivingProfile(1);     }
 void SF_DriveProfile_2(uint16_t ignoreMe)       { SetDrivingProfile(2);     }
 void SF_DriveProfile_Toggle(uint16_t ignoreMe)  { ToggleDrivingProfile();   }
+void SF_ReduceSpeed_75(uint16_t ignoreMe)       { ReduceSpeed(75);          }
+void SF_ReduceSpeed_50(uint16_t ignoreMe)       { ReduceSpeed(50);          }
+void SF_ReduceSpeed_25(uint16_t ignoreMe)       { ReduceSpeed(25);          }
+void SF_RestoreSpeed(uint16_t ignoreMe)         { RestoreSpeed();           }
 void SF_Smoker_Enable(uint16_t ignoreMe)        { EnableSmoker();           }
 void SF_Smoker_Disable(uint16_t ignoreMe)       { DisableSmoker();          }
 void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }

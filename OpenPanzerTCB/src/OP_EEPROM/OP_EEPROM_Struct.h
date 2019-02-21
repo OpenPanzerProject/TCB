@@ -25,6 +25,8 @@ struct _eeprom_data {
 // External I/O ports
     external_io_settings PortA_Settings;
     external_io_settings PortB_Settings;
+    uint16_t IOBlinkOnTime_mS;
+    uint16_t IOBlinkOffTime_mS;
 
 // Special function triggers
     _functionTrigger SF_Trigger[MAX_FUNCTION_TRIGGERS]; // Info for each trigger, up to MAX_FUNCTION_TRIGGERS

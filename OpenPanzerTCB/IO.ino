@@ -39,7 +39,7 @@ void ReadIOPorts()
     if (IO_Pin[IOB].inputActive) PortB_ReadValue();
 }
 
-// PORT A - OUTPUT FUNCTIONS (On, Off, Toggle)
+// PORT A - OUTPUT FUNCTIONS (On, Off, Toggle, Pulse, Blink)
 boolean isPortA_Output(void)
 {   // If this statement is true, PortA is set to Output
     // If false, it is an input
@@ -85,6 +85,11 @@ void PortA_Pulse()
         timer.setTimeout(IO_PULSE_TIME, PortA_Off); // Wait briefly then revert to default low
     }
 }
+void PortA_Blink()
+{
+    // 
+}
+
 // PORT A - INPUT FUNCTION 
 void PortA_ReadValue(void)
 {   int oldVal;
@@ -108,7 +113,7 @@ void PortA_ReadValue(void)
 }
 
 
-// PORT B - OUTPUT FUNCTIONS (On, Off, Toggle)
+// PORT B - OUTPUT FUNCTIONS (On, Off, Toggle, Pulse, Blink)
 boolean isPortB_Output(void)
 {   // If this statement is true, PortB is set to Output
     // If false, it is an input
@@ -153,6 +158,10 @@ void PortB_Pulse()
         PortB_On();                                 // Go in the opposite direction (dataType == false means default low, so go high)
         timer.setTimeout(IO_PULSE_TIME, PortB_Off); // Wait briefly then revert to default low
     }
+}
+void PortB_Blink()
+{
+    // 
 }
 
 // PORT B - INPUT FUNCTION 
