@@ -65,12 +65,29 @@ void ToggleDrivingProfile(void)
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void ReduceSpeed(uint8_t speedAmt)
 {
-    //
-}
-
-void RestoreSpeed()
-{
-    //
+    static int SavedForwardSpeed_Max = ForwardSpeed_Max;
+    static int SavedReverseSpeed_Max = ReverseSpeed_Max;
+    
+    // speedAmt will be the new percentage we want, not the percentage we want reduced.
+    // For example, if speedAmt is 75, reduce max speed to 75%
+    if (speedAmt < 100)
+    {
+        ForwardSpeed_Max = (int)(((float)speedAmt / 100.0) * (float)SavedForwardSpeed_Max); 
+        ReverseSpeed_Max = (int)(((float)speedAmt / 100.0) * (float)SavedReverseSpeed_Max); 
+        if (DEBUG) 
+        {
+            DebugSerial->print(F("Speed reduced to "));
+            DebugSerial->print(speedAmt);
+            DebugSerial->println(F("%"));
+        }
+    }
+    else
+    {
+        // Restore speed
+        ForwardSpeed_Max = SavedForwardSpeed_Max; 
+        ReverseSpeed_Max = SavedReverseSpeed_Max; 
+        if (DEBUG) DebugSerial->println(F("Speed restored"));
+    }
 }
 
 

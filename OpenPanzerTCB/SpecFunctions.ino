@@ -609,7 +609,7 @@ void SF_DriveProfile_Toggle(uint16_t ignoreMe)  { ToggleDrivingProfile();   }
 void SF_ReduceSpeed_75(uint16_t ignoreMe)       { ReduceSpeed(75);          }
 void SF_ReduceSpeed_50(uint16_t ignoreMe)       { ReduceSpeed(50);          }
 void SF_ReduceSpeed_25(uint16_t ignoreMe)       { ReduceSpeed(25);          }
-void SF_RestoreSpeed(uint16_t ignoreMe)         { RestoreSpeed();           }
+void SF_RestoreSpeed(uint16_t ignoreMe)         { ReduceSpeed(100);         }
 void SF_Smoker_Enable(uint16_t ignoreMe)        { EnableSmoker();           }
 void SF_Smoker_Disable(uint16_t ignoreMe)       { DisableSmoker();          }
 void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }

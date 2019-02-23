@@ -158,7 +158,9 @@
     boolean skipTransmissionSound = false;        // We may not always want to play a sound when we engage/disengage the transmission
     _driveModes DriveModeActual = STOP;           // As opposed to DriveModeCommand, this is the actual DriveMode being implemented
     _ManualTransGear ManualGear = GEAR_NA;        // Manual transmission not detected yet
-
+    int ForwardSpeed_Max;                         // A calculated absolute figure for max forward speed based on the user's setting of MaxForwardSpeedPct
+    int ReverseSpeed_Max;                         // A calculated absolute figure for max reverse speed based on the user's setting of MaxReverseSpeedPct
+  
 // INERTIAL MEASUREMENT UNIT (IMU)
 //    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board) - NOT USED FOR NOW
     boolean UseIMU = false;
@@ -524,9 +526,7 @@ void loop()
     static boolean NudgeStarted = false;                              // Has a nudge started
     static boolean NudgeEnabled = false;                              // Is nudging even enabled
 // Driving Variables Calculated at Startup
-    static int ReverseSpeed_Max;                                      // Calculate an absolute figure for max reverse speed based on the user's setting of MaxReverseSpeedPct
-    static int ForwardSpeed_Max;                                      // Calcluate an absolute figure for max forward speed based on teh user's setting of MaxForwardSpeedPct
-//    static float BrakeSensitivityPct;                                 // NOT IMPLEMENTED: We convert the user's BrakeSensitivityPct to a number between 0-1. 
+//  static float BrakeSensitivityPct;                                 // NOT IMPLEMENTED: We convert the user's BrakeSensitivityPct to a number between 0-1. 
     static int NeutralTurn_Max;                                       // Calculate an absolute figure for max neutral turn speed based on the user's setting of NeutralTurnPct
     static int HalftrackTurn_Max;                                     // Calculate an absolute figure for max rear tread turn based on the user's setting of HalftrackTreadTurnPct
     static uint8_t NudgeAmount = 0;                                   // User saves nudge amount as percent, we convert it to an actual number between 0-255
@@ -575,7 +575,7 @@ if (Startup)
     // We take the user setting of NeutralTurnPct and calculate a max speed for neutral turns
         NeutralTurn_Max = (int)(((float)eeprom.ramcopy.NeutralTurnPct / 100.0) * (float)MOTOR_MAX_FWDSPEED); 
         
-    // Same for the percent of turns that can be applied to the treds in halftrack mode
+    // Same for the percent of turns that can be applied to the treads in halftrack mode
         HalftrackTurn_Max = (int)(((float)eeprom.ramcopy.HalftrackTreadTurnPct / 100.0) * (float)MOTOR_MAX_FWDSPEED); 
     
     // Convert the user setting of MaxForwardSpeedPct & MaxReverseSpeedPct into an absolute max forward/reverse speed
@@ -585,7 +585,7 @@ if (Startup)
         else { ReverseSpeed_Max = MOTOR_MAX_REVSPEED; } // This part isn't really necessary, but we do it just in case we forget an if statement later
     
     // Check if nudging is active, if so, calculate the forward, reverse, and neutral turn nudge amounts from the user percent.
-    // Note, if we used ForwardSpeed_Max above in the formula below instead of MOTOR_MAX_FWDSPEED, the nudge amount would become a percent of our adjsuted 
+    // Note, if we used ForwardSpeed_Max above in the formula below instead of MOTOR_MAX_FWDSPEED, the nudge amount would become a percent of our adjusted 
     // maximum forward speed. For example in that case, if ForwardSpeed_Max was set to 70% and MotorNudgePct was set to 100%, then in effect the MotorNudgePct
     // would only be 70% in absolute terms. For now we leave it as-is, which means that it is possibe for the NudgePct to equal a drive speed greater than the 
     // actual restricted speed limit. This can look silly but the user must be responsible for choosing settings that make sense for his model, and this way gives him
@@ -1129,11 +1129,11 @@ if (Startup)
             // It probably wouldn't be any more work really than what we've ended up doing which is adjusting the command, but that's how we're doing it. 
             // And no, this will NOT hinder the ability of the sound object from reaching full speed even with limited motor speeds. The engine sound speed is based off 
             // ThrottleCommand which we do not limit the way we are now with DriveCommand. 
-            if (DriveModeActual == FORWARD && eeprom.ramcopy.MaxForwardSpeedPct < 100)
+            if (DriveModeActual == FORWARD && ForwardSpeed_Max < MOTOR_MAX_FWDSPEED)
             {
                 DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_FWDSPEED, 0, ForwardSpeed_Max);
             }
-            else if (DriveModeActual == REVERSE && eeprom.ramcopy.MaxReverseSpeedPct < 100)
+            else if (DriveModeActual == REVERSE && ReverseSpeed_Max > MOTOR_MAX_REVSPEED)
             {
                 DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_REVSPEED, 0, ReverseSpeed_Max);
             }
