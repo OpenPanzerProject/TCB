@@ -16,9 +16,9 @@
 // OPEN PANZER TANK CONTROL BOARD (TCB) - FIRMWARE VERSION NUMBER
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is the firmware version that will be returned to the desktop application when it checks. It will be split into three, two-digit numbers
-    #define FIRMWARE_VERSION        "0.93.44"      // version. Last update 11/19/2018
+    #define FIRMWARE_VERSION        "0.93.45"      // version. Last update 2/23/2019
     
-    #define MIN_OPCONFIG_VERSION    "0.93.41"      // Minimum version of OP Config this version of firmware requires
+    #define MIN_OPCONFIG_VERSION    "0.93.45"      // Minimum version of OP Config this version of firmware requires
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // PROGMEM
@@ -71,7 +71,7 @@
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// TIMER 0 - DEFAULT
+// TIMER 0 - DEFAULT (8-bit)
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 0 is for now left to the Arduino-default setup. We believe this to be: 
     // Prescaler of 64 with a TOP of 255. This would mean each tick is 4 uS and TCNT0 rolls-over every 256 ticks (roughly 1 mS). 
@@ -95,7 +95,7 @@
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// TIMER 1
+// TIMER 1  (16-bit)
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 1 is used by several classes:
     // [] PPMDecode - checks the value of TCNT1 everytime the PPM input pin changes (the pin is using an external interrupt). By checking the time since the
@@ -129,7 +129,7 @@
     
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// TIMER 2
+// TIMER 2  (8-bit)
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 2 is used to generate the PWM for IR sending. It is used in phase-correct PWM mode, with OCR2A controlling the frequency and 
     // OCR2B controlling the duty cycle. There is no prescaling, so the output frequency is 16MHz / (2 * OCR2A)
@@ -148,14 +148,14 @@
     
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// TIMER 3
+// TIMER 3  (16-bit)
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 3 is used for ramping effects: 
     // OP_Driver - uses Timer 3's Output Compare A for acceleration and deceleration ramping of the main drive motors
     
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// TIMER 4 - DEFAULT
+// TIMER 4  (16-bit)
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 4 is used to generate PWM for the Aux Output (if used in analog mode) and the "Hit Notification LEDs" which are the LEDs typically installed 
     // in the IR apple. These LEDs are dimmed and faded in and out to create various effects. 
@@ -197,7 +197,7 @@
     
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
-// TIMER 5
+// TIMER 5    (16-bit)
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // Timer 5 is used to generate ultra-sonic PWM for variable speed control of three motors: 
     // Arduino pins 46 (OC5A) and 45 (OC5B) for the L298 dual motor controller, and 44 (OC5C) for the MOSFET output to the Heng Long smoker.
@@ -430,7 +430,7 @@
     // The remaining pins are defined in their respective libraries: 
         // - 8 Servos (top of OP_Servo.cpp - all 8 PORTA pins (Arduino 22-29, Atmega 71-78))
         // - PPM input pin (top of OP_PPM.h - Arduino Pin 3/INT1, but in Atmega terms it is Pin 7/INT5)
-        // - Mechanical recoil switch (top of OP_Tank.h - Atmega Pin 8/INT6 - not connected on Arduinos!)
+        // - Mechanical recoil switch (setup in OP_Tank::begin() function of OP_Tank.cpp - Atmega Pin 8/INT6 - not connected on Arduinos!)
         // - IR sending and receiving pins (OP_IRLib library)
         // - Hardware Serial, SPI, and I2C ports (defined by Arduino)
 
