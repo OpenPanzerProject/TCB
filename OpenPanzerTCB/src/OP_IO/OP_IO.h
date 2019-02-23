@@ -37,7 +37,6 @@ typedef struct external_io{
     boolean inputActive;    // If input, hast his been assigned as a trigger to any function?
     uint16_t inputValue;    // If input, what is the analog reading (0-1023 if analog) or digital reading (0/1 if digital)
     boolean updated;        // If input, has the input value changed since last time? 
-    boolean outputValue;    // If output, is it currently high (1) or low (0) (may not need this)
     external_io_settings Settings;  // Settings
 };
 

@@ -39,6 +39,7 @@ class LedHandler
         
         void begin (byte p, boolean i=false); 
         void on(void);
+        boolean isOn(void);
         void off(void);
         void toggle(void);
         void update(void);                                                      // Update blinking effect

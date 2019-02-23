@@ -49,25 +49,22 @@ void PortA_On()
 {   // For safety, we only do anything if this has been set to output
     if (isPortA_Output()) 
     { 
-        digitalWrite(pin_IO_A, HIGH);
-        IO_Pin[IOA].outputValue = HIGH;
-        if (DEBUG) { DebugSerial->println(F("IO Port A Output - On")); }
+        if (DEBUG && !IO_Output[IOA].isOn()) { DebugSerial->println(F("IO Port A Output - On")); }
+        IO_Output[IOA].on();
     }
 }
 void PortA_Off()
 {   // For safety, we only do anything if this has been set to output
     if (isPortA_Output()) 
-    { 
-        digitalWrite(pin_IO_A, LOW);
-        IO_Pin[IOA].outputValue = LOW;
-        if (DEBUG) { DebugSerial->println(F("IO Port A Output - Off")); }
+    {   
+        if (DEBUG && (IO_Output[IOA].isOn() || IO_Output[IOA].isBlinking())) { DebugSerial->println(F("IO Port A Output - Off")); }
+        IO_Output[IOA].off();
     }
 }
 void PortA_Toggle()
 {
-    static boolean PortA_State = false;
-    PortA_State ? PortA_Off() : PortA_On();
-    PortA_State = !PortA_State;
+    // Normally we would use IO_Output[IOA].toggle(); but we want to show the debugging messages so we do it this way instead
+    IO_Output[IOA].isOn() ? PortA_Off() : PortA_On();
 }
 void PortA_Pulse()
 {
@@ -76,18 +73,20 @@ void PortA_Pulse()
     // emulate a "button push" to external devices that can accept a logic signal.
     if (IO_Pin[IOA].Settings.dataType)
     {   
-        PortA_Off();                                // Go in the opposite direction (dataType == true means default high, so go low)
+        IO_Output[IOA].off();                       // Go in the opposite direction (dataType == true means default high, so go low)
         timer.setTimeout(IO_PULSE_TIME, PortA_On);  // Wait briefly then revert to default high
     }
     else
     {
-        PortA_On();                                 // Go in the opposite direction (dataType == false means default low, so go high)
+        IO_Output[IOA].on();                        // Go in the opposite direction (dataType == false means default low, so go high)        
         timer.setTimeout(IO_PULSE_TIME, PortA_Off); // Wait briefly then revert to default low
     }
+    if (DEBUG) { DebugSerial->println(F("IO Port A - Pulsed")); }
 }
 void PortA_Blink()
 {
-    // 
+    IO_Output[IOA].startBlinking(eeprom.ramcopy.IOBlinkOnTime_mS, eeprom.ramcopy.IOBlinkOffTime_mS);
+    if (DEBUG) { DebugSerial->println(F("IO Port A - Start Blinking")); }
 }
 
 // PORT A - INPUT FUNCTION 
@@ -123,25 +122,22 @@ void PortB_On()
 {   // For safety, we only do anything if this has been set to output
     if (isPortB_Output()) 
     { 
-        digitalWrite(pin_IO_B, HIGH);
-        IO_Pin[IOB].outputValue = HIGH;
-        if (DEBUG) { DebugSerial->println(F("IO Port B Output - On")); }
+        if (DEBUG && !IO_Output[IOB].isOn()) { DebugSerial->println(F("IO Port B Output - On")); }        
+        IO_Output[IOB].on();
     }
 }
 void PortB_Off()
 {   // For safety, we only do anything if this has been set to output
     if (isPortB_Output()) 
-    { 
-        digitalWrite(pin_IO_B, LOW);
-        IO_Pin[IOB].outputValue = LOW;
-        if (DEBUG) { DebugSerial->println(F("IO Port B Output - Off")); }
+    {   
+        if (DEBUG && (IO_Output[IOB].isOn() || IO_Output[IOB].isBlinking())) { DebugSerial->println(F("IO Port B Output - Off")); }
+        IO_Output[IOB].off();
     }
 }
 void PortB_Toggle()
 {
-    static boolean PortB_State = false;
-    PortB_State ? PortB_Off() : PortB_On();
-    PortB_State = !PortB_State;
+    // Normally we would use IO_Output[IOB].toggle(); but we want to show the debugging messages so we do it this way instead
+    IO_Output[IOB].isOn() ? PortB_Off() : PortB_On();    
 }
 void PortB_Pulse()
 {
@@ -150,18 +146,20 @@ void PortB_Pulse()
     // emulate a "button push" to external devices that can accept a logic signal.
     if (IO_Pin[IOB].Settings.dataType)
     {   
-        PortB_Off();                                // Go in the opposite direction (dataType == true means default high, so go low)
+        IO_Output[IOB].off();                       // Go in the opposite direction (dataType == true means default high, so go low)
         timer.setTimeout(IO_PULSE_TIME, PortB_On);  // Wait briefly then revert to default high
     }
     else
     {
-        PortB_On();                                 // Go in the opposite direction (dataType == false means default low, so go high)
+        IO_Output[IOB].on();                        // Go in the opposite direction (dataType == false means default low, so go high)
         timer.setTimeout(IO_PULSE_TIME, PortB_Off); // Wait briefly then revert to default low
     }
+    if (DEBUG) { DebugSerial->println(F("IO Port B - Pulsed")); }    
 }
 void PortB_Blink()
 {
-    // 
+    IO_Output[IOB].startBlinking(eeprom.ramcopy.IOBlinkOnTime_mS, eeprom.ramcopy.IOBlinkOffTime_mS);
+    if (DEBUG) { DebugSerial->println(F("IO Port B - Start Blinking")); }
 }
 
 // PORT B - INPUT FUNCTION 

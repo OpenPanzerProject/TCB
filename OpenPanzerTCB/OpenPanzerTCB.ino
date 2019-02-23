@@ -81,7 +81,7 @@
 
 // I/O PINS
     external_io IO_Pin[NUM_IO_PORTS];            // Information about the general purpose I/O pins
-    boolean UsingIOInputs = false;               // Set to true if any IO pin is set to input and that input has been set as a trigger for some function. Otherwise, no point in checking the port. 
+    LedHandler IO_Output[NUM_IO_PORTS];          // These outputs are not necessarily for LEDs but the LedHandler class gives us convenient functions for controlling the ouputs.
 
 // LIGHTS/AUX OUTPUT
     boolean BrakeLightsActive = false;           // Are the brake lights on. We need to know this and running light state because they are both on the same output.
@@ -317,7 +317,7 @@ void setup()
         triggerCount = CountTriggers();
         LoadFunctionTriggers();
         SetActiveInputFlag();                   // Determines if any of the external IO are set to input, and if so, are they matched to a function
-
+        
 
     // SETUP SOUND STUFF
     // -------------------------------------------------------------------------------------------------------------------------------------------------->            
@@ -1363,7 +1363,7 @@ if (Startup)
                     {
                         SF_Callback[t](0);
                     }
-                // Anallog aux channel triggers
+                // Analog aux channel triggers
                 if (Radio.AuxChannel[a].Settings->Digital == false &&
                     (Radio.AuxChannel[a].updated || ForceTriggersOnFirstPass) &&
                     (eeprom.ramcopy.SF_Trigger[t].TriggerID == (trigger_id_multiplier_auxchannel * (a+1))))
@@ -1701,8 +1701,8 @@ if (Startup)
                 {                
                     RedLedOff(); 
                     GreenLedOff();
-                    if (DEBUG && DriveModeActual != DriveMode_Previous) { DebugSerial->println(F("Stopped")); }
                 }
+                if (DEBUG && DriveModeActual != DriveMode_Previous) { DebugSerial->println(F("Stopped")); }                
                 break;
         }
 
@@ -1717,6 +1717,7 @@ if (Startup)
 // ====================================================================================================================================================>
 //  SOME AD-HOC TRIGGERS RELATED TO MOVEMENT
 // ====================================================================================================================================================> 
+        // Brake flag
         if (Braking && !Braking_Previous) 
         { 
             bitSet(AdHocTriggers, ADHOCT_BIT_BRAKES_APPLIED);
@@ -1724,6 +1725,21 @@ if (Startup)
             TankSound->Brake();
         }
 
+        // Forward/reverse/stop flag
+        if (DriveMode_Previous == STOP && DriveModeActual == FORWARD)        bitSet(AdHocTriggers, ADHOCT_BIT_MOVE_FORWARD);   // DebugSerial->println(F("FWD"));   }
+        if (DriveMode_Previous == STOP && DriveModeActual == REVERSE)        bitSet(AdHocTriggers, ADHOCT_BIT_MOVE_REVERSE);   // DebugSerial->println(F("REV"));   }
+        if (DriveMode_Previous != STOP && DriveModeActual == STOP)           bitSet(AdHocTriggers, ADHOCT_BIT_VEHICLE_STOP);   // DebugSerial->println(F("STP"));   }
+
+        // Right/left/no turn flag
+        if (TurnCommand_Previous < 0 && TurnCommand > 0)                     bitSet(AdHocTriggers, ADHOCT_BIT_RIGHT_TURN);     // DebugSerial->println(F("RIGHT")); }
+        if (TurnCommand_Previous > 0 && TurnCommand < 0)                     bitSet(AdHocTriggers, ADHOCT_BIT_LEFT_TURN);      // DebugSerial->println(F("LEFT"));  }
+        if (TurnCommand_Previous == 0 && TurnCommand != 0)
+        {
+            TurnCommand > 0 ? bitSet(AdHocTriggers, ADHOCT_BIT_RIGHT_TURN) : bitSet(AdHocTriggers, ADHOCT_BIT_LEFT_TURN);
+//            if (TurnCommand > 0) { bitSet(AdHocTriggers, ADHOCT_BIT_RIGHT_TURN); DebugSerial->println(F("RIGHT")); }
+//            if (TurnCommand < 0) { bitSet(AdHocTriggers, ADHOCT_BIT_LEFT_TURN);  DebugSerial->println(F("LEFT")); }
+        }
+        else if (TurnCommand_Previous != 0 && TurnCommand == 0)              bitSet(AdHocTriggers, ADHOCT_BIT_NO_TURN);        // DebugSerial->println(F("NO TURN")); }
 
 // ====================================================================================================================================================>
 //  SAVE COMMANDS FOR NEXT ITERATION

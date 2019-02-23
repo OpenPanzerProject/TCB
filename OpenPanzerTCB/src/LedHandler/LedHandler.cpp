@@ -37,6 +37,11 @@ void LedHandler::on(void)
     this->pinOn();
 }
 
+boolean LedHandler::isOn(void)
+{
+    _invert ? !digitalRead(_pin) : digitalRead(_pin);
+}
+
 void LedHandler::off(void)
 {
     if (_isBlinking) this->stopBlinking();
@@ -73,8 +78,8 @@ void LedHandler::Blink(uint8_t times, uint16_t interval /*=DEFAULT_BLINK_INTERVA
     ClearBlinker();
     _fixedInterval = true;
     _nextWait = interval;
-    _numSteps = (times * 2) - 1;    // multiply by two and minus one to add spaces between the blinks where the LED is off
-    this->pinOn();                     // Start with the Led on. User needs to call the handle() function to update the next steps 
+    _numSteps = (times * 2) - 1;        // multiply by two and minus one to add spaces between the blinks where the LED is off
+    this->pinOn();                      // Start with the Led on. User needs to call the handle() function to update the next steps 
     _time = 0;
     _isBlinking = true;
 }

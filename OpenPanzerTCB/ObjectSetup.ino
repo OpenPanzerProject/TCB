@@ -605,8 +605,8 @@ void SetupPins()
     IO_Pin[IOA].Settings = eeprom.ramcopy.PortA_Settings;
     if (IO_Pin[IOA].Settings.dataDirection == OUTPUT)    
     {
-        pinMode(pin_IO_A, OUTPUT);
-        IO_Pin[IOA].Settings.dataType ? PortA_On() : PortA_Off();   // The default pin state is defined by the dataType setting
+        IO_Output[IOA].begin(pin_IO_A, false);      // False for n on-inverting
+        IO_Pin[IOA].Settings.dataType ? IO_Output[IOA].on() : IO_Output[IOA].off();   // The default pin state is defined by the dataType setting
     }   
     else                                            
     {   // Use pullups if the input is "digital" (only needs to read on/off)
@@ -619,8 +619,8 @@ void SetupPins()
     IO_Pin[IOB].Settings = eeprom.ramcopy.PortB_Settings;
     if (IO_Pin[IOB].Settings.dataDirection == OUTPUT)
     {
-        pinMode(pin_IO_B, OUTPUT);
-        IO_Pin[IOB].Settings.dataType ? PortB_On() : PortB_Off();   // The default pin state is defined by the dataType setting
+        IO_Output[IOB].begin(pin_IO_B, false);      // False for non-inverting
+        IO_Pin[IOB].Settings.dataType ? IO_Output[IOB].on() : IO_Output[IOB].off();   // The default pin state is defined by the dataType setting
     }
     else                                            
     {   // Use pullups if the input is "digital" (only needs to read on/off)
