@@ -150,7 +150,7 @@ class OP_Tank
         static uint8_t  MGHitsTaken;                // How many machine gun hits have we sustained
                 
         // Mechanical recoil switch interrupt
-        static void     INT6_RECOIL_ISR(void);      // The actual ISR will call this public member function, in order that it can access class variables
+        static void     RECOIL_ISR(void);           // The actual ISR will call this public member function, in order that it can access class variables
                                                     // We don't need this to be a public function but Arduino gives us an error if we put it in protected
         // Machine Gun
         static void     MachineGun(void);

@@ -179,7 +179,19 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
 
     // Clear hit count and enable IR reception immediately. 
     ResetBattleImmediate();
-    
+
+
+#ifdef TCB_DIY
+    // DIY version of TCB, for use with off-the shelf Arduino MEGA
+    // Same commentary as below, only we are using INT0 (PORT D PIN D0)
+    DDRD  &= ~(1 << DDD0);      // Set PD0 to input
+    PORTD |=  (1 << PD0);       // Input pullups on
+    EIMSK &= ~(1 << INT0);      // Disable INT0 interrupt for now
+    EICRA =  (EICRA & ~((1 << ISC00) | (1 << ISC01)));                  // Clear interrupt sense control to start
+    if (_Airsoft)   { EICRA |= (AIRSOFT_TRIGGER_MODE    << ISC00); }    // Now set appropriately
+    else            { EICRA |= (MECHRECOIL_TRIGGER_MODE << ISC00); }
+
+#else   
     // Set up an external interrupt to read the mechanical airsoft or recoil trigger switch
     // SETUP EXTERNAL INTERRUPT PIN
     // ------------------------------------------------------------------------------------------------------------------------>>
@@ -239,6 +251,7 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     else            { EICRB |= (MECHRECOIL_TRIGGER_MODE << ISC60); }
     // Second piece: |= (mode << ISC60)
     // This now sets the two bits to whatever is specified in MECHRECOIL/AIRSOFT_TRIGGER_MODE through an OR statement   
+#endif
 
     // For good measure, make sure interrupt is off
     Disable_MechRecoilInterrupt();  
@@ -635,19 +648,38 @@ void OP_Tank::StopMechRecoilMotor(void)
 }
 void OP_Tank::Enable_MechRecoilInterrupt(void)
 {
+#ifdef TCB_DIY
+    // Enable external interrupt 0
+    EIMSK |= (1 << INT0);   
+#else
     // Enable external interrupt 6
     EIMSK |= (1 << INT6);   
+#endif
 }
 void OP_Tank::Disable_MechRecoilInterrupt(void)
 {
+#ifdef TCB_DIY
+    // Disable external interrupt 0
+    EIMSK &= ~(1 << INT0);  
+#else
     // Disable external interrupt 6
     EIMSK &= ~(1 << INT6);  
+#endif
 }
+
+#ifdef TCB_DIY
+// This is Atmega external Interrupt 0 on Atmega2560 pin 43 (TQFP), Arduino Pin 21 (D0)
+ISR(INT0_vect){
+    OP_Tank::RECOIL_ISR();
+}
+#else
 // This is Atmega external Interrupt 6 on Atmega2560 pin 8 (TQFP). Arduino wouldn't call this anything because this pin is not brought out on the Arduino boards. 
 ISR(INT6_vect){
-    OP_Tank::INT6_RECOIL_ISR();
+    OP_Tank::RECOIL_ISR();
 }
-void OP_Tank::INT6_RECOIL_ISR()
+#endif
+
+void OP_Tank::RECOIL_ISR()
 {
     if (_Airsoft)
     {
@@ -656,8 +688,14 @@ void OP_Tank::INT6_RECOIL_ISR()
 
         // As with the mechanical recoil unit, this is our signal to cut power to the airsoft motor (it's done firing). But unlike the mechanical recoil unit, 
         // this is also when all the other effects *start* - flash, sound, and servo recoil. 
-       
+
+#ifdef TCB_DIY       
+        // DIY version - same notes as below, only using pin D0 (Arduino 21) instead
+        if ((PIND & (1<<PD0)) == 0) // pin low
+#else
+        // Regular TCB version - uses pin E6 (not available on Arduino)
         if ((PINE & (1<<PE6)) == 0) // pin low
+#endif
         {
             // The pin is still low. If it were high, it means some low signal triggered the interrupt (that's why we're here) but it was so short
             // that now we're checking, it's gone. In that case it's a transient and we want to ignore those. But if the pin is still low now that we're
@@ -692,9 +730,15 @@ void OP_Tank::INT6_RECOIL_ISR()
         // In testing a false positive has never gotten through in countless cycles of both the Tamiya and Asiatam recoil units. But if we 
         // need a longer time here, put in a small delay, like delay(1);
         //delay(1);
+#ifdef TCB_DIY     
+        // DIY version - same notes as below, only using pin D0 (Arduino 21) instead  
+        if (PIND & (1<<PD0))    // pin is high
+#else    
+        // Regular TCB version - uses pin E6 (not available on Arduino)
         if (PINE & (1<<PE6))    // pin is high
+#endif
         {
-            // If the PE6 bit is still high now we're reading it, we really must have hit the end
+            // If the bit is still high now we're reading it, we really must have hit the end
             Disable_MechRecoilInterrupt();
             StopMechRecoilMotor();
         }

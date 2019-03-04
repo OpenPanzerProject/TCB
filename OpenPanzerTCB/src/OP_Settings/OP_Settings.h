@@ -20,6 +20,27 @@
     
     #define MIN_OPCONFIG_VERSION    "0.93.45"      // Minimum version of OP Config this version of firmware requires
 
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------->>
+// DIY VERSION
+// ------------------------------------------------------------------------------------------------------------------------------------------------------->>
+    // Un-comment the line below if you are using this firmware on a standard Arduino MEGA as a DIY project. 
+    
+    // - - - - - - - - - - 
+    // #define TCB_DIY    
+    // - - - - - - - - - - 
+    
+    // Explanation: There are two pins on the standard TCB that are not connected on the Arduino MEGA. When we define "TCB_DIY" these two pins are changed 
+    //so that you can access them on the MEGA. They are: 
+    //
+    //                              DIY Version                                 Standard TCB
+    //---------------------------------------------------------------------------------------------------------------------------------------------------->>
+    // Machine gun LED pin -        Arduino pin 20/ATmega pin 44/Port D1        ATmega pin 4/Port E2
+    // Recoil/airsoft switch -      Arduino pin 21/ATmega pin 43/Port D0        ATmega pin 8/Port E6
+    // 
+    // Note - this negates the use of the I2C port on the DIY version, however, we aren't using it for anything so far anyway, so no loss.
+
+
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // PROGMEM
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -412,11 +433,21 @@
         #define pin_AuxOutput            8        // Output   - Aux output. PWM capable. Has a flyback diode installed, this special output can drive a relay directly, or even a small motor (ATmega H5)
         #define pin_MuzzleFlash          41       // Output   - Trigger output for Taigen High Intensity muzzle flash unit (ATmega G0)
         #define pin_HitNotifyLEDs        7        // Output   - Hit notification LEDs if using the Tamiya apple. PWM capable (ATmega H4)
+
+#ifdef TCB_DIY
+        //Machine Gun light output - DIY version. For compatibility with the regular TCB code, we specify it the long way
+        #define MG_PORT                  PORTD    // Port D
+        #define MG_DDR                   DDRD     // Data direction register for Port D
+        #define MG_PORTPIN               PD1      // The specific port pin for the machine gun LED (ATmega D1)
+#else
         //Machine Gun light output - slightly different. This is on Atmega pin 4, but it does not have an Arduino pin number! 
         // Therefore we have to manipulate the port directly, we can't use pinMode() or digitalWrite() functions
         #define MG_PORT                  PORTE    // Port E
         #define MG_DDR                   DDRE     // Data direction register for Port E 
         #define MG_PORTPIN               PE2      // The specific port pin for the machine gun LED (ATmega E2)
+#endif
+
+
 
         
     // Mechanical Recoil 
@@ -430,7 +461,9 @@
     // The remaining pins are defined in their respective libraries: 
         // - 8 Servos (top of OP_Servo.cpp - all 8 PORTA pins (Arduino 22-29, Atmega 71-78))
         // - PPM input pin (top of OP_PPM.h - Arduino Pin 3/INT1, but in Atmega terms it is Pin 7/INT5)
-        // - Mechanical recoil switch (setup in OP_Tank::begin() function of OP_Tank.cpp - Atmega Pin 8/INT6 - not connected on Arduinos!)
+        // - Mechanical recoil switch - setup in OP_Tank::begin() function of OP_Tank.cpp
+        //     Regular TCB - Atmega Pin 8/INT6 - not connected on Arduinos!
+        //     DIY TCB - Atmega Pin 43/INT0, Arduino Pin 21
         // - IR sending and receiving pins (OP_IRLib library)
         // - Hardware Serial, SPI, and I2C ports (defined by Arduino)
 
