@@ -160,14 +160,6 @@
     _ManualTransGear ManualGear = GEAR_NA;        // Manual transmission not detected yet
     int ForwardSpeed_Max;                         // A calculated absolute figure for max forward speed based on the user's setting of MaxForwardSpeedPct
     int ReverseSpeed_Max;                         // A calculated absolute figure for max reverse speed based on the user's setting of MaxReverseSpeedPct
-  
-// INERTIAL MEASUREMENT UNIT (IMU)
-//    OP_BNO055 IMU;                                // Class for handling the Bosch BNO055 9DOF IMU sensor (on the Adafruit breakout board) - NOT USED FOR NOW
-    boolean UseIMU = false;
-    boolean IMU_Present = false;
-    boolean IMU_ReadyToSample = true;
-    uint8_t BarrelSensitivity;                    // Number from 0-100 that defines how sensitive the barrel stabilization is
-    uint8_t HillSensitivity;                      // Number from 0-100 that defines how sensitive the hill physics effect is
 
 // PC COMMUNICATION OBJECT
     OP_PCComm PCComm;
@@ -352,71 +344,7 @@ void setup()
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEngine, VC_ENGINE);
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEffects, VC_EFFECTS);
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeTrackOverlay, VC_TRACK_OVERLAY);
-
-    
-    // INERTIAL MEASUREMENT UNIT    (Bosch BNO055 on Adafruit breakout board)
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->    
-        // Sadly, the Arduino i2c library (called "Wire" or TWI), is completely incompatible with a project of this nature. It breaks every good practice
-        // by not only using long delays to block the rest of code, but doing so within ISRs so it blocks other interrupts as well. This wreaks havoc
-        // with time-critical tasks like reading the incoming PPM stream, creating the outgoing servo pulses, and reading/writing IR signals. 
-        // Therefore we need to use a non-blocking implementation (the underlying hardware uses interrupts so this should be possible). 
-        // See the OP_I2C library for our version. 
-        
-        // Let's determine if we even want to use the IMU in the first place. Initialize to false. 
-        UseIMU = false;
-        
-        // Barrel stabilization requires the turret elevation motor to be type SERVO_PAN, and the user also has to enable it
-        if (eeprom.ramcopy.EnableBarrelStabilize)
-        {
-            if (eeprom.ramcopy.TurretElevationMotor == SERVO_PAN) { UseIMU = true; }
-            else
-            {
-                // In this case, user wants to use Barrel Stabilization, but the turret motor is the wrong type. Disable it.
-                eeprom.ramcopy.EnableBarrelStabilize = false;   // This doesn't actually change the setting in eeprom, just our working copy
-            }
-        }
-
-        // Hill physics requires the user to enable it.
-        if (eeprom.ramcopy.EnableHillPhysics) UseIMU = true;
-
-        // EDIT: THE IMU IS NOT YET WORKING RELIABLY. I BELIEVE IT IS AN ISSUE WITH I2C COMMUNICATIONS, WHICH OCCASIONALLY CRASH THE PROGRAM. SEVERAL PORTIONS RELATED
-        // TO THE IMU HAVE BEEN COMMENTED-OUT ON THIS TAB OF THE SKETCH, HOWEVER MOST OF THIS CODE IS PERFECTLY FINE IF YOU CAN GET THE LIBRARIES TO DO WHAT THEY'RE 
-        // SUPPOSED TO
-
-        // HARD-CODED TO DISABLE:
-        IMU_Present = false;
-        UseIMU = false;
-/*
-        // Now see if the IMU is even attached (don't predicate this on UseIMU = true, because the user may have elected to turn off/on the IMU from the radio)
-        IMU.begin();                                // Initialize the IMU class
-        IMU.checkIfPresent();                       // Now see if the IMU can be detected on the bus
-        while (!IMU.process()) { delay(1); }        // Wait for transaction to complete (yes, we block but this is the setup routine so we don't care)
-        if (IMU.isPresent()) 
-        {   
-            //IMU.setup(true, OP_BNO055::OPERATION_MODE_NDOF);    // Device is present, let's see if we can initialize it (true to use external crystal, mode = 9-DOF fusion mode)
-            if (IMU.setup(true, OP_BNO055::OPERATION_MODE_IMUPLUS)) // IMUPLUS is fusion data of just the accel and gyro
-            {
-                IMU_Present = true;                  // Device is present and set-up, so set the flag
-            }
-            else 
-            {
-                IMU_Present = false;                 // We couldn't get setup to work, treat it as disconnected
-                UseIMU = false;                
-            }
-        }
-        else 
-        {   
-            IMU_Present = false; // Not attached
-            UseIMU = false;     // If it's not present, we're also not going to be using it.
-        }
-*/        
-       
-        // Now just because IMU_Present might equal true, doesn't mean we will actually use it: UseIMU can still be false if nothing is enabled. 
-
-        // We also obtain our sensitivity values
-        BarrelSensitivity = eeprom.ramcopy.BarrelSensitivity;
-        HillSensitivity = eeprom.ramcopy.HillSensitivity;
-             
+            
 
     // LIGHTS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->            
@@ -535,22 +463,6 @@ void loop()
     static int DestroyedBlinkerID = 0;                                // Timer ID for blinking lights when tank is destroyed
     HIT_TYPE HitType;                                                 // If we were hit, what kind of hit was it
     static uint8_t LastDamagePct = 0;                                 // Number from 0-100 of our damage percentage on the last time through the loop
-// Inertial Measurement Unit
-    const int IMU_SampleDelay = 20;                                   // The BNO055 can output fusion data up to 100hz. If we set this delay to 20mS that will actually be a refresh rate of 50 times per second. 
-    static boolean IMU_WaitingForSample = false;
-    static boolean IMU_Updated = false;
-    float rawpitch;
-    static float pitch;
-    const float alpha = 0.90;                                         // Alpha determines the low pass filter on the pitch reading. If Alpha is set to 0.99, it is like taking the average of 100 readings. 
-// Barrel stabilization
-    static int Barrel_Level;   
-    static int Barrel_Offset;
-    static boolean BarrelPosChanged = true;
-    float TankPitchRange;
-// Hill physics
-    static uint16_t ThrottlePulseMin = Radio.Sticks.Throttle.Settings->pulseMin;    // Save these so we can manipulate them but always know what to put them back to
-    static uint16_t ThrottlePulseMax = Radio.Sticks.Throttle.Settings->pulseMax;
-    float HillInclineRange;
 // Sounds
     static uint8_t MinSqueakSpeed;
 // Blinkers
@@ -725,100 +637,6 @@ if (Startup)
             PCComm.ListenToPC();
         }
 
-        
-    
-    // GET IMU DATA - BNO055 9-DOF IMU
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->
-    // Product:  https://www.adafruit.com/products/2472
-    // Because we are using a non-blockin i2c library, we basically submit a request, go on to do other things, then check back to see if the request is complete.
-    // EDIT: BECAUSE THE IMU IS NOT WORKING RELIABLY YET, THIS PORTION OF CODE HAS BEEN COMMENTED-OUT. HOWEVER THERE IS NOTHING WRONG WITH IT, THE ISSUE IS I2C COMMUNICATIONS.
-    //       WE WILL PROBABLY HAVE TO SWITCH TO SERIAL COMS WITH THE BNO055 OVER THE SERIAL 1 PORT. 
-/*    
-    if (UseIMU && HavePower)
-    {
-        IMU_Updated = false;    // This can only be true for one loop. We always start it at false, then set it to true below if an update did occur. 
-        
-        if (IMU_WaitingForSample)
-        {
-            if (IMU.process())  // Processing is done
-            {   
-                // Update the reading if the request was successful and the system calibration level is greater than 0
-                if (IMU.transactionSuccessful()) 
-                {   
-                    // You may actually want to just request accel/gyro readings directly, and fuse them yourself using a complimentary filter. 
-                    // The BNO fusion works well but is constantly going in and out of calibration...
-                    
-                    //if (IMU.calibration.system > 0)   // Use this in 9DOF mode
-                    if (IMU.calibration.gyro > 0 && IMU.calibration.accel > 0)
-                    {
-                        // The beauty of this device is that it provides us absolute orientation directly - the accelerometer, gyro and magnetometer data have all been fused already. 
-                        // The results are floating point Euler angles - in other words, we have pitch, roll and yaw directly without any maths. 
-                        // Range of Euler is 0-359 (360 degrees) 
-                        rawpitch = IMU.orientation.z;             // We can use any axis for pitch so long as we install the sensor in the correct orientation. Z makes most sense from an installation standpoint. 
-                        if (rawpitch >= 180) rawpitch -= 360;     // Convert angles from 0:360 to -180:180 which works better for our purposes
-                        //pitch = alpha * pitch + ((1.0 - alpha) * rawpitch);   // We can apply a filter to the reading to remove glitches if necessary
-                        pitch = rawpitch;
-                        IMU_Updated = true;
-                    }
-                }
-                IMU_WaitingForSample = false;                           // We got the sample, successful or not, so we are not waiting for anything
-                IMU_ReadyToSample = false;                              // We are also not yet ready to sample again
-                timer.setTimeout(IMU_SampleDelay, SetReadyToSample);    // Instead we wait a while before taking another sample
-            }
-        }
-        // Request the next reading if we are ready for the next sample
-        if (IMU_ReadyToSample)
-        {
-            IMU.requestEuler();         // Request fusion data
-            IMU_ReadyToSample = false;  // While false, no further samples will be taken
-            IMU_WaitingForSample = true;    // 
-        }
-    }
-*/
-        
-
-    // ADJUST FOR HILLS - DISABLED FOR NOW
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->
-    // THIS WAS NOT QUITE COMPLETED. IF YOU CAN GET THE IMU TO WORK, THIS CODE IS CLOSE, BUT PROBABLY NEEDS A FEW MORE CONDITIONAL CHECKS, AND MAYBE
-    // SOME ADJUSTMENT ON THE RANGES. HOWEVER THE PRINCIPLE IS SOUND AND TESTED TO WORK (eg, the idea that we reduce or increase speed by temporarily 
-    // manipulating the throttle channel end-points)
-    /*
-    if (eeprom.ramcopy.EnableHillPhysics)
-    {
-        if (IMU_Updated)
-        {
-            HillInclineRange = 120.0 - float(HillSensitivity);   // Range will be 20 to 120
-            //#define MaxHillPulseSubtract 300;
-    //        #define MinExtra 200
-            uint16_t ThrottleAdjust;
-            ThrottleAdjust = abs(int(mapf(pitch, -HillInclineRange,  HillInclineRange, -400, 400))); 
-            // Case where moving forward, or moving in reverse with throttle channel reversed
-            if ((DriveModeActual == FORWARD && !Radio.Sticks.Throttle.Settings->reversed) || (DriveModeActual == REVERSE && Radio.Sticks.Throttle.Settings->reversed))
-            {
-                if (pitch > 0) { Radio.Sticks.Throttle.Settings->pulseMax = ThrottlePulseMax + ThrottleAdjust; } // Uphill forward   - reduce speed
-                else           { Radio.Sticks.Throttle.Settings->pulseMax = ThrottlePulseMax - ThrottleAdjust; } // Downhill forward - increase speed
-                //Radio.Sticks.Throttle.Settings->pulseMax = max(Radio.Sticks.Throttle.Settings->pulseMax, Radio.Sticks.Throttle.Settings->pulseCenter + MinExtra);
-                // Keep the other side of the scale normal because we will use it for braking
-                Radio.Sticks.Throttle.Settings->pulseMin = ThrottlePulseMin;
-            }
-            // Case where moving in reverse, or moving forward with throttle channel reversed
-            else if ((DriveModeActual == REVERSE && !Radio.Sticks.Throttle.Settings->reversed) || (DriveModeActual == FORWARD && Radio.Sticks.Throttle.Settings->reversed))
-            {
-                if (pitch > 0) { Radio.Sticks.Throttle.Settings->pulseMin = ThrottlePulseMin + ThrottleAdjust; } // Downhill reverse - increase speed
-                else           { Radio.Sticks.Throttle.Settings->pulseMin = ThrottlePulseMin - ThrottleAdjust; } // Uphill reverse   - reduce speed
-                //Radio.Sticks.Throttle.Settings->pulseMin = min(Radio.Sticks.Throttle.Settings->pulseMin, Radio.Sticks.Throttle.Settings->pulseCenter - MinExtra);
-                // Keep the other side of the scale normal because we will use it for braking
-                Radio.Sticks.Throttle.Settings->pulseMax = ThrottlePulseMax;            
-            }
-        }
-    }
-    else
-    {   // Restore end-points
-        Radio.Sticks.Throttle.Settings->pulseMin = ThrottlePulseMin;
-        Radio.Sticks.Throttle.Settings->pulseMax = ThrottlePulseMax;
-    }
-    */
-    
     
     // GET RX COMMANDS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -853,76 +671,19 @@ if (Startup)
     if (Alive & HavePower)
     {   
         // BARREL UP / DOWN
-        // We have two different sets of code for dealing with the barrel. If barrel stabilization is enabled, we manipulate the 
-        // Servo_PAN class object called "Barrel"
-        // EDIT: THIS IS TESTED TO WORK WELL. IF YOU GET THE IMU TO WORK RELIABLY, YOU CAN SIMPLY UN-COMMENT THE STUFF BELOW
-/*        if (eeprom.ramcopy.EnableBarrelStabilize) // This will only be enabled if the elevation motor is of the correct type (SERVO_PAN)
+        if (eeprom.ramcopy.TurretElevationMotor != DRIVE_DETACHED)  // Only apply turret stick movements if we have specified an actual motor type
         {
             // Move barrel up/down in response to user commands
             if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
             {   
-                Barrel->setSpeed(Radio.Sticks.Elevation.command);   
-                
-                // If we are changing the position of the barrel, set the position changed flag
-                if (Radio.Sticks.Elevation.command != 0) BarrelPosChanged = true;
-                
+                TurretElevation->setSpeed(Radio.Sticks.Elevation.command); 
                 // If barrel elevation sound is enabled, play or stop the sound as appropriate
                 if (eeprom.ramcopy.BarrelSound_Enabled)
                 {
                     Radio.Sticks.Elevation.command == 0 ? TankSound->StopBarrel() : TankSound->Barrel();                      
-                }                  
-            }
-    
-            // In addition to barrel movement commanded by the user, we will also move the barrel to keep it stable as measured by the accelerometer. 
-            // But we only stabilize the barrel when the user isn't commanding a position change (hence the check for command == 0)
-            if (Radio.Sticks.Elevation.command == 0 && IMU_Updated)
-            {   
-                // Pitch will be a number from -180 to 179 degrees, but most servos will only travel from -45 to 45. But of course some servos
-                // can travel more or less, and the actual range of travel of the barrel will depend on the linkage between the servo and the barrel. 
-                // We adjust sensitivy by changing the range from which the pitch is being mapped. We let the user specify a number from 1 to 100, 
-                // with 100 being most sensitive. Right in the middle would be 50, which is very close to the -45/45* the sensor is likely to actually move in 
-                // practice, as well as the servo travel. Lower numbers will mean less sensitivity, higher numbers will mean more sensitivity. 
-                TankPitchRange = 100.0 - float(BarrelSensitivity);  // Lower pitch numbers are actually more sensitive, but we want the user to see large numbers as more sensitive.
-                if (eeprom.ramcopy.TurretElevation_Reversed)
-                { Barrel_Level = int(mapf(pitch,  TankPitchRange, -TankPitchRange, eeprom.ramcopy.TurretElevation_EPMin, eeprom.ramcopy.TurretElevation_EPMax)); }
-                else 
-                { Barrel_Level = int(mapf(pitch, -TankPitchRange,  TankPitchRange, eeprom.ramcopy.TurretElevation_EPMin, eeprom.ramcopy.TurretElevation_EPMax)); }
-
-                
-                // If BarrelPosChanged (and command = 0), we know that the user has finished setting the barrel to a new position.
-                // We save the current level as measured by the accelerometer as our offset for this position. 
-                if (BarrelPosChanged)
-                {
-                    Barrel_Offset = Barrel_Level;
-                    BarrelPosChanged = false;   // Set this to false so we don't record a new offset until user changes position again. 
-                }
-                // Barrel_Level:                 instantaneous pulse width that would set the barrel level with the ground (in other words, a measure of the tank's inclination)
-                // Barrel_Offset:                will be the servo pulse width needed to put the barrel at the actual angle to the ground the user wants, at the inclination the tank was at when the user set it. 
-                // Barrel_Offset - Barrel_Level: the change needed to adjust for a change in inclination since the set point. 
-                
-                // We don't use setSpeed in this case, because by definition this is a pan servo, and setSpeed for pan servos only sets the rate at which they move.
-                // When stabilizing the servo we need to set the position directly, so we use the setPos function of the Servo_PAN class. 
-                Barrel->setPos(Barrel->fixedPos + (Barrel_Offset - Barrel_Level));
-            }
+                }                    
+            }                
         }
-        // Barrel stabilization is not enabled: in this case we maninpulate the Motor object called "TurretElevation" (because in this case the motor could be anything, not necessarily a pan servo)
-        else
-        {
-*/            
-            if (eeprom.ramcopy.TurretElevationMotor != DRIVE_DETACHED)  // Only apply turret stick movements if we have specified an actual motor type
-            {
-                // Move barrel up/down in response to user commands
-                if (Radio.Sticks.Elevation.updated && (Radio.Sticks.Elevation.ignore == false)) 
-                {   
-                    TurretElevation->setSpeed(Radio.Sticks.Elevation.command); 
-                    // If barrel elevation sound is enabled, play or stop the sound as appropriate
-                    if (eeprom.ramcopy.BarrelSound_Enabled)
-                    {
-                        Radio.Sticks.Elevation.command == 0 ? TankSound->StopBarrel() : TankSound->Barrel();                      
-                    }                    
-                }                
-            }
-//        }
 
         // TURRET LEFT / RIGHT
         // Move turret left/right if command has changed. Also check if there is a turret sound associated with this movement
@@ -1266,7 +1027,7 @@ if (Startup)
                     }
                     // In the case of halftracks with steering servos, we set the servo a bit later, outside of this code block because we want steering control even when the engine is not running
                     break;
-
+                    
                 case DT_CAR:
                     // In this case, there is only a single rear axle speed, and no such thing as neutral turns. 
                     // Send the signal if the DriveSpeed has changed

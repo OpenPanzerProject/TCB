@@ -133,9 +133,6 @@ void DumpSysInfo()
     DumpSoundInfo();
         PerLoopUpdates();
         DebugSerial->flush();        
-    DumpIMUInfo();
-        PerLoopUpdates();
-        DebugSerial->flush();    
     DumpFunctionTriggers();
         PerLoopUpdates();
         DebugSerial->flush();    
@@ -407,52 +404,6 @@ void PrintSoundBank1()
 void PrintSoundBank2()
 {
     DebugSerial->print(F(" Auto-Loop: "));
-}
-
-void DumpIMUInfo()
-{
-    DebugSerial->println();
-    PrintDebugLine();
-    DebugSerial->println(F("INERTIAL MEASUREMENT UNIT"));
-    PrintDebugLine();
-    if (IMU_Present)
-    {
-        DebugSerial->print(F("Sensor detected:              Yes")); DebugSerial->println();
-        DebugSerial->print(F("Barrel Stabilization Enabled: ")); PrintYesNo(eeprom.ramcopy.EnableBarrelStabilize);
-        if (eeprom.ramcopy.EnableBarrelStabilize) PrintBarrelSensitivity(); 
-        DebugSerial->println();
-        DebugSerial->print(F("Hill Physics Enabled:         ")); PrintYesNo(eeprom.ramcopy.EnableHillPhysics);
-        if (eeprom.ramcopy.EnableHillPhysics) PrintHillSensitivity();
-        DebugSerial->println();
-    }
-    else
-    {
-        DebugSerial->println(F("Sensor not detected!")); 
-    }
-}
-
-void PrintBarrelSensitivity()
-{
-    DebugSerial->print(F(" (Sensitivity ")); 
-    DebugSerial->print(eeprom.ramcopy.BarrelSensitivity); 
-    if (eeprom.ramcopy.BarrelSensitivity != BarrelSensitivity)
-    {
-        DebugSerial->print(F(" - Adjusted to "));
-        DebugSerial->print(BarrelSensitivity);
-    }
-    DebugSerial->print(F(")"));  
-}
-
-void PrintHillSensitivity()
-{
-    DebugSerial->print(F(" (Sensitivity ")); 
-    DebugSerial->print(eeprom.ramcopy.HillSensitivity); 
-    if (eeprom.ramcopy.HillSensitivity != HillSensitivity)
-    {
-        DebugSerial->print(F(" - Adjusted to "));
-        DebugSerial->print(HillSensitivity);
-    }
-    DebugSerial->print(F(")"));        
 }
 
 void DumpBattleInfo()

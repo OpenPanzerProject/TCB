@@ -149,14 +149,6 @@ void LoadFunctionTriggers()
                 case SF_RC6_PASS_PAN:               SF_Callback[i] = &RC_PanServo_6;                                break; // Analog function
                 case SF_RC7_PASS_PAN:               SF_Callback[i] = &RC_PanServo_7;                                break; // Analog function
                 case SF_RC8_PASS_PAN:               SF_Callback[i] = &RC_PanServo_8;                                break; // Analog function
-                case SF_BARREL_STAB_ON:             SF_Callback[i] = &SF_BarrelStab_On;                             break;                    
-                case SF_BARREL_STAB_OFF:            SF_Callback[i] = &SF_BarrelStab_Off;                            break;                    
-                case SF_BARREL_STAB_TOGGLE:         SF_Callback[i] = &SF_BarrelStab_Toggle;                         break;                                        
-                case SF_BARREL_STAB_LEVEL:          SF_Callback[i] = &SetBarrelSensitivity;                         break; // Analog function
-                case SF_HILLS_ON:                   SF_Callback[i] = &SF_HillPhysics_On;                            break;                    
-                case SF_HILLS_OFF:                  SF_Callback[i] = &SF_HillPhysics_Off;                           break;                    
-                case SF_HILLS_TOGGLE:               SF_Callback[i] = &SF_HillPhysics_Toggle;                        break;                                        
-                case SF_HILLS_LEVEL:                SF_Callback[i] = &SetHillSensitivity;                           break; // Analog function
                 case SF_USER_FUNC_1:                SF_Callback[i] = &SF_UserFunc1;                                 break;
                 case SF_USER_FUNC_2:                SF_Callback[i] = &SF_UserFunc2;                                 break;                    
                 case SF_USER_ANLG_1:                SF_Callback[i] = &User_Analog_Function1;                        break; // Analog function
@@ -594,12 +586,6 @@ void SF_PortB_On(uint16_t ignoreMe)             { PortB_On();               }
 void SF_PortB_Off(uint16_t ignoreMe)            { PortB_Off();              }
 void SF_PortB_Pulse(uint16_t ignoreMe)          { PortB_Pulse();            }
 void SF_PortB_Blink(uint16_t ignoreMe)          { PortB_Blink();            }
-void SF_BarrelStab_On(uint16_t ignoreMe)        { EnableBarrelStabilization(true);  }
-void SF_BarrelStab_Off(uint16_t ignoreMe)       { EnableBarrelStabilization(false); }
-void SF_BarrelStab_Toggle(uint16_t ignoreMe)    { ToggleBarrelStabilization();      }
-void SF_HillPhysics_On(uint16_t ignoreMe)       { EnableHillPhysics(true);  }
-void SF_HillPhysics_Off(uint16_t ignoreMe)      { EnableHillPhysics(false); }
-void SF_HillPhysics_Toggle(uint16_t ignoreMe)   { ToggleHillPhysics();      }
 void SF_UserFunc1(uint16_t ignoreMe)            { UserFunction1();          }
 void SF_UserFunc2(uint16_t ignoreMe)            { UserFunction2();          }
 void SF_DumpDebug(uint16_t ignoreMe)            { DumpSysInfo();            }
@@ -695,30 +681,6 @@ void SF_SetDecelRampFreq(uint16_t val)
         }
     }
 }
-
-// Barrel stabilization and "Hill physics" adjustment
-// ----------------------------------------------------------------------------------------------------------------------------------------------->>
-// Barrel Stabilization and Hill Physics sensitivy numbers can vary between 1-100. 
-void SetBarrelSensitivity(uint16_t level)       
-{ 
-    uint8_t bs = map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 1, 100); 
-    // Only update if changed
-    if (BarrelSensitivity != bs)
-    {
-        BarrelSensitivity = bs; 
-        if (DEBUG) { DebugSerial->print(F("Set Barrel Sensitivity: ")); PrintLnPct(bs); } 
-    }
-}  
-void SetHillSensitivity(uint16_t level)         
-{ 
-    uint8_t hs = map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 1, 100); 
-    // Only update if changed
-    if (HillSensitivity != hs)
-    {
-        HillSensitivity = hs;     
-        if (DEBUG) { DebugSerial->print(F("Set Hill Sensitivity: ")); PrintLnPct(hs); } 
-    }
-}  
 
 
 // RC Output pass-through functions
@@ -862,12 +824,6 @@ void SaveAdjustments()
         EEPROM.updateByte(offsetof(_eeprom_data, DecelSkipNum_2), eeprom.ramcopy.DecelSkipNum_2);
     }
     
-    // Barrel stabilization/Hill physics sensitivity
-    eeprom.ramcopy.BarrelSensitivity = BarrelSensitivity;
-    EEPROM.updateByte(offsetof(_eeprom_data, BarrelSensitivity), eeprom.ramcopy.BarrelSensitivity);
-    eeprom.ramcopy.HillSensitivity = HillSensitivity;
-    EEPROM.updateByte(offsetof(_eeprom_data, HillSensitivity), eeprom.ramcopy.HillSensitivity);
-
     // Aux Output level
     EEPROM.updateByte(offsetof(_eeprom_data, AuxLightPresetDim), eeprom.ramcopy.AuxLightPresetDim);
 
