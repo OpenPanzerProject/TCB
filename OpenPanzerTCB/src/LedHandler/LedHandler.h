@@ -24,6 +24,9 @@
 #include "../OP_Settings/OP_Settings.h"
 #include "../elapsedMillis/elapsedMillis.h"
 
+#define FADE_IN                            1
+#define FADE_OUT                           2
+#define NUM_FADE_UPDATES                 100
 
 #define DEFAULT_BLINK_INTERVAL           200
 #define MAX_STREAM_STEPS                  10            // A stream consists of a pattern of on/off blinks separated by user-specified lengths of time. A single blink (on/off) takes 2 steps. 
@@ -44,6 +47,7 @@ class LedHandler
         void toggle(void);
         void update(void);                                                      // Update blinking effect
         boolean isBlinking(void);
+        boolean isFading(void);
         void ExpireIn(uint16_t); 
         void Blink(uint16_t interval=DEFAULT_BLINK_INTERVAL);                   // Blinks once at set interval
         void Blink(uint8_t times, uint16_t  interval=DEFAULT_BLINK_INTERVAL);   // Overload - Blinks N times at set interval
@@ -53,9 +57,12 @@ class LedHandler
         void TripleTap(boolean repeat=false);
         void QuadTap(boolean repeat=false);
         void StreamBlink(BlinkStream bs, uint8_t numSteps);
+        void Fade(uint8_t fade_in, uint16_t span, boolean AddBlinkEffect);
+        void stopFading(void);
         
     private:
         void ClearBlinker(void);
+        void ClearFader(void);
         void pinOn(void);
         void pinOff(void);
         elapsedMillis   _time;
@@ -64,12 +71,16 @@ class LedHandler
         byte            _pin;
         boolean         _invert;
         boolean         _isBlinking;
-        uint8_t         _curStep;
-        uint8_t         _numSteps;
+        uint8_t         _isFading;
+        uint16_t        _curStep;
+        uint16_t        _numSteps;
         uint16_t        _nextWait;
         boolean         _fixedInterval;
         BlinkStream     _blinkStream;
-      
+        float           _fadeStart;
+        boolean         _fadeBlinkEffect;
+        uint16_t        _fadeInterval;
+     
 };
 
 
