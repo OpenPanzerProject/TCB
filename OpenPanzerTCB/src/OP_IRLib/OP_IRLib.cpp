@@ -1006,8 +1006,13 @@ bool IRrecvBase::GetResults(IRdecodeBase *decoder, const uint16_t Time_per_Tick)
 }
 
 void IRrecvBase::enableIRIn(void) { 
-  pinMode(IR_ReceiveParams.recvpin, INPUT);
+  pinMode(IR_ReceiveParams.recvpin, INPUT_PULLUP);
   resume();
+}
+
+void IRrecvBase::disableIRIn(void) {
+    // Disable IR receiver interrupt
+    EIMSK &= ~(1 << INT4);   // AND-NOT
 }
 
 void IRrecvBase::resume() {
@@ -1027,7 +1032,7 @@ void IRrecvBase::resume() {
 IRrecvPCI::IRrecvPCI(unsigned char inum) 
 {
     Init();             // Base function, initializes blinkflag = 0, sets Mark_Excess=100 as default (can be changed by user myreceiverobject.Mark_Excess = whatever;
-    intrnum=inum;       // Sets the interrupt number (not the pin number). From IR_RECEIVE_INT_NUM in OP_Settings.h. Should be 0 for Arduino External Interrupt 0 (Atmega INT 4)
+    intrnum=inum;       // Sets the interrupt number (not the pin number). From IR_RECEIVE_INT_NUM in OP_Tank.h. Should be 0 for Arduino External Interrupt 0 (Atmega INT 4)
     IR_ReceiveParams.recvpin=Pin_from_Intr(inum); //If you want to know the pin number, check myreceiverobject.getPinNum;
     
     // The interrupt doesn't get enabled until a call to enableIRIn of the base class. This sets the pin to input, 

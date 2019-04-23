@@ -272,6 +272,7 @@ class IRrecvBase
         void setBlinkingOnReceive(bool blinkflag);
         bool GetResults(IRdecodeBase *decoder, const uint16_t Time_per_Ticks = 1);
         void enableIRIn(void);
+        void disableIRIn(void);
         virtual void resume(void);
         unsigned char getPinNum(void);
         unsigned char Mark_Excess;
