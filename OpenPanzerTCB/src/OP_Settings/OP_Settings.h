@@ -16,9 +16,9 @@
 // OPEN PANZER TANK CONTROL BOARD (TCB) - FIRMWARE VERSION NUMBER
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is the firmware version that will be returned to the desktop application when it checks. It will be split into three, two-digit numbers
-    #define FIRMWARE_VERSION        "0.93.46"      // version. Last update 3/3/2019
+    #define FIRMWARE_VERSION        "0.93.47"      // version. Last update 4/22/2019
     
-    #define MIN_OPCONFIG_VERSION    "0.93.45"      // Minimum version of OP Config this version of firmware requires
+    #define MIN_OPCONFIG_VERSION    "0.93.47"      // Minimum version of OP Config this version of firmware requires
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
@@ -461,7 +461,7 @@
         // - Mechanical recoil switch - setup in OP_Tank::begin() function of OP_Tank.cpp
         //     Regular TCB - Atmega Pin 8/INT6 - not connected on Arduinos!
         //     DIY TCB - Atmega Pin 43/INT0, Arduino Pin 21
-        // - IR sending and receiving pins (OP_IRLib library)
+        // - IR sending and receiving pins (OP_IRLib library, and Tank.h which is where the receive pin is defined (Arduino Interrupt 0 (Atmega interrupt 4) - PE4 / Arduino Pin 2)
         // - Hardware Serial, SPI, and I2C ports (defined by Arduino)
 
 
