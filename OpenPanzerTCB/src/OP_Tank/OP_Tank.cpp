@@ -1092,18 +1092,21 @@ void OP_Tank::DisableHitReception(void)
     
 void OP_Tank::EnableHitReception(void)
 {
-    if (IR_Tx.isSendingDone()) 
+    if (IR_Enabled == true)             // Only re-enable if the user has allowed it
     {
-        IR_Decoder.Reset();         // Clear the decoder of anything that may have come in
-        IR_Rx->resume();            // Resume IR reception
-        isInvulnerable = false;     // We are now vulnerable to hits
-    }
-    else
-    {
-        // We want to enable reception, but we are also still in the middle of sending a signal out. 
-        // Start a repeating timer that will keep checking back, and auto enable hit reception
-        // when the transmission is done. 
-        TankTimer->setTimeout(5, EnableHitReception);
+        if (IR_Tx.isSendingDone()) 
+        {
+            IR_Decoder.Reset();         // Clear the decoder of anything that may have come in
+            IR_Rx->resume();            // Resume IR reception
+            isInvulnerable = false;     // We are now vulnerable to hits
+        }
+        else
+        {
+            // We want to enable reception, but we are also still in the middle of sending a signal out. 
+            // Start a repeating timer that will keep checking back, and auto enable hit reception
+            // when the transmission is done. 
+            TankTimer->setTimeout(5, EnableHitReception);
+        }
     }
 }
 
