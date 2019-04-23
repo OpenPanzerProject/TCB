@@ -50,7 +50,7 @@
                                             // Not presently used, but can be implemented if we have issues
 
 // The IR receiver class needs to know which external interrupt to use. 
-#define IR_RECEIVE_INT_NUM          0       // For the TCB board, this must be Arduino Interrupt 0 (Atmega interrupt 4)
+#define IR_RECEIVE_INT_NUM          0       // For the TCB board, this must be Arduino Interrupt 0 / Pin 2 (Atmega Interrupt 4 / Port E4) 
 
 // These variables are used to create a flickering effect on the hit notification LEDs, similar to the way Tamiya does
 #define MAX_BRIGHT                  255     // Maximum LED brightness during the flicker effect (should be 255)
@@ -148,6 +148,10 @@ class OP_Tank
         static boolean  isDestroyed;                // Is the tank destroyed
         static uint8_t  CannonHitsTaken;            // How many cannon hits have we sustained
         static uint8_t  MGHitsTaken;                // How many machine gun hits have we sustained
+        static void     EnableIR(void);             // Enable IR functionality
+        static void     DisableIR(void);            // Disable IR functionality
+        static void     ToggleIR(void);             // Toggle IR functionality
+        static boolean  IsIREnabled(void);          // Return status of IR
                 
         // Mechanical recoil switch interrupt
         static void     RECOIL_ISR(void);           // The actual ISR will call this public member function, in order that it can access class variables
@@ -212,6 +216,8 @@ class OP_Tank
         static void     ResetBattleImmediate(void);
         static IRTYPES  _lastHit;
         static IRTEAMS  _lastTeam;
+        static void     EnableIR_Internal(void);
+        static void     DisableIR_Internal(void);
         
         // Hit notification LEDs
         static boolean  HitLEDsOn;                  // True if currently ON or DIM, False if OFF
@@ -226,9 +232,9 @@ class OP_Tank
         static void     HitLEDs_Destroyed(void);    // Destroyed light effect
         static void     Repair_BlinkHandler(void);  // Repair light effect
         static void     HitLEDs_Repair(void);       // Repair light effect
-        static int16_t      FadeStep;
-        static int16_t      FadeTarget;
-        static int16_t      CurrentFadeLevel;
+        static int16_t  FadeStep;
+        static int16_t  FadeTarget;
+        static int16_t  CurrentFadeLevel;
         static boolean  FadeOut;
         static int      FadeStep_TimerID;
         static int      HitLED_TimerID;

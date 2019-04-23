@@ -145,8 +145,7 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     }
     else
     {   // Some sort of battling is enabled, so enable IR
-        IR_Enabled = true;
-        IR_Rx->enableIRIn();
+        EnableIR_Internal();    // We use the "internal" version so we skip the notification LED routine, unnecessary here
 
         // If we aren't using a custom weight class, setup the specified Tamiya weight class
         if (BattleSettings.WeightClass != WC_CUSTOM)
@@ -431,7 +430,7 @@ void OP_Tank::Cannon_Sound(void)
 void OP_Tank::Cannon_SendIR(void)
 {
     // The user can choose to skip IR completely, so check first if it's enabled
-    if (BattleSettings.IR_FireProtocol != IR_DISABLED)
+    if (BattleSettings.IR_FireProtocol != IR_DISABLED && IR_Enabled == true)
     {
         // We don't want to hit ourselves. So while we are sending, we disable reception
         DisableHitReception();      
@@ -536,14 +535,16 @@ void OP_Tank::MG_BlinkLight(void)
 }
 void OP_Tank::MG_Fire_IR(void)
 {   // As long as the machine gun is firing, this routine will be called by the TankTimer every MG_REPEAT_TIME_mS milliseconds. 
-
-    // To avoid hitting ourselves, we must disable hit reception while firing the IR code. But we only do it briefly, 
-    // just while the code is being sent 
-    DisableHitReception();      
-    // We'll assume all the checks were already done that would determine if we even need to be sending this...
-    IR_Tx.send(BattleSettings.IR_MGProtocol);
-    // Done sending, re-enable reception
-    EnableHitReception();
+    // Check if we even need to be sending this...
+    if (BattleSettings.Use_MG_Protocol == true && IR_Enabled == true)
+    {
+        // To avoid hitting ourselves, we must disable hit reception while firing the IR code. But we only do it briefly, 
+        // just while the code is being sent 
+        DisableHitReception();      
+        IR_Tx.send(BattleSettings.IR_MGProtocol);
+        // Done sending, re-enable reception
+        EnableHitReception();
+    }
 }
 
 
@@ -778,6 +779,48 @@ void OP_Tank::ClearAuxFlash(void)
 //------------------------------------------------------------------------------------------------------------------------>>
 // RECEIVING HITS AND TAKING DAMAGE
 //------------------------------------------------------------------------------------------------------------------------>>
+
+void OP_Tank::EnableIR(void)
+{
+    // But only enable if we have valid protocols selected
+    if (BattleSettings.IR_FireProtocol == IR_DISABLED  && BattleSettings.IR_MGProtocol == IR_DISABLED)
+    {
+        DisableIR();
+    }
+    else
+    {   
+        EnableIR_Internal();
+        AppleLEDs.Fade(FADE_IN, 100, true);    // true meaning add a double-blip after the fade-in completes
+    }
+}
+
+void OP_Tank::EnableIR_Internal(void)
+{   // We split these out in the case we want to enable without the LED notification
+    IR_Rx->enableIRIn();
+    IR_Enabled = true;
+}
+
+void OP_Tank::DisableIR(void)
+{
+    DisableIR_Internal();
+    AppleLEDs.Fade(FADE_OUT, 200, true);       // true meaning add a double-blip before the fade-out starts
+}
+
+void OP_Tank::DisableIR_Internal(void)
+{   // We split these out in the case we want to disable without the LED notification
+    IR_Rx->disableIRIn();
+    IR_Enabled = false;
+}
+
+void OP_Tank::ToggleIR(void)
+{
+    IR_Enabled ? DisableIR() : EnableIR();
+}
+
+boolean OP_Tank::IsIREnabled(void)
+{
+    return IR_Enabled;
+}
 
 // Returns the HIT_TYPE if the tank was hit
 HIT_TYPE OP_Tank::WasHit(void)
@@ -1464,7 +1507,6 @@ void OP_Tank::HitLEDs_Repair(void)
     Interval -= Subtract;    
 }
 
-
 //------------------------------------------------------------------------------------------------------------------------>>
 // LedHandler objects and other items that need polled updates
 //------------------------------------------------------------------------------------------------------------------------>>
@@ -1472,6 +1514,8 @@ void OP_Tank::HitLEDs_Repair(void)
 void OP_Tank::Update(void)
 {
     AppleLEDs.update();
+    
+    
 }
 
 

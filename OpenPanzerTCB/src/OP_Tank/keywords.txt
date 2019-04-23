@@ -36,6 +36,8 @@ CannonHitsTaken	KEYWORD2
 MGHitsTaken	KEYWORD2
 MachineGun	KEYWORD2
 MachineGun_Stop	KEYWORD2
+EnableIR    KEYWORD2
+DisableIR   KEYWORD2
 
 
 #-------------------------------------------------------------
