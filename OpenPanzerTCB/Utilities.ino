@@ -414,31 +414,31 @@ void DumpBattleInfo()
     PrintDebugLine();
     if (Tank.BattleSettings.IR_FireProtocol != IR_UNKNOWN)
     {
-    DebugSerial->print(F("Is Repair Tank?   ")); PrintLnYesNo(Tank.isRepairTank());
-    if (Tank.isRepairTank()) { DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_RepairProtocol)); }
-    else
-    {
-        DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_FireProtocol));
-        if (Tank.BattleSettings.IR_Team != IR_TEAM_NONE) { DebugSerial->print(F(" (Team ")); DebugSerial->print(ptrIRTeam(Tank.BattleSettings.IR_Team)); DebugSerial->print(F(")")); } DebugSerial->println();
-    }
-    DebugSerial->print(F("Hit Protocol 2:   ")); 
-    if (Tank.BattleSettings.IR_HitProtocol_2 != IR_UNKNOWN ) { DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_HitProtocol_2)); } else { DebugSerial->println(F("N/A")); }
-    DebugSerial->print(F("Repaired by:      ")); 
-    if (Tank.BattleSettings.IR_RepairProtocol != IR_UNKNOWN) { DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_RepairProtocol)); } else { DebugSerial->println(F("N/A")); }
-    DebugSerial->print(F("Send MG IR Code:  ")); 
-    if (Tank.BattleSettings.Use_MG_Protocol) { DebugSerial->print(F("Yes (")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_MGProtocol)); DebugSerial->println(")"); }
-    else PrintLnYesNo(false);
-    DebugSerial->print(F("Accept MG Damage: ")); 
-    if (Tank.BattleSettings.Accept_MG_Damage) { DebugSerial->print(F("Yes (")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_MGProtocol)); DebugSerial->println(")"); }
-    else PrintLnYesNo(false);
+        DebugSerial->print(F("Is Repair Tank?   ")); PrintLnYesNo(Tank.isRepairTank());
+        if (Tank.isRepairTank()) { DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_RepairProtocol)); }
+        else
+        {
+            DebugSerial->print(F("Fire Protocol:    ")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_FireProtocol));
+            if (Tank.BattleSettings.IR_Team != IR_TEAM_NONE) { DebugSerial->print(F(" (Team ")); DebugSerial->print(ptrIRTeam(Tank.BattleSettings.IR_Team)); DebugSerial->print(F(")")); } DebugSerial->println();
+        }
+        DebugSerial->print(F("Hit Protocol 2:   ")); 
+        if (Tank.BattleSettings.IR_HitProtocol_2 != IR_UNKNOWN ) { DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_HitProtocol_2)); } else { DebugSerial->println(F("N/A")); }
+        DebugSerial->print(F("Repaired by:      ")); 
+        if (Tank.BattleSettings.IR_RepairProtocol != IR_UNKNOWN) { DebugSerial->println(ptrIRName(Tank.BattleSettings.IR_RepairProtocol)); } else { DebugSerial->println(F("N/A")); }
+        DebugSerial->print(F("Send MG IR Code:  ")); 
+        if (Tank.BattleSettings.Use_MG_Protocol) { DebugSerial->print(F("Yes (")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_MGProtocol)); DebugSerial->println(")"); }
+        else PrintLnYesNo(false);
+        DebugSerial->print(F("Accept MG Damage: ")); 
+        if (Tank.BattleSettings.Accept_MG_Damage) { DebugSerial->print(F("Yes (")); DebugSerial->print(ptrIRName(Tank.BattleSettings.IR_MGProtocol)); DebugSerial->println(")"); }
+        else PrintLnYesNo(false);
     
-    DebugSerial->print(F("Damage Profile:   ")); DebugSerial->println(ptrDamageProfile(Tank.BattleSettings.DamageProfile));
-    DebugSerial->print(F("Weight Class:     ")); DebugSerial->println(ptrWeightClassName(Tank.BattleSettings.WeightClass)); 
-    DebugSerial->print(F("(")); DebugSerial->print(Tank.BattleSettings.ClassSettings.maxHits); DebugSerial->print(F(" cannon hits, ")); if (Tank.BattleSettings.WeightClass == WC_CUSTOM) { DebugSerial->print(Tank.BattleSettings.ClassSettings.maxMGHits); DebugSerial->print(F(" MG hits, ")); } DebugSerial->print(Convert_mS_to_Sec(Tank.BattleSettings.ClassSettings.reloadTime),1); DebugSerial->print(F(" sec reload, ")); DebugSerial->print(Convert_mS_to_Sec(Tank.BattleSettings.ClassSettings.recoveryTime),1); DebugSerial->println(F(" sec recovery)"));    
+        DebugSerial->print(F("Damage Profile:   ")); DebugSerial->println(ptrDamageProfile(Tank.BattleSettings.DamageProfile));
+        DebugSerial->print(F("Weight Class:     ")); DebugSerial->println(ptrWeightClassName(Tank.BattleSettings.WeightClass)); 
+        DebugSerial->print(F("(")); DebugSerial->print(Tank.BattleSettings.ClassSettings.maxHits); DebugSerial->print(F(" cannon hits, ")); if (Tank.BattleSettings.WeightClass == WC_CUSTOM) { DebugSerial->print(Tank.BattleSettings.ClassSettings.maxMGHits); DebugSerial->print(F(" MG hits, ")); } DebugSerial->print(Convert_mS_to_Sec(Tank.BattleSettings.ClassSettings.reloadTime),1); DebugSerial->print(F(" sec reload, ")); DebugSerial->print(Convert_mS_to_Sec(Tank.BattleSettings.ClassSettings.recoveryTime),1); DebugSerial->println(F(" sec recovery)"));    
     }
     else
     {
-    DebugSerial->println(F("IR & Tank Battling Disabled"));
+        DebugSerial->println(F("IR & Tank Battling Disabled"));
     }
 }
 

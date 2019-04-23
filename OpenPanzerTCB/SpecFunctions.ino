@@ -41,6 +41,9 @@ void LoadFunctionTriggers()
                 case SF_BARREL_ENABLE:              SF_Callback[i] = &SF_MechBarrel_Enable;                         break;
                 case SF_BARREL_DISABLE:             SF_Callback[i] = &SF_MechBarrel_Disable;                        break;
                 case SF_BARREL_TOGGLE:              SF_Callback[i] = &SF_MechBarrel_Toggle;                         break;
+                case SF_IR_ENABLE:                  SF_Callback[i] = &SF_IR_Enable;                                 break;
+                case SF_IR_DISABLE:                 SF_Callback[i] = &SF_IR_Disable;                                break;
+                case SF_IR_TOGGLE:                  SF_Callback[i] = &SF_IR_Toggle;                                 break;
                 case SF_LIGHT1_TOGGLE:              SF_Callback[i] = &SF_Light1Toggle;                              break;
                 case SF_LIGHT1_ON:                  SF_Callback[i] = &SF_Light1On;                                  break;
                 case SF_LIGHT1_OFF:                 SF_Callback[i] = &SF_Light1Off;                                 break;
@@ -510,6 +513,9 @@ void SF_MG2_Stop(uint16_t ignoreMe)             { MG2_Stop();               }
 void SF_MechBarrel_Enable(uint16_t ignoreMe)    { MechBarrel_Enable();      }
 void SF_MechBarrel_Disable(uint16_t ignoreMe)   { MechBarrel_Disable();     }
 void SF_MechBarrel_Toggle(uint16_t ignoreMe)    { MechBarrel_Toggle();      }
+void SF_IR_Enable(uint16_t ignoreMe)            { IR_Enable();              }
+void SF_IR_Disable(uint16_t ignoreMe)           { IR_Disable();             }
+void SF_IR_Toggle(uint16_t ignoreMe)            { IR_Toggle();              }
 void SF_Light1Toggle(uint16_t ignoreMe)         { Light1Toggle();           }
 void SF_Light1On(uint16_t ignoreMe)             { Light1On();               }
 void SF_Light1Off(uint16_t ignoreMe)            { Light1Off();              }

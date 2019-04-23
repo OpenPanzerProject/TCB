@@ -34,7 +34,12 @@ void FireCannon()
             // This is a fighting tank. But we can't fire the cannon if we're in the midst of being repaired by another tank.
             if (!Tank.isRepairOngoing())
             {
-                if (DEBUG) { DebugSerial->println(F("Fire Cannon")); } 
+                if (DEBUG) 
+                { 
+                    DebugSerial->print(F("Fire Cannon")); 
+                    if (Tank.IsIREnabled()) DebugSerial->print(F(" (with IR)"));
+                    DebugSerial->println();
+                } 
                 Tank.Fire(); // See OP_Tank library. This triggers the mechanical and servo recoils, the high intensity flash unit, the cannon sound, and it sends the IR signal
                 CannonWasFired = true;
                 
@@ -185,6 +190,29 @@ void MuzzleFlash()
     if (DEBUG) { DebugSerial->println(F("High Intensity Flash Unit - Manual Trigger")); }
 }
 
+// SPECIAL FUNCTIONS: Enable/Disable IR functionality
+// -------------------------------------------------------------------------------------------------------------------------------------------------->
+void IR_Enable()
+{
+    Tank.EnableIR();
+    if (DEBUG) 
+    { 
+        if (eeprom.ramcopy.IR_FireProtocol == IR_DISABLED && eeprom.ramcopy.IR_MGProtocol == IR_DISABLED) DebugSerial->println(F("IR NOT enabled - no IR protocols selected.")); 
+        else if (Tank.IsIREnabled()) DebugSerial->println(F("IR enabled"));
+        else DebugSerial->println(F("Unable to enable IR"));
+    }
+}
+
+void IR_Disable()
+{
+    Tank.DisableIR();
+    if (DEBUG) { DebugSerial->println(F("IR disabled")); }
+}
+
+void IR_Toggle()
+{
+    Tank.ToggleIR();
+}
 
 
 
