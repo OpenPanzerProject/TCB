@@ -43,20 +43,31 @@ void FireCannon()
                 Tank.Fire(); // See OP_Tank library. This triggers the mechanical and servo recoils, the high intensity flash unit, the cannon sound, and it sends the IR signal
                 CannonWasFired = true;
                 
-                // If we are stopped, and if the user has enabled track recoil, kick that off too
-                if (DriveModeActual == STOP && eeprom.ramcopy.EnableTrackRecoil)
+                // Handle track recoil if the user has it enabled
+                if (eeprom.ramcopy.EnableTrackRecoil)
                 {
-                    // However when we start the track recoil depends on whether we are in airsoft mode and whether it is enabled or not.
-                    if (eeprom.ramcopy.Airsoft && Tank.isMechBarrelSetWithCannon())
+                    // When the track recoil starts depends on whether we we have a mechanical barrel action included and if so which one
+                    if (Tank.isMechBarrelSetWithCannon())
                     {
-                        // With the airsoft unit we must wait until the airsoft actually fires, which will happen after it has cocked. We will just have to poll the tank class to see when this is. 
-                        CheckAirsoftTimerID = timer.setInterval(50, CheckAirsoft);
+                        if (eeprom.ramcopy.Airsoft)
+                        {
+                            // With the airsoft unit we must wait until the airsoft actually fires, which will happen after it has cocked. We will just have to poll the tank class to see when this is. 
+                            // The CheckAirsoft will keep checking back, and when the airsoft has cocked, and if the vehicle is actually stopped, then it will kick off the track recoil
+                            CheckAirsoftTimerID = timer.setInterval(50, CheckAirsoft);
+                        }
+                        else    // Mechanical recoil
+                        {
+                            if (DriveModeActual == STOP)    // If we are stopped, track recoil is possible
+                            {
+                                // With mechanical recoil we can start it more or less right away, or else after a single, pre-known delay if one is specified
+                                if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
+                                else StartTrackRecoil();                                                                            // Otherwise go directly to it
+                            }
+                        }
                     }
                     else
-                    {
-                        // Otherwise we can start it more or less right away, or at any rate, after a single, pre-known delay
-                        if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
-                        else StartTrackRecoil();                                                                            // Otherwise go directly to it
+                    {   // Here there is no mechanical barrel action so we have nothing to wait for, go straight to track recoil
+                        StartTrackRecoil(); 
                     }
                 }
             }
