@@ -128,3 +128,14 @@ void Smoker_ManualOff()
         Smoker->setSpeed(0);
     }
 }
+
+void Smoker_ManualToggle()
+{   
+    if (eeprom.ramcopy.SmokerControlAuto == false)
+    {   
+        if (Smoker->getSpeed() > 0)  Smoker->setSpeed(0);
+        else                         Smoker->setSpeed(MOTOR_MAX_FWDSPEED);
+    }
+}
+
+

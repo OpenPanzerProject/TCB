@@ -120,6 +120,11 @@ void UserSound_Stop(uint8_t s)
     TankSound->UserSound_Stop(s);
     if (DEBUG) { PrintUserSound(); DebugSerial->print(s); DebugSerial->println(F(" - Stop")); }
 }
+void UserSound_StopAll()
+{
+    TankSound->UserSound_StopAll();
+    if (DEBUG) { DebugSerial->println(F("Stop All User Sounds")); }
+}
 
 void PrintUserSound()
 {

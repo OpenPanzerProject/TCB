@@ -105,6 +105,7 @@ class OP_Sound {
     virtual void UserSound_Play(uint8_t) = 0;           // Play user sound x once
     virtual void UserSound_Repeat(uint8_t) =0;          // Repeat user sound x
     virtual void UserSound_Stop(uint8_t) =0;            // Stop user sound x
+    virtual void UserSound_StopAll(void) =0;            // Stop all users sounds that might be playing
     // Sound banks
     virtual void SoundBank(soundbank, switch_action) =0;  // Sound banks
     virtual void SoundBank_SetAutoloop(soundbank, boolean) =0; // Set auto-loop on this sound bank
@@ -182,6 +183,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void UserSound_Play(uint8_t s)                              { OP_TBS::UserSound_Play(s);           }
     void UserSound_Repeat(uint8_t s)                            { OP_TBS::UserSound_Repeat(s);         }
     void UserSound_Stop(uint8_t s)                              { OP_TBS::UserSound_Stop(s);           }
+    void UserSound_StopAll(void)                                { OP_TBS::UserSound_StopAll();         }
   // Sound banks
     void SoundBank(soundbank, switch_action)                    { return;                              }
     void SoundBank_SetAutoloop(soundbank, boolean)              { return;                              }
@@ -263,6 +265,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_HEADLIGHT2                  0x50   // 80
 #define OPSC_CMD_SOUNDBANK                   0x51   // 81  -- Use Value to specify Soundbank A or B (0 or 1). Modifier specifies action (ACTION_ONSTART, ACTION_PLAYNEXT, ACTION_PLAYPREV, ACTION_PLAYRANDOM)
 #define OPSC_CMD_SOUNDBANK_LOOP              0x52   // 82  -- Use Value to specify Soundbank A or B (0 or 1). Modifier indicates whether auto-loop is enabled or not (true/false)
+#define OPSC_CMD_USER_SOUND_STOP_ALL         0x53   // 83  -- Stop any user sound that might be playing
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -324,6 +327,7 @@ class OP_SoundCard: public OP_Sound {
     void UserSound_Play(uint8_t s)                              { command(OPSC_CMD_USER_SOUND_PLAY, 0, s);                  }
     void UserSound_Repeat(uint8_t s)                            { command(OPSC_CMD_USER_SOUND_REPEAT, 0, s);                }
     void UserSound_Stop(uint8_t s)                              { command(OPSC_CMD_USER_SOUND_STOP, 0, s);                  }
+    void UserSound_StopAll(void)                                { command(OPSC_CMD_USER_SOUND_STOP_ALL);                    }
   // Sound banks
     void SoundBank(soundbank sb, switch_action a)               { command(OPSC_CMD_SOUNDBANK, sb, a);                       }
     void SoundBank_SetAutoloop(soundbank sb, boolean b)         { command(OPSC_CMD_SOUNDBANK_LOOP, sb, b);                  }
@@ -477,6 +481,7 @@ class OP_TaigenSound: public OP_Sound {
     void UserSound_Play(uint8_t)                                { return;               }
     void UserSound_Repeat(uint8_t)                              { return;               }
     void UserSound_Stop(uint8_t)                                { return;               }
+    void UserSound_StopAll(void)                                { return;               }
   // Sound banks
     void SoundBank(soundbank, switch_action)                    { return;               }    
     void SoundBank_SetAutoloop(soundbank, boolean)              { return;               }    

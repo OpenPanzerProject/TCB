@@ -190,6 +190,7 @@ public:
     void UserSound_Play(uint8_t);                           // Play user sound x once
     void UserSound_Repeat(uint8_t);                         // Repeat user sound x
     void UserSound_Stop(uint8_t);                           // Stop user sound x
+    void UserSound_StopAll(void);                           // Stop all user sounds
     void IncreaseVolume(void);                              // Increase volume
     void DecreaseVolume(void);                              // Decrease volume
     void StopVolume(void);                                  // Stop changing volume

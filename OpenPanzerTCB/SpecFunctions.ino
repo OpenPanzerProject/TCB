@@ -104,6 +104,7 @@ void LoadFunctionTriggers()
                 case SF_USER_SOUND12_ONCE:          SF_Callback[i] = &SF_TriggerUserSound12;                        break;
                 case SF_USER_SOUND12_RPT:           SF_Callback[i] = &SF_UserSound12_Repeat;                        break;
                 case SF_USER_SOUND12_OFF:           SF_Callback[i] = &SF_UserSound12_Stop;                          break;
+                case SF_USER_SOUND_ALL_OFF:         SF_Callback[i] = &SF_UserSound_Stop_All;                        break;
                 case SF_SBA_PLAYSTOP:               SF_Callback[i] = &SF_Soundbank_A_PlayStop;                      break;
                 case SF_SBA_NEXT:                   SF_Callback[i] = &SF_Soundbank_A_Next;                          break;
                 case SF_SBA_PREVIOUS:               SF_Callback[i] = &SF_Soundbank_A_Previous;                      break;
@@ -128,8 +129,9 @@ void LoadFunctionTriggers()
                 case SF_TURNMODE_2:                 SF_Callback[i] = &SF_TurnMode2;                                 break;                    
                 case SF_TURNMODE_3:                 SF_Callback[i] = &SF_TurnMode3;                                 break;                    
                 case SF_SMOKER:                     SF_Callback[i] = &Smoker_ManualControl;                         break; // Analog function for controlling speed of smoker output (could be a motor or light or whatever)
-                case SF_SMOKER_ON:                  SF_Callback[i] = &SF_Smoker_ManualOn;                           break; 
-                case SF_SMOKER_OFF:                 SF_Callback[i] = &SF_Smoker_ManualOff;                          break;
+                case SF_SMOKER_ON:                  SF_Callback[i] = &SF_Smoker_ManualOn;                           break; // Manual control of smoker output
+                case SF_SMOKER_OFF:                 SF_Callback[i] = &SF_Smoker_ManualOff;                          break; // Manual control of smoker output
+                case SF_SMOKER_MANTOGGLE:           SF_Callback[i] = &SF_Smoker_ManualToggle;                       break; // Manual control of smoker output
                 case SF_MOTOR_A:                    SF_Callback[i] = &MotorA_ManualControl;                         break; // Analog function
                 case SF_MOTOR_B:                    SF_Callback[i] = &MotorB_ManualControl;                         break; // Analog function
                 case SF_MOTOR_A_ON:                 SF_Callback[i] = &MotorA_On;                                    break;
@@ -167,9 +169,9 @@ void LoadFunctionTriggers()
                 case SF_SPEED_50:                   SF_Callback[i] = &SF_ReduceSpeed_50;                            break;
                 case SF_SPEED_25:                   SF_Callback[i] = &SF_ReduceSpeed_25;                            break;
                 case SF_SPEED_RESTORE:              SF_Callback[i] = &SF_RestoreSpeed;                              break;
-                case SF_SMOKER_ENABLE:              SF_Callback[i] = &SF_Smoker_Enable;                             break;
-                case SF_SMOKER_DISABLE:             SF_Callback[i] = &SF_Smoker_Disable;                            break;
-                case SF_SMOKER_TOGGLE:              SF_Callback[i] = &SF_Smoker_Toggle;                             break;
+                case SF_SMOKER_ENABLE:              SF_Callback[i] = &SF_Smoker_Enable;                             break; // Control of auto smoker function
+                case SF_SMOKER_DISABLE:             SF_Callback[i] = &SF_Smoker_Disable;                            break; // Control of auto smoker function
+                case SF_SMOKER_TOGGLE:              SF_Callback[i] = &SF_Smoker_Toggle;                             break; // Control of auto smoker function
                 case SF_INCR_VOLUME:                SF_Callback[i] = &SF_IncreaseVolume;                            break;
                 case SF_DECR_VOLUME:                SF_Callback[i] = &SF_DecreaseVolume;                            break;
                 case SF_STOP_VOLUME:                SF_Callback[i] = &SF_StopVolume;                                break;
@@ -574,6 +576,7 @@ void SF_UserSound11_Stop(uint16_t ignoreMe)     { UserSound_Stop(11);       }
 void SF_TriggerUserSound12(uint16_t ignoreMe)   { TriggerUserSound(12);     }
 void SF_UserSound12_Repeat(uint16_t ignoreMe)   { UserSound_Repeat(12);     }
 void SF_UserSound12_Stop(uint16_t ignoreMe)     { UserSound_Stop(12);       }
+void SF_UserSound_Stop_All(uint16_t ignoreMe)   { UserSound_StopAll();      }
 void SF_Soundbank_A_PlayStop(uint16_t ignoreMe) { SoundBank(SOUNDBANK_A, ACTION_ONSTART); }
 void SF_Soundbank_A_Next(uint16_t ignoreMe)     { SoundBank(SOUNDBANK_A, ACTION_PLAYNEXT); }
 void SF_Soundbank_A_Previous(uint16_t ignoreMe) { SoundBank(SOUNDBANK_A, ACTION_PLAYPREV); }
@@ -607,6 +610,7 @@ void SF_Smoker_Disable(uint16_t ignoreMe)       { DisableSmoker();          }
 void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }
 void SF_Smoker_ManualOn(uint16_t ignoreMe)      { Smoker_ManualOn();        }
 void SF_Smoker_ManualOff(uint16_t ignoreMe)     { Smoker_ManualOff();       }
+void SF_Smoker_ManualToggle(uint16_t ignoreMe)  { Smoker_ManualToggle();    }
 void SF_IncreaseVolume(uint16_t ignoreMe)       { IncreaseVolume();         }
 void SF_DecreaseVolume(uint16_t ignoreMe)       { DecreaseVolume();         }
 void SF_StopVolume(uint16_t ignoreMe)           { StopVolume();             }

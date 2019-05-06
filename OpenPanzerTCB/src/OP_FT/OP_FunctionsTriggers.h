@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 161;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 163;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -94,7 +94,7 @@ enum _special_function : byte {
     SF_TURNMODE_1       = 49,       // 49
     SF_TURNMODE_2       = 50,       // 50
     SF_TURNMODE_3       = 51,       // 51
-    SF_SMOKER           = 52,       // 52   -- analog function, sets the speed of the smoker manually -- see also 101-102 for on/off digital functions
+    SF_SMOKER           = 52,       // 52   -- analog function, sets the speed of the smoker manually -- see also 101-102 & 161 for manual on/off/toggle digital functions. See 82-84 for control of auto smoker.
     SF_MOTOR_A          = 53,       // 53   -- analog function
     SF_MOTOR_B          = 54,       // 54   -- analog function
     SF_RC1_PASS         = 55,       // 55   -- analog function ("PASS" for pass-through) -- see also 92-97 for pass-throughs 6-8
@@ -124,7 +124,7 @@ enum _special_function : byte {
     SF_DRIVEPROFILE_1   = 79,       // 79
     SF_DRIVEPROFILE_2   = 80,       // 80
     SF_DRIVEPROFILE_TOGGLE = 81,    // 81
-    SF_SMOKER_ENABLE    = 82,       // 82
+    SF_SMOKER_ENABLE    = 82,       // 82   -- for control of _auto_ smoker functionality
     SF_SMOKER_DISABLE   = 83,       // 83
     SF_SMOKER_TOGGLE    = 84,       // 84
     SF_SET_VOLUME       = 85,       // 85
@@ -143,7 +143,7 @@ enum _special_function : byte {
     SF_INCR_VOLUME      = 98,       // 98
     SF_DECR_VOLUME      = 99,       // 99
     SF_STOP_VOLUME      = 100,      // 100
-    SF_SMOKER_ON        = 101,      // 101  -- see also 52 for analog manual control of smoker output
+    SF_SMOKER_ON        = 101,      // 101  -- functions for controlling smoker manually, see also 52 for analog manual control of smoker output, and 161 for toggle. See 82-84 for control of auto smoker.
     SF_SMOKER_OFF       = 102,      // 102
     SF_USER_SOUND5_ONCE = 103,      // 103  -- see also 35-40 for user sounds 1 & 2 and 86-91 for user sounds 3 & 4
     SF_USER_SOUND5_RPT  = 104,      // 104
@@ -202,7 +202,9 @@ enum _special_function : byte {
     SF_OUTPUT_B_BLINK   = 157,      // 157
     SF_IR_ENABLE        = 158,      // 158
     SF_IR_DISABLE       = 159,      // 159
-    SF_IR_TOGGLE        = 160      // 160
+    SF_IR_TOGGLE        = 160,      // 160
+    SF_SMOKER_MANTOGGLE = 161,      // 161  -- see also 52 for analog manual control of smoker output and 101-102 for manual on/off. This toggle is for manual control. See 82-84 for auto controls.
+    SF_USER_SOUND_ALL_OFF = 162     // 162
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -226,7 +228,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,1,1,1,1,1,   // 130-139
  1,1,1,1,1,1,1,1,1,1,   // 140-149
  1,1,1,1,1,1,1,1,1,1,   // 150-159
- 1                      // 160
+ 1,1,1                  // 160-162
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -293,7 +295,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Set Turn Mode = 1",                         // 49
     "Set Turn Mode = 2",                         // 50
     "Set Turn Mode = 3",                         // 51
-    "Smoker - Manual Control",                   // 52   -- see also 101-102 for digital on/off manual control of the smoker output
+    "Smoker - Manual Control",                   // 52   -- see also 101-102 for digital on/off manual control of the smoker output and 161 for toggle
     "Motor A - Manual Control",                  // 53
     "Motor B - Manual Control",                  // 54
     "RC Output 1 - Pass-through",                // 55   -- see also 92-97 for pass-throughs 6-8
@@ -342,7 +344,7 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "Start Increasing Volume",                   // 98
     "Start Decreasing Volume",                   // 99
     "Stop Changing Volume",                      // 100
-    "Smoker - Manual On",                        // 101  -- see also 52 for analag manual control of the smoker output speed
+    "Smoker - Manual On",                        // 101  -- see also 52 for analag manual control of the smoker output speed and 161 for toggle
     "Smoker - Manual Off",                       // 102
     "User Sound 5 - Play Once",                  // 103  -- see also 35-40 for user sounds 1 & 2 and 86-91 for user sounds 3 & 4
     "User Sound 5 - Repeat",                     // 104
@@ -401,7 +403,9 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "External Output B - Blink",                 // 157
     "IR - Enable",                               // 158
     "IR - Disable",                              // 159
-    "IR - Toggle On/Off"                        // 160
+    "IR - Toggle On/Off",                        // 160
+    "Smoker - Manual Toggle",                    // 161  -- see also 52 for analag manual control of the smoker output speed and 101-102 for on/off
+    "User Sounds - Stop All"                    // 162
 };
 
 

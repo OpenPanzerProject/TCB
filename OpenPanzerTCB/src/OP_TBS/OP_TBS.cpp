@@ -471,6 +471,11 @@ void OP_TBS::UserSound_Stop(uint8_t s)
         default: break;        
     }
 }     
+void OP_TBS::UserSound_StopAll()
+{
+    for (int i = 1; i < 7; i++) { UserSound_Stop(i); }
+}
+
 
 //------------------------------------------------------------------------------------------------------------------------>>
 // VOLUME
