@@ -1053,23 +1053,26 @@ if (Startup)
                     break;                    
             }
 
-            // Other checks to do when we're moving: 
+            // Other checks to do when we're moving - but we don't count track recoil as actually moving
 
-            // Let the sound card know how fast the vehicle is moving for track overlay sounds (not the same as engine speed, set above).
-            // But only if our speed has changed, and only if the effect is even enabled (the user may choose to turn it off or on via triggers)
-            if (TankSound->isTrackOverlayEnabled() && DriveSpeed_Previous != DriveSpeed) TankSound->SetVehicleSpeed(DriveSpeed);
-
-            // Start squeaking if we haven't already. The sound object will automatically ignore any squeaks the user disabled in settings. 
-            if      (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed && abs(DriveSpeed_Previous) <  MinSqueakSpeed) { TankSound->StartSqueaks(); }
-            else if (TankSound->AreSqueaksActive() == true  && abs(DriveSpeed) <  MinSqueakSpeed && abs(DriveSpeed_Previous) >= MinSqueakSpeed) { TankSound->StopSqueaks();  }
-
-            // If the user set brake lights to come on automatically at stop, turn them off now, because we are no longer stopped
-            if (eeprom.ramcopy.BrakesAutoOnAtStop && BrakeLightsActive) { BrakeLightsOff(); }
-
-            // If we are moving, keep the idle timer going. Once we come to a stop we'll quit updating it, and if the user has EngineAutoStopTime_mS set to something more than 0 (meaning, they want the 
-            // engine to automatically turn off after a certain amount of time sitting stopped at idle), then when the timer expires it will turn the engine off. UpdateEngineIdleTimer() also starts the timer
-            // if this is the first time we're calling it. 
-            if (DriveModeActual != STOP)   { UpdateEngineIdleTimer(); }
+            if (DriveModeActual != TRACK_RECOIL)
+            {
+                // Let the sound card know how fast the vehicle is moving for track overlay sounds (not the same as engine speed, set above).
+                // But only if our speed has changed, and only if the effect is even enabled (the user may choose to turn it off or on via triggers)
+                if (TankSound->isTrackOverlayEnabled() && DriveSpeed_Previous != DriveSpeed) TankSound->SetVehicleSpeed(DriveSpeed);
+    
+                // Start squeaking if we haven't already. The sound object will automatically ignore any squeaks the user disabled in settings. 
+                if      (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed && abs(DriveSpeed_Previous) <  MinSqueakSpeed) { TankSound->StartSqueaks(); }
+                else if (TankSound->AreSqueaksActive() == true  && abs(DriveSpeed) <  MinSqueakSpeed && abs(DriveSpeed_Previous) >= MinSqueakSpeed) { TankSound->StopSqueaks();  }
+    
+                // If the user set brake lights to come on automatically at stop, turn them off now, because we are no longer stopped - except ignore track recoil
+                if (eeprom.ramcopy.BrakesAutoOnAtStop && BrakeLightsActive) { BrakeLightsOff(); }
+    
+                // If we are moving, keep the idle timer going. Once we come to a stop we'll quit updating it, and if the user has EngineAutoStopTime_mS set to something more than 0 (meaning, they want the 
+                // engine to automatically turn off after a certain amount of time sitting stopped at idle), then when the timer expires it will turn the engine off. UpdateEngineIdleTimer() also starts the timer
+                // if this is the first time we're calling it. 
+                if (DriveModeActual != STOP)   { UpdateEngineIdleTimer(); }
+            }
         }
     }
     else // In this case the engine is stopped
