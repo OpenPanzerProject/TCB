@@ -1016,7 +1016,7 @@ if (Startup)
                     // Now we mix the throttle and turn outputs to arrive at individual motor commands. 
                     // RightSpeed and LeftSpeed are passed by reference and updated by the function
                     Driver.MixSteering(DriveSpeed, TurnSpeed, &RightSpeed, &LeftSpeed);  
-    
+
                     //Finally! We send the motor commands out to the motors, but only if something has changed since last time. 
                     if ((RightSpeed_Previous != RightSpeed) || (LeftSpeed_Previous != LeftSpeed))
                     {

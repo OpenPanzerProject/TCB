@@ -925,7 +925,7 @@ void IRdecodeBase::convertValueToSonyNumbers(uint32_t &val)
     SonyDeviceID = ReverseByte(v);          // Swap the bits, this is now our Device ID
 
     v = (uint8_t)((val & 0x0FE0) >> 4);     // Toss the device ID, and leave us with the command bits padded to 8 (by only moving right 4 instead of 5)
-    SonyDeviceID = ReverseByte(v);          // Swap the bits, this is now our Command 
+    SonyCommand = ReverseByte(v);           // Swap the bits, this is now our Command 
     
     //Serial.print(F("Val: ")); Serial.print(val); Serial.print(F(" DeviceID: ")); Serial.print(SonyDeviceID); Serial.print(F(" Command: ")); Serial.println(SonyCommand);
 }
