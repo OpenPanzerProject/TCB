@@ -69,7 +69,7 @@ void PPMDecode::begin()
     // 1        0       Interrupt on falling edge
     // 1        1       Interrupt on rising edge
 
-    // We tell it which setting we want through the mode variable passed to this function. mode can be:
+    // We tell it which setting we want through PPM_MODE which is defined in OP_PPMDecode.h. Mode can be:
     // CHANGE
     // RISING
     // FALLING

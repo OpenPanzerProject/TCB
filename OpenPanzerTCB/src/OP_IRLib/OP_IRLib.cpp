@@ -773,7 +773,7 @@ bool IRdecodeIBU_Repair::decode(void) {
         }
     }
     // If we make it here, no match. 
-    return DATA_MARK_ERROR(pgm_read_word_near(&(IBU2RepairSig[0])));;
+    return DATA_MARK_ERROR(pgm_read_word_near(&(IBU2RepairSig[0])));
 }
 bool IRdecodeRCTA_Repair::decode(void) {
 // RC Tanks Australia repair signal is very simple: 4000 uS ON, 1500 OFF, 2000 ON, 2500 OFF, repeated 32 times
@@ -808,7 +808,7 @@ bool IRdecodeRCTA_Repair::decode(void) {
         }
     }
     // If we make it here, no match. 
-    return DATA_MARK_ERROR(pgm_read_word_near(&(RCTARepairSig[0])));;
+    return DATA_MARK_ERROR(pgm_read_word_near(&(RCTARepairSig[0])));
 }
 bool IRdecodeRCTA_MG::decode(void) {
 // RC Tanks Australia machine gun signal is very simple: 8000 uS ON, 6000 OFF, 2000 ON, 4000 OFF, repeated 20 times by RCTA devices. 
@@ -844,7 +844,7 @@ bool IRdecodeRCTA_MG::decode(void) {
         }
     }
     // If we make it here, no match. 
-    return DATA_MARK_ERROR(pgm_read_word_near(&(RCTAMGSig[0])));;
+    return DATA_MARK_ERROR(pgm_read_word_near(&(RCTAMGSig[0])));
     
 }
 // We have the Sony protocol included because Clark uses it for repair and machine gun codes

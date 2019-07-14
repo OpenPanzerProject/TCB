@@ -72,7 +72,7 @@
 #define QIK_MOTOR_M1_BRAKE               0x07
 #define QIK_MOTOR_BRAKE_LEVEL            0x7F   // Maximum = 127
 
-// CRC7 lookup table, takes up 256 bytes, stick it PROGRMEM
+// CRC7 lookup table, takes up 256 bytes, stick it in PROGMEM
 const unsigned char CRC7Table[256] PROGMEM_FAR = 
 {
     0x00,

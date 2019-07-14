@@ -114,7 +114,7 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     if (BattleSettings.IR_Team != IR_TEAM_NONE)
     {   // If we aren't one of these protocols, change IR_TEAM back to NONE
         if (BattleSettings.IR_FireProtocol != IR_FOV)
-            BattleSettings.IR_Team == IR_TEAM_NONE;
+            BattleSettings.IR_Team = IR_TEAM_NONE;
     }
             
     // Misc Settings
@@ -1230,7 +1230,7 @@ void OP_Tank::HitLEDs_Off(void)
 void OP_Tank::HitLEDs_Toggle(void)
 {
     HitLEDsOn ? HitLEDs_Off() : HitLEDs_On();
-    HitLEDsOn != HitLEDsOn;
+    HitLEDsOn = !HitLEDsOn;
 }
 void OP_Tank::HitLEDs_SetDim(uint8_t level)
 {

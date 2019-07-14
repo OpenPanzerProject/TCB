@@ -12,7 +12,7 @@
  *
  * Mr. Christensen's original copyright is reprinted below:
  *   
-/*----------------------------------------------------------------------*
+ *----------------------------------------------------------------------*
  * Arduino Button Library v1.0                                          *
  * Jack Christensen Mar 2012                                            *
  *                                                                      *

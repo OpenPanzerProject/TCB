@@ -40,7 +40,8 @@ void LedHandler::on(void)
 
 boolean LedHandler::isOn(void)
 {
-    _invert ? !digitalRead(_pin) : digitalRead(_pin);
+    if (_invert) return !digitalRead(_pin);
+    else         return  digitalRead(_pin);    
 }
 
 void LedHandler::off(void)

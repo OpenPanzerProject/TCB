@@ -56,7 +56,6 @@ class OP_Servos
     // We are using static for everything because we only want one instance of this class. 
 public:
     OP_Servos();
-//  static void setup();
 
     // configures timer1
     static void begin();
@@ -118,8 +117,7 @@ protected:
 
 private:    
     // Remember, static variables must be initialized outside the class
-    static uint16_t _GlobalMaxTicks;
-    static uint16_t _GlobalMinTicks;
+
 };
 
 

@@ -47,8 +47,6 @@ volatile OP_Servos::PortPin OP_Servos::Channel[SERVO_OUT_COUNT];
 volatile uint8_t OP_Servos::CurrentChannel;
 
 // They are set to private, so you won't be able to access them from the sketch
-uint16_t OP_Servos::_GlobalMaxTicks = SERVO_uS_TO_TICKS(SERVO_OUT_MAXPULSE);
-uint16_t OP_Servos::_GlobalMinTicks = SERVO_uS_TO_TICKS(SERVO_OUT_MINPULSE);
 boolean  OP_Servos::initialized = false;
 
 
@@ -281,7 +279,7 @@ void OP_Servos::writeMicroseconds(uint8_t WhatChannel, uint16_t Set_uS)
 
 uint16_t OP_Servos::getPulseWidth(uint8_t WhatChannel)
 {
-    // Return this servo's min pulse width is uS
+    // Return this servo's pulse width in uS
     if(WhatChannel > SERVO_OUT_COUNT)
     {
         return 0;
@@ -332,7 +330,7 @@ void OP_Servos::setMaxPulseWidth(uint8_t WhatChannel, uint16_t Set_uS)
 
 uint16_t OP_Servos::getMinPulseWidth(uint8_t WhatChannel)
 {
-    // Return this servo's min pulse width is uS
+    // Return this servo's min pulse width in uS
     if(WhatChannel > SERVO_OUT_COUNT)
     {
         return SERVO_OUT_MINPULSE;
@@ -345,7 +343,7 @@ uint16_t OP_Servos::getMinPulseWidth(uint8_t WhatChannel)
 
 uint16_t OP_Servos::getMaxPulseWidth(uint8_t WhatChannel)
 {
-    // Return this servo's min pulse width is uS
+    // Return this servo's max pulse width in uS
     if(WhatChannel > SERVO_OUT_COUNT)
     {
         return SERVO_OUT_MAXPULSE;
