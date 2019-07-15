@@ -79,7 +79,7 @@
     // that all have a 3-pin JST-PH connector (+5v, Gnd, and Tx). Later we added SBus support and we read SBus on the Serial 3 input (Rx) at 100000 baud, which is 
     // non-standard. If we use an SBus receiver, the Serial 3 Tx line is disabled in code, so an LCD on that port will no longer work. And in four years of development,
     // we never needed to use an LCD anyway. 
-    // We've left the Serail 3 Tx connector on the TCB board for the fun of it, and it may be of some use in certain situations. But if you want to use an SBus receiver
+    // We've left the Serial 3 Tx connector on the TCB board for the fun of it, and it may be of some use in certain situations. But if you want to use an SBus receiver
     // and an LCD, you'll have to put the LCD on Serial1 (AuxSerial). 
     #define Serial3Tx                   Serial3     // We call this Serial3Tx because we only have access to the Tx line, not the Rx (which is dedicated to SBus). 
 
