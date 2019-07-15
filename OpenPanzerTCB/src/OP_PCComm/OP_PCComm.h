@@ -128,6 +128,7 @@
 // Communication defines
 #define DELIMITER               '|'
 #define NEWLINE                 '\n'
+#define NUM_DELIMITERS           3      // How many delimiters are in a full sentence
 
 // Commands received from PC
 #define INIT_STRING             "OPZ"   // The initialization string that tells us to start communicating with the PC
