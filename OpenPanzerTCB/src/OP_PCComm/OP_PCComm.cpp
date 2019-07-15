@@ -246,7 +246,7 @@ byte c;
         switch (c)
         {
         case NEWLINE:           // end of transmission
-            if (numDelimiters = 2 && segment_length > 0)
+            if (numDelimiters == 2 && segment_length > 0)
             {
                 // This is the fourth delimiter. The last number received will be the checksum
                 // We subtract 1 from segment_length so that the newline char doesn't get counted as part of the number
@@ -439,7 +439,7 @@ OP_PololuQik * Qik;
                             strcat(arrOut, prefixString);
                             strLen += prefixLength;
                         }
-                        else if (HiLo = HIGH)
+                        else if (HiLo == HIGH)
                         {   // Alternate sentence prefix with the HI ID
                             strcat(arrOut, altPrefixString);
                             strLen += altPrefixLength;                      
