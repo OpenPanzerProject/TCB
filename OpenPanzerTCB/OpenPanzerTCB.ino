@@ -2,7 +2,7 @@
  * Source:          openpanzer.org              
  * Authors:         Luke Middleton
  * 
- * Copyright 2018 Open Panzer
+ * Copyright 2019 Open Panzer
  *   
  * For more information, see the Open Panzer Wiki:
  * http://wiki.openpanzer.org
