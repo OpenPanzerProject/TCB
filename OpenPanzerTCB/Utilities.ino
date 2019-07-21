@@ -152,7 +152,10 @@ void DumpVersion()
     PrintDebugLine();
     DebugSerial->print(F("FIRMWARE VERSION: "));
     String str = FIRMWARE_VERSION;
-    DebugSerial->println(str);
+    DebugSerial->print(str);
+    DebugSerial->print(" (EEPROM Size: ");
+    DebugSerial->print(sizeof(_eeprom_data));
+    DebugSerial->println(")");    
 }
 
 void DumpRadioInfo()
