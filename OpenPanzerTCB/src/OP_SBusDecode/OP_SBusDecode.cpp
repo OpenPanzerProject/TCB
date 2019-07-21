@@ -166,7 +166,8 @@ uint8_t UART_error;
                 {   // If there is *more* than 3mS since previous char (TimeFlag = true, which in this case is bad), 
                     // reset the count and start looking for start byte again. 
                     sbus_pointer = 0 ;              // Reset the frame
-                    State = FAILSAFE_state;         // Set state to Failsafe
+                    stateCount = 0;
+                    if (State == READY_state) State = FAILSAFE_state;         // Set state to Failsafe if we were previously connected, otherwise leave in existing state (acquiring or not synched). 
                 }
                 else 
                 {
@@ -199,6 +200,7 @@ uint8_t UART_error;
                                 else
                                 {
                                     State = READY_state;        // Valid frame, keep at Ready
+                                    stateCount = 0;             // reset
                                 }
 
                                 if (++frameCount > framesToDiscard)
@@ -240,7 +242,7 @@ void SBusDecode::ConvertSBus_to_PWM()
     uint8_t inputbitsavailable = 0;
     uint32_t inputbits = 0;
     uint8_t *sbus = SBusData;
-    *sbus++;    // Skip start byte
+    sbus++;    // Skip start byte
     for ( uint8_t i = 0 ; i < SBUS_CHANNELS ; i += 1 )
     {
         uint16_t temp;
