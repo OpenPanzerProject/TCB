@@ -33,6 +33,7 @@ OP_Servos      * OP_TBS::TBSProp;
 boolean         OP_TBS::Micro;
 int             OP_TBS::TBSProp2TimerID;
 boolean         OP_TBS::Prop2TimerComplete;
+boolean         OP_TBS::EngineRunning;
 int             OP_TBS::TBSProp3TimerID;
 boolean         OP_TBS::Prop3TimerComplete;
 uint8_t         OP_TBS::currentProp3SoundNum;
@@ -72,6 +73,9 @@ OP_TBS::OP_TBS(OP_SimpleTimer * t, boolean m)
     TBSProp3TimerID = 0;
     currentProp3SoundNum = SOUND_OFF;
     previousProp3SoundNum = SOUND_OFF;
+    
+    // The engine is not running
+    EngineRunning = false;
     
     // Initialize squeak times, and set them to off to begin
     // Later we will load in the user's settings for squeak times and whether they are enabled or not. 
@@ -187,13 +191,27 @@ void OP_TBS::StartEngine(void)
         SetEngineSpeed(75); // Not full throttle, but enough it should be registered
         TBSTimer->setTimeout(TBS_SIGNAL_mS, ClearThrottleBlip); // After a brief time the blip will be reverted to idle
     }
-    else ToggleEngineSound();
+    else 
+    {
+        if (!EngineRunning)     // No need to turn on the engine if it's already on, otherwise we will get out of sync
+        {        
+            ToggleEngineSound();
+            EngineRunning = true;
+        }
+    }
 }
 
 void OP_TBS::StopEngine(void)
 {
-    if (Micro) return;  // We have no way of turning off the engine on the Micro, other than letting it turn off itself after some idle time. 
-    else ToggleEngineSound();
+    if (Micro) return;      // We have no way of turning off the engine on the Micro, other than letting it turn off itself after some idle time. 
+    else 
+    {
+        if (EngineRunning)  // No need to turn off the engine if it's already off, otherwise we will get out of synch
+        {            
+            ToggleEngineSound(); 
+            EngineRunning = false;
+        }
+    }
 }
 
 void OP_TBS::ToggleEngineSound(void)

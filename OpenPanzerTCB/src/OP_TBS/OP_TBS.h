@@ -222,6 +222,7 @@ public:
     static void         StartProp2Timer(void);
     static void         StartProp2Timer(int);               // Overloaded, in case we want to keep it on for a set amount of time. 
     static void         ClearProp2Timer(void);
+    static boolean      EngineRunning;
     
     // PROP 3
     static void         TriggerSpecialSound(int, bool = true);     // eg, TriggerSpecialSound(SOUND_CANNON); // will trigger cannon sound. The second parameter is an optional boolean 
