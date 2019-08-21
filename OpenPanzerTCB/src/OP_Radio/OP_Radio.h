@@ -51,9 +51,10 @@ const PROGMEM uint8_t TurretStickPositionStringLengths[SPECIALPOSITIONS+1] = { 7
 #define SBUS_TRY_TIME       250     // How long to try detecting an SBus signal, in mS. Only used in detect mode at startup. 
 #define iBUS_TRY_TIME       250     // How long to try detecting an iBus signal, in mS. Only used in detect mode at startup. 
 
-#define RADIO_FAILSAFE_MS   300     // If we exceed this amount of time in milliseconds without reading a valid radio frame, go into failsafe. 
+#define RADIO_FAILSAFE_MS   500     // If we exceed this amount of time in milliseconds without reading a valid radio frame, go into failsafe. 
                                     // 250 milliseconds is 1/4 second. That is a long time for an RC receiver, normally 12 PPM frames and over 25 SBus
                                     // frames would have arrived in that time (although we throw away every other SBus frame so in fact it's about the same as PPM). 
+                                    // Nevertheless we give ourselves extra leeway with 1/2 second. 
 
 class OP_Radio
 {

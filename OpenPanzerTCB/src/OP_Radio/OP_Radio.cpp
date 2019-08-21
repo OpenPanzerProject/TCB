@@ -839,7 +839,7 @@ void OP_Radio::GetSwitchPosition(int a)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------->>
 // If the watchdog timer expires, this function will be called
 void OP_Radio::SetChannelsFailSafe()
-{
+{   
     if (!InFailsafe)    
     {
         Sticks.Throttle.pulse = Sticks.Throttle.Settings->pulseCenter; 
