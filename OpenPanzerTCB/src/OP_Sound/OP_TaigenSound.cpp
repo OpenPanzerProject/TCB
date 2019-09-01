@@ -25,7 +25,7 @@
 
 
 volatile uint16_t OP_TaigenSound::command; 
-
+elapsedMillis     OP_TaigenSound::elapsed;
 
 void OP_TaigenSound::begin() 
 { 
@@ -73,6 +73,8 @@ void OP_TaigenSound::OVF_ISR()
     static uint8_t bitNum = 0;
     static uint16_t data = 0;
     static boolean TriggerSent = false;
+    static boolean engineStartSent = false;
+    static boolean engineRunning = false;
 
     #define OverflowPerHalfmS 8         // How many overflows equals 1/2 millisecond
 
@@ -158,13 +160,26 @@ void OP_TaigenSound::OVF_ISR()
                 { 
                     if (TriggerSent)
                     {
-                        command ^= TS_MASK_ENGINE_START;    // Clear the start signal
-                        command |= TS_MASK_ENGINE_IDLE;     // Set the engine idle flag
-                        TriggerSent = false;                // Reset
+                        command ^= TS_MASK_ENGINE_START;    // Command went through, clear engine start
+                        TriggerSent = false;                // Command went through, clear flag
                     }
-                    else    TriggerSent = true;             // Set flag so this only happens once
+                    else    
+                    {
+                        TriggerSent = true;                 // Let the commend go through to data, next time will clear
+                        engineRunning = true;               // Set our engine state variable
+                        engineStartSent = true;             // We will use this second flag to help us send the idle command later
+                        elapsed = 0;
+                    }
                 }
                 
+                // Check if some time has passed after engine start, then send the idle command
+                // All three of the Taigen cards tested (PzIII, Leopard 2A6, and JS-2 all use a fixed 8.3 second
+                // engine start sound, and the Taigen MFU waits 8.3 seconds before sending the idle signal. 
+                if (engineStartSent && engineRunning && elapsed > 8300)
+                {
+                    engineStartSent = false;
+                    command |= TS_MASK_ENGINE_IDLE;         // Set the engine idle flag, this one stays on continuously until engine is stopped
+                }
                 
                 // Stop signal only gets sent once
                 if (command & TS_MASK_ENGINE_STOP)
@@ -172,9 +187,14 @@ void OP_TaigenSound::OVF_ISR()
                     if (TriggerSent) 
                     { 
                         command = 0;                        // Turn off all sounds
-                        TriggerSent = false;                
+                        TriggerSent = false;                // Command went through, clear flag
                     }
-                    else    TriggerSent = true;            
+                    else
+                    {    
+                        TriggerSent = true;                 // Let the command go through to data       
+                        engineRunning = false;              // Set our local engine state variable
+                        engineStartSent = false;
+                    }
                 }
                 
                 // Stop Cannon
@@ -182,10 +202,10 @@ void OP_TaigenSound::OVF_ISR()
                 {
                     if (TriggerSent) 
                     { 
-                        command ^= TS_MASK_CANNON;         
-                        TriggerSent = false;
+                        command ^= TS_MASK_CANNON;          // Command went through, clear cannon
+                        TriggerSent = false;                // Command went through, clear flag
                     }
-                    else    TriggerSent = true;            
+                    else    TriggerSent = true;             // Let the command go through to data
                 }
 
                 // Stop Hit
@@ -193,10 +213,10 @@ void OP_TaigenSound::OVF_ISR()
                 {
                     if (TriggerSent) 
                     { 
-                        command ^= TS_MASK_CANNON_HIT;            
-                        TriggerSent = false;
+                        command ^= TS_MASK_CANNON_HIT;      // Command went through, clear cannon hit    
+                        TriggerSent = false;                // Command went through, clear flag
                     }
-                    else    TriggerSent = true;            
+                    else    TriggerSent = true;             // Let the command go through to data           
                 }
                 
                 // Stop Destroy
@@ -204,10 +224,10 @@ void OP_TaigenSound::OVF_ISR()
                 {
                     if (TriggerSent) 
                     { 
-                        command ^= TS_MASK_DESTROY;        
-                        TriggerSent = false;
+                        command ^= TS_MASK_DESTROY;         // Command went through, clear destroy
+                        TriggerSent = false;                // Command went through, clear flag
                     }
-                    else    TriggerSent = true;            
+                    else    TriggerSent = true;             // Let the command go through to data            
                 }
                 
                 // Set our local data variable, then repeat
@@ -224,7 +244,6 @@ void OP_TaigenSound::OVF_ISR()
 void OP_TaigenSound::StartEngine(void)
 {
     command |= TS_MASK_ENGINE_START;
-    command |= TS_MASK_ENGINE_IDLE;
 }
 
 void OP_TaigenSound::StopEngine(void)

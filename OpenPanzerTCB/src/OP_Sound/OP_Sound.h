@@ -22,6 +22,7 @@
 
 #include <Arduino.h>
 #include "../OP_TBS/OP_TBS.h"
+#include "../elapsedMillis/elapsedMillis.h"
 
 typedef char SOUND_DEVICE;
 #define SD_BENEDINI_TBSMINI     0
@@ -395,6 +396,7 @@ class OP_SoundCard: public OP_Sound {
 #define TOP_BIT             0x8000      // Mask for left-most bit of a 16 bit binary number
 
 // There are 16 data bits in a Taigen sentence. Bits 12 and 16 don't seem to be used for anything. 
+// RECALL - when looking at the data stream on the o-scope, we are counting bits FROM THE LEFT (not from the right as would make sense)
 // Auxillary sounds
 #define TS_MASK_TURRET          0x0004  // Bit 3    Turret movement
 #define TS_MASK_BARREL          0x0008  // Bit 4    Barrel movement
@@ -406,9 +408,11 @@ class OP_SoundCard: public OP_Sound {
 // Engine sounds
 #define TS_MASK_ENGINE_NA       0x0002  // Bit 2 plus engine bit (7) - sounds like a louder version of idle, but doesn't seem to be used from any of the o-scope captures. 
                                         // Since they don't seem to use it we don't either. 
+
 #define TS_MASK_ENGINE_START    0x0200  // Bit 10 - just one cycle
 #define TS_MASK_ENGINE_STOP     0x0400  // Bit 11 - just one cycle
 #define TS_MASK_ENGINE_IDLE     0x0040  // Bit 7  
+
 #define TS_MASK_ENGINE_SPEED_1  0x0041  // Bit 1,  7
 #define TS_MASK_ENGINE_SPEED_2  0x1041  // Bit 13, 7, 1
 #define TS_MASK_ENGINE_SPEED_3  0x3041  // Bit 14, 7, 1, 13
@@ -424,8 +428,6 @@ class OP_SoundCard: public OP_Sound {
 #define TS_SPEED4_RANGE         135
 #define TS_SPEED5_RANGE         175
 #define TS_SPEED6_RANGE         215      
-
-
 
 class OP_TaigenSound: public OP_Sound {
   public:
@@ -511,13 +513,14 @@ class OP_TaigenSound: public OP_Sound {
   
   private:
     static volatile uint16_t    command;    // Used to consruct our 16 bit data stream
+    static elapsedMillis        elapsed;
     
     // Class variables
     boolean     _turretEnabled;
     boolean     _turretSoundActive;
     boolean     _barrelEnabled;
     boolean     _barrelSoundActive;
-  
+      
 };
 
 #endif // OP_SOUND_H
