@@ -96,10 +96,6 @@ class Motor {
     // Constructor, set member ESC_Position, external speed range, and reversed status
     Motor (ESC_POS_t pos, int min, int max, int middle, boolean rev=false) : ESC_Position(pos), e_minspeed(min), e_maxspeed(max), e_middlespeed(middle), reversed(rev) {}
     
-    // The external range is the range of values our motor object should expect to be passed for control.
-    void set_ExternalRange (int min, int max, int middle) 
-        { this->e_minspeed = min; this->e_maxspeed = max; this->e_maxspeed = middle; }
-
     // This is the internal range of values that is specific to each motor driver.
     void set_InternalRange (int min, int max, int middle)
         { this->i_minspeed = min; this->i_maxspeed = max; this->i_middlespeed = middle; }
@@ -196,35 +192,6 @@ class Onboard_ESC: public Motor {
     void update(void) { return; }   // Do nothing, we only need the update for serial controllers
 };
 
-class Onboard_Smoker: public Motor {
-  public:
-    Onboard_Smoker(ESC_POS_t pos, int min, int max, int middle, int IdleSpeed, int FastIdleSpeed, int MaxSpeed) : Motor(pos,min,max,middle), _IdleSpeed(IdleSpeed), _FastIdleSpeed(FastIdleSpeed), _MaxSpeed(MaxSpeed) {}
-    void setSpeed(int s);
-    void begin(void);   
-    void stop(void);
-    void setIdle(void);
-    void setFastIdle(void);
-    void update(void);              // Actually we will use the update routine on the smoker for special effects
-    void Shutdown(boolean);         // This will trigger the shutdown smoker effect (slowly turn off smoker)
-private:
-    const int _IdleSpeed;
-    const int _FastIdleSpeed;
-    const int _MaxSpeed;
-    uint32_t LastUpdate_mS;    
-    
-    // These can be used for special smoker effects. The main sketch will poll the update() function routinely, 
-    // which can then create changes in smoker speeds over time. We use this presently to slowly reduce speed
-    // from idle when the engine is turned off. 
-    #define smoker_update_rate_mS   15
-    typedef enum smoker_effect_t
-    {   NONE = 0,
-        SHUTDOWN
-    };
-    smoker_effect_t smoker_effect;
-    void setSpeed_wEffect(int s);   // The update() routine can call this version of setSpeed without clearing the special effect
-    void clearSmokerEffect(void) { if (smoker_effect != NONE) smoker_effect = NONE; }
-};
-
 class Servo_ESC: public Motor, public OP_Servos {
   public:
     Servo_ESC(ESC_POS_t pos, int min, int max, int middle) : Motor(pos,min,max,middle) {}
@@ -249,6 +216,14 @@ class Servo_PAN: public Motor, public OP_Servos {
   private: 
     boolean canSetFixedPos; 
 };
+
+
+typedef char RecoilPreset;
+#define RS_PRESET_NONE                  0
+#define RS_PRESET_TAIGEN_TIGER1         1
+//#define ADDITIONAL (number)
+#define LAST_RS_PRESET RS_PRESET_TAIGEN_TIGER1
+const __FlashStringHelper *ptrRecoilPreset(RecoilPreset rs); //Returns a character string that is name of recoil preset (see OP_Motors.cpp)
 
 class Servo_RECOIL: public Motor, public OP_Servos {
   public:
