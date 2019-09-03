@@ -451,13 +451,19 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.RecoilServo_Return_mS = 800;
         ramcopy.RecoilServo_EPMin = 1000;
         ramcopy.RecoilServo_EPMax = 2000;
-
+        ramcopy.RecoilServo_PresetNum = RS_PRESET_NONE;  // Not presently implemented
+        
     // On board smoker output
         ramcopy.SmokerControlAuto = true;
         ramcopy.SmokerIdleSpeed = 89;           // 35 percent
         ramcopy.SmokerFastIdleSpeed = 128;      // 50 percent
         ramcopy.SmokerMaxSpeed = 255;           // 100 percent
         ramcopy.SmokerDestroyedSpeed = 255;     // 100 percent
+        ramcopy.SmokerDeviceType = SMOKERTYPE_ONBOARD_STANDARD; // Standard onboard smoker with single output for combined fan & heat (ie, Heng Long/Taigen types)
+        ramcopy.SmokerPreHeat_Sec = 0;          // How long to preheat the heating element before engine start, 0 to disable
+        ramcopy.SmokerHeatIdleAmt = 255;
+        ramcopy.SmokerHeatFastIdleAmt = 255;
+        ramcopy.SmokerHeatMaxAmt = 255;
 
     // Driving adjustments
         ramcopy.AccelRampEnabled_1 = true;      // Profile 1 settings - mild

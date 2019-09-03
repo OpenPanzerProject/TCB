@@ -31,6 +31,7 @@
 #include "../OP_Radio/OP_RadioDefines.h"
 #include "../OP_Sound/OP_Sound.h"
 #include "../OP_Motors/OP_Motors.h"
+#include "../OP_Smoker/OP_Smoker.h"
 #include "../OP_Driver/OP_Driver.h"
 #include "../OP_Settings/OP_Settings.h"
 #include "../EEPROMex/EEPROMex.h"   // We use the extended version, not Arduino's built-in EEPROM library. 
@@ -48,7 +49,7 @@
 // In that case EEPROM data corruption WILL occur and the sketch will exhibit unstable behavior!
 // 
 
-    #define EEPROM_INIT             0xF183          // Modified with 00.93.45 on 2/20/2019
+    #define EEPROM_INIT             0x5D4C          // Modified with 00.93.60 on 9/2/2019
 //
 //
 //=======================================================================================================================================>>

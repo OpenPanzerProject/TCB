@@ -66,7 +66,7 @@ struct _eeprom_data {
     int16_t RecoilServo_Return_mS;             // Time in milliseconds for barrel to return
     int16_t RecoilServo_EPMin;                 // Recoil servo endpoint adjustments. Min will be recoiled position
     int16_t RecoilServo_EPMax;                 // Max will be returned position
-
+    RecoilPreset RecoilServo_PresetNum;        // Pre-defined recoil servo settings, not presently implemented.
 
 // On board smoker output
     boolean SmokerControlAuto;                 // If true, Smoker will be set according to engine speed. If false, smoker can be set manually with an analog function trigger.
@@ -74,6 +74,11 @@ struct _eeprom_data {
     int16_t SmokerFastIdleSpeed;
     int16_t SmokerMaxSpeed;
     int16_t SmokerDestroyedSpeed;
+    Smoker_t SmokerDeviceType;
+    uint8_t SmokerPreHeat_Sec;
+    int16_t SmokerHeatIdleAmt;
+    int16_t SmokerHeatFastIdleAmt;
+    int16_t SmokerHeatMaxAmt;
 
 // Driving adjustments
     boolean AccelRampEnabled_1;                // Profile 1 settings
