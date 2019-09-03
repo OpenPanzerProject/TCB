@@ -54,8 +54,8 @@
 
 // Commands                                         // 0    Motor 1 forward
                                                     // 1    Motor 1 reverse
-                                                    // 2    Set minimum voltage
-                                                    // 3        Reserved for Set maximum voltage - not presently implemented
+#define SCOUT_CMD_MIN_VOLTAGE               0x02    // 2    Set minimum voltage
+#define SCOUT_CMD_MAX_VOLTAGE               0x03    // 3    Set maximum voltage
                                                     // 4    Motor 2 forward
                                                     // 5    Motor 2 reverse
                                                     // 6        Reserved for Motor 1 7-bit commands - not presently implemented
@@ -84,7 +84,7 @@ class OP_Scout
 {
 public:
   
-    // Initializes a new instance of the Sabertooth class.
+    // Initializes a new instance of the Scout class.
     // The driver address is set to the value given, and the specified serial port is used.
     OP_Scout(byte address, HardwareSerial *port);
 
@@ -134,6 +134,26 @@ public:
         if (cl > 0 && cl <= SCOUT_MAXIMUM_CURRENT_LIMIT) command(SCOUT_CMD_SET_MAX_CURRENT, cl); 
         else                                             command(SCOUT_CMD_SET_MAX_CURRENT, SCOUT_DEFAULT_CURRENT_LIMIT);
     }
+
+    // Set minimum voltage
+    // Used to set a custom minimum voltage for the battery supplying power (essentially LVC level). If battery voltage drops below this value, 
+    // motors will be turned off. This value is cleared at startup, so must be set each run (Scout reverts to default min voltage of 6 volts at boot). 
+    // The value is sent in 0.2 volt increments with a command of zero corresponding to 6v, which is the minimum. Valid data is from 0 to 50 (6-16 volts). 
+    // The function for converting volts to command data is Value = (desired volts-6) x 5    
+    inline void SetMinVoltage(uint8_t v)
+    {
+        if (v >= 0 && v <= 50) command(SCOUT_CMD_MIN_VOLTAGE, v);
+    }
+    
+    // Set maximum voltage
+    // Used to set a custom maximum voltage. If voltage exceeds this level, the motors will be turned off. The Scout reverts to a default maximum
+    // voltage of 16 volts at boot, so this command must be sent at each startup if you want something different. 
+    // The value is sent in 0.2 volt increments within the allowed range of 6-26 volts that equates to values of 30 to 130. 
+    // The function for converting volts to command data is Value = (desired volts / 0.2)
+    inline void SetMaxVoltage(uint8_t v)
+    {
+        if (v >= 30 && v <= 130) command(SCOUT_CMD_MAX_VOLTAGE, v);
+    }    
 
 private:
     void throttleCommand(byte command, int speed) const;
