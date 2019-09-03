@@ -1,0 +1,54 @@
+#-------------------------------------------------------------
+# Syntax Coloring Map
+# Words separated by a single TAB, not SPACE
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# KEYWORD1 - Classes
+#-------------------------------------------------------------
+OP_Smoker	KEYWORD1
+
+
+#-------------------------------------------------------------
+# KEYWORD2 - Methods, functions, members
+#-------------------------------------------------------------
+setSpeed    KEYWORD2
+getSpeed    KEYWORD2
+begin   KEYWORD2
+stop    KEYWORD2
+setIdle KEYWORD2
+setFastIdle KEYWORD2
+update  KEYWORD2
+Shutdown    KEYWORD2
+command KEYWORD2
+setLevelSerial  KEYWORD2
+set_InternalSpeedRange  KEYWORD2
+set_DefaultInternalSpeedRange   KEYWORD2
+set_InternalHeatRange   KEYWORD2
+set_DetaultInternalHeatRange    KEYWORD2
+restore_Speed   KEYWORD2
+cut_SpeedPct    KEYWORD2
+set_MaxSpeedPct KEYWORD2
+cut_HeatPct KEYWORD2
+set_MaxHeatPct  KEYWORD2
+map_RangeFan    KEYWORD2
+map_RangeHeat   KEYWORD2
+
+
+#-------------------------------------------------------------
+# LITERAL1 - Constants & Defines
+#-------------------------------------------------------------
+SMOKER_ADDRESS  LITERAL1
+SMOKER_CMD_HEATER_LEVEL LITERAL1
+SMOKER_CMD_FAN_SPEED    LITERAL1
+SMOKER_CMD_SERIAL_WATCHDOG  LITERAL1
+SMOKER_CMD_BAUD_RATE    LITERAL1
+SMOKER_BAUD_CODE_2400   LITERAL1
+SMOKER_BAUD_CODE_9600   LITERAL1
+SMOKER_BAUD_CODE_19200  LITERAL1
+SMOKER_BAUD_CODE_38400  LITERAL1
+SMOKER_BAUD_CODE_115200 LITERAL1
+SMOKER_BAUD_CODE_57600  LITERAL1
+OP_Smoker_WatchdogTimeout_mS    LITERAL1
+
