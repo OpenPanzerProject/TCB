@@ -13,7 +13,6 @@ Sabertooth_SerialESC	KEYWORD1
 Pololu_SerialESC	KEYWORD1
 OPScout_SerialESC	KEYWORD1
 Onboard_ESC	KEYWORD1
-Onboard_Smoker	KEYWORD1
 Servo_ESC	KEYWORD1
 Servo_PAN	KEYWORD1
 Servo_RECOIL	KEYWORD1
@@ -40,9 +39,6 @@ getSpeed	KEYWORD2
 setSpeed	KEYWORD2
 begin	KEYWORD2
 stop	KEYWORD2
-setIdle	KEYWORD2
-setFastIdle	KEYWORD2
-Shutdown    KEYWORD2
 setPos	KEYWORD2
 setLimits	KEYWORD2
 PulseWidth	KEYWORD2
