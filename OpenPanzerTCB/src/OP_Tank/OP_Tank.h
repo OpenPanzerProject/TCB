@@ -26,6 +26,7 @@
 #include "../OP_IRLib/OP_IRLib.h"
 #include "../OP_SimpleTimer/OP_SimpleTimer.h"
 #include "../OP_Motors/OP_Motors.h"
+#include "../OP_Smoker/OP_Smoker.h"
 #include "../OP_Sound/OP_Sound.h"
 #include "../LedHandler/LedHandler.h"
 #include "OP_BattleTimes.h"
@@ -142,7 +143,7 @@ class OP_Tank
         static uint8_t  PctDamaged(void);           // Returns a number from 0-100 of the percent damage taken
         static uint8_t  PctHealthRemaining(void);   // Returns a number from 0-100 of the percent of health remaining
         static boolean  isRepairOngoing(void);      // Returns the status of a repair operation
-        static void     Damage(Motor*, Motor*, Motor*, Motor*, Motor*, boolean, DRIVETYPE); // Pass 5 motor objects - left tread, right tread, turret elevation, turret azimuth, smoker, plus we pass the drive type and whether the smoker should be included or not
+        static void     Damage(Motor*, Motor*, Motor*, Motor*, OP_Smoker*, boolean, DRIVETYPE); // Pass 5 motor objects - left tread, right tread, turret elevation, turret azimuth, smoker, plus we pass the drive type and whether the smoker should be included or not
         static battle_settings BattleSettings;      // Battle settings struct
         static boolean  isInvulnerable;             // Is the tank presently invulnerable to incoming fire
         static boolean  isDestroyed;                // Is the tank destroyed

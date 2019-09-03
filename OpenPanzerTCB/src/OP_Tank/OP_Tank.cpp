@@ -1112,7 +1112,7 @@ void OP_Tank::EnableHitReception(void)
 
 
 // Cut speed to motors (ie, "damage"). 
-void OP_Tank::Damage(Motor* Right_orRear, Motor* Left_orSteering, Motor* elevation, Motor* azimuth, Motor* smoke, boolean includeSmoker, DRIVETYPE driveType)
+void OP_Tank::Damage(Motor* Right_orRear, Motor* Left_orSteering, Motor* elevation, Motor* azimuth, OP_Smoker* smoke, boolean includeSmoker, DRIVETYPE driveType)
 {
 int cut_Pct;
 

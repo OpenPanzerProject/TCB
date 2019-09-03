@@ -80,7 +80,7 @@ void SetSmoker_FastIdle(void)
 void SetSmoker_Speed(int smoker_speed)
 {
     if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled)
-    {
+    {   
         Smoker->setSpeed(smoker_speed);
     }
 }

@@ -410,13 +410,12 @@ void InstantiateMotorObjects()
         // In Auto mode, the smoker object has three settings specified by the user: idle, fast idle and max speed. Those are also passed to the constructor. 
         if (eeprom.ramcopy.SmokerControlAuto)
         {   // If the user wants the smoker to be controlled automatically with engine speed, we pass the user's max speed setting
-                                      // Pos, Throttle (external input) Min / Max /Middle, Idle     , Fast Idle                        , Max Speed
-            Smoker = new Onboard_Smoker (SIDEA,0,MOTOR_MAX_FWDSPEED,0,eeprom.ramcopy.SmokerIdleSpeed,eeprom.ramcopy.SmokerFastIdleSpeed,eeprom.ramcopy.SmokerMaxSpeed);
+            Smoker = new OP_Smoker(0, MOTOR_MAX_FWDSPEED, 0, eeprom.ramcopy.SmokerIdleSpeed, eeprom.ramcopy.SmokerFastIdleSpeed, eeprom.ramcopy.SmokerMaxSpeed, eeprom.ramcopy.SmokerHeatIdleAmt, eeprom.ramcopy.SmokerHeatFastIdleAmt, eeprom.ramcopy.SmokerHeatMaxAmt, &MotorSerial, &eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.SmokerDeviceType, eeprom.ramcopy.SmokerPreHeat_Sec);
         }
         else
         {   // But if the user wants to disconnect the smoker from the engine and control it manually, we set max speed to MOTOR_MAX_FWDSPEED (100%)
             // We still pass the Idle and FastIdle speeds but they will not be used. 
-            Smoker = new Onboard_Smoker (SIDEA,0,MOTOR_MAX_FWDSPEED,0,eeprom.ramcopy.SmokerIdleSpeed,eeprom.ramcopy.SmokerFastIdleSpeed,MOTOR_MAX_FWDSPEED);
+            Smoker = new OP_Smoker(0, MOTOR_MAX_FWDSPEED, 0, eeprom.ramcopy.SmokerIdleSpeed, eeprom.ramcopy.SmokerFastIdleSpeed, eeprom.ramcopy.SmokerHeatIdleAmt, eeprom.ramcopy.SmokerHeatFastIdleAmt, eeprom.ramcopy.SmokerHeatMaxAmt, MOTOR_MAX_FWDSPEED, &MotorSerial, &eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.SmokerDeviceType, eeprom.ramcopy.SmokerPreHeat_Sec);
         }
         Smoker->begin();
 

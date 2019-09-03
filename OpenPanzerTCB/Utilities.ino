@@ -127,6 +127,9 @@ void DumpSysInfo()
     DumpTurretInfo();
         PerLoopUpdates();
         DebugSerial->flush();    
+    DumpSmokerInfo();
+        PerLoopUpdates();
+        DebugSerial->flush();
     DumpBattleInfo();
         PerLoopUpdates();
         DebugSerial->flush();
@@ -373,6 +376,61 @@ void DumpTurretInfo()
     }
     else { PrintLnYesNo(0); }    
     
+    // Recoil servo preset - not presently used
+    // DebugSerial->println(ptrRecoilPreset(eeprom.ramcopy.RecoilServo_PresetNum));
+}
+
+void DumpSmokerInfo()
+{
+    int f;
+    int h;
+    boolean i = false;  // Include heat settings
+    
+    DebugSerial->println();
+    PrintDebugLine();
+    DebugSerial->println(F("SMOKER"));
+    PrintDebugLine();
+    if (eeprom.ramcopy.SmokerControlAuto == false)
+    {
+        DebugSerial->println(F("Smoker output controlled manually"));
+    }
+    else
+    {   
+        DebugSerial->print(F("Smoker Type:          ")); DebugSerial->println(ptrSmokerType(eeprom.ramcopy.SmokerDeviceType)); 
+        if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD) i = true;
+        DebugSerial->print(F("Pre-heat delay:       ")); if (eeprom.ramcopy.SmokerPreHeat_Sec == 0) { DebugSerial->println(F("N/A")); } else { DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
+        // Idle
+        f = (int)((((float)eeprom.ramcopy.SmokerIdleSpeed/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
+        h = (int)((((float)eeprom.ramcopy.SmokerHeatIdleAmt/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
+        DebugSerial->print(F("Fan idle speed:       ")); PrintPct(f); 
+        if (f<100) { PrintSpace(); } if (f<10) { PrintSpace(); } PrintSpaces(3); if (i) { PrintHeatAmt(); PrintPct(h); } else { PrintHeat(); PrintSameHeatAsFan(); }
+        PrintLine();
+        // Fast idle
+        f = (int)((((float)eeprom.ramcopy.SmokerFastIdleSpeed/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
+        h = (int)((((float)eeprom.ramcopy.SmokerHeatFastIdleAmt/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
+        DebugSerial->print(F("Fan fast idle speed:  ")); PrintPct(f); 
+        if (f<100) { PrintSpace(); } if (f<10) { PrintSpace(); } PrintSpaces(3); if (i) { PrintHeatAmt(); PrintPct(h); } else { PrintHeat(); PrintSameHeatAsFan(); }
+        PrintLine();
+        // Max speed
+        f = (int)((((float)eeprom.ramcopy.SmokerMaxSpeed/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
+        h = (int)((((float)eeprom.ramcopy.SmokerHeatMaxAmt/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
+        DebugSerial->print(F("Fan max speed:        ")); PrintPct(f); 
+        if (f<100) { PrintSpace(); } if (f<10) { PrintSpace(); } PrintSpaces(3); if (i) { PrintHeatAmt(); PrintPct(h); } else { PrintHeat(); PrintSameHeatAsFan(); }
+        PrintLine();            
+        DebugSerial->print(F("Smoke when destroyed: ")); if (eeprom.ramcopy.SmokerDestroyedSpeed == 0) { DebugSerial->println(F("Disabled")); } else { DebugSerial->print((int)((((float)eeprom.ramcopy.SmokerDestroyedSpeed/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5)); DebugSerial->println(F("%")); }
+    }   
+}
+void PrintHeatAmt()
+{
+    DebugSerial->print(F("Heat Amt: "));
+}
+void PrintHeat()
+{
+    DebugSerial->print(F("Heat: "));
+}
+void PrintSameHeatAsFan()
+{ 
+    DebugSerial->print(F("Same as fan"));
 }
 
 void DumpSoundInfo()

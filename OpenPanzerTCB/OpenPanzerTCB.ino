@@ -35,6 +35,7 @@
 #include "src/OP_Sabertooth/OP_Sabertooth.h"
 #include "src/OP_PololuQik/OP_PololuQik.h"
 #include "src/OP_Scout/OP_Scout.h"
+#include "src/OP_Smoker/OP_Smoker.h"
 #include "src/OP_SimpleTimer/OP_SimpleTimer.h"
 #include "src/OP_Driver/OP_Driver.h"
 #include "src/OP_IRLib/OP_IRLib.h"
@@ -52,7 +53,6 @@
 // but we actually need to make a change to the default settings, so we include a copy in our own src folder.
 // You must comment-out the "#define _EEPROMEX_DEBUG" line in EEPROMex.cpp
 #include "src/EEPROMex/EEPROMex.h"   
-
 
 // GLOBAL VARIABLES
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>>
@@ -117,7 +117,7 @@
     // We always have a recoil servo
         Servo_RECOIL * RecoilServo;
     // And of course we always have the mechanical smoker motor
-        Onboard_Smoker * Smoker;
+        OP_Smoker * Smoker;
         boolean SmokerEnabled = true;   // The user can enable/disable the smoker on the fly, we assume it is enabled to begin with. 
     // We may optionally have up to 7 general purpose RC outputs, depending on how the user sets up the other motor objects and sound cards. The user can choose to have them be regular RC pass-through
     // or create them as Pan servo pass-throughs by selecting the appropriate function in OP Config. RC output #5 is always reserved for recoil no matter what, so it can't be repurposed for anything else. 
@@ -975,14 +975,14 @@ if (Startup)
             // forward. But while this timer is running, the drive command will have no effect, so we also force throttle command to stay at 0 too. 
             // However, if the the transmission is *not* engaged, we allow the user to rev away all he wants. 
             if (TransmissionEngaged && DriveSpeed == 0) { ThrottleCommand = 0; }
-            
+
             // Now we calculate a throttle speed based on the command and other parameters
             ThrottleSpeed = Driver.GetThrottleSpeed(ThrottleCommand, ThrottleSpeed_Previous, DriveSpeed, DriveModeActual, Braking); 
         }
 
         // Now pass the throttle speed to the sound unit and the smoker 
-        if (ThrottleSpeed != ThrottleSpeed_Previous)    // But only if the command has changed from last time...
-        {
+        if (ThrottleSpeed != ThrottleSpeed_Previous)         // But only if the command has changed from last time...
+        {       
                 TankSound->SetEngineSpeed(ThrottleSpeed);    // Sound unit engine speed
                 SetSmoker_Speed(ThrottleSpeed);              // Smoker speed
         }
@@ -1079,9 +1079,14 @@ if (Startup)
     {
         if (WasRunning) // Means, we were running last time we checked
         {   // So turn this stuff off
-            DriveSpeed = 0;
-            ThrottleSpeed = 0;
-            TurnSpeed = 0;
+            DriveSpeed = DriveSpeed_Previous = 0;
+            ThrottleSpeed = ThrottleSpeed_Previous = 0;
+            TurnSpeed = TurnSpeed_Previous = 0;
+            // We don't actually check the throttle and steering radio channels unless the engine is running. Clear both the current and previous commands
+            // to prevent unusual behavior the next time the engine is started (for example, a smoker that goes full speed all of a sudden)
+            ThrottleCommand = ThrottleCommand_Previous = 0;
+            TurnCommand = TurnCommand_Previous = 0;
+            TurnCommand_Previous = 0;
             RightSpeed = 0;
             LeftSpeed = 0;
             StopDriveMotors();      // Stops the motors and any sounds associated with them

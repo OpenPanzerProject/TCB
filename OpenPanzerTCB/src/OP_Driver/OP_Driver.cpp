@@ -641,7 +641,7 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
     else if (ThrottleCMD > LastThrottleSpeed) // Acceleration 
     {   // Here we do use a very small bit of ramping on acceleration. If you step on the gas, the engine RPM responds immediately (even though tank speed won't respond so quickly),
         // and we want to keep that responsive feel. But some sound cards like the Taigen will sound odd if you jump straight to full speed so we do introduce a slight delay. 
-      
+
         // Don't limit anything at a low level so we get a responsive throttle sound. But above that we do limit just a bit so it doesn't sound jerky. 
         if (LastThrottleSpeed > 60)
         {
@@ -659,7 +659,6 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
     // Don't let t_ThrottleSkipNum get below 1
     if (t_ThrottleSkipNum < 1) { t_ThrottleSkipNum = 1; }
         
-    
     // Save ramp step 
     if (ThrottleRampEnabled) 
     {   
