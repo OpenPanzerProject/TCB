@@ -1207,7 +1207,7 @@ if (Startup)
         }
         
         // Finally, sort of a one-off trigger: the user has the option of starting the engine with the throttle channel
-        if (eeprom.ramcopy.EngineAutoStart && TankEngine.Running() == false && Radio.Sticks.Throttle.command > 126) // We check for throttle command greater than half
+        if (eeprom.ramcopy.EngineAutoStart && TankEngine.Running() == false && Radio.Sticks.Throttle.command > 126 && EngineInPreheat == false) // We check for throttle command greater than half. We also ignore when engine in preheat, meaning it is already getting started.
         {
             EngineOn();
         }

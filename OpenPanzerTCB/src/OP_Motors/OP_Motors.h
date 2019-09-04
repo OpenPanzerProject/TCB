@@ -218,7 +218,7 @@ class Servo_PAN: public Motor, public OP_Servos {
 };
 
 
-typedef char RecoilPreset;
+typedef unsigned char RecoilPreset;
 #define RS_PRESET_NONE                  0
 #define RS_PRESET_TAIGEN_TIGER1         1
 //#define ADDITIONAL (number)

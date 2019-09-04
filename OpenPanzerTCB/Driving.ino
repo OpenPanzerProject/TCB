@@ -112,7 +112,7 @@ void EngineOn()
             if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
         }
         else if (TankEngine.StartEngine())
-        {
+        {   
             // Clear the pre-heat flag if set
                 EngineInPreheat = false;
             // Set the engine start ad-hoc trigger bit 
