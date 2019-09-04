@@ -23,6 +23,7 @@
 #ifndef OP_Smoker_h
 #define OP_Smoker_h   
 
+#include <Arduino.h>
 #include "../OP_Settings/OP_Settings.h"
 
 typedef char Smoker_t;
@@ -55,22 +56,6 @@ const __FlashStringHelper *ptrSmokerType(Smoker_t sType); //Returns a character 
 
 
 class OP_Smoker {
-  protected:
-    int e_minspeed, e_maxspeed, e_middlespeed;      // We have external speed range, and internal. External is the range of numbers that will be passed
-                                                    // to the motor object from our main sketch. These are likely to be -255 to 255
-    int i_minspeed, i_maxspeed, i_middlespeed;      // The internal is specific to each ESC, the external range will be mapped to the internal range
-                                                    // For example, the internal range for a servo motor is 1000-2000. For Pololu Serial controllers it is -127 to 127
-    int di_minspeed, di_maxspeed, di_middlespeed;   // We also have "backup" or "default" values of internal speed, so we can modify internal speed
-                                                    // temporarily and then easily revert back to the default. 
-    int curspeed;                                   // Current speed
-
-    // Now do the same for the heater. We can use the same external range however
-    int i_minheat, i_maxheat, i_middleheat;
-    int di_minheat, di_maxheat, di_middleheat;
-    int curheat;                              
-    
-    boolean reversed;                               // Motor reversed - not presently used
-
   public:
     OP_Smoker(int min, int max, int middle, int idle, int fastIdle, int maxSpeed, int idleHeat, int fastIdleHeat, int maxHeat, HardwareSerial *port, uint32_t *baud, Smoker_t st, uint8_t preheat) : e_minspeed(min), e_maxspeed(max), e_middlespeed(middle), Idle(idle), FastIdle(fastIdle), MaxSpeed(maxSpeed), HeatAmtIdle(idleHeat), HeatAmtFastIdle(fastIdleHeat), HeatAmtMax(maxHeat), smokerPort(port), smokerBaud(baud), SmokerType(st), preHeat_Seconds(preheat) {}
     void setSpeed(int s);
@@ -79,6 +64,7 @@ class OP_Smoker {
     void stop(void);
     void setIdle(void);
     void setFastIdle(void);
+    void preHeat(void);
     void update(void);              // Actually we will use the update routine on the smoker for special effects
     void Shutdown(boolean);         // This will trigger the shutdown smoker effect (slowly turn off smoker)
 
@@ -159,31 +145,44 @@ class OP_Smoker {
         }
     }   
 
+
 private:
-    const Smoker_t SmokerType;
+    int e_minspeed, e_maxspeed, e_middlespeed;      // We have external speed range, and internal. External is the range of numbers that will be passed
+                                                    // to the motor object from our main sketch. These are likely to be -255 to 255
+    int i_minspeed, i_maxspeed, i_middlespeed;      // The internal is specific to each ESC, the external range will be mapped to the internal range
+                                                    // For example, the internal range for a servo motor is 1000-2000. For Pololu Serial controllers it is -127 to 127
+    int di_minspeed, di_maxspeed, di_middlespeed;   // We also have "backup" or "default" values of internal speed, so we can modify internal speed
+                                                    // temporarily and then easily revert back to the default. 
+    
+    int i_minheat, i_maxheat, i_middleheat;         // Now do the same for the heater. We can use the same external range however
+    int di_minheat, di_maxheat, di_middleheat;
+    int curheat;                              
+    
+    boolean reversed;                               // Motor reversed - not presently used
+    int curspeed;                                   // Current speed
     const int Idle;
     const int FastIdle;
     const int MaxSpeed;
     const int HeatAmtIdle;
     const int HeatAmtFastIdle;
     const int HeatAmtMax;
-    uint32_t LastUpdate_mS;    
+    HardwareSerial *smokerPort;
+    uint32_t *smokerBaud;
+    const Smoker_t SmokerType;
     uint8_t preHeat_Seconds;
-    
+    uint32_t LastUpdate_mS;    
+  
     // These can be used for special smoker effects. The main sketch will poll the update() function routinely, 
     // which can then create changes in smoker speeds over time. We use this presently to slowly reduce speed
     // from idle when the engine is turned off. 
     #define smoker_update_rate_mS   15
-    typedef enum smoker_effect_t
+    enum smoker_effect_t
     {   NONE = 0,
         SHUTDOWN
     };
     smoker_effect_t smoker_effect;
     void setSpeed_wEffect(int s);   // The update() routine can call this version of setSpeed without clearing the special effect
     void clearSmokerEffect(void) { if (smoker_effect != NONE) smoker_effect = NONE; }
-    
-    HardwareSerial *smokerPort;
-    uint32_t *smokerBaud;
     
 };
 

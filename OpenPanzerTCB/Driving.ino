@@ -102,8 +102,19 @@ void EngineOn()
         if (ManualGear && ManualGear != GEAR_NEUTRAL) { if (DEBUG) DebugSerial->println(F("Manual transmission - put in neutral gear before starting engine!")); return; }
         
         // Start the engine object
-        if (TankEngine.StartEngine())
+        if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && eeprom.ramcopy.SmokerPreHeat_Sec > 0 && EngineInPreheat == false)
         {
+            // In this case there will be a delay between the time the user commands engine start and when we actually start it, in order to give the heating element time to heat up
+            Smoker->preHeat();              // Turn on the heater
+            TankSound->PreHeatSound();      // Play the pre-heat sound
+            EngineInPreheat = true;         // Set a flag so we know the next time we come back here
+            timer.setTimeout((eeprom.ramcopy.SmokerPreHeat_Sec * 1000), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
+            if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
+        }
+        else if (TankEngine.StartEngine())
+        {
+            // Clear the pre-heat flag if set
+                EngineInPreheat = false;
             // Set the engine start ad-hoc trigger bit 
                 bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_START);
             // Play the engine start sound
@@ -140,6 +151,8 @@ void EngineOff()
     // (for example, see StopEverything() below)
     if (!Tank.isRepairOngoing())
     {
+        // Clear the pre-heat flag if set
+            EngineInPreheat = false;        
         // Stop the engine object 
             TankEngine.StopEngine();
         // Set the engine stop ad-hoc trigger bit 

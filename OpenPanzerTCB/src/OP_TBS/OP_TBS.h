@@ -60,11 +60,11 @@
 #define SOUND_BATTLE_DESTROY 7          // Sound 7:  Received hit - vehicle destroyed
 #define SOUND_HEADLIGHTS     8          // Sound 8:  Headlights on/off
 #define SOUND_USER_1         9          // Sound 9:  Custom User Sound 1
-#define SOUND_USER_2         10         // Sound 10: Custom User Sound 2
-#define SOUND_USER_3         11         // Sound 11: Custom User Sound 3
-#define SOUND_USER_4         12         // Sound 12: Custom User Sound 4            - SAME AS SQUEAK 1
-#define SOUND_USER_5         13         // Sound 13: Custom User Sound 5            - SAME AS SQUEAK 2
-#define SOUND_USER_6         14         // Sound 14: Custom User Sound 6            - SAME AS SQUEAK 3
+#define SOUND_USER_2         10         // Sound 10: Custom User Sound 2 / Preheat sound
+#define SOUND_USER_3         11         // Sound 11: Custom User Sound 3 / Second MG           
+#define SOUND_USER_4         12         // Sound 12: Custom User Sound 4 / Squeak 1
+#define SOUND_USER_5         13         // Sound 13: Custom User Sound 5 / Squeak 2
+#define SOUND_USER_6         14         // Sound 14: Custom User Sound 6 / Squeak 3
 #define SOUND_SQUEAK_1       12         // Sound 12: Squeak 1 (frequent)            - SAME AS USER SOUND 4
 #define SOUND_SQUEAK_2       13         // Sound 13: Squeak 2 (medium frequency)    - SAME AS USER SOUND 5
 #define SOUND_SQUEAK_3       14         // Sound 14: Squeak 3 (less frequent)       - SAME AS USER SOUND 6
@@ -103,7 +103,7 @@ const Prop3Settings Prop3[PROP3_NUM_SOUNDS] PROGMEM_FAR = {
 {1351, 4},  // Sound 7:  Received hit - vehicle destroyed - set to high priority though it shouldn't matter, nothing else will be playing at this time anyway
 {1433, 1},  // Sound 8:  Headlights on/off
 {1630, 3},  // Sound 9:  Custom User Sound 1 - even higher priority than MG 
-{1711, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG
+{1711, 3},  // Sound 10: Custom User Sound 2 - even higher priority than MG (also used for pre-heat sound)
 {1793, 3},  // Sound 11: Custom User Sound 3 - even higher priority than MG (also used for Second MG)
 {1874, 3},  // Sound 12: Squeak 1 / Custom User Sound 4
 {1955, 3},  // Sound 13: Squeak 2 / Custom User Sound 5
@@ -187,6 +187,7 @@ public:
     void CannonHit(void);                                   // Play cannon hit sound
     void Destroyed(void);                                   // Play tank destroyed sound
     void HeadlightSound(void);                              // Play the headlight on/off sound
+    void PreHeatSound(void);                                // Play a sound to let the user know the engine start has been delayed in order to pre-heat the heating element of the smoker
     void UserSound_Play(uint8_t);                           // Play user sound x once
     void UserSound_Repeat(uint8_t);                         // Repeat user sound x
     void UserSound_Stop(uint8_t);                           // Stop user sound x

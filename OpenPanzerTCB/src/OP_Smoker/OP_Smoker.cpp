@@ -152,7 +152,7 @@ void OP_Smoker::setSpeed(int s)
             f = map_RangeFan(abs(s));       // Make sure we are using the internal range. We don't do reverse so negative values are converted to positive with abs()
             h = map_RangeHeat(abs(s));      // Now do heat
             
-            // Send the serial commands for hte individual fan and heat outputs
+            // Send the serial commands for the individual fan and heat outputs
             OP_Smoker::setLevelSerial(SMOKER_CMD_FAN_SPEED, f);
             OP_Smoker::setLevelSerial(SMOKER_CMD_HEATER_LEVEL, h);
             curspeed = f;
@@ -238,6 +238,33 @@ void OP_Smoker::stop(void)
     LastUpdate_mS = millis();               // Save the time    
 }
 
+void OP_Smoker::preHeat(void)
+{
+    // Here we turn the heating element to full on
+    clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
+
+    switch (SmokerType)
+    {
+        case SMOKERTYPE_ONBOARD_STANDARD:    
+            // This case should not happen - we only permit pre-heat for smokers that have seperate control of the heating element and fan.
+            break;
+        
+        case SMOKERTYPE_ONBOARD_SEPARATE:
+            // Set the heater to full on
+            OB_SMOKER_OCR = MOTOR_MAX_FWDSPEED; // Heat- Smoker output (OB_SMOKER_OCR is defined in OP_Settings.h)
+            curheat = MOTOR_MAX_FWDSPEED;   // Heat - level
+            break;
+            
+        case SMOKERTYPE_SERIAL:
+            // Send the serial command to turn on the heater
+            OP_Smoker::setLevelSerial(SMOKER_CMD_HEATER_LEVEL, MOTOR_MAX_FWDSPEED);
+            curheat = MOTOR_MAX_FWDSPEED;
+            break;
+    }       
+
+    LastUpdate_mS = millis();               // Save the time    
+}
+
 void OP_Smoker::setIdle(void)
 {
     clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
@@ -317,6 +344,9 @@ void OP_Smoker::update(void)
                 {
                     OP_Smoker::setSpeed_wEffect(curspeed); // We use the private "_wEffect" version of setSpeed so it doesn't clear the effect
                 }
+                break;
+            
+            default:
                 break;
         }
     }

@@ -70,6 +70,7 @@ class OP_Sound {
     virtual void StopEngine(void) =0;   
     virtual void SetEngineSpeed(int) =0;                // Send the engine speed to TBS
     virtual void IdleEngine(void) =0;                   // Idle engine
+    virtual void PreHeatSound(void) =0;                 // Sound to play when the user chooses to delay the engine start for smoker pre-heat
     virtual void SetVehicleSpeed(int) = 0;              // Speed of the vehicle, rather than the engine. 
     virtual void EnableTrackOverlay(boolean) = 0;       // Enable/disable track overlay sounds
     virtual boolean isTrackOverlayEnabled(void) = 0;    // Return track overlay sound enabled status
@@ -148,6 +149,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
     void StopEngine(void)                                       { OP_TBS::StopEngine();                }   
     void SetEngineSpeed(int s)                                  { OP_TBS::SetEngineSpeed(s);           }
     void IdleEngine(void)                                       { OP_TBS::IdleEngine();                }
+    void PreHeatSound(void)                                     { OP_TBS::PreHeatSound();              }   // Sound to play when the user chooses to delay the engine start for smoker pre-heat    
     void SetVehicleSpeed(int)                                   { return;                              }   // No vehicle speed distinct from engine speed implemented on Benedini
     void EnableTrackOverlay(boolean)                            { return;                              }   // Not supported
     boolean isTrackOverlayEnabled(void)                         { return false;                        }   // Not supported, never active
@@ -267,6 +269,7 @@ class BenediniTBS: public OP_Sound, public OP_TBS {
 #define OPSC_CMD_SOUNDBANK                   0x51   // 81  -- Use Value to specify Soundbank A or B (0 or 1). Modifier specifies action (ACTION_ONSTART, ACTION_PLAYNEXT, ACTION_PLAYPREV, ACTION_PLAYRANDOM)
 #define OPSC_CMD_SOUNDBANK_LOOP              0x52   // 82  -- Use Value to specify Soundbank A or B (0 or 1). Modifier indicates whether auto-loop is enabled or not (true/false)
 #define OPSC_CMD_USER_SOUND_STOP_ALL         0x53   // 83  -- Stop any user sound that might be playing
+#define OPSC_CMD_PREHEAT                     0x54   // 84  -- Sound to play when the user chooses to delay the engine start for smoker pre-heat    
 
 // Modifiers
 #define OPSC_MAX_NUM_SQUEAKS                  6     // How many squeaks can this device implement
@@ -292,6 +295,7 @@ class OP_SoundCard: public OP_Sound {
     // behavior will be unpredictable! Keep in mind also, in the case of engine sound, a speed of 0 should correspond to engine idle, not engine stopped. 
     void SetEngineSpeed(int s)                                  { command(OPSC_CMD_ENGINE_SET_SPEED, abs(s));               }
     void IdleEngine(void)                                       { command(OPSC_CMD_ENGINE_SET_IDLE);                        }   
+    void PreHeatSound(void)                                     { command(OPSC_CMD_PREHEAT);                                }   // Sound to play when the user chooses to delay the engine start for smoker pre-heat        
     void SetVehicleSpeed(int s)                                 { command(OPSC_CMD_VEHICLE_SET_SPEED, abs(s));              }   // Vehicle speed distinct from engine speed
     void EnableTrackOverlay(boolean b)                          { _trackOverlayActive = b; if (b == false) command(OPSC_CMD_VEHICLE_SET_SPEED, 0); } // If disabled, tell the sound card the speed is 0 so it will turn off the track sounds
     boolean isTrackOverlayEnabled(void)                         { return _trackOverlayActive;                               }
@@ -459,6 +463,7 @@ class OP_TaigenSound: public OP_Sound {
   // Functions that are not implemented by this card
   // ----------------------------------------------------------------------------------------------
   // Vehicle speed, distinct from engine
+    void PreHeatSound(void)                                     { return;               }
     void SetVehicleSpeed(int s)                                 { return;               }
     void EnableTrackOverlay(boolean b)                          { return;               }
     boolean isTrackOverlayEnabled(void)                         { return false;         }
