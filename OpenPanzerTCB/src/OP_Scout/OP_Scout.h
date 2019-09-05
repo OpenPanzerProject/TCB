@@ -148,11 +148,11 @@ public:
     // Set maximum voltage
     // Used to set a custom maximum voltage. If voltage exceeds this level, the motors will be turned off. The Scout reverts to a default maximum
     // voltage of 16 volts at boot, so this command must be sent at each startup if you want something different. 
-    // The value is sent in 0.2 volt increments within the allowed range of 6-26 volts that equates to values of 30 to 130. 
-    // The function for converting volts to command data is Value = (desired volts / 0.2)
+    // The value is sent in 0.2 volt increments within the allowed range of 6-28 volts that equates to values of 30 to 140. 
+    // The function for converting volts to command data is Value = (desired volts * 5)
     inline void SetMaxVoltage(uint8_t v)
     {
-        if (v >= 30 && v <= 130) command(SCOUT_CMD_MAX_VOLTAGE, v);
+        if (v >= 30 && v <= 140) command(SCOUT_CMD_MAX_VOLTAGE, v);
     }    
 
 private:
