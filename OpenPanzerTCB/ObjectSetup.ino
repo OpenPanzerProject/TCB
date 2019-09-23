@@ -683,16 +683,10 @@ void SetupPins()
     if (isFunctionAssigned(SF_AUXOUT_INV_FLASH))    digitalWrite(pin_AuxOutput, HIGH); 
     else                                            digitalWrite(pin_AuxOutput, LOW);       
 
-    // Onboard motorized outputs - set off
+    // Onboard motorized outputs
     pinMode(OB_MA_PWM, OUTPUT);             // Motor A
-    digitalWrite(OB_MA_PWM, LOW);
-    OB_MA_OCR = 0;
     pinMode(OB_MB_PWM, OUTPUT);             // Motor B
-    digitalWrite(OB_MB_PWM, LOW);           
-    OB_MB_OCR = 0;
     pinMode(OB_SMOKER_PWM, OUTPUT);         // Smoker
-    digitalWrite(OB_SMOKER_PWM, LOW);
-    OB_SMOKER_OCR = 0;
     
     // Mechanical Recoil Trigger
     pinMode(pin_MechRecoilMotor, OUTPUT);   // Output   - Transistor for Asiatam, Tamiya or similar mechanical recoil units
