@@ -20,6 +20,7 @@ stop    KEYWORD2
 setIdle KEYWORD2
 setFastIdle KEYWORD2
 update  KEYWORD2
+Startup KEYWORD2
 Shutdown    KEYWORD2
 command KEYWORD2
 setLevelSerial  KEYWORD2

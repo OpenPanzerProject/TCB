@@ -31,7 +31,8 @@ void UpdateSimpleTimers()
     TurretRotation->update();
     TurretElevation->update();
 
-    // We also update the smoker object because it can have special effects that require polling
+    // We also update the smoker object because it can have special effects that require polling, 
+    // or serial watchdog that requires re-sending the current speed at regular intervals
     Smoker->update();
 
     // Update IO A/B if outputs

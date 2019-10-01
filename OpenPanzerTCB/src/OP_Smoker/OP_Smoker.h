@@ -44,6 +44,8 @@ const __FlashStringHelper *ptrSmokerType(Smoker_t sType); //Returns a character 
 #define SMOKER_CMD_FAN_SPEED                 0x04    // 4       Fan speed
 #define SMOKER_CMD_SERIAL_WATCHDOG           0x0E    // 14
 #define SMOKER_CMD_BAUD_RATE                 0x0F    // 15
+#define SMOKER_CMD_STARTUP                   0x18    // 24      Startup command
+#define SMOKER_CMD_SHUTDOWN                  0x19    // 25      Shutdown command
 // Codes
 #define SMOKER_BAUD_CODE_2400                   1     // Codes for changing baud rates
 #define SMOKER_BAUD_CODE_9600                   2     // These are the same codes used by certain Dimension Engineering Sabertooth controllers
@@ -66,14 +68,15 @@ class OP_Smoker {
     void setFastIdle(void);
     void preHeat(void);
     void update(void);              // Actually we will use the update routine on the smoker for special effects
-    void Shutdown(boolean);         // This will trigger the shutdown smoker effect (slowly turn off smoker)
+    void Startup(boolean);          // This will trigger the startup  smoker effect (boolean for whether the transmission is engaged or not)
+    void Shutdown(boolean);         // This will trigger the shutdown smoker effect (boolean for whether the transmission is engaged or not - the effect slowly turns off smoker)
 
     // SERIAL FUNCTIONS
     // ---------------------------------------------------------------->>
     // Sends a packet serial command to the serial smoker device
     // command  The number of the command.
     // value    The command's value.
-    void command(byte command, byte value) const;
+    void command(byte command, byte value = 0) const;
     
     // Sets the level of the heating element or the speed of the fan
     // output   The heater or fan (code 0 or 4)

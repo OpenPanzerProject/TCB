@@ -56,6 +56,13 @@ void StopSmoker(void)
         Smoker->stop();
     }
 }
+void StartSmoker(boolean engaged)
+{
+    if (eeprom.ramcopy.SmokerControlAuto)
+    {
+        Smoker->Startup(engaged);
+    }    
+}
 void ShutdownSmoker(boolean engaged)
 {
     if (eeprom.ramcopy.SmokerControlAuto)

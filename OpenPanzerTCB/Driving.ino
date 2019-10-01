@@ -129,11 +129,13 @@ void EngineOn()
                         timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngage); 
         
                         // Also start the smoker. We start in fast idle until the transmission engages
-                        SetSmoker_FastIdle();
+                        StartSmoker(false); // We pass false for "transmission not engaged"
                     }
                     else 
                     {   // If there is no delay specified, engage the transmission right away. This will also set the smoker speed. 
-                        skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine on
+                        skipTransmissionSound = true;       // No need to clunk the transmission just because we're turning the engine on
+                        smokerStartupWithEngage = true;     // We want the transmission engage function to issue the smoker startup command. Otherwise, for normal toggling of the transmission 
+                                                            // after the engine has been started, the transmission engage function will simply set the smoker idle speed. 
                         TransmissionEngage(); 
                     }
                 }
@@ -229,7 +231,17 @@ void TransmissionEngage()
     if (TankEngine.Running() && !Tank.isRepairOngoing() && !TransmissionEngaged) 
     { 
         TransmissionEngaged = true;
-        SetSmoker_Idle();
+        if (smokerStartupWithEngage)
+        {   // In this case, the engine has just been started and there is no delay specified between the engine start and transmission engage,
+            // so we issue the smoker startup command
+            StartSmoker(true);
+            smokerStartupWithEngage = false;
+        }
+        else
+        {   // In this case we are just toggling the transmission after the engine has already been started, so we just set the idle speed
+            SetSmoker_Idle();
+        }
+        
         if (skipTransmissionSound)  skipTransmissionSound = false;          // Skip the sound, but reset the flag for next time
         else                        TankSound->EngageTransmission(true);    // Play the transmission engage sound
         if (DEBUG) DebugSerial->println(F("Engage Transmission")); 

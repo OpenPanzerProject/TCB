@@ -265,6 +265,19 @@ void OP_Smoker::preHeat(void)
     LastUpdate_mS = millis();               // Save the time    
 }
 
+void OP_Smoker::Startup(boolean engaged)
+{
+    clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
+
+    // For serial smokers, send the startup command so it knows to handle any special startup effect
+    if (SmokerType == SMOKERTYPE_SERIAL) OP_Smoker::command(SMOKER_CMD_STARTUP); 
+
+    // And for all cases, set the idle speed depending on the transmission engaged status
+    engaged ? OP_Smoker::setFastIdle() : OP_Smoker::setIdle();
+
+    LastUpdate_mS = millis();               // Save the time    
+}
+
 void OP_Smoker::setIdle(void)
 {
     clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
@@ -274,8 +287,6 @@ void OP_Smoker::setIdle(void)
     this->set_InternalSpeedRange(Idle, MaxSpeed, Idle);
     this->set_InternalHeatRange(HeatAmtIdle, HeatAmtMax, HeatAmtIdle);
     this->setSpeed(0);
-    curspeed = 0;                           // Save current speed, it is the same for fan and heat
-    curheat = 0;
 
     LastUpdate_mS = millis();               // Save the time
 }
@@ -289,65 +300,87 @@ void OP_Smoker::setFastIdle(void)
     this->set_InternalSpeedRange(FastIdle, MaxSpeed, FastIdle);
     this->set_InternalHeatRange(HeatAmtFastIdle, HeatAmtMax, HeatAmtFastIdle);
     this->setSpeed(0);
-    curspeed = 0;                           // Save current speed, it is the same for fan and heat
-    curheat = 0;
 
     LastUpdate_mS = millis();               // Save the time
 }
 
 void OP_Smoker::Shutdown(boolean engaged)
 {
-    // Here we are going to slowly turn off the smoker. We can't use the ramp feature of ThrottleSpeed in the main sketch because the smoker
-    // treats 0 throttle as idle speed (non-zero). In other words, ThrottleSpeed can only ramp us down to idle (or fast idle, depending), but not
-    // to zero. However when the user turns off the engine, smoker speed is going to have to go from idle (or fast idle) to a complete stop, and
-    // we don't want this to be abrupt. That is why we've created smoker effects, though they may have other uses as well. 
-
-    // Restore the internal range to full so we can actually get down to zero speed
-    restore_Speed();    // This restores both the fan and heater ranges
-
-    // But now we need to modify our curspeed variable so the shutdown effect knows where to start from. Under normal operation we modify the internal speed range of the 
-    // smoker object, setting the minimum to something greater than zero, which becomes idle. Under that scheme, curspeed of 0 actually represents some none-zero smoker speed. 
-    // Now that we are using the full speed scale range where 0 actually means 0 (stopped), we need to adjust our prior curspeed variable to the new range. The adjustment 
-    // depends on whether the transmission was engaged or not. We don't need to do this to the heat level variable because that one goes straight to full off on shutdown with 
-    // no gradual slowing down. 
-    if (curspeed == 0)
+    // For serial smokers we let the external device handle the shutdown effect on its own, we just give it the shutdown command
+    // and set our internal variables to zero. 
+    if (SmokerType == SMOKERTYPE_SERIAL) 
     {
-        engaged == true ? curspeed = Idle : curspeed = FastIdle; 
+        OP_Smoker::command(SMOKER_CMD_SHUTDOWN); 
+        curspeed = 0;
+        curheat = 0;
     }
+    else    
+    {
+        // Here we are going to slowly turn off the smoker. We can't use the ramp feature of ThrottleSpeed in the main sketch because the smoker
+        // treats 0 throttle as idle speed (non-zero). In other words, ThrottleSpeed can only ramp us down to idle (or fast idle, depending), but not
+        // to zero. However when the user turns off the engine, smoker speed is going to have to go from idle (or fast idle) to a complete stop, and
+        // we don't want this to be abrupt. That is why we've created smoker effects, though they may have other uses as well. 
 
-    // Set the active effect
-    smoker_effect = SHUTDOWN;
-    
-    // Now the sketch will poll the update() function which will take care of the effect
+        // Restore the internal range to full so we can actually get down to zero speed
+        restore_Speed();    // This restores both the fan and heater ranges
+
+        // But now we need to modify our curspeed variable so the shutdown effect knows where to start from. Under normal operation we modify the internal speed range of the 
+        // smoker object, setting the minimum to something greater than zero, which becomes idle. Under that scheme, curspeed of 0 actually represents some non-zero smoker speed. 
+        // Now that we are using the full speed scale range where 0 actually means 0 (stopped), we need to adjust our prior curspeed variable to the new range. The adjustment 
+        // depends on whether the transmission was engaged or not. We don't need to do this to the heat level variable because that one goes straight to full off on shutdown with 
+        // no gradual slowing down. 
+        if (curspeed == 0)
+        {
+            engaged == true ? curspeed = Idle : curspeed = FastIdle; 
+        }
+
+        // Set the active effect
+        smoker_effect = SHUTDOWN;
+        
+        // Now the sketch will poll the update() function which will take care of the effect
+    }
 }
 
 void OP_Smoker::update(void)
 {
-
-    if (smoker_effect != NONE && (millis() - LastUpdate_mS > smoker_update_rate_mS))
+    if (smoker_effect != NONE)
     {   
-        switch (smoker_effect)
+        if (millis() - LastUpdate_mS > smoker_update_rate_mS)
         {
-            case SHUTDOWN:
-                // This effect simply turns off the smoker gradually instead of all at once. Each update through we reduce the speed by 1. 
-                // In most cases we assume the user decides to turn off the engine while the tank is stopped, so already the smoker should 
-                // probably be down to idle speed, which is not very fast to begin with. Therefore even with only reducing the speed by 1 step
-                // per pass it won't take long to get to zero.
-                // As for heat, when the user wants to stop the smoker, we turn off the heater immediately (no ramping down)
-                curspeed -= 1;
-                curheat   = 0;
-                if (curspeed <= 0) 
-                {
-                    OP_Smoker::stop(); // Stop the smoker - this will also clear the effect so we don't keep coming back here. 
-                }
-                else
-                {
-                    OP_Smoker::setSpeed_wEffect(curspeed); // We use the private "_wEffect" version of setSpeed so it doesn't clear the effect
-                }
-                break;
-            
-            default:
-                break;
+            switch (smoker_effect)
+            {
+                case SHUTDOWN:
+                    // This effect simply turns off the smoker gradually instead of all at once. Each update through we reduce the speed by 1. 
+                    // In most cases we assume the user decides to turn off the engine while the tank is stopped, so already the smoker should 
+                    // probably be down to idle speed, which is not very fast to begin with. Therefore even with only reducing the speed by 1 step
+                    // per pass it won't take long to get to zero.
+                    // As for heat, when the user wants to stop the smoker, we turn off the heater immediately (no ramping down)
+                    curspeed -= 1;
+                    curheat   = 0;
+                    if (curspeed <= 0) 
+                    {
+                        OP_Smoker::stop(); // Stop the smoker - this will also clear the effect so we don't keep coming back here. 
+                    }
+                    else
+                    {
+                        OP_Smoker::setSpeed_wEffect(curspeed); // We use the private "_wEffect" version of setSpeed so it doesn't clear the effect
+                    }
+                    break;
+                
+                default:
+                    break;
+            }
+        }
+        // LastUpdate_mS will get updated through either the stop() or setSpeed_wEffect() functions called above
+    }
+    else 
+    {
+        // No effect active - but we also send a routine speed/level update if this is a serial smoker and we are nearing the watchdog timeout time
+        if (SmokerType == SMOKERTYPE_SERIAL && (millis() - LastUpdate_mS > (OP_Smoker_WatchdogTimeout_mS - 100)))
+        {
+            OP_Smoker::setLevelSerial(SMOKER_CMD_FAN_SPEED, curspeed);
+            OP_Smoker::setLevelSerial(SMOKER_CMD_HEATER_LEVEL, curheat);
+            LastUpdate_mS = millis();               // Save the time    
         }
     }
 }
@@ -410,7 +443,6 @@ void OP_Smoker::set_MaxHeatPct(uint8_t max_pct)
 
 // SERIAL FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------------------------->>
-
 void OP_Smoker::command(byte command, byte value) const
 {
   smokerPort->write(SMOKER_ADDRESS);

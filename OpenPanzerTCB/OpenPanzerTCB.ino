@@ -119,6 +119,9 @@
     // And of course we always have the mechanical smoker motor
         OP_Smoker * Smoker;
         boolean SmokerEnabled = true;   // The user can enable/disable the smoker on the fly, we assume it is enabled to begin with. 
+        boolean smokerStartupWithEngage = false; // Flag to indicate if the smoker startup effect should be applied when the transmission is engaged, in those cases where no transmission engage delay is specified. 
+                                    // Otherwise the smoker start will happen directly when the engine is started and not when the transmission is engaged (which will be later). 
+                                    // See Driving tab.
     // We may optionally have up to 7 general purpose RC outputs, depending on how the user sets up the other motor objects and sound cards. The user can choose to have them be regular RC pass-through
     // or create them as Pan servo pass-throughs by selecting the appropriate function in OP Config. RC output #5 is always reserved for recoil no matter what, so it can't be repurposed for anything else. 
         Servo_ESC * RCOutput1;      // If the drive motors are onboard or serial controllers, this will be available
