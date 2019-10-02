@@ -622,10 +622,10 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
         t_ThrottleRampStep = DRIVE_RAMP_STEP_DEFAULT;       // Set step to default (2 steps per active interrupt)
         
         // This is just hard-coded for now. 
-        // Combined these two statements result in an engine that takes ~1.2 seconds to return to idle from full speed
+        // Combined these two statements result in an engine that takes ~2.1 seconds to return to idle from full speed
         if (LastThrottleSpeed > 50)                         
         {   // Step of two and level (SkipNum) 4 means decelerate at a rate that would equal 2 seconds from full speed to full stop
-            // But this rate only appplies to throttle speeds above 50
+            // But this rate only appplies to throttle speeds above 50, so this portion will take about 1.6 seconds
             t_ThrottleRampStep = 2;
             t_ThrottleSkipNum = 4;
         }
