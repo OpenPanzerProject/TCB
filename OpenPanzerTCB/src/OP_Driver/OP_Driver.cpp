@@ -622,17 +622,16 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
         t_ThrottleRampStep = DRIVE_RAMP_STEP_DEFAULT;       // Set step to default (2 steps per active interrupt)
         
         // This is just hard-coded for now. 
-        // Combined these two statements result in an engine that takes ~2.1 seconds to return to idle from full speed
+        // Combined these two statements result in an engine that takes ~1.4 seconds to return to idle from full speed
         if (LastThrottleSpeed > 50)                         
-        {   // Step of two and level (SkipNum) 4 means decelerate at a rate that would equal 2 seconds from full speed to full stop
-            // But this rate only appplies to throttle speeds above 50, so this portion will take about 1.6 seconds
-            t_ThrottleRampStep = 2;
+        {   // This rate only appplies to throttle speeds above 50, and this portion will take approximately 1 second
+            t_ThrottleRampStep = 3;
             t_ThrottleSkipNum = 4;
         }
         else
-        {   // At throttle speeds below 50, we slow down a bit more slowly. From 50 to 0 would take ~1/2 second
+        {   // At throttle speeds below 50, we slow down a bit more slowly. From 50 to 0 these settings will take ~0.4 seconds
             t_ThrottleRampStep = 2;
-            t_ThrottleSkipNum = 5;      
+            t_ThrottleSkipNum = 4;      
         }                               
     }
    
@@ -642,13 +641,14 @@ int OP_Driver::GetThrottleSpeed(int ThrottleCMD, int LastThrottleSpeed, int Driv
     {   // Here we do use a very small bit of ramping on acceleration. If you step on the gas, the engine RPM responds immediately (even though tank speed won't respond so quickly),
         // and we want to keep that responsive feel. But some sound cards like the Taigen will sound odd if you jump straight to full speed so we do introduce a slight delay. 
 
-        // Don't limit anything at a low level so we get a responsive throttle sound. But above that we do limit just a bit so it doesn't sound jerky. 
+        // Don't limit anything at a low level so we get a responsive throttle sound. But above that we do limit just a bit so it doesn't sound jerky, the settings here
+        // will take approximately 3/4 of a second.
         if (LastThrottleSpeed > 60)
         {
             ThrottleRampEnabled = true;
             RampDir = 1;
             t_ThrottleRampStep = 2;
-            t_ThrottleSkipNum = 3;
+            t_ThrottleSkipNum = 2;
         }
         // else if throttle speed < 60 then there will be no ramping
     }
