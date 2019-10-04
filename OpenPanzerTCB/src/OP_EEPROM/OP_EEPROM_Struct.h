@@ -79,6 +79,7 @@ struct _eeprom_data {
     int16_t SmokerHeatIdleAmt;
     int16_t SmokerHeatFastIdleAmt;
     int16_t SmokerHeatMaxAmt;
+    uint8_t HotStartTimeout_Sec;
 
 // Driving adjustments
     boolean AccelRampEnabled_1;                // Profile 1 settings

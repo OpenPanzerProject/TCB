@@ -464,6 +464,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.SmokerHeatIdleAmt = 255;
         ramcopy.SmokerHeatFastIdleAmt = 255;
         ramcopy.SmokerHeatMaxAmt = 255;
+        ramcopy.HotStartTimeout_Sec = 0;        // If the engine is started again within this amount of time since the last shutdown, it will be considered a hot-start and the pre-heat will be skipped. 
 
     // Driving adjustments
         ramcopy.AccelRampEnabled_1 = true;      // Profile 1 settings - mild
