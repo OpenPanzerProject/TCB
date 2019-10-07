@@ -768,11 +768,17 @@ void OP_Radio::GetSwitchPosition(int a)
     {
         switch (numPos)
         {
-            case 2: d = abs(MultiSwitch_MatchArray2[i] - pulse);   break;
-            case 3: d = abs(MultiSwitch_MatchArray3[i] - pulse);   break;
-            case 4: d = abs(MultiSwitch_MatchArray4[i] - pulse);   break;
-            case 5: d = abs(MultiSwitch_MatchArray5[i] - pulse);   break;
-            case 6: d = abs(MultiSwitch_MatchArray6[i] - pulse);   break;
+            case 2:  d = abs(MultiSwitch_MatchArray2[i] - pulse);   break;
+            case 3:  d = abs(MultiSwitch_MatchArray3[i] - pulse);   break;
+            case 4:  d = abs(MultiSwitch_MatchArray4[i] - pulse);   break;
+            case 5:  d = abs(MultiSwitch_MatchArray5[i] - pulse);   break;
+            case 6:  d = abs(MultiSwitch_MatchArray6[i] - pulse);   break;
+            case 7:  d = abs(MultiSwitch_MatchArray7[i] - pulse);   break;
+            case 8:  d = abs(MultiSwitch_MatchArray8[i] - pulse);   break;
+            case 9:  d = abs(MultiSwitch_MatchArray9[i] - pulse);   break;
+            case 10: d = abs(MultiSwitch_MatchArray10[i] - pulse);   break;
+            case 11: d = abs(MultiSwitch_MatchArray11[i] - pulse);   break;
+            case 12: d = abs(MultiSwitch_MatchArray12[i] - pulse);   break;            
         }
 
         if (d < distance)
@@ -817,7 +823,73 @@ void OP_Radio::GetSwitchPosition(int a)
                 else if (POS == Pos4) POS = Pos3; 
                 else if (POS == Pos5) POS = Pos2; 
                 else if (POS == Pos6) POS = Pos1; 
-                break;                                
+                break;     
+            case 7:
+                if (POS == Pos1) POS = Pos7; 
+                else if (POS == Pos2) POS = Pos6; 
+                else if (POS == Pos3) POS = Pos5; 
+                else if (POS == Pos5) POS = Pos3; 
+                else if (POS == Pos6) POS = Pos2; 
+                else if (POS == Pos7) POS = Pos1; 
+                break;
+            case 8:
+                if (POS == Pos1) POS = Pos8; 
+                else if (POS == Pos2) POS = Pos7; 
+                else if (POS == Pos3) POS = Pos6; 
+                else if (POS == Pos4) POS = Pos5; 
+                else if (POS == Pos5) POS = Pos4; 
+                else if (POS == Pos6) POS = Pos3;             
+                else if (POS == Pos7) POS = Pos2; 
+                else if (POS == Pos8) POS = Pos1; 
+                break;
+            case 9:
+                if (POS == Pos1) POS = Pos9; 
+                else if (POS == Pos2) POS = Pos8; 
+                else if (POS == Pos3) POS = Pos7; 
+                else if (POS == Pos4) POS = Pos6; 
+                else if (POS == Pos6) POS = Pos4; 
+                else if (POS == Pos7) POS = Pos3;             
+                else if (POS == Pos8) POS = Pos2; 
+                else if (POS == Pos9) POS = Pos1;             
+                break;
+            case 10:
+                if (POS == Pos1) POS = Pos10; 
+                else if (POS == Pos2) POS = Pos9; 
+                else if (POS == Pos3) POS = Pos8; 
+                else if (POS == Pos4) POS = Pos7; 
+                else if (POS == Pos5) POS = Pos6; 
+                else if (POS == Pos6) POS = Pos5;
+                else if (POS == Pos7) POS = Pos4;             
+                else if (POS == Pos8) POS = Pos3; 
+                else if (POS == Pos9) POS = Pos2;             
+                else if (POS == Pos10) POS = Pos1; 
+                break;
+            case 11:
+                if (POS == Pos1) POS = Pos11; 
+                else if (POS == Pos2) POS = Pos10; 
+                else if (POS == Pos3) POS = Pos9; 
+                else if (POS == Pos4) POS = Pos8; 
+                else if (POS == Pos5) POS = Pos7; 
+                else if (POS == Pos7) POS = Pos5;
+                else if (POS == Pos8) POS = Pos4;             
+                else if (POS == Pos9) POS = Pos3; 
+                else if (POS == Pos10) POS = Pos2;             
+                else if (POS == Pos11) POS = Pos1; 
+                break;
+            case 12:
+                if (POS == Pos1) POS = Pos12; 
+                else if (POS == Pos2) POS = Pos11; 
+                else if (POS == Pos3) POS = Pos10; 
+                else if (POS == Pos4) POS = Pos9; 
+                else if (POS == Pos5) POS = Pos8; 
+                else if (POS == Pos6) POS = Pos7;
+                else if (POS == Pos7) POS = Pos6;             
+                else if (POS == Pos8) POS = Pos5; 
+                else if (POS == Pos9) POS = Pos4;             
+                else if (POS == Pos10) POS = Pos3;             
+                else if (POS == Pos11) POS = Pos2;             
+                else if (POS == Pos11) POS = Pos1; 
+                break;                
         }    
     }
     

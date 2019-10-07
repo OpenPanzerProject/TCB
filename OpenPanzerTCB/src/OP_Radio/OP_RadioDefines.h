@@ -76,7 +76,13 @@ enum switch_positions : byte {          // Names for the switch positions
     Pos3,
     Pos4,
     Pos5,
-    Pos6
+    Pos6,
+    Pos7,
+    Pos8,
+    Pos9,
+    Pos10,
+    Pos11,
+    Pos12
 };
 
 typedef struct aux_channel_settings{    // Settings are saved to EEPROM
@@ -127,6 +133,75 @@ const int16_t MultiSwitch_MatchArray6[6] = {
     1600,  // 3
     1800,  // 4
     2000   // 5
+};
+const int16_t MultiSwitch_MatchArray7[7] = {
+    1000,   // 0
+    1167,   // 1
+    1333,   // 2
+    1500,   // 3
+    1667,   // 4
+    1833,   // 5
+    2000    // 6
+};
+const int16_t MultiSwitch_MatchArray8[8] = {
+    1000,   // 0
+    1143,   // 1
+    1286,   // 2
+    1429,   // 3
+    1571,   // 4
+    1714,   // 5
+    1857,   // 6
+    2000    // 7
+};
+const int16_t MultiSwitch_MatchArray9[9] = {
+    1000,   // 0
+    1125,   // 1
+    1250,   // 2
+    1375,   // 3
+    1500,   // 4
+    1625,   // 5
+    1750,   // 6
+    1875,   // 7
+    2000    // 8
+};
+const int16_t MultiSwitch_MatchArray10[10] = {
+    1000,   // 0
+    1111,   // 1
+    1222,   // 2
+    1333,   // 3
+    1444,   // 4
+    1556,   // 5
+    1667,   // 6
+    1778,   // 7
+    1889,   // 8
+    2000    // 9
+};
+const int16_t MultiSwitch_MatchArray11[11] = {
+    1000,   // 0
+    1100,   // 1
+    1200,   // 2
+    1300,   // 3
+    1400,   // 4
+    1500,   // 5
+    1600,   // 6
+    1700,   // 7
+    1800,   // 8
+    1900,   // 9
+    2000    // 10
+};
+const int16_t MultiSwitch_MatchArray12[12] = {
+    1000,   // 0
+    1091,   // 1
+    1182,   // 2
+    1273,   // 3
+    1364,   // 4
+    1455,   // 5
+    1545,   // 6
+    1636,   // 7
+    1727,   // 8
+    1818,   // 9
+    1909,   // 10
+    2000    // 11
 };
 
 
