@@ -398,7 +398,23 @@ void DumpSmokerInfo()
     {   
         DebugSerial->print(F("Smoker Type:          ")); DebugSerial->println(ptrSmokerType(eeprom.ramcopy.SmokerDeviceType)); 
         if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD) i = true;
+        // Preheat and hot start
         DebugSerial->print(F("Pre-heat delay:       ")); if (eeprom.ramcopy.SmokerPreHeat_Sec == 0) { DebugSerial->println(F("N/A")); } else { DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
+/* Hidden for now because we are not using this feature, although it does work.
+        if (eeprom.ramcopy.SmokerPreHeat_Sec > 0)
+        {
+            if (eeprom.ramcopy.HotStartTimeout_Sec > 0)
+            {
+                DebugSerial->print(F("Skip pre-heat delay if engine re-started within ")); 
+                DebugSerial->print(eeprom.ramcopy.HotStartTimeout_Sec);
+                DebugSerial->println(F(" seconds of last engine shutdown."));
+            }
+            else
+            {
+                DebugSerial->println(F("Hot start:            Disabled"));
+            }
+        }
+*/
         // Idle
         f = (int)((((float)eeprom.ramcopy.SmokerIdleSpeed/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);
         h = (int)((((float)eeprom.ramcopy.SmokerHeatIdleAmt/(float)MOTOR_MAX_FWDSPEED)*100.0)+0.5);

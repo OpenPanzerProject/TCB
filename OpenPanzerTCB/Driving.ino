@@ -95,24 +95,44 @@ void ReduceSpeed(uint8_t speedAmt)
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void EngineOn()
 {   
+boolean Proceed = true;
+    
     // We don't permit engine status changes during repair operations, because it will cause the sounds to get out of sync
     if (!Tank.isRepairOngoing())
     {
         // But if we're operating a manual transmission require the gear to be in neutral first
-        if (ManualGear && ManualGear != GEAR_NEUTRAL) { if (DEBUG) DebugSerial->println(F("Manual transmission - put in neutral gear before starting engine!")); return; }
+        if (ManualGear && ManualGear != GEAR_NEUTRAL) { if (DEBUG) DebugSerial->println(F("Manual transmission - put in neutral gear before starting engine!")); Proceed = false; return; }
         
         // Start the engine object
         if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && eeprom.ramcopy.SmokerPreHeat_Sec > 0 && EngineInPreheat == false)
-        {
-            // In this case there will be a delay between the time the user commands engine start and when we actually start it, in order to give the heating element time to heat up
-            Smoker->preHeat();              // Turn on the heater
-            TankSound->PreHeatSound();      // Play the pre-heat sound
-            EngineInPreheat = true;         // Set a flag so we know the next time we come back here
-            timer.setTimeout((eeprom.ramcopy.SmokerPreHeat_Sec * 1000), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
-            if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
-        }
-        else if (TankEngine.StartEngine())
         {   
+            if (eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L)))
+            {
+                // Here we are re-starting the engine within the hot start time since the last shutdown, so skip the pre-heat
+                Proceed = true;
+            }
+            else
+            {
+                // In this case there will be a delay between the time the user commands engine start and when we actually start it, in order to give the heating element time to heat up
+                Smoker->preHeat();              // Turn on the heater
+                TankSound->PreHeatSound();      // Play the pre-heat sound
+                EngineInPreheat = true;         // Set a flag so we know the next time we come back here
+                timer.setTimeout((eeprom.ramcopy.SmokerPreHeat_Sec * 1000L), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
+                if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
+                Proceed = false;
+            }
+        }
+        
+        if (Proceed && TankEngine.StartEngine())
+        {   
+            // Give the user a notification if we are skipping the smoker pre-heat
+                if (EngineInPreheat == false && eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && eeprom.ramcopy.SmokerPreHeat_Sec > 0 && eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L))) 
+                {
+                    DebugSerial->print(F("Engine last stopped "));
+                    DebugSerial->print(((millis() - LastStopTime) / 1000L),1);
+                    DebugSerial->print(F(" seconds ago - smoker preheat skipped"));
+                    DebugSerial->println();
+                }
             // Clear the pre-heat flag if set
                 EngineInPreheat = false;
             // Set the engine start ad-hoc trigger bit 
@@ -178,6 +198,8 @@ void EngineOff()
             StopDriveMotors();
         // Clear the engine idle timer
             UpdateEngineIdleTimer();  
+        // Save the time, we can use this to skip the smoker pre-heat delay if they start the engine again shortly after the last stop
+            LastStopTime = millis();
     }    
 }
 void EngineOffSound()

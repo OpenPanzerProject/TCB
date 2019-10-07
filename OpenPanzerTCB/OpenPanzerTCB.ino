@@ -119,6 +119,7 @@
     // And of course we always have the mechanical smoker motor
         OP_Smoker * Smoker;
         boolean SmokerEnabled = true;   // The user can enable/disable the smoker on the fly, we assume it is enabled to begin with. 
+        uint32_t LastStopTime = 0;      // We use this for the hot-start option which bypasses any pre-heat delay if the user starts the engine within a specified amount of time from the last time the engine was shut down
         boolean smokerStartupWithEngage = false; // Flag to indicate if the smoker startup effect should be applied when the transmission is engaged, in those cases where no transmission engage delay is specified. 
                                     // Otherwise the smoker start will happen directly when the engine is started and not when the transmission is engaged (which will be later). 
                                     // See Driving tab.
@@ -408,8 +409,8 @@ void setup()
         
         // Now check how many channels were detected. If the Radio state is READY_state, we are assured of at least 4 channels.
         int ChannelsDetected = Radio.getChannelCount();
- 
 
+    
     // RANDOM SEED
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
         randomSeed(analogRead(A0));
