@@ -36,7 +36,7 @@
 #define ANALOG_SPECFUNCTION_CENTER_VAL      511     // scale, it will need to be mapped to this range before it can control an analog function. 
 #define ANALOG_SPECFUNCTION_MIN_VAL         0
 
-const byte COUNT_SPECFUNCTIONS  = 163;   // Count of special functions. 
+const byte COUNT_SPECFUNCTIONS  = 166;   // Count of special functions. 
 
 // Each function has a number and an enum name. 
 // We don't want Arduino turning these into ints, so use " : byte" to keep the enum to bytes (chars)
@@ -204,7 +204,10 @@ enum _special_function : byte {
     SF_IR_DISABLE       = 159,      // 159
     SF_IR_TOGGLE        = 160,      // 160
     SF_SMOKER_MANTOGGLE = 161,      // 161  -- see also 52 for analog manual control of smoker output and 101-102 for manual on/off. This toggle is for manual control. See 82-84 for auto controls.
-    SF_USER_SOUND_ALL_OFF = 162     // 162
+    SF_USER_SOUND_ALL_OFF = 162,    // 162
+    SF_SMOKE_PREHEAT_ON = 163,      // 163
+    SF_SMOKE_PREHEAT_OFF= 164,      // 164
+    SF_SMOKE_PREHEAT_TOGGLE = 165   // 165  
 };
 
 // This is really kludgy, and it makes no difference to the running of the program, but we do use it
@@ -228,7 +231,7 @@ const boolean DigitalFunctionsTable[COUNT_SPECFUNCTIONS] PROGMEM_FAR =
  1,1,1,1,1,1,1,1,1,1,   // 130-139
  1,1,1,1,1,1,1,1,1,1,   // 140-149
  1,1,1,1,1,1,1,1,1,1,   // 150-159
- 1,1,1                  // 160-162
+ 1,1,1,1,1,1            // 160-165
  };
 // This macro lets us pass a _special_function number and it will return 1 if the function is a digital function, 0 if analog
 #define isSpecialFunctionDigital(f) pgm_read_byte_far(pgm_get_far_address(DigitalFunctionsTable) + (uint32_t)f);
@@ -405,7 +408,10 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "IR - Disable",                              // 159
     "IR - Toggle On/Off",                        // 160
     "Smoker - Manual Toggle",                    // 161  -- see also 52 for analag manual control of the smoker output speed and 101-102 for on/off
-    "User Sounds - Stop All"                    // 162
+    "User Sounds - Stop All",                    // 162
+    "Smoker Preheat - Enable",                   // 163
+    "Smoker Preheat - Disable",                  // 164
+    "Smoker Preheat - Toggle"                    // 165
 };
 
 

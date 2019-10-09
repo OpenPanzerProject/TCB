@@ -132,6 +132,9 @@ void LoadFunctionTriggers()
                 case SF_SMOKER_ON:                  SF_Callback[i] = &SF_Smoker_ManualOn;                           break; // Manual control of smoker output
                 case SF_SMOKER_OFF:                 SF_Callback[i] = &SF_Smoker_ManualOff;                          break; // Manual control of smoker output
                 case SF_SMOKER_MANTOGGLE:           SF_Callback[i] = &SF_Smoker_ManualToggle;                       break; // Manual control of smoker output
+                case SF_SMOKE_PREHEAT_ON:           SF_Callback[i] = &SF_Smoker_PreheatEnable;                      break;
+                case SF_SMOKE_PREHEAT_OFF:          SF_Callback[i] = &SF_Smoker_PreheatDisable;                     break;
+                case SF_SMOKE_PREHEAT_TOGGLE:       SF_Callback[i] = &SF_Smoker_PreheatToggle;                      break;
                 case SF_MOTOR_A:                    SF_Callback[i] = &MotorA_ManualControl;                         break; // Analog function
                 case SF_MOTOR_B:                    SF_Callback[i] = &MotorB_ManualControl;                         break; // Analog function
                 case SF_MOTOR_A_ON:                 SF_Callback[i] = &MotorA_On;                                    break;
@@ -611,6 +614,9 @@ void SF_Smoker_Toggle(uint16_t ignoreMe)        { ToggleSmoker();           }
 void SF_Smoker_ManualOn(uint16_t ignoreMe)      { Smoker_ManualOn();        }
 void SF_Smoker_ManualOff(uint16_t ignoreMe)     { Smoker_ManualOff();       }
 void SF_Smoker_ManualToggle(uint16_t ignoreMe)  { Smoker_ManualToggle();    }
+void SF_Smoker_PreheatEnable(uint16_t ignoreMe) { Smoker_PreheatEnable();   }
+void SF_Smoker_PreheatDisable(uint16_t ignoreMe){ Smoker_PreheatDisable();  }
+void SF_Smoker_PreheatToggle(uint16_t ignoreMe) { Smoker_PreheatToggle();   }
 void SF_IncreaseVolume(uint16_t ignoreMe)       { IncreaseVolume();         }
 void SF_DecreaseVolume(uint16_t ignoreMe)       { DecreaseVolume();         }
 void SF_StopVolume(uint16_t ignoreMe)           { StopVolume();             }

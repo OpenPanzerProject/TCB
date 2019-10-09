@@ -418,6 +418,8 @@ void InstantiateMotorObjects()
             Smoker = new OP_Smoker(0, MOTOR_MAX_FWDSPEED, 0, eeprom.ramcopy.SmokerIdleSpeed, eeprom.ramcopy.SmokerFastIdleSpeed, eeprom.ramcopy.SmokerHeatIdleAmt, eeprom.ramcopy.SmokerHeatFastIdleAmt, eeprom.ramcopy.SmokerHeatMaxAmt, MOTOR_MAX_FWDSPEED, &MotorSerial, &eeprom.ramcopy.MotorSerialBaud, eeprom.ramcopy.SmokerDeviceType, eeprom.ramcopy.SmokerPreHeat_Sec);
         }
         Smoker->begin();
+        // Also save a local copy of this variable so the user can alter it on the fly and yet still restore it from the eeprom.ramcopy version
+        SmokerPreHeat_Sec = eeprom.ramcopy.SmokerPreHeat_Sec;
 
     // OPTIONAL ONBOARD MOTOR CONTROL
     // -------------------------------------------------------------------------------------------------------------------------------------->>

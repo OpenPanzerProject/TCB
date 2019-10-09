@@ -120,6 +120,38 @@ void Smoker_ManualControl(uint16_t level)
     }
 }
 
+void Smoker_PreheatEnable()
+{
+    // Restore our active preheat seconds setting to the saved version in the eeprom.ramcopy
+    SmokerPreHeat_Sec = eeprom.ramcopy.SmokerPreHeat_Sec;
+    if (DEBUG) 
+    {
+        DebugSerial->print(F("Smoker preheat delay enabled (")); 
+        DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec);
+        DebugSerial->println(F(" seconds)"));
+    }
+}
+void Smoker_PreheatDisable()
+{
+    // By setting our active preheat seconds setting to 0 we disable the preheat functionality
+    SmokerPreHeat_Sec = 0;
+    if (DEBUG) DebugSerial->println(F("Smoker preheat delay disabled"));
+}
+void Smoker_PreheatToggle()
+{
+    static boolean isEnabled = (bool)eeprom.ramcopy.SmokerPreHeat_Sec;
+    if (isEnabled)
+    {
+        Smoker_PreheatDisable();
+        isEnabled = false; 
+    }
+    else
+    {
+        Smoker_PreheatEnable();
+        isEnabled = true;
+    }
+}
+
 void Smoker_ManualOn()
 {
     if (eeprom.ramcopy.SmokerControlAuto == false)

@@ -104,7 +104,7 @@ boolean Proceed = true;
         if (ManualGear && ManualGear != GEAR_NEUTRAL) { if (DEBUG) DebugSerial->println(F("Manual transmission - put in neutral gear before starting engine!")); Proceed = false; return; }
         
         // Start the engine object
-        if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && eeprom.ramcopy.SmokerPreHeat_Sec > 0 && EngineInPreheat == false)
+        if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && SmokerPreHeat_Sec > 0 && EngineInPreheat == false)
         {   
             if (eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L)))
             {
@@ -117,8 +117,8 @@ boolean Proceed = true;
                 Smoker->preHeat();              // Turn on the heater
                 TankSound->PreHeatSound();      // Play the pre-heat sound
                 EngineInPreheat = true;         // Set a flag so we know the next time we come back here
-                timer.setTimeout((eeprom.ramcopy.SmokerPreHeat_Sec * 1000L), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
-                if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
+                timer.setTimeout((SmokerPreHeat_Sec * 1000L), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
+                if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
                 Proceed = false;
             }
         }
@@ -126,7 +126,7 @@ boolean Proceed = true;
         if (Proceed && TankEngine.StartEngine())
         {   
             // Give the user a notification if we are skipping the smoker pre-heat
-                if (EngineInPreheat == false && eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && eeprom.ramcopy.SmokerPreHeat_Sec > 0 && eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L))) 
+                if (EngineInPreheat == false && eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && SmokerPreHeat_Sec > 0 && eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L))) 
                 {
                     DebugSerial->print(F("Engine last stopped "));
                     DebugSerial->print(((millis() - LastStopTime) / 1000L),1);
