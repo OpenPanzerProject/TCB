@@ -68,7 +68,6 @@ pin_Dip2	LITERAL1
 pin_Dip3	LITERAL1
 pin_Dip4	LITERAL1
 pin_Dip5	LITERAL1
-pin_Dip6	LITERAL1
 pin_RepairTank	LITERAL1
 pin_Button	LITERAL1
 pin_RedLED	LITERAL1
