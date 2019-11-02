@@ -543,6 +543,8 @@ void StopFailsafeLights()
         RxSignalLostTimerID = 0;
         ResetAllLights();
     }
+    // Also restore the running lights if the user wants them always on
+    if (eeprom.ramcopy.RunningLightsAlwaysOn) RunningLightsOn();    
 }
 
 void BlinkLightsTankDestroyed()
