@@ -414,7 +414,7 @@ void setup()
     
     // RANDOM SEED
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
-        randomSeed(analogRead(A0));
+        randomSeed(analogRead(pin_RandomSeed));
 
 
     // SET DEBUG TO USER SETTING IN ANOTHER SECOND

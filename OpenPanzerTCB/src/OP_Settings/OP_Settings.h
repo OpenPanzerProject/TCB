@@ -449,6 +449,9 @@
         
     // Mechanical Recoil 
         #define pin_MechRecoilMotor      43       // Output   - Controls the mechanical recoil motor (on/off) (ATmega L6)
+
+    // Random seed
+        #define pin_RandomSeed           A0       // Input    - Specify an analog pin that isn't connected to anything (floating), or if not, that is at least connected to some analog input
         
     // OTHER PINS
         // Onboard motor driver pins are defined above in the "MOTOR DRIVERS - ONBOARD" section
