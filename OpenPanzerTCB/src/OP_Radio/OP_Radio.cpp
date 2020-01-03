@@ -253,6 +253,16 @@ void OP_Radio::begin(_eeprom_data *storage)
     
     // We assume the radio has at least 4 channels for the two sticks, and we are going to use them
     ChannelsUtilized = 4;   // Later we will add any aux channels utilized as well
+
+    // Initialize all channels as present = false
+	Sticks.Throttle.present = false;
+	Sticks.Turn.present = false;
+	Sticks.Elevation.present = false;
+	Sticks.Azimuth.present = false;
+	for (uint8_t a=0; a<AUXCHANNELS; a++)
+	{
+		AuxChannel[a].present = false; 
+	}
     
     // All channels are initalized to present = false. If the actual channel number is within the number of channels
     // detected in the PPM stream, we change the present flag to true. 
