@@ -541,7 +541,6 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         
     // Battle settings
         ramcopy.IR_FireProtocol = IR_TAMIYA;            // Default to Tamiya IR battle protocol
-        ramcopy.IR_Team = IR_TEAM_NONE;                 // Default to NO team (default protocol of Tamiya doesn't have teams)
         ramcopy.IR_HitProtocol_2 = IR_UNKNOWN;          // Default to no second protocol
         ramcopy.IR_RepairProtocol = IR_RPR_CLARK;       // Default to Clark repair protocol
         ramcopy.IR_MGProtocol = IR_UNKNOWN;             // Default to no machine gun protocol
@@ -554,6 +553,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.CustomClassSettings.maxMGHits = 10;     // User custom weight class: Default to 10 hits with MG and vehicle destroyed (only if Accept_MG_Damage = true)
         ramcopy.SendTankID = false;                     // Default to not sending the tank ID
         ramcopy.TankID = 1;                             // Tank ID number, default to 1
+        ramcopy.IR_Team = IR_TEAM_NONE;                 // Default to NO team (default protocol of Tamiya doesn't have teams)
 
     // Board settings
         ramcopy.USBSerialBaud = USB_BAUD_RATE;
