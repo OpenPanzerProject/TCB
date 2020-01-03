@@ -343,6 +343,7 @@ void StopDriveMotors()
         case DT_CAR:        { DriveMotor->stop();                        }  break;
         case DT_DKLM:       // Fall through
         case DT_DMD:        { DriveMotor->stop(); SteeringMotor->stop(); }  break;
+        case DT_DIRECT:     { RightTread->stop(); LeftTread->stop();     }  break;        
         default:                                                            break;
     }
 
