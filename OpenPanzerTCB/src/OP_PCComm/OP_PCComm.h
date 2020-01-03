@@ -144,6 +144,7 @@
 #define PCCMD_READ_VERSION      128     // PC wants to know what firmware version we're running
 #define PCCMD_STAY_AWAKE        129     // PC is tellings us to stay on the line
 #define PCCMD_MINOPC_VERSION    130     // PC requests the minimum version of OP Config the current version of TCB firmware requires
+#define PCCMD_READ_HARDWARE     131     // PC requests what hardware this is
 #define PCCMD_DISCONNECT        31      // PC tells us to disconnect
 
 // "Commands" returned by device
@@ -178,7 +179,7 @@
 // The switchToAltSerial() function will switch us to whatever is defined here. 
 #define ALT_SERIAL_PORT         Serial1
 
-#define VALUE_BUFF              11      // Max amount of bytes it could take to print any single value in the sentence. Firmware version is 9 chars with the delimiter, longest we have so far.
+#define VALUE_BUFF              15      // Max amount of bytes it could take to print any single value in the sentence. Firmware version is max 9 chars with the delimiter, longest we have so far.
                                         // But we also use VALUE_BUFF for an entire prefix (Command/Delimeter/ID/Delimeter) which could reach 10 bytes. 
                                         // And technically a 4 byte long could equal a number 11 bytes long with delimiter, but we don't have any numbers that big so far. 
 #define SENTENCE_BUFF           64      // Max amount of bytes a single sentence could take. If sending 8 channels of data back, it would be about 55 bytes. Arduino's
@@ -227,6 +228,7 @@ class OP_PCComm
         static void GivePC_Value_byID(uint16_t ID);                 // Sends an eeprom value by eeprom variable ID
         static void GivePC_Int(uint16_t returnID, int32_t val);     // Sends an arbitrary value up to int32
         static void GivePC_FirmwareVersion(void);
+		static void GivePC_HardwareVersion(void);		
         static void GivePC_MinOPCVersion(void); 
         static void sendNullValueSentence(uint8_t command, boolean setValueFlag = false);
         static void prefixToByteArray(SentencePrefix s, char *prefixOut, uint8_t prefixBUFF, uint8_t &returnStrLen);
