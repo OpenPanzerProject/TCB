@@ -128,7 +128,7 @@ void InstantiateMotorObjects()
         }
     }
     else
-    {   // The user wants independent tread speeds, either tank or halftrack
+    {   // The user wants independent tread speeds, either tank or halftrack or direct control of each track
         switch (eeprom.ramcopy.DriveMotors)
         {
             case OP_SCOUT:

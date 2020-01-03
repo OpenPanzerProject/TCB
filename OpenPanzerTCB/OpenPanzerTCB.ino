@@ -2,7 +2,7 @@
  * Source:          openpanzer.org              
  * Authors:         Luke Middleton
  * 
- * Copyright 2019 Open Panzer
+ * Copyright 2020 Open Panzer
  *   
  * For more information, see the Open Panzer Wiki:
  * http://wiki.openpanzer.org
@@ -720,16 +720,33 @@ if (Startup)
         if ((Radio.Sticks.Throttle.updated || Radio.Sticks.Turn.updated) && DriveModeActual != TRACK_RECOIL)
         {    
             // We set Throttle (engine speed) and Drive (wheel speed) equal to begin with, but they will diverge as we proceed. 
-            DriveCommand = ThrottleCommand = Radio.Sticks.Throttle.command;
-            // However in manual transmission mode, our throttle command is absolute and spans the full range of stick movement so we need to re-scale
-            if (ManualGear) 
-            { 
-                DriveCommand = ThrottleCommand = map(DriveCommand, MOTOR_MAX_REVSPEED, MOTOR_MAX_FWDSPEED, 0, MOTOR_MAX_FWDSPEED); 
-                if (ManualGear == GEAR_REVERSE) DriveCommand = ThrottleCommand = -DriveCommand;     // If reverse, convert back to negative value
-                if (ManualGear == GEAR_NEUTRAL) DriveCommand = 0;   // But if we're in neutral we can't be driving. But we still allow ThrottleCommand to pass through so the user can control the engine sound.
+            if (eeprom.ramcopy.DriveType == DT_DIRECT)
+            {   // In direct drive mode the user is controlling each tread separately using distinct radio channels (throttle for left tread, "turn" channel for right tread)
+                LeftSpeed = Radio.Sticks.Throttle.command;  // Throttle channel goes directly to left tread
+                RightSpeed = Radio.Sticks.Turn.command;     // "Turn" channel goes directly to right tread
+                
+                // Usually we have a single drive and turn speed and from that we calculate individual tread speeds. Here we are doing it backwards, we have individual tread speeds and 
+                // although we don't bother calculating a turn amount, we need to figure out an overall drive speed. We use the greater amount of either tread, and if the greater tread is going in reverse
+                // then we set the speed in reverse as well. 
+                if (abs(LeftSpeed) >= abs(RightSpeed)) { DriveSpeed = DriveCommand = ThrottleCommand = LeftSpeed; }
+                else                                   { DriveSpeed = DriveCommand = ThrottleCommand = RightSpeed; }
+                
+                // In this mode, there is no such thing as an internally-tracked turn command, the user will manage turns manually
+                TurnCommand = 0;
             }
-            // Turn command
-            TurnCommand = Radio.Sticks.Turn.command;
+            else
+            {
+                DriveCommand = ThrottleCommand = Radio.Sticks.Throttle.command;
+                // However in manual transmission mode, our throttle command is absolute and spans the full range of stick movement so we need to re-scale
+                if (ManualGear) 
+                { 
+                    DriveCommand = ThrottleCommand = map(DriveCommand, MOTOR_MAX_REVSPEED, MOTOR_MAX_FWDSPEED, 0, MOTOR_MAX_FWDSPEED); 
+                    if (ManualGear == GEAR_REVERSE) DriveCommand = ThrottleCommand = -DriveCommand;     // If reverse, convert back to negative value
+                    if (ManualGear == GEAR_NEUTRAL) DriveCommand = 0;   // But if we're in neutral we can't be driving. But we still allow ThrottleCommand to pass through so the user can control the engine sound.
+                }
+                // Turn command
+                TurnCommand = Radio.Sticks.Turn.command;
+            }
             
             // Get drive mode command
             if (!TransmissionEngaged)
@@ -885,71 +902,79 @@ if (Startup)
         // GET DRIVE SPEED
         // ---------------------------------------------------------------------------------------------------------------------------------------------->
         // Now get our drive speed
-        if (DriveModeActual != NEUTRALTURN && DriveModeActual != STOP) 
-        {   // We're going to start manipulating drive speed so we will use the DriveSpeed variable rather than DriveCommand, because we want DriveCommand (and DriveCommand_Previous)
-            // to accurately reflect the actual command. 
-            
-            // Apply any user speed limitations to forward and reverse. We do this by scaling the command to the range the user specifies. 
-            // Why not simply adjust the internal speed range of the motor object? That is a great idea, but unfortunately, because forward and reverse can have different
-            // max speeds, limiting the motor object will cause uneven motor speed in Neutral Turns - for example, the tread turning in reverse will move slower than the tread
-            // moving forward. We would have to keep changing the internal speed range on the fly depending on if we were moving forward, reverse, or in a neutral turn. 
-            // It probably wouldn't be any more work really than what we've ended up doing which is adjusting the command, but that's how we're doing it. 
-            // And no, this will NOT hinder the ability of the sound object from reaching full speed even with limited motor speeds. The engine sound speed is based off 
-            // ThrottleCommand which we do not limit the way we are now with DriveCommand. 
-            if (DriveModeActual == FORWARD && ForwardSpeed_Max < MOTOR_MAX_FWDSPEED)
-            {
-                DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_FWDSPEED, 0, ForwardSpeed_Max);
-            }
-            else if (DriveModeActual == REVERSE && ReverseSpeed_Max > MOTOR_MAX_REVSPEED)
-            {
-                DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_REVSPEED, 0, ReverseSpeed_Max);
-            }
-            else
-            {
-                DriveSpeed = DriveCommand;
-            }
-            
-            // If we are just starting to move from a stop, and the nudge effect is enabled, we want to immediately set the drive motors
-            // to a pre-determined minimum amount. To prevent the driver class from ramping up to this level, we artificially assign
-            // this starting level to the DriveSpeed_Previous variable, so there will be no ramping required to reach it (ramping
-            // is used to change speed from the prior amount to the current amount, but if it thinks the prior amount is already at the level
-            // we want to be, it won't need to ramp)
-            if (DriveModeActual != TRACK_RECOIL)    // Ignore nudge during track recoil
-            {
-                if (NudgeStarted)
+        if (eeprom.ramcopy.DriveType != DT_DIRECT)  // Note: there are no speed limitations in direct drive mode
+        {        
+            if (DriveModeActual != NEUTRALTURN && DriveModeActual != STOP) 
+            {   // We're going to start manipulating drive speed so we will use the DriveSpeed variable rather than DriveCommand, because we want DriveCommand (and DriveCommand_Previous)
+                // to accurately reflect the actual command. 
+                
+                // Apply any user speed limitations to forward and reverse. We do this by scaling the command to the range the user specifies. 
+                // Why not simply adjust the internal speed range of the motor object? That is a great idea, but unfortunately, because forward and reverse can have different
+                // max speeds, limiting the motor object will cause uneven motor speed in Neutral Turns - for example, the tread turning in reverse will move slower than the tread
+                // moving forward. We would have to keep changing the internal speed range on the fly depending on if we were moving forward, reverse, or in a neutral turn. 
+                // It probably wouldn't be any more work really than what we've ended up doing which is adjusting the command, but that's how we're doing it. 
+                // And no, this will NOT hinder the ability of the sound object from reaching full speed even with limited motor speeds. The engine sound speed is based off 
+                // ThrottleCommand which we do not limit the way we are now with DriveCommand. 
+                if (DriveModeActual == FORWARD && ForwardSpeed_Max < MOTOR_MAX_FWDSPEED)
                 {
-                    if      (DriveModeActual == FORWARD) DriveSpeed_Previous =  NudgeAmount;
-                    else if (DriveModeActual == REVERSE) DriveSpeed_Previous = -NudgeAmount;
-                    NudgeStarted = false;   // We only do this at the start, so set this to false. 
-                }    
+                    DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_FWDSPEED, 0, ForwardSpeed_Max);
+                }
+                else if (DriveModeActual == REVERSE && ReverseSpeed_Max > MOTOR_MAX_REVSPEED)
+                {
+                    DriveSpeed = map(DriveCommand, 0, MOTOR_MAX_REVSPEED, 0, ReverseSpeed_Max);
+                }
+                else
+                {
+                    DriveSpeed = DriveCommand;
+                }
+                
+                // If we are just starting to move from a stop, and the nudge effect is enabled, we want to immediately set the drive motors
+                // to a pre-determined minimum amount. To prevent the driver class from ramping up to this level, we artificially assign
+                // this starting level to the DriveSpeed_Previous variable, so there will be no ramping required to reach it (ramping
+                // is used to change speed from the prior amount to the current amount, but if it thinks the prior amount is already at the level
+                // we want to be, it won't need to ramp)
+                if (DriveModeActual != TRACK_RECOIL)    // Ignore nudge during track recoil
+                {
+                    if (NudgeStarted)
+                    {
+                        if      (DriveModeActual == FORWARD) DriveSpeed_Previous =  NudgeAmount;
+                        else if (DriveModeActual == REVERSE) DriveSpeed_Previous = -NudgeAmount;
+                        NudgeStarted = false;   // We only do this at the start, so set this to false. 
+                    }    
+        
+                    // So long as the nudge flag is active (user determines how long it lasts), we don't let throttle command fall below the minimium set nudge amount
+                    if (Nudge)
+                    {    
+                        if      (DriveModeActual == FORWARD) DriveSpeed = max(DriveSpeed,  NudgeAmount); 
+                        else if (DriveModeActual == REVERSE) DriveSpeed = min(DriveSpeed, -NudgeAmount); 
+                    }
+                }
+                else
+                {
+                    // During track recoil we will be doing our own "nudging"
+                    TurnSpeed = 0;      // No turning during track recoil
+                }
     
-                // So long as the nudge flag is active (user determines how long it lasts), we don't let throttle command fall below the minimium set nudge amount
-                if (Nudge)
-                {    
-                    if      (DriveModeActual == FORWARD) DriveSpeed = max(DriveSpeed,  NudgeAmount); 
-                    else if (DriveModeActual == REVERSE) DriveSpeed = min(DriveSpeed, -NudgeAmount); 
+                // Ok, DriveSpeed finally - GetDriveSpeed() primarily applies any acceleration/deceleration constraints. Remember, DriveSpeed is the speed of the vehicle.
+                DriveSpeed = Driver.GetDriveSpeed(DriveSpeed, DriveSpeed_Previous, DriveModeActual, Braking);
+    
+                // In this case the recoil is over, return DriveModeActual to STOP
+                if (DriveModeActual == TRACK_RECOIL && DriveSpeed == 0)
+                {
+                    DriveModeActual = STOP;
                 }
             }
             else
-            {
-                // During track recoil we will be doing our own "nudging"
-                TurnSpeed = 0;      // No turning during track recoil
-            }
-
-            // Ok, DriveSpeed finally - GetDriveSpeed() primarily applies any acceleration/deceleration constraints. Remember, DriveSpeed is the speed of the vehicle.
-            DriveSpeed = Driver.GetDriveSpeed(DriveSpeed, DriveSpeed_Previous, DriveModeActual, Braking);
-
-            // In this case the recoil is over, return DriveModeActual to STOP
-            if (DriveModeActual == TRACK_RECOIL && DriveSpeed == 0)
-            {
-                DriveModeActual = STOP;
+            {   // This is a neutral turn
+                DriveSpeed = 0; // Neutral turns ignore drive speed
+                // If enabled, we apply acceleration ramping to TurnSpeed (speed of neutral turn). Deceleration ramping will automatically be ignored for neutral turns, even if enabled (it looks silly)
+                TurnSpeed = Driver.GetDriveSpeed(TurnSpeed, TurnSpeed_Previous, DriveModeActual, Braking);
             }
         }
         else
-        {   // This is a neutral turn
-            DriveSpeed = 0; // Neutral turns ignore drive speed
-            // If enabled, we apply acceleration ramping to TurnSpeed (speed of neutral turn). Deceleration ramping will automatically be ignored for neutral turns, even if enabled (it looks silly)
-            TurnSpeed = Driver.GetDriveSpeed(TurnSpeed, TurnSpeed_Previous, DriveModeActual, Braking);
+        {
+            // This is a direct drive vehicle, command (max of either tread) is our actual speed
+            DriveSpeed = DriveCommand; 
         }
 
         // Calculate an absolute percentage of movement (0-100). We will use this for vehicle speed triggers
@@ -1018,10 +1043,17 @@ if (Startup)
             {
                 case DT_TANK:       
                 case DT_HALFTRACK:
+                case DT_DIRECT:                
                     // In this case we have independent tread speeds 
-                    // Now we mix the throttle and turn outputs to arrive at individual motor commands. 
-                    // RightSpeed and LeftSpeed are passed by reference and updated by the function
-                    Driver.MixSteering(DriveSpeed, TurnSpeed, &RightSpeed, &LeftSpeed);  
+
+                    // There is no mixing for direct drive mode, in which case the user is controlling each tread manually. We already have right and left speed, taken directly from throttle and "turn" channel commands earlier.
+                    if (eeprom.ramcopy.DriveType != DT_DIRECT)
+                    {
+                        // But for tanks and halftracks we do perform the mixing internally to derive right and left track speeds
+                        // Now we mix the throttle and turn outputs to arrive at individual motor commands. 
+                        // RightSpeed and LeftSpeed are passed by reference and updated by the function
+                        Driver.MixSteering(DriveSpeed, TurnSpeed, &RightSpeed, &LeftSpeed);  
+                    }
 
                     //Finally! We send the motor commands out to the motors, but only if something has changed since last time. 
                     if ((RightSpeed_Previous != RightSpeed) || (LeftSpeed_Previous != LeftSpeed))
