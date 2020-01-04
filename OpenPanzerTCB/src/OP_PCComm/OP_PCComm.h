@@ -119,6 +119,7 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
+#include "../OP_Devices/OP_Devices.h"
 #include "../EEPROMex/EEPROMex.h"
 #include "../OP_EEPROM/OP_EEPROM.h"
 #include "../OP_Radio/OP_Radio.h"
@@ -203,7 +204,7 @@ struct DataSentence {
 class OP_PCComm
 {   public:
         OP_PCComm(void);                            // Constructor
-        static void begin(OP_EEPROM *, OP_Radio *); // Begin
+        static void begin(OP_EEPROM *, OP_Radio *, DEVICE); // Begin
         
         // Functions 
         static boolean CheckPC(void);               // Did the PC talk to us? 
@@ -250,6 +251,7 @@ class OP_PCComm
         static OP_EEPROM        *_op_eeprom;
         static HardwareSerial   *_serial;
         static OP_Radio         *_radio;
+		static uint8_t			_hardwareDevice;
         static uint32_t         WatchdogStartTime;
         static boolean          Timeout;
         static boolean          Disconnect;

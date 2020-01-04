@@ -24,6 +24,7 @@
 OP_EEPROM       * OP_PCComm::_op_eeprom;
 HardwareSerial  * OP_PCComm::_serial;
 OP_Radio        * OP_PCComm::_radio;
+uint8_t			  OP_PCComm::_hardwareDevice;
 uint32_t          OP_PCComm::WatchdogStartTime;
 boolean           OP_PCComm::Timeout;
 boolean           OP_PCComm::Disconnect;
@@ -38,10 +39,11 @@ DataSentence      OP_PCComm::SentenceIN;
 //------------------------------------------------------------------------------------------------------------------------>>
 OP_PCComm::OP_PCComm(void) {}                                       // Constructor
 
-void OP_PCComm::begin(OP_EEPROM * opeeprom, OP_Radio * radio)       // Begin
+void OP_PCComm::begin(OP_EEPROM * opeeprom, OP_Radio * radio, DEVICE device)       // Begin
 {
     _op_eeprom = opeeprom;
     _radio = radio;
+	_hardwareDevice = device;
     _serial = &DEFAULT_SERIAL_PORT; // Initialize to default set in OP_PCComm.h
     Timeout = false;
     Disconnect = false;
@@ -728,7 +730,7 @@ void OP_PCComm::GivePC_FirmwareVersion(void)
 
 void OP_PCComm::GivePC_HardwareVersion(void)
 {
-    // Send the hardware identification number. This is defined in OP_Settings.h as HARDWARE_VERSION
+    // Send the hardware identification number. This is defined at the top of the sketch as HardwareVersion
 
     // This routine is a bit unusual since in all other cases we are sending a value of 0, 
     // or else some numerical value. But in this case we are sending a string value. 
@@ -750,7 +752,7 @@ void OP_PCComm::GivePC_HardwareVersion(void)
     // Now convert the command | ID | to a byte array
     prefixToByteArray(s, sentenceOut, SENTENCE_BUFF, strLen);
 
-    String str = HARDWARE_VERSION;          // Now convert hardware version string to char array
+    String str = String(_hardwareDevice, DEC);	// Now convert hardware version to string	
     str += DELIMITER;                       // add final delimiter
     strLen += str.length();                 // Add to the string length
     fValue[0] = '\0';                       // Convert the string to a char array in fValue

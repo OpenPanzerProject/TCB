@@ -93,6 +93,61 @@ void ReduceSpeed(uint8_t speedAmt)
 
 // SPECIAL FUNCTIONS: Engine
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
+boolean StartEngine()
+{
+    UpdateEngineStatusDelayTimer();
+    if (EngineTimerComplete && !EngineRunning)  // Only change engine status if some length of time has passed since last change
+    {                                           // AND only if engine is not already running
+        EngineRunning = true;                   // Change state to running
+        EngineTimerComplete = false;            // Reset engine timer
+        StartEngineTimer();
+        if (DEBUG) { DebugSerial->println(F("Turn Engine On")); }
+        return true;
+    }
+    else
+    {   // Engine wasn't started, return false 
+        return false;
+    }
+}
+void StopEngine(boolean msg)
+{
+    UpdateEngineStatusDelayTimer();
+    if (EngineTimerComplete && EngineRunning)   // Only change engine status if some length of time has passed since last change
+    {                                           // AND only if engine is already running
+        EngineRunning = false;                  // Change state to stopped
+        EngineTimerComplete = false;            // Reset engine timer
+        StartEngineTimer();
+        if (DEBUG && msg) { DebugSerial->println(F("Turn Engine Off")); }
+    }
+}
+
+void StartEngineTimer()
+{
+    if (eeprom.ramcopy.EnginePauseTime_mS > 0)
+    {
+        // Start the engine timer. Until it expires, it will not be possible to change that status of the engine. 
+        if (EngineTimerComplete)    // Meaning, the timer is not running
+        {
+            EngineTimerStartTime = millis();
+            EngineTimerComplete = false;
+        }
+    }
+    else
+    {
+        // No pause time specified, we allow immediate changes
+        EngineTimerComplete = true;
+    }
+}
+void UpdateEngineStatusDelayTimer()
+{
+    if (!EngineTimerComplete)
+    {
+        if ((millis() - EngineTimerStartTime) > eeprom.ramcopy.EnginePauseTime_mS)
+        {   // Time's up
+            EngineTimerComplete = true;
+        }
+    }
+}
 void EngineOn()
 {   
 boolean Proceed = true;
@@ -123,7 +178,7 @@ boolean Proceed = true;
             }
         }
         
-        if (Proceed && TankEngine.StartEngine())
+        if (Proceed && StartEngine())
         {   
             // Give the user a notification if we are skipping the smoker pre-heat
                 if (EngineInPreheat == false && eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && SmokerPreHeat_Sec > 0 && eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L))) 
@@ -166,7 +221,8 @@ boolean Proceed = true;
         }
     }
 }
-void EngineOff()
+void EngineOff(boolean debugMsg=true);
+void EngineOff(boolean debugMsg)
 {
     // We don't permit engine status changes during repair operations, because it will cause the sounds to get out of sync.
     // If you really need to shut down the engine (ie, Failsafe), make sure you call Tank.StopRepair() first
@@ -176,7 +232,7 @@ void EngineOff()
         // Clear the pre-heat flag if set
             EngineInPreheat = false;        
         // Stop the engine object 
-            TankEngine.StopEngine();
+            StopEngine(debugMsg);
         // Set the engine stop ad-hoc trigger bit 
             bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_STOP);
         // Stop the smoker
@@ -209,13 +265,13 @@ void EngineOffSound()
 }
 void EngineToggle()
 {
-    TankEngine.Running() ? EngineOff() : EngineOn();
+    EngineRunning ? EngineOff() : EngineOn();
 }
 void UpdateEngineIdleTimer()
 {
     if (eeprom.ramcopy.EngineAutoStopTime_mS > 0)
     {
-        if (TankEngine.Running())
+        if (EngineRunning)
         {
             if (timer.isEnabled(IdleOffTimerID)) timer.restartTimer(IdleOffTimerID);
             else IdleOffTimerID = timer.setTimeout(eeprom.ramcopy.EngineAutoStopTime_mS, EngineIdleOff);
@@ -236,7 +292,7 @@ void EngineIdleOff()
 {
     // This function gets called if the tank has been sitting at idle for longer than the user auto-off setting.
     // So we shut down the engine
-    if (TankEngine.Running()) 
+    if (EngineRunning) 
     {
         EngineOff();
         if (DEBUG) DebugSerial->println(F("Engine Auto Shutdown"));
@@ -250,7 +306,7 @@ void TransmissionEngage()
 {
     // No point in messing with transmission if the engine isn't running
     // We also don't allow the transmission to be engaged if we're in the midst of a repair operation. 
-    if (TankEngine.Running() && !Tank.isRepairOngoing() && !TransmissionEngaged) 
+    if (EngineRunning && !Tank.isRepairOngoing() && !TransmissionEngaged) 
     { 
         TransmissionEngaged = true;
         if (smokerStartupWithEngage)
@@ -273,7 +329,7 @@ void TransmissionEngage()
 void TransmissionDisengage()
 {
     // If the engine is running and we disengage, we need to possibly play a sound and adjust the smoker speed
-    if (TankEngine.Running() && TransmissionEngaged) 
+    if (EngineRunning && TransmissionEngaged) 
     { 
         TransmissionEngaged = false;
         SetSmoker_FastIdle();
@@ -360,7 +416,7 @@ void StopEverything()
     // Make sure we clear any ongoing repairs, otherwise the engine won't turn off
     Tank.StopRepair(); 
     // Turn Engine off
-    if (TankEngine.Running()) 
+    if (EngineRunning) 
     { 
         // Now turn engine off, this will also play the engine stop sound
         EngineOff(); 

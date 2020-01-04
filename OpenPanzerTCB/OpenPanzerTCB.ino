@@ -24,6 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
+#include "src/OP_Devices/OP_Devices.h"
 #include "src/OP_Settings/OP_Settings.h"
 #include "src/OP_FT/OP_FunctionsTriggers.h"
 #include "src/OP_IO/OP_IO.h"
@@ -56,6 +57,9 @@
 
 // GLOBAL VARIABLES
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>>
+// HARDWARE VERSION
+    DEVICE HardwareVersion = DEVICE_TCB_MKI;     // This is the TCB Mk I
+    
 // PROJECT SPECIFIC EEPROM
     OP_EEPROM eeprom;                            // Wrapper class for dealing with eeprom. Note that EEPROM is also a valid object, it is the name of the EEPROMex class instance. Use the correct one!
                                                  // OP_EEPROM basically provides some further functionality beyond EEPROMex. 
@@ -96,7 +100,6 @@
 // TANK OBJECTS
     OP_Servos TankServos;
     OP_Driver Driver;                         
-    OP_Engine TankEngine;
     OP_Sound * TankSound;
     OP_Tank Tank;                              
 
@@ -153,9 +156,12 @@
         boolean MotorA_Available = false;
         boolean MotorB_Available = false;
 
-// MOTOR IDLE & PREHEAT TIMERS 
-    int IdleOffTimerID = 0;                       // User has the option of setting a length of time, after which, if the engine has been idle the whole time, the engine will automatically turn off. 
-    boolean EngineInPreheat = false;              // Is the engine waiting to start while we preheat the heating element for smokers with separate heat and fan controls
+// ENGINE DELAY, MOTOR IDLE OFF, and PREHEAT TIMERS 
+    boolean EngineRunning = false;               // Initialize to engine off
+    uint32_t EngineTimerStartTime;               // We may need to prevent engine starting if the user has specified a delay since its last status change
+    boolean EngineTimerComplete = true;          // Initialize timer complete    
+    int IdleOffTimerID = 0;                      // User has the option of setting a length of time, after which, if the engine has been idle the whole time, the engine will automatically turn off. 
+    boolean EngineInPreheat = false;             // Is the engine waiting to start while we preheat the heating element for smokers with separate heat and fan controls
 
 // DRIVING ADJUSTMENTS
     uint8_t DrivingProfile = 1;                   // There are 2 driving profiles possible - we default to 1, but if the user implements a special function they can change it to 2 (alternate) on the fly
@@ -205,7 +211,7 @@ void setup()
         MotorSerial.begin(eeprom.ramcopy.MotorSerialBaud);         // Hardware Serial 2 - reserved for serial motor controllers
         Serial3Tx.begin(eeprom.ramcopy.Serial3TxBaud);             // Hardware Serial 3 - Receive used for serial radio receivers (SBus,iBus,etc). Tx brought out to Serial 3 connector, but Tx disabled if serial receiver detected. 
                                                                    //                     The original idea was to use Serial 3 for an Adafruit or Sparkfun serial LCD, and the connector is compatible with those, but no code was written for that application.
-        PCComm.begin(&eeprom, &Radio);                             // Initialize the PC communication class. It needs a reference to OP_EEPROM annd OP_Radio objects which we pass by reference.
+        PCComm.begin(&eeprom, &Radio, HardwareVersion);            // Initialize the PC communication class. It needs a reference to OP_EEPROM annd OP_Radio objects which we pass by reference, also give the device ID
         //PCComm.skipCRC();                                        // We can skip CRC checking for testing, but don't use this in production. 
         SetActiveCommPort();                                       // Check Dipswitch #5 and set the active communication port to USB if switch On, or Serial 1 if switch Off
 
@@ -276,7 +282,6 @@ void setup()
                      eeprom.ramcopy.TrackRecoilKickbackSpeed,
                      eeprom.ramcopy.TrackRecoilDecelerateFactor);
         SetDrivingProfile(DrivingProfile);              // See Driving tab
-        TankEngine.begin(eeprom.ramcopy.EnginePauseTime_mS, SAVE_DEBUG, DebugSerial);
         InstantiateSoundObject();                       // Do this after TankServos.begin();
         InstantiateOptionalServoOutputs();              // Do this after InstantiateSoundObject();
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
@@ -710,7 +715,7 @@ if (Startup)
 
     // DRIVING
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
-    if ((TankEngine.Running() || DriveModeActual == TRACK_RECOIL) && HavePower)     // Typicaly we only move the tank when the engine is running, but track recoil is an exception
+    if ((EngineRunning || DriveModeActual == TRACK_RECOIL) && HavePower)     // Typicaly we only move the tank when the engine is running, but track recoil is an exception
     {
         if (WasRunning == false && DriveModeActual != TRACK_RECOIL) { WasRunning = true; }     // Means, we just started the engine running
         
@@ -1244,7 +1249,7 @@ if (Startup)
         }
         
         // Finally, sort of a one-off trigger: the user has the option of starting the engine with the throttle channel
-        if (eeprom.ramcopy.EngineAutoStart && TankEngine.Running() == false && Radio.Sticks.Throttle.command > 126 && EngineInPreheat == false) // We check for throttle command greater than half. We also ignore when engine in preheat, meaning it is already getting started.
+        if (eeprom.ramcopy.EngineAutoStart && EngineRunning == false && Radio.Sticks.Throttle.command > 126 && EngineInPreheat == false) // We check for throttle command greater than half. We also ignore when engine in preheat, meaning it is already getting started.
         {
             EngineOn();
         }

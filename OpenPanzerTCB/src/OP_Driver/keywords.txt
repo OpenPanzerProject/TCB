@@ -9,8 +9,6 @@
 #-------------------------------------------------------------
 
 OP_Driver	KEYWORD1
-OP_Engine	KEYWORD1
-OP_Transmission	KEYWORD1
 
 
 #-------------------------------------------------------------
@@ -34,18 +32,6 @@ GetDriveSpeed	KEYWORD2
 GetThrottleSpeed	KEYWORD2
 ScaleTurnCommand	KEYWORD2
 MixSteering	KEYWORD2
-
-begin	KEYWORD2
-Running	KEYWORD2
-StartEngine	KEYWORD2
-StopEngine	KEYWORD2
-UpdateTimer	KEYWORD2
-
-begin	KEYWORD2
-Engaged	KEYWORD2
-PutInGear	KEYWORD2
-PutInNeutral	KEYWORD2
-UpdateTimer	KEYWORD2
 
 
 #-------------------------------------------------------------

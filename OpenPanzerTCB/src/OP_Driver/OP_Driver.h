@@ -162,27 +162,5 @@ protected:
 };
 
 
-// "ENGINE" FUNCTIONS - this is mostly just taking care of timing requirements when turning on/off the "engine" 
-class OP_Engine
-{
-public:
-    static void    begin(uint16_t, boolean, HardwareSerial *);  // Pass the engine pause time to the object, and whether or not we want debugging messages along with the debug port
-    static boolean Running(void);               // Returns engine running state
-    static boolean StartEngine(void);           // Try to start the engine, returns true if engine started
-    static void    StopEngine(void);
-    static void    UpdateTimer(void);           // This updates the engine timer
-
-private:
-    static uint16_t EnginePauseTime;            // How long to wait before engine can change state, in milliseconds (1000 mS = 1 second)
-    static uint32_t EngineTimerStartTime;
-    static boolean  EngineTimerComplete;         // Timer flag
-    static boolean  EngineRunning;
-    static void StartEngineTimer(void);         // If these are not declared static they can't be used without first creating an object
-    static void ClearEngineTimer(void);         // But we want the class to use them internally, so set them to static. 
-    static boolean _debug;                      // If true, send debug messages out the serial port
-    static HardwareSerial *_debugSerial;        // The debugging serial port to use 
-};
-
-
 #endif
 

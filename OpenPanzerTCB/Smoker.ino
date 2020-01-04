@@ -24,7 +24,7 @@ void EnableSmoker()
         if (DEBUG) { DebugSerial->println(F("Smoker enabled")); }
 
         // Also, if they enable while the engine is running, we need to auto-turn it on
-        if (TankEngine.Running())
+        if (EngineRunning)
         {
             TransmissionEngaged ? SetSmoker_Idle() : SetSmoker_FastIdle();
         }
@@ -39,7 +39,7 @@ void DisableSmoker()
         if (DEBUG) { DebugSerial->println(F("Smoker disabled")); }
         
         // Also, if they disable while the engine is running, we need to auto turn it off
-        if (TankEngine.Running()) ShutdownSmoker(TransmissionEngaged);
+        if (EngineRunning) ShutdownSmoker(TransmissionEngaged);
     }
 }
 
