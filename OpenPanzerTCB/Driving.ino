@@ -99,7 +99,7 @@ boolean StartEngine()
     if (EngineTimerComplete && !EngineRunning)  // Only change engine status if some length of time has passed since last change
     {                                           // AND only if engine is not already running
         EngineRunning = true;                   // Change state to running
-        EngineTimerComplete = false;            // Reset engine timer
+        EngineTimerComplete = true;             // Reset engine timer
         StartEngineTimer();
         if (DEBUG) { DebugSerial->println(F("Turn Engine On")); }
         return true;
@@ -109,18 +109,22 @@ boolean StartEngine()
         return false;
     }
 }
-void StopEngine(boolean msg)
+boolean StopEngine(boolean msg)
 {
     UpdateEngineStatusDelayTimer();
     if (EngineTimerComplete && EngineRunning)   // Only change engine status if some length of time has passed since last change
     {                                           // AND only if engine is already running
         EngineRunning = false;                  // Change state to stopped
-        EngineTimerComplete = false;            // Reset engine timer
+        EngineTimerComplete = true;             // Reset engine timer
         StartEngineTimer();
         if (DEBUG && msg) { DebugSerial->println(F("Turn Engine Off")); }
+        return true;
     }
+    else
+    {   // Engine wasn't stopped, return false
+        return false;
+    }    
 }
-
 void StartEngineTimer()
 {
     if (eeprom.ramcopy.EnginePauseTime_mS > 0)
@@ -201,7 +205,7 @@ boolean Proceed = true;
                     {   // In this case the user has set a delay from the time the engine starts to when the transmission should be engaged. Typically this is to prevent the 
                         // transmission from engaging before the engine startup sound is complete. So we set a timer that will engage it after the set amount of time. 
                         skipTransmissionSound = true;  // We skip the transmission sound unless the user is manually manipulating the transmission, but this is just an automatic engage
-                        timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngage); 
+                        timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngageWithMsg); 
         
                         // Also start the smoker. We start in fast idle until the transmission engages
                         StartSmoker(false); // We pass false for "transmission not engaged"
@@ -211,7 +215,7 @@ boolean Proceed = true;
                         skipTransmissionSound = true;       // No need to clunk the transmission just because we're turning the engine on
                         smokerStartupWithEngage = true;     // We want the transmission engage function to issue the smoker startup command. Otherwise, for normal toggling of the transmission 
                                                             // after the engine has been started, the transmission engage function will simply set the smoker idle speed. 
-                        TransmissionEngage(); 
+                        TransmissionEngage(false);          // Pass false here to skip the message about engaging the transmission, since it is being done automatically. 
                     }
                 }
             // Finally, if the user has set the engine auto-off feature, we start a timer for the specified length of time.
@@ -229,33 +233,34 @@ void EngineOff(boolean debugMsg)
     // (for example, see StopEverything() below)
     if (!Tank.isRepairOngoing())
     {
-        // Clear the pre-heat flag if set
-            EngineInPreheat = false;        
-        // Stop the engine object 
-            StopEngine(debugMsg);
-        // Set the engine stop ad-hoc trigger bit 
-            bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_STOP);
-        // Stop the smoker
-            // As opposed to StopSmoker, Shutdown will let the smoker turn off slowly for a more realistic effect. 
-            // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.
-            TransmissionEngaged ? ShutdownSmoker(true) : ShutdownSmoker(false);
-        // Now disengage the transmission object (no need to have transmission in gear if engine is off)
-            skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine off
-            TransmissionDisengage();
-        // Play the engine stop sound
-            if (eeprom.ramcopy.SoundDevice == SD_BENEDINI_TBSMINI && Tank.isDestroyed)
-            {
-                // The Benedini Mini doesn't like to play the engine shutdown and destroyed sounds simultaneously, but we definitely do still need
-                // to give it the engine off signal. If we delay it slightly the destroyed sound will play and the engine off signal still gets received.
-                timer.setTimeout(100, EngineOffSound); 
-            }
-            else EngineOffSound();  // Otherwise if not destroyed or not Benedini Mini we can play the sound immediately
-        // Stop the drive motor(s)
-            StopDriveMotors();
-        // Clear the engine idle timer
-            UpdateEngineIdleTimer();  
-        // Save the time, we can use this to skip the smoker pre-heat delay if they start the engine again shortly after the last stop
-            LastStopTime = millis();
+        if (StopEngine(debugMsg))   // We may not actually be able to stop the engine yet if the user has a delay specified
+        {        
+            // Clear the pre-heat flag if set
+                EngineInPreheat = false;        
+            // Set the engine stop ad-hoc trigger bit 
+                bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_STOP);
+            // Stop the smoker
+                // As opposed to StopSmoker, Shutdown will let the smoker turn off slowly for a more realistic effect. 
+                // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.
+                TransmissionEngaged ? ShutdownSmoker(true) : ShutdownSmoker(false);
+            // Now disengage the transmission object (no need to have transmission in gear if engine is off)
+                skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine off
+                TransmissionDisengage();
+            // Play the engine stop sound
+                if (eeprom.ramcopy.SoundDevice == SD_BENEDINI_TBSMINI && Tank.isDestroyed)
+                {
+                    // The Benedini Mini doesn't like to play the engine shutdown and destroyed sounds simultaneously, but we definitely do still need
+                    // to give it the engine off signal. If we delay it slightly the destroyed sound will play and the engine off signal still gets received.
+                    timer.setTimeout(100, EngineOffSound); 
+                }
+                else EngineOffSound();  // Otherwise if not destroyed or not Benedini Mini we can play the sound immediately
+            // Stop the drive motor(s)
+                StopDriveMotors();
+            // Clear the engine idle timer
+                UpdateEngineIdleTimer();  
+            // Save the time, we can use this to skip the smoker pre-heat delay if they start the engine again shortly after the last stop
+                LastStopTime = millis();
+        }
     }    
 }
 void EngineOffSound()
@@ -302,7 +307,8 @@ void EngineIdleOff()
 
 // SPECIAL FUNCTIONS: Transmission
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
-void TransmissionEngage()
+// Function prototype that defaults debugMsg = true is located at top of sketch main tab.
+void TransmissionEngage(boolean debugMsg)
 {
     // No point in messing with transmission if the engine isn't running
     // We also don't allow the transmission to be engaged if we're in the midst of a repair operation. 
@@ -322,10 +328,14 @@ void TransmissionEngage()
         
         if (skipTransmissionSound)  skipTransmissionSound = false;          // Skip the sound, but reset the flag for next time
         else                        TankSound->EngageTransmission(true);    // Play the transmission engage sound
-        if (DEBUG) DebugSerial->println(F("Engage Transmission")); 
+        if (DEBUG && debugMsg) DebugSerial->println(F("Engage Transmission"));         
     }
 }
-
+void TransmissionEngageWithMsg(void)
+{
+    // We use this function when we want to engage the transmission via the timer class
+    TransmissionEngage(true);
+}
 void TransmissionDisengage()
 {
     // If the engine is running and we disengage, we need to possibly play a sound and adjust the smoker speed

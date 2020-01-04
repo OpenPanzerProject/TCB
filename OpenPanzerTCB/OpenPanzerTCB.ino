@@ -55,6 +55,10 @@
 // You must comment-out the "#define _EEPROMEX_DEBUG" line in EEPROMex.cpp
 #include "src/EEPROMex/EEPROMex.h"   
 
+// These function prototypes need to go at the very top of the sketch or else the IDE won't compile correctly. 
+void TransmissionEngage(boolean debugMsg=true);
+
+
 // GLOBAL VARIABLES
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>>
 // HARDWARE VERSION
