@@ -30,8 +30,9 @@ typedef char SOUND_DEVICE;
 #define SD_TAIGEN_SOUND         2
 #define SD_BEIER_USMRC2         3
 #define SD_BENEDINI_TBSMICRO    4       // Added December 2017
+#define SD_ONBOARD              5       // Added July 2019, available only on MkII TCB
 #define SD_FIRST_SD             SD_BENEDINI_TBSMINI
-#define SD_LAST_SD              SD_BENEDINI_TBSMICRO
+#define SD_LAST_SD              SD_ONBOARD
 const __FlashStringHelper *printSoundDevice(SOUND_DEVICE Device); //Returns a character string that is name of the sound device
 
 // The four types of volume that can be adjusted relative to each other on the Open Panzer sound card

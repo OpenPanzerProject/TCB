@@ -46,6 +46,7 @@ void InstantiateSoundObject(void)
             RCOutput8_Available = false;            
             break;
 
+        case SD_ONBOARD:                                // No onboard sound for the MkI TCB - fallthrough to default
         default:
             // We shouldn't end up here but in case we do, we need to define something or else the program will croak at runtime.
             // We set it to TBS Mini and save it to EEPROM so we don't end up here again next time
