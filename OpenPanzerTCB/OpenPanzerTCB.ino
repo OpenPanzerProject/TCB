@@ -166,6 +166,7 @@ void TransmissionEngage(boolean debugMsg=true);
     boolean EngineTimerComplete = true;          // Initialize timer complete    
     int IdleOffTimerID = 0;                      // User has the option of setting a length of time, after which, if the engine has been idle the whole time, the engine will automatically turn off. 
     boolean EngineInPreheat = false;             // Is the engine waiting to start while we preheat the heating element for smokers with separate heat and fan controls
+    int PreheatTimerID = 0;                      // Timer ID for the smoker preheat, in case we need to cancel it
 
 // DRIVING ADJUSTMENTS
     uint8_t DrivingProfile = 1;                   // There are 2 driving profiles possible - we default to 1, but if the user implements a special function they can change it to 2 (alternate) on the fly

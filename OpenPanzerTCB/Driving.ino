@@ -112,12 +112,17 @@ boolean StartEngine()
 boolean StopEngine(boolean msg)
 {
     UpdateEngineStatusDelayTimer();
-    if (EngineTimerComplete && EngineRunning)   // Only change engine status if some length of time has passed since last change
+    if ((EngineTimerComplete && EngineRunning) || EngineInPreheat)   // Only change engine status if some length of time has passed since last change (if already on), or if we are in the preheat stage and the engine is scheduled to start
     {                                           // AND only if engine is already running
         EngineRunning = false;                  // Change state to stopped
         EngineTimerComplete = true;             // Reset engine timer
         StartEngineTimer();
-        if (DEBUG && msg) { DebugSerial->println(F("Turn Engine Off")); }
+        if (DEBUG && msg) 
+        { 
+            DebugSerial->print("Turn Engine Off"); 
+            if (EngineInPreheat) DebugSerial->print(" (engine pre-heat cancelled)");
+            DebugSerial->println();
+        }        
         return true;
     }
     else
@@ -162,9 +167,10 @@ boolean Proceed = true;
         // But if we're operating a manual transmission require the gear to be in neutral first
         if (ManualGear && ManualGear != GEAR_NEUTRAL) { if (DEBUG) DebugSerial->println(F("Manual transmission - put in neutral gear before starting engine!")); Proceed = false; return; }
         
-        // Start the engine object
+        // Start the engine object, but first check if we need to pre-heat the smoker
         if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD && SmokerPreHeat_Sec > 0 && EngineInPreheat == false)
         {   
+            // In this case the preheater has not been started yet, so start it if appropriate            
             if (eeprom.ramcopy.HotStartTimeout_Sec > 0 && LastStopTime > 0 && ((millis() - LastStopTime) < (eeprom.ramcopy.HotStartTimeout_Sec * 1000L)))
             {
                 // Here we are re-starting the engine within the hot start time since the last shutdown, so skip the pre-heat
@@ -176,7 +182,7 @@ boolean Proceed = true;
                 Smoker->preHeat();              // Turn on the heater
                 TankSound->PreHeatSound();      // Play the pre-heat sound
                 EngineInPreheat = true;         // Set a flag so we know the next time we come back here
-                timer.setTimeout((SmokerPreHeat_Sec * 1000L), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
+                PreheatTimerID = timer.setTimeout((SmokerPreHeat_Sec * 1000L), EngineOn);  // Set a timer to return here to turn the engine on after the pre-heat time has transpired. 
                 if (DEBUG) { DebugSerial->print(F("Smoker pre-heat started - engine will turn on in ")); DebugSerial->print(SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
                 Proceed = false;
             }
@@ -233,10 +239,14 @@ void EngineOff(boolean debugMsg)
     // (for example, see StopEverything() below)
     if (!Tank.isRepairOngoing())
     {
-        if (StopEngine(debugMsg))   // We may not actually be able to stop the engine yet if the user has a delay specified
+        if (StopEngine(debugMsg))   // We may not actually be able to stop the engine yet if the user has a delay specified - or if it is already stopped        
         {        
             // Clear the pre-heat flag if set
-                EngineInPreheat = false;        
+                if (EngineInPreheat)
+                {
+                    if (PreheatTimerID > 0) timer.deleteTimer(PreheatTimerID);  // Cancel the delayed engine start if it was active
+                    EngineInPreheat = false;
+                }
             // Set the engine stop ad-hoc trigger bit 
                 bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_STOP);
             // Stop the smoker
