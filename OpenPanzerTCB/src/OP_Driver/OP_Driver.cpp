@@ -107,9 +107,8 @@ void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta, uint8_t kbs, uint8_
     NeutralTurnAllowed = nta;                       // Are neutral turns allowed
     
     KickbackSpeed = map(kbs, 0, 100, 0, 255);       // Kickback speed is passed as some number between 0-100, we want to scale it to 0-255
-    DecelerationFactor = 0.85 + (0.0013 * (float)dcf);  // Deceleration factor. dcf will range from 0-100, what we want is a floating point number somewhere 
-                                                    // roughly between 0.8 and 0.99. At 0.8 the kickback spike would last 1/2 second. At .99 it would last approximately 8 seconds.
-                                                    // Here we let it range from 0.85 (somewhat less than 1 second) to 0.98 (somewhere around 4 seconds)
+    DecelerationFactor = 0.65 + (0.0033 * (float)dcf);  // dcf will range from 0-100, what we want to end up at (DecelerationFactor) is a floating point number somewhere 
+                                                    // roughly between 0.65 and 0.98. At 0.65 the kickback spike would last approximately 1/2 second (at full speed). At .98 it would last approximately 3.5 seconds.
     
 
     // SET INTERRUPT FREQUENCY
@@ -346,10 +345,10 @@ static uint16_t lastTRSpeed;
             // In this case, we are going to use RampedDriveSpeed essentially as a counter instead. We set step and skip to 1 such that 
             // RampedDriveSpeed will count to 256 every 1 second. After every 8 steps (1/32nd of a second) we decrement our
             // actual speed manually (t_DriveSpeed) by some deceleration factor set by the user but that falls somewhere in the general 
-            // range of 80-99%. In other words, if speed last time was 100 and our factor is 85%, this time speed will be 85%, next
+            // range of 65-98%. In other words, if speed last time was 100 and our factor is 85%, this time speed will be 85%, next
             // time around it will be 72%, etc... In this way we exponentially decrease our speed (not linearly), which results in 
             // a smooth but rapid deceleration from our original kickback speed
-            if (RampedDriveSpeed >= 1536)  { t_DriveSpeed = 0; } // We've waited 6 full seconds, that's more than long enough, we're done
+            if (RampedDriveSpeed >= 1024)  { t_DriveSpeed = 0; } // We've waited 4 full seconds, that's more than long enough, we're done
             else 
             {
                 DriveRampEnabled = true;
