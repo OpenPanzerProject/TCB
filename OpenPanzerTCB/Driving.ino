@@ -151,7 +151,7 @@ void UpdateEngineStatusDelayTimer()
 {
     if (!EngineTimerComplete)
     {
-        if ((millis() - EngineTimerStartTime) > eeprom.ramcopy.EnginePauseTime_mS)
+        if ((millis() - EngineTimerStartTime) >= eeprom.ramcopy.EnginePauseTime_mS)
         {   // Time's up
             EngineTimerComplete = true;
         }

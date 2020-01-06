@@ -399,7 +399,17 @@ void DumpSmokerInfo()
         DebugSerial->print(F("Smoker Type:          ")); DebugSerial->println(ptrSmokerType(eeprom.ramcopy.SmokerDeviceType)); 
         if (eeprom.ramcopy.SmokerDeviceType != SMOKERTYPE_ONBOARD_STANDARD) i = true;
         // Preheat and hot start
-        DebugSerial->print(F("Pre-heat delay:       ")); if (eeprom.ramcopy.SmokerPreHeat_Sec == 0) { DebugSerial->println(F("N/A")); } else { DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->println(F(" seconds")); }
+        DebugSerial->print(F("Pre-heat delay:       ")); 
+        if (eeprom.ramcopy.SmokerPreHeat_Sec == 0) 
+        { 
+            DebugSerial->println(F("N/A")); 
+        } 
+        else 
+        { 
+            DebugSerial->print(eeprom.ramcopy.SmokerPreHeat_Sec); DebugSerial->print(F(" seconds")); 
+            if (SmokerPreHeat_Sec == 0) DebugSerial->print(F(" (currently disabled)"));  // In this case the preheater has been disabled by the user
+            Serial.println();
+        }
 /* Hidden for now because we are not using this feature, although it does work.
         if (eeprom.ramcopy.SmokerPreHeat_Sec > 0)
         {
