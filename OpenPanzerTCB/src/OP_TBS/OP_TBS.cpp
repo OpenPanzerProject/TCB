@@ -142,7 +142,7 @@ void OP_TBS::IdleEngine(void)
 
 void OP_TBS::ClearThrottleBlip(void)
 {   // Same as IdleEngine which however we can't call from this static function since it is public, and we need this one static so it can be used with SimpleTimer...
-    TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);  // Return the throttle to idle from our brief blip (only used with Mini)
+    TBSProp->writeMicroseconds(PROP1, PROP1_IDLE);  // Return the throttle to idle from our brief blip (only used with Micro)
 }
 
 //------------------------------------------------------------------------------------------------------------------------>>

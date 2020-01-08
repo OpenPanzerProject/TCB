@@ -365,7 +365,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         DefaultChSettings.pulseMin = 1000;
         DefaultChSettings.pulseMax = 2000;
         DefaultChSettings.pulseCenter = 1500;
-        DefaultChSettings.deadband = DEFAULT_DEADBAND;  // Setting in OP_Radio.h
+        DefaultChSettings.deadband = DEFAULT_DEADBAND;  // Setting in OP_RadioDefines.h
         DefaultChSettings.reversed = false;             // Default to not reversed
         
         //We assume Radio has channel order RETA (2/4/3/1), but the user can change this in the menu
