@@ -12,13 +12,14 @@
 
 #include <Arduino.h>
 
+
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // OPEN PANZER TANK CONTROL BOARD (TCB) - FIRMWARE VERSION NUMBER
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
     // This is the firmware version that will be returned to the desktop application when it checks. It will be split into three, two-digit numbers
-    #define FIRMWARE_VERSION        "0.93.64"      // version. Last update 10/9/2019
+    #define FIRMWARE_VERSION        "0.93.67"      // version. Last update 1/7/2020
     
-    #define MIN_OPCONFIG_VERSION    "0.93.64"      // Minimum version of OP Config this version of firmware requires
+    #define MIN_OPCONFIG_VERSION    "0.93.67"      // Minimum version of OP Config this version of firmware requires
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
