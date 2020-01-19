@@ -426,9 +426,14 @@ void SetupServo(ESC_POS_t servoNum)
     DebugSerial->println();
     PrintDebugLine();
     switch (servoNum) 
-    {   case SERVONUM_TURRETELEVATION: DebugSerial->println(F("End Elevation Servo Setup")); break;
-        case SERVONUM_TURRETROTATION:  DebugSerial->println(F("End Rotation Servo Setup"));  break;
-        case SERVONUM_RECOIL:          DebugSerial->println(F("End Recoil Servo Setup"));    break;
+    {   case SERVONUM_TURRETELEVATION:
+            if (eeprom.ramcopy.TurretElevationMotor == SERVO_ESC || eeprom.ramcopy.TurretElevationMotor == SERVO_PAN) DebugSerial->println(F("End Elevation Servo Setup")); 
+            else if (eeprom.ramcopy.DriveType == DT_HALFTRACK && eeprom.ramcopy.DriveMotors == SERVO_ESC)             DebugSerial->println(F("End Steering Servo Setup"));
+            break;
+        case SERVONUM_RIGHTTREAD:       DebugSerial->println(F("End Steering Servo Setup")); break;
+        case SERVONUM_TURRETROTATION:   DebugSerial->println(F("End Rotation Servo Setup")); break;
+        case SERVONUM_RECOIL:           DebugSerial->println(F("End Recoil Servo Setup"));   break;      
+        default:                                                                             break;
     }
     PrintDebugLine();
     DebugSerial->println(F("End Values"));
