@@ -26,6 +26,8 @@ uint8_t             OP_Driver::DriveType;
 // Track recoil
 uint8_t             OP_Driver::KickbackSpeed;
 float               OP_Driver::DecelerationFactor;
+uint8_t 		    OP_Driver::TrackRecoilDuration;
+uint32_t			OP_Driver::TrackRecoilStartTime;
 // Drive speed ramping
 boolean             OP_Driver::DriveRampEnabled;
 volatile uint16_t   OP_Driver::RampedDriveSpeed;
@@ -109,7 +111,7 @@ void OP_Driver::begin(DRIVETYPE dt, uint8_t tm, boolean nta, uint8_t kbs, uint8_
     KickbackSpeed = map(kbs, 0, 100, 0, 255);       // Kickback speed is passed as some number between 0-100, we want to scale it to 0-255
     DecelerationFactor = 0.65 + (0.0033 * (float)dcf);  // dcf will range from 0-100, what we want to end up at (DecelerationFactor) is a floating point number somewhere 
                                                     // roughly between 0.65 and 0.98. At 0.65 the kickback spike would last approximately 1/2 second (at full speed). At .98 it would last approximately 3.5 seconds.
-    
+    TrackRecoilDuration = dcf;						// We also have a simple track recoil option, which takes the value in deceleration factor and uses it as the literal number of mS for the recoil action to take
 
     // SET INTERRUPT FREQUENCY
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
@@ -297,7 +299,7 @@ boolean neg;
 static boolean TrackRecoilStarted = false;
 static uint16_t lastRampSpeed;
 static uint16_t lastTRSpeed;
-
+boolean SimpleTrackRecoil = true;		// In January 2020 we added a different track recoil action, set this to true to use the new action
 
     // First, to avoid repeating a bunch of code for forward & reverse, we convert everything to positive values, then convert them back to signed at the end.
     // We save a "neg" flag if the variable is negative, so we know at the end what sign to set it back to. 
@@ -324,59 +326,91 @@ static uint16_t lastTRSpeed;
     }
     // TRACK RECOIL
     // =============================================================================================================================================================>>    
-    else if (DriveMode == TRACK_RECOIL)
-    {
-        // Track recoil is an anomaly and we are going to handle things exceptionally in this case. 
-        if (!TrackRecoilStarted)
-        {
-            // Just started track recoil movement
-            // The first thing we do, is set the motor speed to KickbackSpeed. Above we already set the motor direction to reverse by setting the "neg" flag
-            t_DriveSpeed = DriveCMD = lastTRSpeed = KickbackSpeed;       
-            DriveRampEnabled = true;                    // Now we will enable ramping although we will not use normally, see below
-            RampDir         = 1;                        // Ramp goes up
-            t_DriveSkipNum  = 1;                        // No skipping
-            t_DriveRampStep = 1;                        // 1 step at a time (256 steps per second)
-            RampedDriveSpeed = lastRampSpeed = 1;       // Save the start
-            TrackRecoilStarted = true;                  // Go
-        }
-        else
-        {
-            // Typically we use the ramping feature to slowly increase or decrease our actual motor speed (RampedDriveSpeed). 
-            // In this case, we are going to use RampedDriveSpeed essentially as a counter instead. We set step and skip to 1 such that 
-            // RampedDriveSpeed will count to 256 every 1 second. After every 8 steps (1/32nd of a second) we decrement our
-            // actual speed manually (t_DriveSpeed) by some deceleration factor set by the user but that falls somewhere in the general 
-            // range of 65-98%. In other words, if speed last time was 100 and our factor is 85%, this time speed will be 85%, next
-            // time around it will be 72%, etc... In this way we exponentially decrease our speed (not linearly), which results in 
-            // a smooth but rapid deceleration from our original kickback speed
-            if (RampedDriveSpeed >= 1024)  { t_DriveSpeed = 0; } // We've waited 4 full seconds, that's more than long enough, we're done
-            else 
-            {
-                DriveRampEnabled = true;
-                RampDir         = 1;
-                t_DriveSkipNum  = 1;
-                t_DriveRampStep = 1; 
-                if ((RampedDriveSpeed - lastRampSpeed) >= 8)    // Every 1/32nd of a second we decrement speed
-                {
-                    t_DriveSpeed = (int16_t)(((float)lastTRSpeed * DecelerationFactor) + 0.5);  // Decrease speed exponentially by our factor somewhere in the range of ~80-99%
-                    lastTRSpeed = DriveCMD = t_DriveSpeed;
-                    lastRampSpeed = RampedDriveSpeed;           // Save this so we know when the next 1/32nd of a second transpires
-                }
-                else
-                {
-                    t_DriveSpeed = DriveCMD = lastTRSpeed;      // Still waiting for 1/32nd of a second to pass, hold last speed
-                }
-            }
+    else if (DriveMode == TRACK_RECOIL)	// Track recoil is an anomaly and we are going to handle things exceptionally in this case. 
+	{	
+		if (SimpleTrackRecoil)
+		{
+			// This is the new, simpler track recoil action added in January 2020. Rather than start with a spike that tapers exponentially, we simply let the user 
+			// specificy a speed percent and a time, and we just run in reverse at that speed for that amount of time. 
+			if (!TrackRecoilStarted)
+			{	
+				// Just started track recoil movement
+				// The first thing we do, is set the motor speed to KickbackSpeed. Above we already set the motor direction to reverse by setting the "neg" flag
+				t_DriveSpeed = DriveCMD = lastTRSpeed = KickbackSpeed;       
+				DriveRampEnabled = false;                   // Not using ramping for simple recoil
+				RampDir = 0;                       			// No ramping
+				TrackRecoilStartTime = millis();			// Record when we started
+				TrackRecoilStarted = true;                  // Go
+			}
+			else
+			{
+				if ((millis() - TrackRecoilStartTime) >= TrackRecoilDuration) 
+				{
+					// When this function spits out a speed of 0, the sketch will automatically end the track recoil DriveMode
+					t_DriveSpeed = DriveCMD = lastTRSpeed = 0;  
+					TrackRecoilStarted = false;				
+				}
+				else
+				{
+					// Continue at the same speed
+					t_DriveSpeed = DriveCMD = lastTRSpeed = KickbackSpeed;       
+				}
+			}
+		}
+		else
+		{
+			// This is the original track recoil action that starts with an initial reverse command spike that tapers exponentially. 
+			if (!TrackRecoilStarted)
+			{
+				// Just started track recoil movement
+				// The first thing we do, is set the motor speed to KickbackSpeed. Above we already set the motor direction to reverse by setting the "neg" flag
+				t_DriveSpeed = DriveCMD = lastTRSpeed = KickbackSpeed;       
+				DriveRampEnabled = true;                    // Now we will enable ramping although we will not use normally, see below
+				RampDir         = 1;                        // Ramp goes up
+				t_DriveSkipNum  = 1;                        // No skipping
+				t_DriveRampStep = 1;                        // 1 step at a time (256 steps per second)
+				RampedDriveSpeed = lastRampSpeed = 1;       // Save the start
+				TrackRecoilStarted = true;                  // Go
+			}
+			else
+			{
+				// Typically we use the ramping feature to slowly increase or decrease our actual motor speed (RampedDriveSpeed). 
+				// In this case, we are going to use RampedDriveSpeed essentially as a counter instead. We set step and skip to 1 such that 
+				// RampedDriveSpeed will count to 256 every 1 second. After every 8 steps (1/32nd of a second) we decrement our
+				// actual speed manually (t_DriveSpeed) by some deceleration factor set by the user but that falls somewhere in the general 
+				// range of 65-98%. In other words, if speed last time was 100 and our factor is 85%, this time speed will be 85%, next
+				// time around it will be 72%, etc... In this way we exponentially decrease our speed (not linearly), which results in 
+				// a smooth but rapid deceleration from our original kickback speed
+				if (RampedDriveSpeed >= 1024)  { t_DriveSpeed = 0; } // We've waited 4 full seconds, that's more than long enough, we're done
+				else 
+				{
+					DriveRampEnabled = true;
+					RampDir         = 1;
+					t_DriveSkipNum  = 1;
+					t_DriveRampStep = 1; 
+					if ((RampedDriveSpeed - lastRampSpeed) >= 8)    // Every 1/32nd of a second we decrement speed
+					{
+						t_DriveSpeed = (int16_t)(((float)lastTRSpeed * DecelerationFactor) + 0.5);  // Decrease speed exponentially by our factor somewhere in the range of ~80-99%
+						lastTRSpeed = DriveCMD = t_DriveSpeed;
+						lastRampSpeed = RampedDriveSpeed;           // Save this so we know when the next 1/32nd of a second transpires
+					}
+					else
+					{
+						t_DriveSpeed = DriveCMD = lastTRSpeed;      // Still waiting for 1/32nd of a second to pass, hold last speed
+					}
+				}
 
-            // If the speed has approached 0, we consider ourselves done recoiling. 
-            // When this function spits out a speed of 0, the sketch will automatically end the track recoil DriveMode
-            if (t_DriveSpeed <= 30)     // 30 out of 255 is ~12%. Below this level most gearboxes are moving imperceptibly if at all.
-            {
-                // We're done
-                DriveRampEnabled = false;
-                t_DriveSpeed = DriveCMD = lastTRSpeed = 0;  
-                TrackRecoilStarted = false;
-            }            
-        }
+				// If the speed has approached 0, we consider ourselves done recoiling. 
+				// When this function spits out a speed of 0, the sketch will automatically end the track recoil DriveMode
+				if (t_DriveSpeed <= 30)     // 30 out of 255 is ~12%. Below this level most gearboxes are moving imperceptibly if at all.
+				{
+					// We're done
+					DriveRampEnabled = false;
+					t_DriveSpeed = DriveCMD = lastTRSpeed = 0;  
+					TrackRecoilStarted = false;
+				}            
+			}
+		}
     }
     // BRAKING
     // =============================================================================================================================================================>>

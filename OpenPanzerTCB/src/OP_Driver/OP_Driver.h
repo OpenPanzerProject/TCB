@@ -129,7 +129,9 @@ protected:
     // Track recoil
     static uint8_t KickbackSpeed;               // Track recoil initial kick-back speed
     static float DecelerationFactor;            // Track recoil deceleration factor applied to kick-back speed
-    
+	static uint8_t TrackRecoilDuration;			// Duration of the simple track recoil in mS (values from 1 to 255)
+    static uint32_t TrackRecoilStartTime;		// Time when simple track recoil begins, so we know when to stop it. 
+	
     // Drive speed ramping
     static boolean DriveRampEnabled;            // Is ramping enabled for drive speed
     static volatile uint16_t RampedDriveSpeed;  // DRIVE speed constrained to ramping
