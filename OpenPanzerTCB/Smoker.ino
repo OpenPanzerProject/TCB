@@ -35,11 +35,12 @@ void DisableSmoker()
 {
     if (SmokerEnabled)
     {
+        // If they disable while the engine is running, we need to auto turn it off
+        if (EngineRunning) ShutdownSmoker(TransmissionEngaged);
+
+        // Disable smoker
         SmokerEnabled = false;
         if (DEBUG) { DebugSerial->println(F("Smoker disabled")); }
-        
-        // Also, if they disable while the engine is running, we need to auto turn it off
-        if (EngineRunning) ShutdownSmoker(TransmissionEngaged);
     }
 }
 
@@ -58,7 +59,7 @@ void StopSmoker(void)
 }
 void StartSmoker(boolean engaged)
 {
-    if (eeprom.ramcopy.SmokerControlAuto)
+    if (eeprom.ramcopy.SmokerControlAuto && SmokerEnabled)
     {
         Smoker->Startup(engaged);
     }    
