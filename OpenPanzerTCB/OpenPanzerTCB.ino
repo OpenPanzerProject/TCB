@@ -972,6 +972,8 @@ if (Startup)
                 if (DriveModeActual == TRACK_RECOIL && DriveSpeed == 0)
                 {
                     DriveModeActual = STOP;
+                    RightSpeed_Previous = 0;    // Force treads to update for next round
+                    LeftSpeed_Previous = 0;
                 }
             }
             else
@@ -1067,7 +1069,7 @@ if (Startup)
 
                     //Finally! We send the motor commands out to the motors, but only if something has changed since last time. 
                     if ((RightSpeed_Previous != RightSpeed) || (LeftSpeed_Previous != LeftSpeed))
-                    {
+                    {   
                         RightTread->setSpeed(RightSpeed);
                         LeftTread->setSpeed(LeftSpeed);
                         RightSpeed_Previous = RightSpeed;    // Save these for next time
