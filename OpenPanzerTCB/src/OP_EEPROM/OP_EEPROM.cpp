@@ -497,7 +497,8 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.DragInnerTrack = false;         // Default to false (off)
         ramcopy.EnableTrackRecoil = false;      // Default to false (off)
         ramcopy.TrackRecoilKickbackSpeed = 100; // Initial motor kickback speed as percent 0-100
-        ramcopy.TrackRecoilDecelerateFactor = 65; // Deceleration factor applied to the original kick-back speed        
+        ramcopy.TrackRecoilDecelerateFactor = 100; // Deceleration factor applied to the original kick-back speed, or, in simple mode this becomes the recoil duration in mS
+		
 
     // "Physics"
         ramcopy.EnableBarrelStabilize = false;  // If an accelerometer is present, and turret elevation motor is type SERVO_PAN, this will stabilize the barrel
