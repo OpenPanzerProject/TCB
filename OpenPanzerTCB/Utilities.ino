@@ -342,7 +342,13 @@ Profile_1 ? DecelRampEnabled = eeprom.ramcopy.DecelRampEnabled_1 : DecelRampEnab
     }
     else if (eeprom.ramcopy.DriveType == DT_DMD) DebugSerial->print(F("Yes (Tamiya)"));  // Tamiya always allows neutral turns but it uses a different method to accomplish it
     else DebugSerial->print(F("N/A for vehicle type"));
-    DebugSerial->println();        
+    DebugSerial->println();   
+    if (eeprom.ramcopy.DriveType == DT_HALFTRACK)
+    {
+        DebugSerial->print(F("Steering Pct to treads: "));
+        DebugSerial->print(eeprom.ramcopy.HalftrackTreadTurnPct);
+        DebugSerial->println(F("%"));
+    }
     DebugSerial->print(F("Turn Mode:              "));  // Turn modes only apply to conventional tank drives (not clutch type) and halftracks
     if (eeprom.ramcopy.DriveType == DT_TANK || eeprom.ramcopy.DriveType == DT_HALFTRACK) DebugSerial->println(Driver.getTurnMode());
     else DebugSerial->println(F("N/A for vehicle type"));

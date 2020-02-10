@@ -348,7 +348,7 @@ boolean SimpleTrackRecoil = true;		// In January 2020 we added a different track
 				{
 					// When this function spits out a speed of 0, the sketch will automatically end the track recoil DriveMode
 					t_DriveSpeed = DriveCMD = lastTRSpeed = 0;  
-					TrackRecoilStarted = false;				
+					TrackRecoilStarted = false;		
 				}
 				else
 				{
