@@ -18,6 +18,8 @@
 	#define DEVICE_ATMEGA328    7           
 	#define DEVICE_TEENSY32     8           
 	#define DEVICE_AT_MKI       9
+	#define DEVICE_HECLO_SHIELD 10
+	#define DEVICE_ATMEGA2560   11
 
 
 #endif
