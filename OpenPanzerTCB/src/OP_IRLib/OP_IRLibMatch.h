@@ -44,8 +44,10 @@
 // pulse parameters are in uSec (micro-seconds). 1000 uSec = 1mS = 0.001 second
 #define Tamiya_BITS         3       // 2 marks and 1 space
 #define Tamiya_GAP          8000
-#define Tamiya_TIMESTOSEND  10      // Tamiya repeats the signal 50 times which takes 1 second (overkill). We default to only 10 repetitions which takes 1/5 second. 
-                                    // This reduces the effect of the notorious "fan" shot
+#define Tamiya_TIMESTOSEND  50      // Tamiya repeats the signal 50 times which takes 1 second. This is overkill and makes possible the infamous "fan shot." We initially set the TCB to 
+									// only repeat a more reasonably 10 times, which takes 1/5 second. However, the new Heng Long 6+ boards only seem to accept hits when the signal is 
+									// sent for the full length of time, and whatever its faults, it may be best to remain consistent with the Tamiya method, so we are now repeating for 
+									// the full 1 second (50 times)
 const PROGMEM uint16_t Tamiya16Sig[Tamiya_BITS+1] = {3000, 3000, 6000, Tamiya_GAP}; // Add 1 to include gap
 const PROGMEM uint16_t Tamiya16TwoShotSig[Tamiya_BITS+1] = {4000, 5000, 3000, Tamiya_GAP}; // Add 1 to include gap
 
