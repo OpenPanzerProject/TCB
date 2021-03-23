@@ -74,12 +74,12 @@ void PortA_Pulse()
     if (IO_Pin[IOA].Settings.dataType)
     {   
         IO_Output[IOA].off();                       // Go in the opposite direction (dataType == true means default high, so go low)
-        timer.setTimeout(IO_PULSE_TIME, PortA_On);  // Wait briefly then revert to default high
+        timer.setTimeout(eeprom.ramcopy.IOPulseOnTime_mS, PortA_On);  // Wait briefly then revert to default high
     }
     else
     {
         IO_Output[IOA].on();                        // Go in the opposite direction (dataType == false means default low, so go high)        
-        timer.setTimeout(IO_PULSE_TIME, PortA_Off); // Wait briefly then revert to default low
+        timer.setTimeout(eeprom.ramcopy.IOPulseOnTime_mS, PortA_Off); // Wait briefly then revert to default low
     }
     if (DEBUG) { DebugSerial->println(F("IO Port A - Pulsed")); }
 }
@@ -147,12 +147,12 @@ void PortB_Pulse()
     if (IO_Pin[IOB].Settings.dataType)
     {   
         IO_Output[IOB].off();                       // Go in the opposite direction (dataType == true means default high, so go low)
-        timer.setTimeout(IO_PULSE_TIME, PortB_On);  // Wait briefly then revert to default high
+        timer.setTimeout(eeprom.ramcopy.IOPulseOnTime_mS, PortB_On);  // Wait briefly then revert to default high
     }
     else
     {
         IO_Output[IOB].on();                        // Go in the opposite direction (dataType == false means default low, so go high)
-        timer.setTimeout(IO_PULSE_TIME, PortB_Off); // Wait briefly then revert to default low
+        timer.setTimeout(eeprom.ramcopy.IOPulseOnTime_mS, PortB_Off); // Wait briefly then revert to default low
     }
     if (DEBUG) { DebugSerial->println(F("IO Port B - Pulsed")); }    
 }

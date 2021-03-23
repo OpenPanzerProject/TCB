@@ -27,6 +27,7 @@ struct _eeprom_data {
     external_io_settings PortB_Settings;
     uint16_t IOBlinkOnTime_mS;
     uint16_t IOBlinkOffTime_mS;
+	uint16_t IOPulseOnTime_mS;
 
 // Special function triggers
     _functionTrigger SF_Trigger[MAX_FUNCTION_TRIGGERS]; // Info for each trigger, up to MAX_FUNCTION_TRIGGERS

@@ -26,7 +26,6 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------->>
 
 #define NUM_IO_PORTS    2
-#define IO_PULSE_TIME   300     // Time in milliseconds to pulse the IO port if set to output and the user triggers the pulse function
 
 typedef struct external_io_settings{
     uint8_t dataDirection;  // 1 = output, 0 = input

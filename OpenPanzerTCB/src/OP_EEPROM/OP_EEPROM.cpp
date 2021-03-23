@@ -402,6 +402,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.PortB_Settings.dataType = 1;        // Assume digital input (on/off only)
         ramcopy.IOBlinkOnTime_mS = 650;             // 650 mS
         ramcopy.IOBlinkOffTime_mS = 650;            // 650 mS
+		ramcopy.IOPulseOnTime_mS = 300;				// 300 mS
 
     // Special function triggers - We init a few common ones to the turret stick (nothing on aux channels)
     // The SF_ numbers are defined in OP_Radio.h
