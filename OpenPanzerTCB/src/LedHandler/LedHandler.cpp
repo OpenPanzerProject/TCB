@@ -253,7 +253,7 @@ void LedHandler::update(void)
                 // We're done
                 switch (_isFading)
                 {
-                    // Fading-in ends with off
+                    // Fading-out ends with off
                     case FADE_OUT: 
                         this->pinOff(); 
                         this->ClearFader(); 
@@ -299,7 +299,7 @@ void LedHandler::update(void)
                     if (_curStep & 1) { this->pinOff(); }  // Odd numbers get turned off
                     else              { this->pinOn();  }  // Even numbers get turned on
         
-                    // Calcluate time to next change
+                    // Calculate time to next change
                     if (!_fixedInterval)
                     {
                         if   (_curStep > MAX_STREAM_STEPS) { this->pinOff(); ClearBlinker(); }    // This shouldn't happen, but if it does, stop the blinker
