@@ -288,11 +288,11 @@ const char _FunctionNames_[COUNT_SPECFUNCTIONS][FUNCNAME_CHARS] PROGMEM_FAR =
     "User Sound 2 - Repeat",                     // 39
     "User Sound 2- Stop",                        // 40
     "External Output A - Toggle",                // 41   -- see also 109 for pulse and 156 for blink
-    "External Output A - Turn On",               // 42
-    "External Output A - Turn Off",              // 43             
+    "External Output A - High",               	 // 42
+    "External Output A - Low",              	 // 43             
     "External Output B - Toggle",                // 44   -- see also 110 for pulse and 157 for blink
-    "External Output B - Turn On",               // 45
-    "External Output B - Turn Off",              // 46
+    "External Output B - High",               	 // 45
+    "External Output B - Low",              	 // 46
     "Set Acceleration Level",                    // 47
     "Set Deceleration Level",                    // 48
     "Set Turn Mode = 1",                         // 49

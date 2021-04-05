@@ -1463,8 +1463,6 @@ if (Startup)
 // ====================================================================================================================================================>        
     if (HavePower)
     {
-        boolean UpdateDebugLEDs = false;
-        
         // Braking is not a drive mode so we check it separately
         // While braking, both the Red and Green LEDs are On. 
         //if (Braking == true && DriveModeActual != STOP)   { RedLedOn(); GreenLedOn(); }
