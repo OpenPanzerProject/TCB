@@ -308,14 +308,14 @@
     
     // We need to set which of the eight servo outputs will be used for drive motors (left and right) and turret motors, amongst other things.
     // Not every setup will require servo outputs for drive or turret motors, but if they do, they should always map to the same servo number. 
-    #define SERVONUM_LEFTTREAD          SERVO_1     // This is the left-most servo output on the board, looking from the top. Servo 1 on the TCB board (Arduino 22, ATmega A0)
-    #define SERVONUM_RIGHTTREAD         SERVO_2     // Servo 2 is right tread (Arduino 23, ATmega A1)
-    #define SERVONUM_TURRETROTATION     SERVO_3     // Servo 3 is turret rotation (Arduino 24, ATmega A2)
-    #define SERVONUM_TURRETELEVATION    SERVO_4     // Servo 4 is turret elevation (Arduino 25, ATmega A3)
-    #define SERVONUM_RECOIL             SERVO_5     // Servo 5 is barrel recoil. Will also recoil even if using a mechanical recoil. (Arduino 26, ATmega A4)
-    #define SERVONUM_PROP3              SERVO_6     // Proportional 3 - used for the 12-sound trigger switch of the TBS Mini (and maybe something else for future sound devices) (Arduino 27, ATmega A5)
-    #define SERVONUM_PROP2              SERVO_7     // Proportional 2 - used as an engine on/off and beep trigger for the TBS Mini (and maybe something else for future sound devices) (Arduino 28, ATmega A6)
-    #define SERVONUM_PROP1              SERVO_8     // Proportional 1 - used as throttle output to sound device (Arduino 29, ATmega A7)
+    #define SERVONUM_LEFTTREAD          SERVO_1     // This is the left-most servo output on the board, looking from the top. Servo 1 on the TCB board (Arduino 29, ATmega A7)
+    #define SERVONUM_RIGHTTREAD         SERVO_2     // Servo 2 is right tread (Arduino 28, ATmega A6)
+    #define SERVONUM_TURRETROTATION     SERVO_3     // Servo 3 is turret rotation (Arduino 27, ATmega A5)
+    #define SERVONUM_TURRETELEVATION    SERVO_4     // Servo 4 is turret elevation (Arduino 26, ATmega A4)
+    #define SERVONUM_RECOIL             SERVO_5     // Servo 5 is barrel recoil. Will also recoil even if using a mechanical recoil. (Arduino 25, ATmega A3)
+    #define SERVONUM_PROP3              SERVO_6     // Proportional 3 - used for the 12-sound trigger switch of the TBS Mini (and maybe something else for future sound devices) (Arduino 24, ATmega A2)
+    #define SERVONUM_PROP2              SERVO_7     // Proportional 2 - used as an engine on/off and beep trigger for the TBS Mini (and maybe something else for future sound devices) (Arduino 23, ATmega A1)
+    #define SERVONUM_PROP1              SERVO_8     // Proportional 1 - used as throttle output to sound device (Arduino 22, ATmega A0)
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
