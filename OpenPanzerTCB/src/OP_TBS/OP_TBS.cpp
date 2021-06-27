@@ -541,7 +541,7 @@ void OP_TBS::StartSqueaks(void)
     }
 */
 	// EDIT June 2021 - we've removed the starting delay
-    if (AllSqueaksActive == false)
+    if (AllSqueaks_Active == false)
 	{
 		if (Squeak1_Enabled) Squeak1_Activate();
 		if (Squeak2_Enabled) Squeak2_Activate();
