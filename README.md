@@ -1,3 +1,4 @@
+![Open Panzer](http://www.openpanzer.org/images/github/openpanzer.png)
 ![Open Panzer](http://www.openpanzer.org/images/github/tcb_intro_git.jpg)
 # Introduction
   * [Open Panzer](http://www.openpanzer.org) is a community project to develop open source products for the RC tank market. 
