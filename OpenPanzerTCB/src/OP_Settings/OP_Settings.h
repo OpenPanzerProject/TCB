@@ -217,6 +217,8 @@
         OCR4B = 0;           \
         OCR4C = 0;  })
     
+	#define AUX_PWM_TOP 1023		// The AUX output has a 10-bit PWM range
+
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // TIMER 5    (16-bit)
@@ -394,7 +396,7 @@
     // Heng Long Smoker (we will call it SIDEA, there is only one)
     #define OB_SMOKER_PWM               44  // This is the Arduino pin for the smoker mosfet PWM pin (Atmega pin 25, PortB6)
     #define OB_SMOKER_OCR            OCR5C  // The output compare register associated with this pin
-    
+
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------->>
 // PINS! 
