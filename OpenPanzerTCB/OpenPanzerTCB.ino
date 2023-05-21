@@ -1117,8 +1117,8 @@ if (Startup)
                 if (TankSound->isTrackOverlayEnabled() && DriveSpeed_Previous != DriveSpeed) TankSound->SetVehicleSpeed(DriveSpeed);
     
                 // Start squeaking if we haven't already. The sound object will automatically ignore any squeaks the user disabled in settings. 
-                if      (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed && abs(DriveSpeed_Previous) <  MinSqueakSpeed) { TankSound->StartSqueaks(); }
-                else if (TankSound->AreSqueaksActive() == true  && abs(DriveSpeed) <  MinSqueakSpeed && abs(DriveSpeed_Previous) >= MinSqueakSpeed) { TankSound->StopSqueaks();  }
+                if      (TankSound->AreSqueaksActive() == false && abs(DriveSpeed) >= MinSqueakSpeed ) { TankSound->StartSqueaks(); }
+                else if (TankSound->AreSqueaksActive() == true  && abs(DriveSpeed) <  MinSqueakSpeed ) { TankSound->StopSqueaks();  }
     
                 // If the user set brake lights to come on automatically at stop, turn them off now, because we are no longer stopped - except ignore track recoil
                 if (eeprom.ramcopy.BrakesAutoOnAtStop && BrakeLightsActive) { BrakeLightsOff(); }
