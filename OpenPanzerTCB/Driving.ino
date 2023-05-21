@@ -1,3 +1,4 @@
+
 // NUDGE
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void Nudge_End()
@@ -211,6 +212,11 @@ boolean Proceed = true;
                         // transmission from engaging before the engine startup sound is complete. So we set a timer that will engage it after the set amount of time. 
                         skipTransmissionSound = true;  // We skip the transmission sound unless the user is manually manipulating the transmission, but this is just an automatic engage
                         timer.setTimeout(eeprom.ramcopy.TransmissionDelay_mS, TransmissionEngageWithMsg); 
+                        // Flag so we know we are in startup
+                        EngineInStartup = true;
+                        
+                        // Commence flickering lights if desired, these will flicker during the transmission delay time
+                        if (eeprom.ramcopy.FlickerLightsOnEngineStart) FlickerLights();
         
                         // Also start the smoker. We start in fast idle until the transmission engages
                         StartSmoker(false); // We pass false for "transmission not engaged"
@@ -252,6 +258,11 @@ void EngineOff(boolean debugMsg)
                 // As opposed to StopSmoker, Shutdown will let the smoker turn off slowly for a more realistic effect. 
                 // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.
                 TransmissionEngaged ? ShutdownSmoker(true) : ShutdownSmoker(false);
+            // Cancel the light flicker if we have been told to shut down while we were still in the middle of engine startup
+                if (eeprom.ramcopy.TransmissionDelay_mS > 0 && EngineInStartup)
+                {
+                    CancelFlickerLights();
+                }
             // Now disengage the transmission object (no need to have transmission in gear if engine is off)
                 skipTransmissionSound = true;  // No need to clunk the transmission just because we're turning the engine off
                 TransmissionDisengage();
@@ -342,8 +353,12 @@ void TransmissionEngage(boolean debugMsg)
 }
 void TransmissionEngageWithMsg(void)
 {
-    // We use this function when we want to engage the transmission via the timer class
-    TransmissionEngage(true);
+    // Transmission engage delay time has expired, clear the engine in startup flag
+    EngineInStartup = false;    
+    // Stop the light flicker effect if it was active
+    CancelFlickerLights();   
+    // We use this function when we want to engage the transmission via the timer class, after the transmission engage delay has expired during engine start
+    TransmissionEngage(true); 
 }
 void TransmissionDisengage()
 {

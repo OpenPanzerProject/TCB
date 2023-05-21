@@ -130,6 +130,9 @@ void DumpSysInfo()
     DumpSmokerInfo();
         PerLoopUpdates();
         DebugSerial->flush();
+    DumpLightsInfo();
+        PerLoopUpdates();
+        DebugSerial->flush();
     DumpBattleInfo();
         PerLoopUpdates();
         DebugSerial->flush();
@@ -465,6 +468,23 @@ void PrintSameHeatAsFan()
     DebugSerial->print(F("Same as fan"));
 }
 
+void DumpLightsInfo()
+{
+    DebugSerial->println();
+    PrintDebugLine();
+    DebugSerial->println(F("LIGHT SETTINGS"));
+    PrintDebugLine();    
+    DebugSerial->print(F("Brake lights on when stopped:")); PrintSpaces(11);
+    PrintLnYesNo(eeprom.ramcopy.BrakesAutoOnAtStop);
+    DebugSerial->print(F("Running lights dim level:"));     PrintSpaces(15);
+    DebugSerial->print(eeprom.ramcopy.RunningLightsDimLevelPct); DebugSerial->println(F("%"));
+    DebugSerial->print(F("Running lights always on:"));     PrintSpaces(15);
+    PrintLnYesNo(eeprom.ramcopy.RunningLightsAlwaysOn);
+    DebugSerial->print(F("Flicker headlights during engine start: ")); 
+    PrintLnYesNo(eeprom.ramcopy.FlickerLightsOnEngineStart);    
+  
+}
+
 void DumpSoundInfo()
 {
     DebugSerial->println();
@@ -647,7 +667,3 @@ void DumpVarInfo()
         delay(5);
     }
 }
-
-
-
-

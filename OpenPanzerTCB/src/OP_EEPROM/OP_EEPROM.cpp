@@ -579,6 +579,7 @@ void OP_EEPROM::Initialize_RAMcopy(void)
         ramcopy.AuxFlashWithCannon = false;             
         ramcopy.SecondMGLightBlink_mS = 30;             // milliseconds        
         ramcopy.CannonReloadBlink = true;
+		ramcopy.FlickerLightsOnEngineStart = false;
 
     // Scout settings
         ramcopy.ScoutCurrentLimit = 12;                 // Default to 12 amps

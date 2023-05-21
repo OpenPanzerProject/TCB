@@ -5,6 +5,7 @@
 void Light1On()
 {
     digitalWrite(pin_Light1, HIGH);    
+    Light1State = true;
     TankSound->HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
     if (DEBUG) { DebugSerial->println(F("Light 1 On")); }
 }
@@ -12,17 +13,71 @@ void Light1On()
 void Light1Off()
 {
     digitalWrite(pin_Light1, LOW);
+    Light1State = false;
     TankSound->HeadlightSound(); // The sound object will automatically ignore this if the headlight sound was disabled
     if (DEBUG) { DebugSerial->println(F("Light 1 Off")); }
 }
 
 void Light1Toggle()
 {
-    static boolean Light1State = false;
     Light1State ? Light1Off() : Light1On();
     Light1State = !Light1State;
 }
 
+void FlickerLights()
+{
+    // This effect takes place on engine startup if the user has selected the option to "Flicker Headlights on Engine Start" (Lights & IO tab of OP Config) 
+    // and if they have specified a "Transmission Engage Delay" (Driving tab of OP Config). 
+
+    // Initialize if appropriate: 
+    if (HeadlightsFlickering == false && BrakeLightsFlickering == false)  // They will both be false if we have not started the effect
+    {
+        // Only flicker lights that are already on
+        if (Light1State)        HeadlightsFlickering = true;
+        if (BrakeLightsActive)  BrakeLightsFlickering = true;
+    }
+
+    // Now perfrom the flickering: 
+    if (HeadlightsFlickering == true || BrakeLightsFlickering == true)
+    {
+        if (HeadlightsFlickering == true)
+        {
+            // The headlight output can not be dimmed, so we simply toggle it on and off
+            Light1Toggle();
+        }
+        
+        if (BrakeLightsFlickering == true)
+        {
+            // We will apply a random dim value to the brake lights. We try to match it with the headlights, but since we can dim this output
+            // we soften it a little
+            if (Light1State)    analogWrite(pin_Brakelights, random(75)+180);   // Brighter - random value between 180 and 255 (full on)
+            else                analogWrite(pin_Brakelights, random(100));      // Dimmer   - random value between 0 (off) and 100 (not even half brightness)
+        }
+    
+        // Now come back here after a random amount of time to continue the effect
+        // We adjust the random delay so that the light "off" time is shorter than the light "on" time
+        if (Light1State) FlickeringTimerID = timer.setTimeout(random(350)+60, FlickerLights); // On  - random time between 60 and 410 mS
+        else             FlickeringTimerID = timer.setTimeout(random(210)+50, FlickerLights); // Off - random time between 50 and 260 mS
+    }
+}
+
+void CancelFlickerLights()
+{
+    // This will end or cancel the flickering effect
+    if (FlickeringTimerID > 0) timer.deleteTimer(FlickeringTimerID);
+    
+    if (HeadlightsFlickering) 
+    {
+        HeadlightsFlickering = false;
+        Light1On();
+    }
+    
+    if (BrakeLightsFlickering)
+    {
+        BrakeLightsFlickering = false;
+        BrakeLightsOn();
+    }
+}
 
 // LIGHT #2 - 
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -195,8 +250,9 @@ void AuxOutput_SetLevel(uint16_t level)
 uint8_t auxLevel;
     
     // Recall, all analog special functions must expect values from 0-1023.
-    // Since analogWrite requires values from 0-255, we need to use the map function: 
-    analogWrite(pin_AuxOutput, map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 0, 255));
+    // But conveniently we have changed the AUX PWM range to 0-1023 and analogWrite seems to accept it
+    analogWrite(pin_AuxOutput, level);
+//  analogWrite(pin_AuxOutput, map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 0, 255));
 
     // We also save the change to our PresetDim variable, in case we decide to write this change to EEPROM
     auxLevel = map(level, ANALOG_SPECFUNCTION_MIN_VAL, ANALOG_SPECFUNCTION_MAX_VAL, 0, 100);
@@ -638,8 +694,3 @@ void RampBlinkDown()
     // For next time
     Interval += Add;    
 }
-
-
-
-
-

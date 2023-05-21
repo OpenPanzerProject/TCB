@@ -95,6 +95,10 @@ void TransmissionEngage(boolean debugMsg=true);
     boolean BrakeLightsActive = false;           // Are the brake lights on. We need to know this and running light state because they are both on the same output.
     boolean RunningLightsActive = false;         // Are the running lights active. We don't want running lights and brake lights to turn each other off if they're not supposed to. 
     uint8_t RunningLightsDimLevel;               // We will convert the user's setting (0-100) to a PWM value (0-255)
+    boolean Light1State = false;                 // Light 1 state (true = on, false = off)
+    int FlickeringTimerID = 0;
+    boolean HeadlightsFlickering = false;
+    boolean BrakeLightsFlickering = false;
     int Light2TimerID = 0;
     boolean Light2Blinking = false;
     int AuxOutputTimerID = 0;                    // The AuxOutput can be set to blink or strobe. We will need a timer ID for it. 
@@ -167,6 +171,7 @@ void TransmissionEngage(boolean debugMsg=true);
     int IdleOffTimerID = 0;                      // User has the option of setting a length of time, after which, if the engine has been idle the whole time, the engine will automatically turn off. 
     boolean EngineInPreheat = false;             // Is the engine waiting to start while we preheat the heating element for smokers with separate heat and fan controls
     int PreheatTimerID = 0;                      // Timer ID for the smoker preheat, in case we need to cancel it
+    boolean EngineInStartup = false;             // Only appplies if a transmission engage delay has been specified, this will be true during that length of time on startup
 
 // DRIVING ADJUSTMENTS
     uint8_t DrivingProfile = 1;                   // There are 2 driving profiles possible - we default to 1, but if the user implements a special function they can change it to 2 (alternate) on the fly
@@ -1573,10 +1578,3 @@ if (Startup)
     ThrottleSpeed_Previous = ThrottleSpeed;
     TurnCommand_Previous = TurnCommand;   
 }
-
-
-
-
-
-
-
