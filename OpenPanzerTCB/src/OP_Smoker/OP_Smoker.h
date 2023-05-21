@@ -38,14 +38,15 @@ const __FlashStringHelper *ptrSmokerType(Smoker_t sType); //Returns a character 
 // DEFINES FOR SERIAL SMOKER 
 // -------------------------------------------------------------------------------------------------------------------------------------------->> 
 // Address
-#define SMOKER_ADDRESS                       0x85    // 133     Scout uses 131 and 132. Sabertooth range is 128-135
+#define SMOKER_ADDRESS                       0x85     // 133     Scout uses 131 and 132. Sabertooth range is 128-135
 // Commands                                          
-#define SMOKER_CMD_HEATER_LEVEL              0x00    // 0       Heater level                                               
-#define SMOKER_CMD_FAN_SPEED                 0x04    // 4       Fan speed
-#define SMOKER_CMD_SERIAL_WATCHDOG           0x0E    // 14
-#define SMOKER_CMD_BAUD_RATE                 0x0F    // 15
-#define SMOKER_CMD_STARTUP                   0x18    // 24      Startup command
-#define SMOKER_CMD_SHUTDOWN                  0x19    // 25      Shutdown command
+#define SMOKER_CMD_HEATER_LEVEL              0x00     // 0       Heater level                                               
+#define SMOKER_CMD_FAN_SPEED                 0x04     // 4       Fan speed
+#define SMOKER_CMD_SERIAL_WATCHDOG           0x0E     // 14
+#define SMOKER_CMD_BAUD_RATE                 0x0F     // 15
+#define SMOKER_CMD_STARTUP                   0x18     // 24      Startup command
+#define SMOKER_CMD_SHUTDOWN                  0x19     // 25      Shutdown command
+#define SMOKER_CMD_FAN_OFF                   0x20     // 26      Fan all the way off - ignore idle
 // Codes
 #define SMOKER_BAUD_CODE_2400                   1     // Codes for changing baud rates
 #define SMOKER_BAUD_CODE_9600                   2     // These are the same codes used by certain Dimension Engineering Sabertooth controllers
@@ -56,6 +57,8 @@ const __FlashStringHelper *ptrSmokerType(Smoker_t sType); //Returns a character 
 // Watchdog
 #define OP_Smoker_WatchdogTimeout_mS         1000     // in milliseconds. If a serial command is not received after this length of time, the Serial Smoker will shutdown automatically. 
 
+// Startup pulsing
+#define Smoker_Startup_Pulse				 true	  // Attempts to create a pulsing (puffing) effect on startup.
 
 class OP_Smoker {
   public:
@@ -67,7 +70,7 @@ class OP_Smoker {
     void setIdle(void);
     void setFastIdle(void);
     void preHeat(void);
-    void update(void);              // Actually we will use the update routine on the smoker for special effects
+    void update(boolean);           // Actually we will use the update routine on the smoker for special effects (boolean for whether the transmission is engaged or not)
     void Startup(boolean);          // This will trigger the startup  smoker effect (boolean for whether the transmission is engaged or not)
     void Shutdown(boolean);         // This will trigger the shutdown smoker effect (boolean for whether the transmission is engaged or not - the effect slowly turns off smoker)
 
@@ -119,12 +122,12 @@ class OP_Smoker {
     {   if (s == this->e_middlespeed) {return this->i_middlespeed;}
         else 
         {   if (s > this->e_middlespeed)
-            {   //Serial.print("A ");
+            {   
                 if (this->reversed) return map(s, this->e_middlespeed, this->e_maxspeed, this->i_middlespeed, this->i_minspeed); 
-                else                return map(s, this->e_middlespeed, this->e_maxspeed, this->i_middlespeed, this->i_maxspeed); //Serial.print(map(s, this->e_middlespeed, this->e_maxspeed, this->i_middlespeed, this->i_maxspeed)); Serial.print(" "); 
+                else                return map(s, this->e_middlespeed, this->e_maxspeed, this->i_middlespeed, this->i_maxspeed); 
             }
             else
-            {
+            {	
                 if (this->reversed) return map(s, this->e_middlespeed, this->e_minspeed, this->i_middlespeed, this->i_maxspeed); 
                 else                return map(s, this->e_middlespeed, this->e_minspeed, this->i_middlespeed, this->i_minspeed); 
             }
@@ -141,7 +144,7 @@ class OP_Smoker {
                 else                return map(s, this->e_middlespeed, this->e_maxspeed, this->i_middleheat, this->i_maxheat);
             }
             else
-            {
+            {	
                 if (this->reversed) return map(s, this->e_middlespeed, this->e_minspeed, this->i_middleheat, this->i_maxheat); 
                 else                return map(s, this->e_middlespeed, this->e_minspeed, this->i_middleheat, this->i_minheat); 
             }
@@ -152,8 +155,8 @@ class OP_Smoker {
 private:
     int e_minspeed, e_maxspeed, e_middlespeed;      // We have external speed range, and internal. External is the range of numbers that will be passed
                                                     // to the motor object from our main sketch. These are likely to be -255 to 255
-    int i_minspeed, i_maxspeed, i_middlespeed;      // The internal is specific to each ESC, the external range will be mapped to the internal range
-                                                    // For example, the internal range for a servo motor is 1000-2000. For Pololu Serial controllers it is -127 to 127
+    int i_minspeed, i_maxspeed, i_middlespeed;      // The internal is specific to each hardware output, the external range will be mapped to the internal range
+                                                    // For example, the smoker output is scaled from 0-255 but the AUX output is from 0-1024
     int di_minspeed, di_maxspeed, di_middlespeed;   // We also have "backup" or "default" values of internal speed, so we can modify internal speed
                                                     // temporarily and then easily revert back to the default. 
     
@@ -163,9 +166,9 @@ private:
     
     boolean reversed;                               // Motor reversed - not presently used
     int curspeed;                                   // Current speed
-    const int Idle;
-    const int FastIdle;
-    const int MaxSpeed;
+    int Idle;
+    int FastIdle;
+    int MaxSpeed;
     const int HeatAmtIdle;
     const int HeatAmtFastIdle;
     const int HeatAmtMax;
@@ -173,18 +176,22 @@ private:
     uint32_t *smokerBaud;
     const Smoker_t SmokerType;
     uint8_t preHeat_Seconds;
-    uint32_t LastUpdate_mS;    
+    uint32_t LastUpdate_mS;                         // Last smoker update timestamp
+    uint16_t UpdateInterval;                        // How long to wait until the next update for effects	
+	uint8_t curStep;								// What step are we on - for effects
   
     // These can be used for special smoker effects. The main sketch will poll the update() function routinely, 
-    // which can then create changes in smoker speeds over time. We use this presently to slowly reduce speed
-    // from idle when the engine is turned off. 
-    #define smoker_update_rate_mS   15
+    // which can then create changes in smoker speeds over time.
+    #define smoker_update_rate_mS   15              // Default update rate, but we can also specify something different if we want
+    #define smoker_startup_steps    8               // How many steps in the startup effect	
     enum smoker_effect_t
     {   NONE = 0,
-        SHUTDOWN
+        SHUTDOWN,
+		STARTUP
     };
     smoker_effect_t smoker_effect;
-    void setSpeed_wEffect(int s);   // The update() routine can call this version of setSpeed without clearing the special effect
+    void setSpeed_Shutdown(int s);   				// The update() routine can call this version of setSpeed without clearing the special effect
+	void setSpeed_Absolutes(int f, int h);			// No mapping to internal ranges, no accounting for idle being "zero", this just sets it to whatever you pass
     void clearSmokerEffect(void) { if (smoker_effect != NONE) smoker_effect = NONE; }
     
 };

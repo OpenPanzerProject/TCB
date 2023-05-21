@@ -1,4 +1,3 @@
-
 // NUDGE
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void Nudge_End()
@@ -328,7 +327,7 @@ void TransmissionEngage(boolean debugMsg)
         if (smokerStartupWithEngage)
         {   // In this case, the engine has just been started and there is no delay specified between the engine start and transmission engage,
             // so we issue the smoker startup command
-            StartSmoker(true);
+            StartSmoker(true);  // Pass true for "transmission is engaged"
             smokerStartupWithEngage = false;
         }
         else
@@ -447,8 +446,3 @@ void StopEverything()
     // Stop smoker
     StopSmoker();
 }
-
-
-
-
-

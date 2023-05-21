@@ -33,7 +33,7 @@ void UpdateSimpleTimers()
 
     // We also update the smoker object because it can have special effects that require polling, 
     // or serial watchdog that requires re-sending the current speed at regular intervals
-    Smoker->update();
+    Smoker->update(TransmissionEngaged);
 
     // Update IO A/B if outputs
     for (int i=0; i<NUM_IO_PORTS; i++)  { if (IO_Pin[i].Settings.dataDirection == OUTPUT) IO_Output[i].update(); }
@@ -83,4 +83,3 @@ void SetTimeUp()
 {
     TimeUp = true;
 }
-

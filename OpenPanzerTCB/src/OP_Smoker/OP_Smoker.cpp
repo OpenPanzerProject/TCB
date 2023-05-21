@@ -37,12 +37,21 @@ const __FlashStringHelper *ptrSmokerType(Smoker_t sType) {
 void OP_Smoker::begin(void)
 {
 
-    // Set the internal speed range (min, max, middle). We are using 8 bit PWM so the values are 0-255
+    // Set the internal speed range (min, max, middle). The values passed to this class (for fan or heat) will be in the range of 0-255. 
+	// The SMOKER output uses the same, but the AUX output uses 0-1023. Either way, MaxSpeed, FastIdle, and Idle will be set from the sketch
+	// based on saved values from OP Config, which come in the range of 0-255. So we might need to rescale these for the fan only (not the heater)
+	if (SmokerType == SMOKERTYPE_ONBOARD_SEPARATE)
+	{
+		if (Idle     > 0) Idle     = ((Idle    +1)*4)-1;
+		if (FastIdle > 0) FastIdle = ((FastIdle+1)*4)-1;
+		if (MaxSpeed > 0) MaxSpeed = ((MaxSpeed+1)*4)-1;
+	}
+	
     // The smoker output has no reverse, so minimum is always 0. We also set middle to 0 so the full range is only one-sided.
     // One complication involves the fact that some users may actually want the smoke to be less at full speed, and more at idle, 
     // which is somewhat backwards from the normal operation, but could be considered more realistic. 
     // The result is that we can't blindly set MaxSpeed (the speed of the smoker at max throttle) to the max of the range, because
-    // in face Idle may be faster. So we do a check of all three fan values (Idle, FastIdle, and MaxSpeed) and use the one that is the 
+    // in fact Idle may be faster. So we do a check of all three fan values (Idle, FastIdle, and MaxSpeed) and use the one that is the 
     // greatest for our internal maximum level. 
     // In practice, the map_Range function will then take care of dealing with increasing or decreasing speed relative to idle. 
         int s;
@@ -63,6 +72,12 @@ void OP_Smoker::begin(void)
     // Smoker effect - none right now
         smoker_effect = NONE;
 
+	// Set the update interval to default to begin with
+		UpdateInterval = smoker_update_rate_mS;
+	
+	// No effects yet, set the step to 0
+		curStep = 0;
+		
     // Reversed - no
         reversed = false;
 
@@ -124,6 +139,8 @@ void OP_Smoker::setSpeed(int s)
     int f; 
     int h; 
     
+	if (smoker_effect == STARTUP) return;
+	
     clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
 
     switch (SmokerType)
@@ -138,8 +155,8 @@ void OP_Smoker::setSpeed(int s)
             break;
         
         case SMOKERTYPE_ONBOARD_SEPARATE:
-            f = map_RangeFan(abs(s));       // Make sure we are using the internal range. We don't do reverse so negative values are converted to positive with abs()
-            h = map_RangeHeat(abs(s));      // Now do heat
+            f = map_RangeFan(abs(s));       // Aux version. Make sure we are using the internal range. We don't do reverse so negative values are converted to positive with abs()
+			h = map_RangeHeat(abs(s));      // Now do heat
 
             // Set the PWM duty cycle of the individual fan and heat outputs
             analogWrite(pin_AuxOutput, f);  // Fan - Aux output
@@ -163,7 +180,7 @@ void OP_Smoker::setSpeed(int s)
     LastUpdate_mS = millis();               // Save the time
 }
 
-void OP_Smoker::setSpeed_wEffect(int s)
+void OP_Smoker::setSpeed_Shutdown(int s)
 {   // The only difference here from setSpeed is that we don't clear the smoker effect, and we also don't call this function publicly, 
     // only privately
     int f; 
@@ -181,8 +198,8 @@ void OP_Smoker::setSpeed_wEffect(int s)
             break;
         
         case SMOKERTYPE_ONBOARD_SEPARATE:
-            f = map_RangeFan(abs(s));       // Make sure we are using the internal range. We don't do reverse so negative values are converted to positive with abs()
-            smoker_effect == SHUTDOWN ? h = 0 : h = map_RangeHeat(abs(s)); // Now do heat, except heat always goes directly to 0 if we are in the shutdown effect
+			f = s;							// We don't need (or want) to map the passed value, which will have already been mapped from the beginning level that it starts from for the shutdown
+			h = 0;							// During shutdown, heat always goes straight to zero. 
 
             // Set the PWM duty cycle of the individual fan and heat outputs
             analogWrite(pin_AuxOutput, f);  // Fan - Aux output
@@ -193,7 +210,7 @@ void OP_Smoker::setSpeed_wEffect(int s)
             
         case SMOKERTYPE_SERIAL:
             f = map_RangeFan(abs(s));       // Make sure we are using the internal range. We don't do reverse so negative values are converted to positive with abs()
-            smoker_effect == SHUTDOWN ? h = 0 : h = map_RangeHeat(abs(s)); // Now do heat, except heat always goes directly to 0 if we are in the shutdown effect
+			h = 0;							// During shutdown, heat always goes straight to zero. 
 
             // Send the serial commands for hte individual fan and heat outputs 
             OP_Smoker::setLevelSerial(SMOKER_CMD_FAN_SPEED, f);
@@ -204,6 +221,36 @@ void OP_Smoker::setSpeed_wEffect(int s)
     }       
 
     LastUpdate_mS = millis();               // Save the time
+}
+
+void OP_Smoker::setSpeed_Absolutes(int f, int h)
+{
+    switch (SmokerType)
+    {
+        case SMOKERTYPE_ONBOARD_STANDARD:    
+            OB_SMOKER_OCR = f;              // OB_SMOKER_OCR is defined in OP_Settings.h
+            curspeed = f;                   // Save the speed, it is the same for fan and heat
+            curheat = f;
+            break;
+        
+        case SMOKERTYPE_ONBOARD_SEPARATE:
+			// Make sure you use the correct scale for the AUX output when you call this function (0-1024, not 0-255)
+			analogWrite(pin_AuxOutput, f);  // Fan - Aux output
+            OB_SMOKER_OCR = h;              // Heat- Smoker output (OB_SMOKER_OCR is defined in OP_Settings.h)
+            curspeed = f;                   // Fan - speed
+            curheat = h;                    // Heat - level
+            break;
+            
+        case SMOKERTYPE_SERIAL:
+            // Send the serial commands for hte individual fan and heat outputs 
+            OP_Smoker::setLevelSerial(SMOKER_CMD_FAN_SPEED, f);
+            OP_Smoker::setLevelSerial(SMOKER_CMD_HEATER_LEVEL, h);
+            curspeed = f;
+            curheat = h;
+            break;
+    }       
+
+    LastUpdate_mS = millis();               // Save the time	
 }
 
 void OP_Smoker::stop(void)
@@ -269,17 +316,29 @@ void OP_Smoker::Startup(boolean engaged)
 {
     clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
 
-    // For serial smokers, send the startup command so it knows to handle any special startup effect
-    if (SmokerType == SMOKERTYPE_SERIAL) OP_Smoker::command(SMOKER_CMD_STARTUP); 
+	if (Smoker_Startup_Pulse && SmokerType != SMOKERTYPE_SERIAL)
+	{
+		smoker_effect = STARTUP;
+		LastUpdate_mS = millis();			// Save the time
+		UpdateInterval = 0;					// Start right away
+	}
+	else
+	{
+		// For serial smokers, send the startup command so it knows to handle any special startup effect
+		if (SmokerType == SMOKERTYPE_SERIAL) OP_Smoker::command(SMOKER_CMD_STARTUP); 
 
-    // And for all cases, set the idle speed depending on the transmission engaged status
-    engaged ? OP_Smoker::setFastIdle() : OP_Smoker::setIdle();
+		// And for all cases, set the idle speed depending on the transmission engaged status
+		engaged ? OP_Smoker::setIdle() : OP_Smoker::setFastIdle();
 
-    LastUpdate_mS = millis();               // Save the time    
+		LastUpdate_mS = millis();               // Save the time    	
+	}
 }
 
 void OP_Smoker::setIdle(void)
 {
+
+	if (smoker_effect == STARTUP) return;
+
     clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
     
     // When idling, we want the minimum speed (speed at input of 0) to be IdleSpeed
@@ -293,7 +352,10 @@ void OP_Smoker::setIdle(void)
 
 void OP_Smoker::setFastIdle(void)
 {
-    clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
+
+	if (smoker_effect == STARTUP) return;
+    
+	clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
     
     // At fast idle (idle with transmission disengaged) we want the minimum speed (speed at input of 0) to be FastIdleSpeed
     // The easiest way to do this is just change the internal range. 
@@ -336,26 +398,65 @@ void OP_Smoker::Shutdown(boolean engaged)
 
         // Set the active effect
         smoker_effect = SHUTDOWN;
+
+        // Set the update rate
+        UpdateInterval = smoker_update_rate_mS;
         
         // Now the sketch will poll the update() function which will take care of the effect
     }
 }
 
-void OP_Smoker::update(void)
+void OP_Smoker::update(boolean engaged)
 {
+	int fullOn; 
+	
     if (smoker_effect != NONE)
     {   
-        if (millis() - LastUpdate_mS > smoker_update_rate_mS)
+        if (millis() - LastUpdate_mS > UpdateInterval)		
         {
             switch (smoker_effect)
             {
+                case STARTUP: 
+					if (curStep >= smoker_startup_steps)
+					{
+						// Startup is done
+						smoker_effect = NONE;
+						curStep = 0;
+						UpdateInterval = smoker_update_rate_mS;		// Revert this to default
+						
+						// Now set idle speed depending on the transmission engaged status
+						engaged ? OP_Smoker::setIdle() : OP_Smoker::setFastIdle();
+
+						LastUpdate_mS = millis();               // Save the time   						
+					}
+					else
+					{	
+						if (SmokerType == SMOKERTYPE_ONBOARD_SEPARATE) fullOn = AUX_PWM_TOP; 
+						else										   fullOn = MOTOR_MAX_FWDSPEED;
+						
+						switch (curStep)
+						{
+							case 0:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on	- in all cases heater is at max
+							case 1:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off
+							case 2:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on
+							case 3:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off
+							case 4:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on
+							case 5:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off							
+							case 6:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on
+							case 7:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off								
+						}
+						curStep += 1; 						// Increment step
+					}
+					break;
+			
                 case SHUTDOWN:
-                    // This effect simply turns off the smoker gradually instead of all at once. Each update through we reduce the speed by 1. 
+                    // This effect simply turns off the smoker gradually instead of all at once. Each update through we reduce the speed by 1 (or 4 if AUX). 
                     // In most cases we assume the user decides to turn off the engine while the tank is stopped, so already the smoker should 
-                    // probably be down to idle speed, which is not very fast to begin with. Therefore even with only reducing the speed by 1 step
+                    // probably be down to idle speed, which is not very fast to begin with. Therefore even with only reducing the speed slightly each step
                     // per pass it won't take long to get to zero.
                     // As for heat, when the user wants to stop the smoker, we turn off the heater immediately (no ramping down)
-                    curspeed -= 1;
+                    if (SmokerType == SMOKERTYPE_ONBOARD_SEPARATE) curspeed -= 4;
+					else										   curspeed -= 1; 
                     curheat   = 0;
                     if (curspeed <= 0) 
                     {
@@ -363,7 +464,7 @@ void OP_Smoker::update(void)
                     }
                     else
                     {
-                        OP_Smoker::setSpeed_wEffect(curspeed); // We use the private "_wEffect" version of setSpeed so it doesn't clear the effect
+                        OP_Smoker::setSpeed_Shutdown(curspeed); 	// We use the shutdown version of setSpeed so it doesn't clear the effect
                     }
                     break;
                 
@@ -371,7 +472,7 @@ void OP_Smoker::update(void)
                     break;
             }
         }
-        // LastUpdate_mS will get updated through either the stop() or setSpeed_wEffect() functions called above
+        // LastUpdate_mS will get updated through either the stop() or setSpeed_Shutdown() functions called above
     }
     else 
     {
