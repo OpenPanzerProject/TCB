@@ -21,43 +21,57 @@ void Light1Off()
 void Light1Toggle()
 {
     Light1State ? Light1Off() : Light1On();
-    Light1State = !Light1State;
 }
 
+// This effect takes place on engine startup if the user has selected the option to "Flicker Headlights on Engine Start" (Lights & IO tab of OP Config) 
+// and if they have specified a "Transmission Engage Delay" (Driving tab of OP Config). The effect will last for the duration of the Transmission Engage Delay. 
+// It applies to both the headlights and the brake/running lights, but only if they were already on before the effect begins. 
 void FlickerLights()
 {
-    // This effect takes place on engine startup if the user has selected the option to "Flicker Headlights on Engine Start" (Lights & IO tab of OP Config) 
-    // and if they have specified a "Transmission Engage Delay" (Driving tab of OP Config). 
-
+    static boolean flickerState;
+    
     // Initialize if appropriate: 
-    if (HeadlightsFlickering == false && BrakeLightsFlickering == false)  // They will both be false if we have not started the effect
-    {
+    if (HeadlightsFlickering == false && BrakeLightsFlickering == false)  // They will both be false if we have not started the effect. 
+    {                                                                     // They will both remain false if neither the headlights or brakelights are on, in which case we won't come back here. 
         // Only flicker lights that are already on
-        if (Light1State)        HeadlightsFlickering = true;
-        if (BrakeLightsActive)  BrakeLightsFlickering = true;
+        if (Light1State)                                    HeadlightsFlickering = true;
+        if (BrakeLightsActive || RunningLightsActive)       BrakeLightsFlickering = true;
+        if (HeadlightsFlickering || BrakeLightsFlickering)  flickerState = false;  // Initialize light state to false (which has the effect of starting the effect with "on")
     }
 
-    // Now perfrom the flickering: 
-    if (HeadlightsFlickering == true || BrakeLightsFlickering == true)
+    // Now perfrom the flickering if it has been enabled 
+    if (HeadlightsFlickering || BrakeLightsFlickering)
     {
-        if (HeadlightsFlickering == true)
+        if (HeadlightsFlickering)
         {
-            // The headlight output can not be dimmed, so we simply toggle it on and off
-            Light1Toggle();
+            // The headlight output can not be dimmed, so we simply toggle it on and off. 
+            // We don't use the dedicated Light1Toggle function because that would also call the headlight sound, which we don't want, not to mention the possible debug message. 
+            flickerState ? digitalWrite(pin_Light1, LOW) : digitalWrite(pin_Light1, HIGH);          
         }
         
-        if (BrakeLightsFlickering == true)
+        if (BrakeLightsFlickering)
         {
-            // We will apply a random dim value to the brake lights. We try to match it with the headlights, but since we can dim this output
-            // we soften it a little
-            if (Light1State)    analogWrite(pin_Brakelights, random(75)+180);   // Brighter - random value between 180 and 255 (full on)
-            else                analogWrite(pin_Brakelights, random(100));      // Dimmer   - random value between 0 (off) and 100 (not even half brightness)
+            // The brake light flickering effect will differ depending on whether we are flickering the running lights or the full brake lights. 
+            if (BrakeLightsActive)
+            { 
+                // Here we vary the light between some lower and higher dim levels, it can go full off or full on, but also something in-between
+                if (flickerState) analogWrite(pin_Brakelights, random(100));      // Dimmer   - random value between 0 (off) and 100 (not even half brightness)
+                else              analogWrite(pin_Brakelights, random(75)+180);   // Brighter - random value between 180 and 255 (full on)
+            }
+            else if (RunningLightsActive)
+            {
+                // Here we vary the light between full off and whatever the running lights dim level is
+                flickerState ? digitalWrite(pin_Brakelights, LOW) : analogWrite(pin_Brakelights, RunningLightsDimLevel);
+            }
         }
-    
-        // Now come back here after a random amount of time to continue the effect
+        
+        // Toggle the flicker state, now it will match what we've just done above (which was the opposite of flickerState)
+        flickerState = !flickerState;
+        
+        // Now set a timer to come back here after a random amount of time to continue the effect
         // We adjust the random delay so that the light "off" time is shorter than the light "on" time
-        if (Light1State) FlickeringTimerID = timer.setTimeout(random(350)+60, FlickerLights); // On  - random time between 60 and 410 mS
-        else             FlickeringTimerID = timer.setTimeout(random(210)+50, FlickerLights); // Off - random time between 50 and 260 mS
+        if (flickerState) FlickeringTimerID = timer.setTimeout(random(350)+60, FlickerLights); // On  - random time between 60 and 410 mS
+        else              FlickeringTimerID = timer.setTimeout(random(210)+50, FlickerLights); // Off - random time between 50 and 260 mS
     }
 }
 
@@ -65,18 +79,25 @@ void CancelFlickerLights()
 {
     // This will end or cancel the flickering effect
     if (FlickeringTimerID > 0) timer.deleteTimer(FlickeringTimerID);
-    
+
+    // Turn the headlight back on if needed
     if (HeadlightsFlickering) 
     {
-        HeadlightsFlickering = false;
-        Light1On();
+        digitalWrite(pin_Light1, HIGH);    
+        Light1State = true; // This should have remained true throughout but we set it anyway
     }
-    
+
+    // Restore the brake light to whatever level it was on before
     if (BrakeLightsFlickering)
     {
-        BrakeLightsFlickering = false;
-        BrakeLightsOn();
+        if      (BrakeLightsActive)   digitalWrite(pin_Brakelights, HIGH);
+        else if (RunningLightsActive) analogWrite(pin_Brakelights, RunningLightsDimLevel); 
+        else                          digitalWrite(pin_Brakelights, LOW); // This case should theoretically never occur   
     }
+
+    // We force both these back to false no matter what
+    HeadlightsFlickering = false;
+    BrakeLightsFlickering = false;            
 }
 
 // LIGHT #2 - 
@@ -193,9 +214,7 @@ void RunningLightsOff()
 
 void RunningLightsToggle()
 {
-    static boolean RunningLightsState = false;
-    RunningLightsState ? RunningLightsOff() : RunningLightsOn();
-    RunningLightsState = !RunningLightsState;
+    RunningLightsActive ? RunningLightsOff() : RunningLightsOn();
 }
 
 // AUX OUTPUT: could be lights, or anything else
