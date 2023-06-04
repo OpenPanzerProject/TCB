@@ -204,6 +204,8 @@ boolean Proceed = true;
                 bitSet(AdHocTriggers, ADHOCT_BIT_ENGINE_START);
             // Play the engine start sound
                 TankSound->StartEngine();
+            // If brake lights should be on at stop turn them on now
+                if (eeprom.ramcopy.BrakesAutoOnAtStop) { BrakeLightsOn(); }                
             // Should the transmission be engaged now too? 
                 if (ManualGear == GEAR_NA)  // Only if we are not manually manipulating the transmission
                 {
@@ -216,9 +218,6 @@ boolean Proceed = true;
                         EngineInStartup = true;
                         
                         // Commence flickering lights if desired, these will flicker during the transmission delay time
-                        // But before we start flickering, check if brake lights should be on at stop and if so turn them on: 
-                        if (eeprom.ramcopy.BrakesAutoOnAtStop) { BrakeLightsOn(); }
-                        // Now start flickering
                         if (eeprom.ramcopy.FlickerLightsOnEngineStart) { FlickerLights(); }
         
                         // Also start the smoker. We start in fast idle until the transmission engages
@@ -262,7 +261,7 @@ void EngineOff(boolean debugMsg)
                 // We need to tell the Shutdown effect where it is starting from, which depends on whether the transmission is currently engaged or not.
                 TransmissionEngaged ? ShutdownSmoker(true) : ShutdownSmoker(false);
             // Cancel the light flicker if we have been told to shut down while we were still in the middle of engine startup
-                if (eeprom.ramcopy.TransmissionDelay_mS > 0 && EngineInStartup)
+                if (eeprom.ramcopy.FlickerLightsOnEngineStart && eeprom.ramcopy.TransmissionDelay_mS > 0 && EngineInStartup)
                 {
                     CancelFlickerLights();
                 }

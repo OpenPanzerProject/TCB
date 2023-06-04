@@ -373,8 +373,16 @@ void setup()
     // -------------------------------------------------------------------------------------------------------------------------------------------------->            
         RunningLightsDimLevel = map(eeprom.ramcopy.RunningLightsDimLevelPct, 0, 100, 0, 255);   // The user sets the dim level as a percent from 0-100, but we want it as a PWM value from 0-255
         if (eeprom.ramcopy.RunningLightsAlwaysOn) RunningLightsOn();
+        
+        // Sanity check - we do not permit the flicker lights during engine start effect to be active if the user has selected separate heat and fan outputs on the smoker. 
+        // The reason being that both will want to use the Aux output, but we prioritize it for the smoker fan. 
+        if (eeprom.ramcopy.SmokerDeviceType == SMOKERTYPE_ONBOARD_SEPARATE && eeprom.ramcopy.FlickerLightsOnEngineStart)
+        {
+            eeprom.ramcopy.FlickerLightsOnEngineStart = false;                                  // Undo the effect in RAM.
+            EEPROM.updateByte(offsetof(_eeprom_data, FlickerLightsOnEngineStart), false);       // But change it in EEPROM too so this doesn't happen again next time.
+        }
 
-     
+             
     // WAIT FOR PC COMM - AND TRY TO DETECT RECEIVER (kill two birds with one stone)
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // Assume no connection to start with. 
