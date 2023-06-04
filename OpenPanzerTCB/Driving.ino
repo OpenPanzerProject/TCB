@@ -216,7 +216,10 @@ boolean Proceed = true;
                         EngineInStartup = true;
                         
                         // Commence flickering lights if desired, these will flicker during the transmission delay time
-                        if (eeprom.ramcopy.FlickerLightsOnEngineStart) FlickerLights();
+                        // But before we start flickering, check if brake lights should be on at stop and if so turn them on: 
+                        if (eeprom.ramcopy.BrakesAutoOnAtStop) { BrakeLightsOn(); }
+                        // Now start flickering
+                        if (eeprom.ramcopy.FlickerLightsOnEngineStart) { FlickerLights(); }
         
                         // Also start the smoker. We start in fast idle until the transmission engages
                         StartSmoker(false); // We pass false for "transmission not engaged"

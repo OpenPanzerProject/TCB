@@ -96,14 +96,16 @@ void TransmissionEngage(boolean debugMsg=true);
     boolean RunningLightsActive = false;         // Are the running lights active. We don't want running lights and brake lights to turn each other off if they're not supposed to. 
     uint8_t RunningLightsDimLevel;               // We will convert the user's setting (0-100) to a PWM value (0-255)
     boolean Light1State = false;                 // Light 1 state (true = on, false = off)
-    int FlickeringTimerID = 0;
-    boolean HeadlightsFlickering = false;
-    boolean BrakeLightsFlickering = false;
     int Light2TimerID = 0;
     boolean Light2Blinking = false;
+    boolean AuxOutputState = false;              // Indicates if Aux output is full on or full off
     int AuxOutputTimerID = 0;                    // The AuxOutput can be set to blink or strobe. We will need a timer ID for it. 
     boolean AuxOutputBlinking = false;
     boolean AuxOutputRevolving = false;
+    boolean AuxLightsFlickering = false;         // Flickering effect during engine startup, can apply to the aux and brake outputs (not headlights)
+    boolean BrakeLightsFlickering = false;
+    int FlickeringTimerID = 0;
+    uint8_t flickerAmount = 0;                   // Value between 0 and 255 representing the current dim level of the flickering effect
 
 // TANK OBJECTS
     OP_Servos TankServos;
@@ -1050,8 +1052,10 @@ if (Startup)
             }
 
             // If the user set brake lights to come on automatically at stop, turn them on - but only if the engine is running,
-            // which by definition it should be if we are at this point in the code
-            if (eeprom.ramcopy.BrakesAutoOnAtStop) { BrakeLightsOn(); }
+            // which by definition it should be if we are at this point in the code 
+            // We add the check for BrakeLightsActive otherwise we'd be overwriting the flickering effect on startup. But this way we only turn them on once and 
+            // the flicker effect can take over for the rest of the time during engine startup. 
+            if (eeprom.ramcopy.BrakesAutoOnAtStop && !BrakeLightsActive) { BrakeLightsOn(); }
         }
         else
         {

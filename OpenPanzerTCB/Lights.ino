@@ -23,82 +23,109 @@ void Light1Toggle()
     Light1State ? Light1Off() : Light1On();
 }
 
-// This effect takes place on engine startup if the user has selected the option to "Flicker Headlights on Engine Start" (Lights & IO tab of OP Config) 
+// This effect takes place on engine startup if the user has selected the option to "Flicker Lights on Engine Start" (Lights & IO tab of OP Config) 
 // and if they have specified a "Transmission Engage Delay" (Driving tab of OP Config). The effect will last for the duration of the Transmission Engage Delay. 
-// It applies to both the headlights and the brake/running lights, but only if they were already on before the effect begins. 
+// It applies to the Aux lights and the brake/running lights, but only if they were already on before the effect begins. It unfortunately will not work with the Headlights (Light1 output)
+// since that pin is limited to on/off. Therefore if you want your "headlights" to flicker you need to use the Aux ouptut as your headlight port. 
 void FlickerLights()
 {
-    static boolean flickerState;
-    
+    static uint8_t lastAmt = 0;
+    int16_t diff;
+        
     // Initialize if appropriate: 
-    if (HeadlightsFlickering == false && BrakeLightsFlickering == false)  // They will both be false if we have not started the effect. 
-    {                                                                     // They will both remain false if neither the headlights or brakelights are on, in which case we won't come back here. 
+    if (AuxLightsFlickering == false && BrakeLightsFlickering == false)  // They will both be false if we have not started the effect. 
+    {                                                                    // They will both remain false if neither the aux lights or brakelights are on, in which case we won't come back here. 
         // Only flicker lights that are already on
-        if (Light1State)                                    HeadlightsFlickering = true;
+        if (AuxOutputState)                                 AuxLightsFlickering = true;
         if (BrakeLightsActive || RunningLightsActive)       BrakeLightsFlickering = true;
-        if (HeadlightsFlickering || BrakeLightsFlickering)  flickerState = false;  // Initialize light state to false (which has the effect of starting the effect with "on")
     }
 
     // Now perfrom the flickering if it has been enabled 
-    if (HeadlightsFlickering || BrakeLightsFlickering)
+    if (AuxLightsFlickering || BrakeLightsFlickering)
     {
-        if (HeadlightsFlickering)
+        // Select a brightness amount
+        flickerAmount = random(130) + 90;       // Brightness can vary from 90 to 220
+        diff = flickerAmount - lastAmt;     
+        if (abs(diff) > 60)                     // But in any single step, we don't change by more than 60
         {
-            // The headlight output can not be dimmed, so we simply toggle it on and off. 
-            // We don't use the dedicated Light1Toggle function because that would also call the headlight sound, which we don't want, not to mention the possible debug message. 
-            flickerState ? digitalWrite(pin_Light1, LOW) : digitalWrite(pin_Light1, HIGH);          
+            diff < 0 ? flickerAmount = lastAmt - 60 : flickerAmount = lastAmt + 60;
         }
-        
+        lastAmt = flickerAmount;                // Save for next round
+
+        // Apply the selected brightness amount to the appropriate light outputs
+        if (AuxLightsFlickering)    
+        { 
+            analogWrite(pin_AuxOutput, flickerAmount);  
+        }
+
         if (BrakeLightsFlickering)
         {
             // The brake light flickering effect will differ depending on whether we are flickering the running lights or the full brake lights. 
-            if (BrakeLightsActive)
-            { 
-                // Here we vary the light between some lower and higher dim levels, it can go full off or full on, but also something in-between
-                if (flickerState) analogWrite(pin_Brakelights, random(100));      // Dimmer   - random value between 0 (off) and 100 (not even half brightness)
-                else              analogWrite(pin_Brakelights, random(75)+180);   // Brighter - random value between 180 and 255 (full on)
-            }
-            else if (RunningLightsActive)
-            {
-                // Here we vary the light between full off and whatever the running lights dim level is
-                flickerState ? digitalWrite(pin_Brakelights, LOW) : analogWrite(pin_Brakelights, RunningLightsDimLevel);
-            }
+            if (BrakeLightsActive)          analogWrite(pin_Brakelights, flickerAmount); 
+            else if (RunningLightsActive)   analogWrite(pin_Brakelights, map(flickerAmount, 0, 255, 0, RunningLightsDimLevel));                
         }
         
-        // Toggle the flicker state, now it will match what we've just done above (which was the opposite of flickerState)
-        flickerState = !flickerState;
-        
         // Now set a timer to come back here after a random amount of time to continue the effect
-        // We adjust the random delay so that the light "off" time is shorter than the light "on" time
-        if (flickerState) FlickeringTimerID = timer.setTimeout(random(350)+60, FlickerLights); // On  - random time between 60 and 410 mS
-        else              FlickeringTimerID = timer.setTimeout(random(210)+50, FlickerLights); // Off - random time between 50 and 260 mS
+        if (flickerAmount < 150)        FlickeringTimerID = timer.setTimeout(random(80)+40, FlickerLights);    // Dimmer   - random time between 40 and 120 mS
+        else                            FlickeringTimerID = timer.setTimeout(random(50)+30, FlickerLights);    // Brighter - random time between 30 and 80 mS
     }
 }
 
 void CancelFlickerLights()
 {
-    // This will end or cancel the flickering effect
+    // We call this function when we want to stop the flickering effect
+
+    // Delete the timer to prevent us from going back to the FlickerLights routine
     if (FlickeringTimerID > 0) timer.deleteTimer(FlickeringTimerID);
 
-    // Turn the headlight back on if needed
-    if (HeadlightsFlickering) 
-    {
-        digitalWrite(pin_Light1, HIGH);    
-        Light1State = true; // This should have remained true throughout but we set it anyway
-    }
-
-    // Restore the brake light to whatever level it was on before
-    if (BrakeLightsFlickering)
-    {
-        if      (BrakeLightsActive)   digitalWrite(pin_Brakelights, HIGH);
-        else if (RunningLightsActive) analogWrite(pin_Brakelights, RunningLightsDimLevel); 
-        else                          digitalWrite(pin_Brakelights, LOW); // This case should theoretically never occur   
-    }
-
-    // We force both these back to false no matter what
-    HeadlightsFlickering = false;
-    BrakeLightsFlickering = false;            
+    // But we don't end abruptly, instead we will fade the lights back up to full brightness. 
+    flickerAmount = 100;        // Start here
+    FlickerFadeIn();            // Commence fade-in
 }
+
+void FlickerFadeIn()
+{   // This routine will gradually (but quickly) fade the Aux and/or Brake lights back to the level they had before we began flickering them. 
+    
+    if (flickerAmount < 245)    // Keep incrementing until we reach nearly full brightness
+    {
+        flickerAmount += 10;    // Increment the brightness level
+        if (AuxLightsFlickering)   { analogWrite(pin_AuxOutput, flickerAmount); }
+        if (BrakeLightsFlickering) 
+        {
+            if      (BrakeLightsActive)   analogWrite(pin_Brakelights, flickerAmount);
+            else if (RunningLightsActive) analogWrite(pin_Brakelights, map(flickerAmount, 0, 255, 0, RunningLightsDimLevel));        
+        }
+        FlickeringTimerID = timer.setTimeout(15, FlickerFadeIn);    // Come back here in 15 mS
+    }
+    else
+    {   // This is the end of the flickering effect, we have faded back to full brightness. 
+        // Clean up everything. 
+        flickerAmount = 0;
+
+        // Delete this although it should already be expired
+        if (FlickeringTimerID > 0) timer.deleteTimer(FlickeringTimerID);
+    
+        // Turn the Aux light back on if needed
+        if (AuxLightsFlickering) 
+        {
+            digitalWrite(pin_AuxOutput, HIGH);    
+            AuxOutputState = true;                  // This should have remained true throughout but we set it anyway
+        }
+    
+        // Restore the brake light to whatever level it was on before
+        if (BrakeLightsFlickering)
+        {
+            if      (BrakeLightsActive)   digitalWrite(pin_Brakelights, HIGH);
+            else if (RunningLightsActive) analogWrite(pin_Brakelights, RunningLightsDimLevel); 
+            else                          digitalWrite(pin_Brakelights, LOW); // This case should theoretically never occur   
+        }
+    
+        // We force both these back to false no matter what
+        AuxLightsFlickering = false;
+        BrakeLightsFlickering = false;    
+    }
+}
+
 
 // LIGHT #2 - 
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -217,16 +244,18 @@ void RunningLightsToggle()
     RunningLightsActive ? RunningLightsOff() : RunningLightsOn();
 }
 
+
 // AUX OUTPUT: could be lights, or anything else
 // -------------------------------------------------------------------------------------------------------------------------------------------------->
 void AuxOutputOn()
 {
+    AuxOutputState = true;
     digitalWrite(pin_AuxOutput, HIGH);    
     if (DEBUG && !AuxOutputBlinking) { DebugSerial->println(F("Aux Output On")); }
 }
 void AuxOutputOff()
 {
-    // Turn off
+    AuxOutputState = false;
     if (timer.isEnabled(AuxOutputTimerID)) timer.deleteTimer(AuxOutputTimerID);
     digitalWrite(pin_AuxOutput, LOW);
     if (DEBUG)
@@ -247,13 +276,12 @@ void AuxOutputTempOff()
 }
 void AuxOutputToggle()
 {
-    static boolean AuxOutputState = false;
     // Toggle the light state
     AuxOutputState ? AuxOutputOff() : AuxOutputOn();
-    AuxOutputState = !AuxOutputState;
 }
 void AuxOutput_PresetDim()
 {
+    AuxOutputState = false; // We don't consider Dim to be "full on"
     analogWrite(pin_AuxOutput, eeprom.ramcopy.AuxLightPresetDim);
     if (DEBUG) DebugSerial->println(F("Aux Output Preset Dim"));
 }
@@ -312,7 +340,7 @@ void AuxOutputInverseFlash()
 }
 void AuxOutputBlink()
 {
-    static boolean AuxOutputState = false;
+    static boolean AuxOutputBlinkState = false;
     
     // Start blinking
     if (!AuxOutputBlinking) 
@@ -323,13 +351,13 @@ void AuxOutputBlink()
     }
 
     // Toggle the light state
-    AuxOutputState ? AuxOutputTempOff() : AuxOutputOn();    // Use the "temp" off version here otherwise we would turn off the blinker
-    AuxOutputState = !AuxOutputState;                       // Flop states
+    AuxOutputBlinkState ? AuxOutputTempOff() : AuxOutputOn();    // Use the "temp" off version here otherwise we would turn off the blinker
+    AuxOutputBlinkState = !AuxOutputBlinkState;                  // Flop states
 
     // Now set a timer to come back here and toggle it after the correct length of time has passed.
     // The time can be different for the on portion and the off portion:
-    if (AuxOutputState) AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightBlinkOnTime_mS, AuxOutputBlink);
-    else AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightBlinkOffTime_mS, AuxOutputBlink);
+    if (AuxOutputBlinkState) AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightBlinkOnTime_mS, AuxOutputBlink);
+    else                     AuxOutputTimerID = timer.setTimeout(eeprom.ramcopy.AuxLightBlinkOffTime_mS, AuxOutputBlink);
 }
 void AuxOutputToggleBlink()
 {
