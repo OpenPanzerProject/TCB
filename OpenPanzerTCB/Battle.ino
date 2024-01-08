@@ -7,72 +7,75 @@
 
 void FireCannon()
 {
-    if (Tank.CannonReloaded())          // Only fire if reloading is complete
-    {   
-        if (Tank.isRepairTank()) 
-        {   
-            if (!Tank.isRepairOngoing() && !RepairOngoing)
-            {
-                // If we are a repair tank, we immobilize the tank when firing the repair signal. 
-                // This is very similar to what we do if we *receive* a repair signal
-                RepairOngoing = REPAIR_OTHER;   // This marks the start of a repair operation - we are repairing an other vehicle
-                if (DEBUG) { DebugSerial->println(F("Fire Repair Signal")); }
-                
-                // Disengage the transmission - we will keep it in neutral until the repair is over. 
-                // Even if the user tries to re-engage it, the TransmissionEngage() function will check if a repair is ongoing, if so, it won't do anything. 
-                // And without an engaged transmission, the tank will not move. 
-                skipTransmissionSound = true;  // No need to clunk the transmission now
-                TransmissionDisengage();
-                
-                // Now fire the repair signal. 
-                Tank.Fire(); 
-                CannonWasFired = true;
-            }
-        }
-        else
-        {
-            // This is a fighting tank. But we can't fire the cannon if we're in the midst of being repaired by another tank.
-            if (!Tank.isRepairOngoing())
-            {
-                if (DEBUG) 
-                { 
-                    DebugSerial->print(F("Fire Cannon")); 
-                    if (Tank.IsIREnabled()) DebugSerial->print(F(" (with IR)"));
-                    DebugSerial->println();
-                } 
-                Tank.Fire(); // See OP_Tank library. This triggers the mechanical and servo recoils, the high intensity flash unit, the cannon sound, and it sends the IR signal
-                CannonWasFired = true;
-                
-                // Handle track recoil if the user has it enabled
-                if (eeprom.ramcopy.EnableTrackRecoil)
-                {
-                    // When the track recoil starts depends on whether we we have a mechanical barrel action included and if so which one
-                    if (Tank.isMechBarrelSetWithCannon())
-                    {
-                        if (eeprom.ramcopy.Airsoft)
-                        {
-                            // With the airsoft unit we must wait until the airsoft actually fires, which will happen after it has cocked. We will just have to poll the tank class to see when this is. 
-                            // The CheckAirsoft will keep checking back, and when the airsoft has cocked, and if the vehicle is actually stopped, then it will kick off the track recoil
-                            CheckAirsoftTimerID = timer.setInterval(50, CheckAirsoft);
-                        }
-                        else    // Mechanical recoil
-                        {
-                            if (DriveModeActual == STOP)    // If we are stopped, track recoil is possible
-                            {
-                                // With mechanical recoil we can start it more or less right away, or else after a single, pre-known delay if one is specified
-                                if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
-                                else StartTrackRecoil();                                                                            // Otherwise go directly to it
-                            }
-                        }
-                    }
-                    else
-                    {   // Here there is no mechanical barrel action so we have nothing to wait for, go straight to track recoil
-                        StartTrackRecoil(); 
-                    }
-                }
-            }
-        }
-    }
+    if (!Tank.isDestroyed)                  // We can't fire the gun if we're destroyed (not the same as invulnerability time, which comes after respawn: we are allowed to fire then)
+    { 
+		if (Tank.CannonReloaded())          // Only fire if reloading is complete
+		{   
+			if (Tank.isRepairTank()) 
+			{   
+				if (!Tank.isRepairOngoing() && !RepairOngoing)
+				{
+					// If we are a repair tank, we immobilize the tank when firing the repair signal. 
+					// This is very similar to what we do if we *receive* a repair signal
+					RepairOngoing = REPAIR_OTHER;   // This marks the start of a repair operation - we are repairing an other vehicle
+					if (DEBUG) { DebugSerial->println(F("Fire Repair Signal")); }
+					
+					// Disengage the transmission - we will keep it in neutral until the repair is over. 
+					// Even if the user tries to re-engage it, the TransmissionEngage() function will check if a repair is ongoing, if so, it won't do anything. 
+					// And without an engaged transmission, the tank will not move. 
+					skipTransmissionSound = true;  // No need to clunk the transmission now
+					TransmissionDisengage();
+					
+					// Now fire the repair signal. 
+					Tank.Fire(); 
+					CannonWasFired = true;
+				}
+			}
+			else
+			{
+				// This is a fighting tank. But we can't fire the cannon if we're in the midst of being repaired by another tank.
+				if (!Tank.isRepairOngoing())
+				{
+					if (DEBUG) 
+					{ 
+						DebugSerial->print(F("Fire Cannon")); 
+						if (Tank.IsIREnabled()) DebugSerial->print(F(" (with IR)"));
+						DebugSerial->println();
+					} 
+					Tank.Fire(); // See OP_Tank library. This triggers the mechanical and servo recoils, the high intensity flash unit, the cannon sound, and it sends the IR signal
+					CannonWasFired = true;
+					
+					// Handle track recoil if the user has it enabled
+					if (eeprom.ramcopy.EnableTrackRecoil)
+					{
+						// When the track recoil starts depends on whether we we have a mechanical barrel action included and if so which one
+						if (Tank.isMechBarrelSetWithCannon())
+						{
+							if (eeprom.ramcopy.Airsoft)
+							{
+								// With the airsoft unit we must wait until the airsoft actually fires, which will happen after it has cocked. We will just have to poll the tank class to see when this is. 
+								// The CheckAirsoft will keep checking back, and when the airsoft has cocked, and if the vehicle is actually stopped, then it will kick off the track recoil
+								CheckAirsoftTimerID = timer.setInterval(50, CheckAirsoft);
+							}
+							else    // Mechanical recoil
+							{
+								if (DriveModeActual == STOP)    // If we are stopped, track recoil is possible
+								{
+									// With mechanical recoil we can start it more or less right away, or else after a single, pre-known delay if one is specified
+									if (eeprom.ramcopy.RecoilDelay > 0) timer.setTimeout(eeprom.ramcopy.RecoilDelay, StartTrackRecoil); // We may need to delay it
+									else StartTrackRecoil();                                                                            // Otherwise go directly to it
+								}
+							}
+						}
+						else
+						{   // Here there is no mechanical barrel action so we have nothing to wait for, go straight to track recoil
+							StartTrackRecoil(); 
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void CheckAirsoft()
