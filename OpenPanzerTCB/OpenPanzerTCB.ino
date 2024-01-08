@@ -440,6 +440,8 @@ void setup()
     // RANDOM SEED
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
         randomSeed(analogRead(pin_RandomSeed));
+        // Now we are no longer going to use this pin, enable the pull-up resistor
+        pinMode(pin_RandomSeed, INPUT_PULLUP);
 
 
     // SET DEBUG TO USER SETTING IN ANOTHER SECOND

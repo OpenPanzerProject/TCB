@@ -442,19 +442,29 @@
         #define MG_PORT                  PORTD    // Port D
         #define MG_DDR                   DDRD     // Data direction register for Port D
         #define MG_PORTPIN               PD1      // The specific port pin for the machine gun LED (ATmega D1)
+		
+		// We keep track of the unused one as well so we can initialize it correctly
+		#define UNUSED_MG_PORT			 PORTE
+		#define UNUSED_MG_DDR			 DDRE
+		#define UNUSED_MG_PIN			 PE2		
 #else
         //Machine Gun light output - slightly different. This is on Atmega pin 4, but it does not have an Arduino pin number! 
         // Therefore we have to manipulate the port directly, we can't use pinMode() or digitalWrite() functions
         #define MG_PORT                  PORTE    // Port E
         #define MG_DDR                   DDRE     // Data direction register for Port E 
         #define MG_PORTPIN               PE2      // The specific port pin for the machine gun LED (ATmega E2)
+		
+		// We keep track of the unused one as well so we can initialize it correctly
+		#define UNUSED_MG_PORT			 PORTD
+		#define UNUSED_MG_DDR			 DDRD
+		#define UNUSED_MG_PIN			 PD1		
 #endif
         
     // Mechanical Recoil 
         #define pin_MechRecoilMotor      43       // Output   - Controls the mechanical recoil motor (on/off) (ATmega L6)
 
     // Random seed
-        #define pin_RandomSeed           A0       // Input    - Specify an analog pin that isn't connected to anything (floating), or if not, that is at least connected to some analog input
+        #define pin_RandomSeed           A0       // Input    - Specify an analog pin that isn't connected to anything (floating), or if not, that is at least connected to some analog input	
         
     // OTHER PINS
         // Onboard motor driver pins are defined above in the "MOTOR DRIVERS - ONBOARD" section

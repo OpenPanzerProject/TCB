@@ -189,7 +189,11 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     EICRA =  (EICRA & ~((1 << ISC00) | (1 << ISC01)));                  // Clear interrupt sense control to start
     if (_Airsoft)   { EICRA |= (AIRSOFT_TRIGGER_MODE    << ISC00); }    // Now set appropriately
     else            { EICRA |= (MECHRECOIL_TRIGGER_MODE << ISC00); }
-
+	
+	// In this case we won't be using PORTE6 but we still want it set to input with pull-ups enabled
+    DDRE  &= ~(1 << DDE6);      // Set PE6 to input. We "and-not" a 1 with bit DDE6 of the Port E Data Direction Register. This sets it to Zero, which means, input. 
+    PORTE |=  (1 << PE6);       // Set input pullups on. We accomplish this by writing a 1 to the PE6 bit of the PORTE register. 
+	
 #else   
     // Set up an external interrupt to read the mechanical airsoft or recoil trigger switch
     // SETUP EXTERNAL INTERRUPT PIN
@@ -250,6 +254,11 @@ void OP_Tank::begin(battle_settings BS, boolean mbwc, boolean airsoft, boolean r
     else            { EICRB |= (MECHRECOIL_TRIGGER_MODE << ISC60); }
     // Second piece: |= (mode << ISC60)
     // This now sets the two bits to whatever is specified in MECHRECOIL/AIRSOFT_TRIGGER_MODE through an OR statement   
+
+	// In this case we won't be using PORTD0 but we still want it set to input with pull-ups enabled
+    DDRD  &= ~(1 << DDD0);      // Set PD0 to input. We "and-not" a 1 with bit DDD0 of the Port D Data Direction Register. This sets it to Zero, which means, input. 
+    PORTD |=  (1 << PD0);       // Set input pullups on. We accomplish this by writing a 1 to the PD0 bit of the PORTD register. 
+	
 #endif
 
     // For good measure, make sure interrupt is off

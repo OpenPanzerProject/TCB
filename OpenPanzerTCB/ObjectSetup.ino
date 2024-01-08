@@ -695,5 +695,75 @@ void SetupPins()
     pinMode(pin_MechRecoilMotor, OUTPUT);   // Output   - Transistor for Asiatam, Tamiya or similar mechanical recoil units
     // Also NPN, logic low is off
     digitalWrite(pin_MechRecoilMotor, LOW);
-    
+
+// Unconnected Pins - set to Input with internal Pullups enabled
+                                    // A Port dedicated to servos
+    pinMode(12, INPUT_PULLUP);      // B6
+    pinMode(30, INPUT_PULLUP);      // C7   
+    pinMode(31, INPUT_PULLUP);      // C6
+    pinMode(32, INPUT_PULLUP);      // C5   (C4 / Pin 33 is used for the Fight/Repair switch)
+    pinMode(34, INPUT_PULLUP);      // C3
+    pinMode(35, INPUT_PULLUP);      // C2
+    pinMode(36, INPUT_PULLUP);      // C1
+    pinMode(37, INPUT_PULLUP);      // C0
+    pinMode(38, INPUT_PULLUP);      // D7         
+                                    // E Port taken care of
+  //pinMode(A0, INPUT_PULLUP);      // F0 - we set this one after we have used it for randomSeed in void setup()
+    pinMode(A1, INPUT_PULLUP);      // F1
+    pinMode(A2, INPUT_PULLUP);      // F2    
+    pinMode(A7, INPUT_PULLUP);      // F7
+    pinMode(40, INPUT_PULLUP);      // G1
+    pinMode(39, INPUT_PULLUP);      // G2
+                                    // H Port taken care of
+                                    // I Port - doesn't exis
+                                    // J Port taken care of
+    pinMode(A13, INPUT_PULLUP);     // K5         
+    pinMode(42, INPUT_PULLUP);      // L7
+    pinMode(47, INPUT_PULLUP);      // L2
+    pinMode(48, INPUT_PULLUP);      // L1
+    pinMode(49, INPUT_PULLUP);      // L0
+                                    // AREF pin is not connected to anything either, which is correct because we are not using it. There is no setup needed for it. 
+
+    // Unused MG pin (depends on if this is the DIY version or not)
+    // This takes care of either D1 or E2 (the other one will be the MG pin and is taken care of above)
+    UNUSED_MG_DDR  &= ~(1 << UNUSED_MG_PIN);  // Input - unusued machine gun pin, we "and-not" the data direction register slot with a 1 to set it to 0, this makes it an input
+    UNUSED_MG_PORT |=  (1 << UNUSED_MG_PIN);  // When we write a 1 to the port pin after it has been set to input, that connects the internal pull-up resistor
+
+    // D0 and E6 are taken care of in OP_Tank::begin() in OP_Tank.cpp
+
+    // These are the remaining pins that are always unused regardless of version and which can't be access via Arduino names
+    // Port D unused
+        DDRD  &= ~(1 << DDD4);
+        DDRD  &= ~(1 << DDD5);
+        DDRD  &= ~(1 << DDD6);
+            PORTD |=  (1 << PD4);
+            PORTD |=  (1 << PD5);
+            PORTD |=  (1 << PD6);        
+    // Port E unusued
+        DDRE  &= ~(1 << DDE7);
+            PORTE |=  (1 << PE7);   
+    // Port G unusued
+        DDRG  &= ~(1 << DDG3);
+        DDRG  &= ~(1 << DDG4);        
+            PORTG |=  (1 << PG3);    
+            PORTG |=  (1 << PG4);   
+    // Port H unusued
+        DDRH  &= ~(1 << DDH2);    
+        DDRH  &= ~(1 << DDH7);
+            PORTH |=  (1 << PH2);         
+            PORTH |=  (1 << PH7); 
+    // Port J unused 
+        DDRJ  &= ~(1 << DDJ2);
+        DDRJ  &= ~(1 << DDJ3);
+        DDRJ  &= ~(1 << DDJ4);   
+        DDRJ  &= ~(1 << DDJ5);
+        DDRJ  &= ~(1 << DDJ6);
+        DDRJ  &= ~(1 << DDJ7);
+            PORTJ |=  (1 << PJ2);    
+            PORTJ |=  (1 << PJ3); 
+            PORTJ |=  (1 << PJ4); 
+            PORTJ |=  (1 << PJ5); 
+            PORTJ |=  (1 << PJ6); 
+            PORTJ |=  (1 << PJ7); 
+      
 }
