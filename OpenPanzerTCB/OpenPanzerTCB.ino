@@ -238,12 +238,14 @@ void setup()
         SetupTimer1();
         SetupTimer4();
         SetupTimer5();
+
         
     // PINS NOT RELATED TO OBJECTS - SETUP
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
         // We want to setup the pins as early as possible to put all outputs in a safe state. But remember to read EEPROM first because some EEPROM settings will determine how the pins are set. 
         SetupPins();                                               // Any pin not explicitly set by a library gets initalized here. 
         RedLedOn();                                                // Keep the Red LED on solid until we are out of setup. 
+
         
     // BUTTON CHECK
     // -------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -279,11 +281,13 @@ void setup()
                 break;
             }
         } while (InputButton.isPressed());
+
         
     // MOTOR OBJECTS
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
         TankServos.begin();                             // Do this before setting up motor objects
         InstantiateMotorObjects();
+
 
     // OTHER OBJECTS - BEGIN
     // -------------------------------------------------------------------------------------------------------------------------------------------------->    
@@ -296,9 +300,44 @@ void setup()
         SetDrivingProfile(DrivingProfile);              // See Driving tab
         InstantiateSoundObject();                       // Do this after TankServos.begin();
         InstantiateOptionalServoOutputs();              // Do this after InstantiateSoundObject();
+            
+
+    // LIGHTS
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->            
+        RunningLightsDimLevel = map(eeprom.ramcopy.RunningLightsDimLevelPct, 0, 100, 0, 255);   // The user sets the dim level as a percent from 0-100, but we want it as a PWM value from 0-255
+        if (eeprom.ramcopy.RunningLightsAlwaysOn) RunningLightsOn();                            // If they want the running lights always on, turn them on
+        
+        // Sanity check - we do not permit the flicker lights during engine start effect to be active if the user has selected separate heat and fan outputs on the smoker. 
+        // The reason being that both will want to use the Aux output, but we prioritize it for the smoker fan. 
+        if (eeprom.ramcopy.SmokerDeviceType == SMOKERTYPE_ONBOARD_SEPARATE && eeprom.ramcopy.FlickerLightsOnEngineStart)
+        {
+            eeprom.ramcopy.FlickerLightsOnEngineStart = false;                                  // Undo the effect in RAM.
+            EEPROM.updateByte(offsetof(_eeprom_data, FlickerLightsOnEngineStart), false);       // But change it in EEPROM too so this doesn't happen again next time.
+        }
+
+        // Sanity check - we do not permit the auto-flash of the Aux output on canon fire if the user has selected separate heat and fan outputs on the smoker.
+        // The reason being that both will want to use the Aux output, but we prioritize it for the smoker fan
+        // This sanity check needs to be run prior to Tank.begin below, where we pass the AuxFlashWithCannon setting that might get disabled here. 
+        if (eeprom.ramcopy.SmokerDeviceType == SMOKERTYPE_ONBOARD_SEPARATE && eeprom.ramcopy.AuxFlashWithCannon)
+        {
+            eeprom.ramcopy.AuxFlashWithCannon = false;                                          // Undo the effect in RAM.
+            EEPROM.updateByte(offsetof(_eeprom_data, AuxFlashWithCannon), false);               // But change it in EEPROM too so this doesn't happen again next time.
+        }
+
+        // Sanity check - even if we are not using separate heat and fan (and therefore, the Aux output is available for other uses), we must avoid conflicts between 
+        // "Auto-Flash with Canon" and "Flicker on Engine Start." We prioritize the former.
+        if (eeprom.ramcopy.AuxFlashWithCannon && eeprom.ramcopy.FlickerLightsOnEngineStart)
+        {
+            eeprom.ramcopy.FlickerLightsOnEngineStart = false;                                  // Undo the non-prioritized effect in RAM.
+            EEPROM.updateByte(offsetof(_eeprom_data, FlickerLightsOnEngineStart), false);       // But change it in EEPROM too so this doesn't happen again next time.
+        }           
+
+
+    // TANK OBJECT
+    // -------------------------------------------------------------------------------------------------------------------------------------------------->         
         // The tank object needs to be told whether IR is enabled, the weight class and settings, the IR and Damage protocols to use, whether or not the tank is a repair tank or battle, 
-        // whether we are running an airsoft unit or mechanical recoil, the mechanical recoil delay, the machine gun blink interval, 
-        // and it also needs a pointer to our Servo_RECOIL object and the TankSound object. RecoilServo is already a pointer, but TankSound we pass by reference.
+        // whether we are running an airsoft unit or mechanical recoil, the mechanical recoil delay, settings related to the High Intensity Flash and if we want the Aux output to flash on canon fire, 
+        // the machine gun blink interval, and it also needs a pointer to our Servo_RECOIL object and the TankSound object.
         // First fill a temp battle_seetings struct
         battle_settings BattleSettings;
         BattleSettings.WeightClass = GetWeightClass();  // This is set by the user via dip-switch
@@ -367,20 +406,6 @@ void setup()
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEngine, VC_ENGINE);
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeEffects, VC_EFFECTS);
         TankSound->setRelativeVolume(eeprom.ramcopy.VolumeTrackOverlay, VC_TRACK_OVERLAY);
-            
-
-    // LIGHTS
-    // -------------------------------------------------------------------------------------------------------------------------------------------------->            
-        RunningLightsDimLevel = map(eeprom.ramcopy.RunningLightsDimLevelPct, 0, 100, 0, 255);   // The user sets the dim level as a percent from 0-100, but we want it as a PWM value from 0-255
-        if (eeprom.ramcopy.RunningLightsAlwaysOn) RunningLightsOn();
-        
-        // Sanity check - we do not permit the flicker lights during engine start effect to be active if the user has selected separate heat and fan outputs on the smoker. 
-        // The reason being that both will want to use the Aux output, but we prioritize it for the smoker fan. 
-        if (eeprom.ramcopy.SmokerDeviceType == SMOKERTYPE_ONBOARD_SEPARATE && eeprom.ramcopy.FlickerLightsOnEngineStart)
-        {
-            eeprom.ramcopy.FlickerLightsOnEngineStart = false;                                  // Undo the effect in RAM.
-            EEPROM.updateByte(offsetof(_eeprom_data, FlickerLightsOnEngineStart), false);       // But change it in EEPROM too so this doesn't happen again next time.
-        }
 
              
     // WAIT FOR PC COMM - AND TRY TO DETECT RECEIVER (kill two birds with one stone)
