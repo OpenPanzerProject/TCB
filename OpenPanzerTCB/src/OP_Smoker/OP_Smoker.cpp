@@ -80,6 +80,9 @@ void OP_Smoker::begin(void)
 		
     // Reversed - no
         reversed = false;
+		
+	// Initialized to zero speed
+		curspeed = 0;
 
     switch (SmokerType)
     {
