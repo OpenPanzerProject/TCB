@@ -177,11 +177,10 @@ void Smoker_ManualOff()
 
 void Smoker_ManualToggle()
 {   
-    if (eeprom.ramcopy.SmokerControlAuto == false)
+    // We don't want to toggle this one with the ForceTriggersOnFirstPass. 
+    if (eeprom.ramcopy.SmokerControlAuto == false && ForceTriggersOnFirstPass == false)
     {   
         if (Smoker->getSpeed() > 0)  Smoker->setSpeed(0);
         else                         Smoker->setSpeed(MOTOR_MAX_FWDSPEED);
     }
 }
-
-
