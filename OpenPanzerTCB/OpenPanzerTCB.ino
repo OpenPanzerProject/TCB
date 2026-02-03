@@ -1342,6 +1342,7 @@ if (Startup)
         switch (HitType)
         {
             case HIT_TYPE_CANNON: 
+                if (eeprom.ramcopy.EnableTrackRecoil_IRHit) { StartTrackRecoil(); }  // If track recoil on IR-hit is enabled, perform track recoil (function will check to see if we are stopped, otherwise nothing will happen)
                 if (DEBUG) 
                 { 
                     DebugSerial->print(F("CANNON HIT! (")); 

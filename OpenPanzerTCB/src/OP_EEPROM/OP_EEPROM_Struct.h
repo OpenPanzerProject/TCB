@@ -121,6 +121,7 @@ struct _eeprom_data {
     boolean EnableTrackRecoil;                 // Track recoil enabled true/false
     uint8_t TrackRecoilKickbackSpeed;          // Initial motor kickback speed as percent 0-100
     uint8_t TrackRecoilDecelerateFactor; 	   // Deceleration factor applied to the original kick-back speed, or, in simple mode this becomes the recoil duration in mS	
+	boolean EnableTrackRecoil_IRHit;		   // Track recoil also occurs when IR hit received
 
 // IMU Physics
     boolean EnableBarrelStabilize;             // If an accelerometer is present, and turret elevation motor is type SERVO_PAN, this will stabilize the barrel

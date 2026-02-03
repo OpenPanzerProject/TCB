@@ -8,7 +8,7 @@
 //=======================================================================================================================================>>
 // You must make sure this number equals the number of variables defined in the __eeprom_data struct (including the unused FirstVar)
 // 
-    #define NUM_STORED_VARS         333
+    #define NUM_STORED_VARS         334
 
 // THIS NUMBER CAN BE CALCULATED BY THE EXCEL REFERENCE SHEET - AS CAN THE ENTIRE PROGMEM STATEMENT BELOW
 // Don't bother trying to do it by hand!
@@ -312,77 +312,78 @@ const _storage_var_info STORAGEVARS[NUM_STORED_VARS] PROGMEM_FAR = {
     {2439, 375, varBOOL},        // EnableTrackRecoil
     {2440, 376, varUINT8},        // TrackRecoilKickbackSpeed
     {2441, 377, varUINT8},        // TrackRecoilDecelerateFactor
-    {2511, 378, varBOOL},        // EnableBarrelStabilize
-    {2512, 379, varUINT8},        // BarrelSensitivity
-    {2513, 380, varBOOL},        // EnableHillPhysics
-    {2514, 381, varUINT8},        // HillSensitivity
-    {2711, 382, varINT16},        // IgnoreTurretDelay_mS
-    {2811, 384, varUINT8},        // SoundDevice
-    {2812, 385, varUINT16},        // Squeak1_MinInterval_mS
-    {2813, 387, varUINT16},        // Squeak1_MaxInterval_mS
-    {2814, 389, varUINT16},        // Squeak2_MinInterval_mS
-    {2815, 391, varUINT16},        // Squeak2_MaxInterval_mS
-    {2816, 393, varUINT16},        // Squeak3_MinInterval_mS
-    {2817, 395, varUINT16},        // Squeak3_MaxInterval_mS
-    {2818, 397, varBOOL},        // Squeak1_Enabled
-    {2819, 398, varBOOL},        // Squeak2_Enabled
-    {2820, 399, varBOOL},        // Squeak3_Enabled
-    {2821, 400, varUINT8},        // MinSqueakSpeed
-    {2822, 401, varBOOL},        // HeadlightSound_Enabled
-    {2823, 402, varBOOL},        // TurretSound_Enabled
-    {2824, 403, varBOOL},        // BarrelSound_Enabled
-    {2825, 404, varUINT16},        // Squeak4_MinInterval_mS
-    {2826, 406, varUINT16},        // Squeak4_MaxInterval_mS
-    {2827, 408, varUINT16},        // Squeak5_MinInterval_mS
-    {2828, 410, varUINT16},        // Squeak5_MaxInterval_mS
-    {2829, 412, varUINT16},        // Squeak6_MinInterval_mS
-    {2830, 414, varUINT16},        // Squeak6_MaxInterval_mS
-    {2831, 416, varBOOL},        // Squeak4_Enabled
-    {2832, 417, varBOOL},        // Squeak5_Enabled
-    {2833, 418, varBOOL},        // Squeak6_Enabled
-    {2834, 419, varUINT8},        // VolumeEngine
-    {2835, 420, varUINT8},        // VolumeTrackOverlay
-    {2836, 421, varUINT8},        // VolumeEffects
-    {2837, 422, varBOOL},        // HeadlightSound2_Enabled
-    {2838, 423, varBOOL},        // SoundBankA_Loop
-    {2839, 424, varBOOL},        // SoundBankB_Loop
-    {3011, 425, varUINT8},        // IR_FireProtocol
-    {3012, 426, varUINT8},        // IR_HitProtocol_2
-    {3013, 427, varUINT8},        // IR_RepairProtocol
-    {3014, 428, varUINT8},        // IR_MGProtocol
-    {3015, 429, varBOOL},        // Use_MG_Protocol
-    {3016, 430, varBOOL},        // Accept_MG_Damage
-    {3017, 431, varUINT8},        // DamageProfile
-    {3018, 432, varUINT16},        // CustomClassSettings.reloadTime
-    {3019, 434, varUINT16},        // CustomClassSettings.recoveryTime
-    {3020, 436, varUINT8},        // CustomClassSettings.maxHits
-    {3021, 437, varUINT8},        // CustomClassSettings.maxMGHits
-    {3022, 438, varBOOL},        // SendTankID
-    {3023, 439, varUINT16},        // TankID
-    {3024, 441, varUINT8},        // IR_Team
-    {3211, 442, varUINT32},        // USBSerialBaud
-    {3212, 446, varUINT32},        // AuxSerialBaud
-    {3213, 450, varUINT32},        // MotorSerialBaud
-    {3214, 454, varUINT32},        // Serial3TxBaud
-    {3215, 458, varBOOL},        // LVC_Enabled
-    {3216, 459, varUINT16},        // LVC_Cutoff_mV
-    {3411, 461, varBOOL},        // RunningLightsAlwaysOn
-    {3412, 462, varUINT8},        // RunningLightsDimLevelPct
-    {3413, 463, varBOOL},        // BrakesAutoOnAtStop
-    {3414, 464, varUINT16},        // AuxLightFlashTime_mS
-    {3415, 466, varUINT16},        // AuxLightBlinkOnTime_mS
-    {3416, 468, varUINT16},        // AuxLightBlinkOffTime_mS
-    {3417, 470, varUINT8},        // AuxLightPresetDim
-    {3418, 471, varUINT8},        // MGLightBlink_mS
-    {3419, 472, varBOOL},        // FlashLightsWhenSignalLost
-    {3420, 473, varBOOL},        // HiFlashWithCannon
-    {3421, 474, varBOOL},        // AuxFlashWithCannon
-    {3422, 475, varUINT8},        // SecondMGLightBlink_mS
-    {3423, 476, varBOOL},        // CannonReloadBlink
-    {3424, 477, varBOOL},        // FlickerLightsOnEngineStart
-    {3611, 478, varUINT8},        // ScoutCurrentLimit
-    {9011, 479, varBOOL},        // PrintDebug
-    {9999, 480, varUINT32}        // InitStamp
+    {2442, 378, varBOOL},        // EnableTrackRecoil_IRHit
+    {2511, 379, varBOOL},        // EnableBarrelStabilize
+    {2512, 380, varUINT8},        // BarrelSensitivity
+    {2513, 381, varBOOL},        // EnableHillPhysics
+    {2514, 382, varUINT8},        // HillSensitivity
+    {2711, 383, varINT16},        // IgnoreTurretDelay_mS
+    {2811, 385, varUINT8},        // SoundDevice
+    {2812, 386, varUINT16},        // Squeak1_MinInterval_mS
+    {2813, 388, varUINT16},        // Squeak1_MaxInterval_mS
+    {2814, 390, varUINT16},        // Squeak2_MinInterval_mS
+    {2815, 392, varUINT16},        // Squeak2_MaxInterval_mS
+    {2816, 394, varUINT16},        // Squeak3_MinInterval_mS
+    {2817, 396, varUINT16},        // Squeak3_MaxInterval_mS
+    {2818, 398, varBOOL},        // Squeak1_Enabled
+    {2819, 399, varBOOL},        // Squeak2_Enabled
+    {2820, 400, varBOOL},        // Squeak3_Enabled
+    {2821, 401, varUINT8},        // MinSqueakSpeed
+    {2822, 402, varBOOL},        // HeadlightSound_Enabled
+    {2823, 403, varBOOL},        // TurretSound_Enabled
+    {2824, 404, varBOOL},        // BarrelSound_Enabled
+    {2825, 405, varUINT16},        // Squeak4_MinInterval_mS
+    {2826, 407, varUINT16},        // Squeak4_MaxInterval_mS
+    {2827, 409, varUINT16},        // Squeak5_MinInterval_mS
+    {2828, 411, varUINT16},        // Squeak5_MaxInterval_mS
+    {2829, 413, varUINT16},        // Squeak6_MinInterval_mS
+    {2830, 415, varUINT16},        // Squeak6_MaxInterval_mS
+    {2831, 417, varBOOL},        // Squeak4_Enabled
+    {2832, 418, varBOOL},        // Squeak5_Enabled
+    {2833, 419, varBOOL},        // Squeak6_Enabled
+    {2834, 420, varUINT8},        // VolumeEngine
+    {2835, 421, varUINT8},        // VolumeTrackOverlay
+    {2836, 422, varUINT8},        // VolumeEffects
+    {2837, 423, varBOOL},        // HeadlightSound2_Enabled
+    {2838, 424, varBOOL},        // SoundBankA_Loop
+    {2839, 425, varBOOL},        // SoundBankB_Loop
+    {3011, 426, varUINT8},        // IR_FireProtocol
+    {3012, 427, varUINT8},        // IR_HitProtocol_2
+    {3013, 428, varUINT8},        // IR_RepairProtocol
+    {3014, 429, varUINT8},        // IR_MGProtocol
+    {3015, 430, varBOOL},        // Use_MG_Protocol
+    {3016, 431, varBOOL},        // Accept_MG_Damage
+    {3017, 432, varUINT8},        // DamageProfile
+    {3018, 433, varUINT16},        // CustomClassSettings.reloadTime
+    {3019, 435, varUINT16},        // CustomClassSettings.recoveryTime
+    {3020, 437, varUINT8},        // CustomClassSettings.maxHits
+    {3021, 438, varUINT8},        // CustomClassSettings.maxMGHits
+    {3022, 439, varBOOL},        // SendTankID
+    {3023, 440, varUINT16},        // TankID
+    {3024, 442, varUINT8},        // IR_Team
+    {3211, 443, varUINT32},        // USBSerialBaud
+    {3212, 447, varUINT32},        // AuxSerialBaud
+    {3213, 451, varUINT32},        // MotorSerialBaud
+    {3214, 455, varUINT32},        // Serial3TxBaud
+    {3215, 459, varBOOL},        // LVC_Enabled
+    {3216, 460, varUINT16},        // LVC_Cutoff_mV
+    {3411, 462, varBOOL},        // RunningLightsAlwaysOn
+    {3412, 463, varUINT8},        // RunningLightsDimLevelPct
+    {3413, 464, varBOOL},        // BrakesAutoOnAtStop
+    {3414, 465, varUINT16},        // AuxLightFlashTime_mS
+    {3415, 467, varUINT16},        // AuxLightBlinkOnTime_mS
+    {3416, 469, varUINT16},        // AuxLightBlinkOffTime_mS
+    {3417, 471, varUINT8},        // AuxLightPresetDim
+    {3418, 472, varUINT8},        // MGLightBlink_mS
+    {3419, 473, varBOOL},        // FlashLightsWhenSignalLost
+    {3420, 474, varBOOL},        // HiFlashWithCannon
+    {3421, 475, varBOOL},        // AuxFlashWithCannon
+    {3422, 476, varUINT8},        // SecondMGLightBlink_mS
+    {3423, 477, varBOOL},        // CannonReloadBlink
+    {3424, 478, varBOOL},        // FlickerLightsOnEngineStart
+    {3611, 479, varUINT8},        // ScoutCurrentLimit
+    {9011, 480, varBOOL},        // PrintDebug
+    {9999, 481, varUINT32}        // InitStamp
 };
 
 
