@@ -290,7 +290,7 @@ void OP_Smoker::stop(void)
 
 void OP_Smoker::preHeat(void)
 {
-    // Here we turn the heating element to full on
+    // Here we turn the heating element to full on (or max allowed)
     clearSmokerEffect();                    // Clear any special effect - they only run when manual commands are not being given
 
     switch (SmokerType)
@@ -300,9 +300,9 @@ void OP_Smoker::preHeat(void)
             break;
         
         case SMOKERTYPE_ONBOARD_SEPARATE:
-            // Set the heater to full on
-            OB_SMOKER_OCR = MOTOR_MAX_FWDSPEED; // Heat- Smoker output (OB_SMOKER_OCR is defined in OP_Settings.h)
-            curheat = MOTOR_MAX_FWDSPEED;   // Heat - level
+            // Set the heater to max level		
+			OB_SMOKER_OCR = this->i_maxheat;	// Heat- Smoker output (OB_SMOKER_OCR is defined in OP_Settings.h)
+			curheat = this->i_maxheat;			// Heat - level
             break;
             
         case SMOKERTYPE_SERIAL:
@@ -433,20 +433,20 @@ void OP_Smoker::update(boolean engaged)
 						LastUpdate_mS = millis();               // Save the time   						
 					}
 					else
-					{	
-						if (SmokerType == SMOKERTYPE_ONBOARD_SEPARATE) fullOn = AUX_PWM_TOP; 
-						else										   fullOn = MOTOR_MAX_FWDSPEED;
-						
+					{	// Here we get the appropriate max speed for the fan, depending on whether it's on the aux port (separate heat/fan), or the smoker port (combined heat/fan)
+						if (SmokerType == SMOKERTYPE_ONBOARD_SEPARATE) fullOn = AUX_PWM_TOP; 				// 1023
+						else										   fullOn = MOTOR_MAX_FWDSPEED;			// 255
+
 						switch (curStep)
-						{
-							case 0:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on	- in all cases heater is at max
-							case 1:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off
-							case 2:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on
-							case 3:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off
-							case 4:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on
-							case 5:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off							
-							case 6:		setSpeed_Absolutes(fullOn, e_maxspeed);		UpdateInterval = 250; 	break;		// Fan on
-							case 7:		setSpeed_Absolutes(0, e_maxspeed);			UpdateInterval = 180; 	break;		// Fan off								
+						{			 // setSpeed_Absolutes(fan, heat) - if smoker type is combined, only fan value will be used for both, and heat level ignored
+							case 0:		setSpeed_Absolutes(fullOn, this->i_maxheat);	UpdateInterval = 250; 	break;		// Fan on	- in all cases heater is at max allowabled (this->i_maxheat, which is the greatest of HeatAmtIdle, HeatAmtFastIdle, or HeatAmtMax)
+							case 1:		setSpeed_Absolutes(0,      this->i_maxheat);	UpdateInterval = 180; 	break;		// Fan off
+							case 2:		setSpeed_Absolutes(fullOn, this->i_maxheat);	UpdateInterval = 250; 	break;		// Fan on
+							case 3:		setSpeed_Absolutes(0,      this->i_maxheat);	UpdateInterval = 180; 	break;		// Fan off
+							case 4:		setSpeed_Absolutes(fullOn, this->i_maxheat);	UpdateInterval = 250; 	break;		// Fan on
+							case 5:		setSpeed_Absolutes(0,      this->i_maxheat);	UpdateInterval = 180; 	break;		// Fan off							
+							case 6:		setSpeed_Absolutes(fullOn, this->i_maxheat);	UpdateInterval = 250; 	break;		// Fan on
+							case 7:		setSpeed_Absolutes(0,      this->i_maxheat);	UpdateInterval = 180; 	break;		// Fan off								
 						}
 						curStep += 1; 						// Increment step
 					}
